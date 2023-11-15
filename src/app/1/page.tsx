@@ -1,5 +1,6 @@
 "use client";
 
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
 import {
   CalendarIcon,
@@ -8,8 +9,8 @@ import {
   CopyCheckIcon,
   HomeIcon,
   LayoutListIcon,
+  MoreHorizontalIcon,
   PencilIcon,
-  Trash,
   TrashIcon,
 } from "lucide-react";
 import { Inter } from "next/font/google";
@@ -37,10 +38,16 @@ const Home: React.FC = () => {
     setTasks((t) => t.filter((t, index) => index !== i));
   };
 
+  const focusInput = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "k" && inputRef.current) {
-        inputRef.current.focus();
+      if (e.metaKey && e.key === "k") {
+        focusInput();
       }
     };
 
@@ -111,21 +118,26 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 m-5 flex h-14 w-[350px] max-w-[95%] items-center justify-center rounded-full bg-neutral-900 shadow-lg shadow-neutral-800/20  ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
-          <form onSubmit={handleAddTask} className="w-full">
-            <input
-              ref={inputRef}
-              className="h-[95%] w-full bg-transparent pl-5 pr-2  text-neutral-200 focus:outline-none"
-              placeholder="タスクを入力してください..."
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-            />
-          </form>
-          <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
-            <div className="flex items-center text-neutral-50">
-              <CommandIcon size={15} />
-              <div className="text-sm">K</div>
+        <div className="absolute bottom-0 m-5 flex max-w-[95%] items-start gap-2">
+          <div className="flex h-14 w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
+            <form onSubmit={handleAddTask} className="h-full w-full">
+              <input
+                ref={inputRef}
+                className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 focus:outline-none"
+                placeholder="タスクを入力してください..."
+                value={task}
+                onChange={(e) => setTask(e.target.value)}
+              />
+            </form>
+            <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
+              <div className="flex items-center text-neutral-50">
+                <CommandIcon size={15} />
+                <div className="select-none text-sm">K</div>
+              </div>
             </div>
+          </div>
+          <div className="shrink-0">
+            <Menu />
           </div>
         </div>
       </div>
@@ -145,7 +157,7 @@ const SideBarItem: React.FC<{ children: ReactNode; icon: ReactNode; active?: boo
       className={clsx(
         "flex w-full items-center justify-start gap-2 rounded p-3 transition-all duration-200",
         { "pointer-events-none bg-neutral-100 text-neutral-700": active },
-        { "text-neutral-100 hover:bg-white/10": !active },
+        { "text-neutral-100 hover:bg-white/20": !active },
       )}
     >
       {icon}
@@ -162,5 +174,38 @@ const TaskItemButton: React.FC<{ icon: ReactNode; onClick?: () => void }> = ({ i
     >
       {icon}
     </button>
+  );
+};
+
+const Menu: React.FC = () => {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 hover:bg-neutral-700 focus:outline-none">
+          <MoreHorizontalIcon size="60%" />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="data-[state=open]:animate-popoverEnter data-[state=closed]:animate-popoverExit min-w-[300px] origin-[100%_100%] rounded-lg bg-neutral-900 p-3 transition-all duration-200"
+          sideOffset={12}
+          side="top"
+          align="end"
+        >
+          <MenuItem icon={<HomeIcon />}>今日のタスク</MenuItem>
+          <MenuItem icon={<LayoutListIcon />}>過去のタスク</MenuItem>
+          <MenuItem icon={<CalendarIcon />}>予定</MenuItem>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+};
+
+const MenuItem: React.FC<{ icon: ReactNode; children: ReactNode }> = ({ icon, children }) => {
+  return (
+    <DropdownMenu.Item className="flex cursor-pointer items-center gap-2 rounded p-2 text-sm text-neutral-200 outline-none transition-all duration-200 hover:bg-white/20 hover:outline-none focus:bg-white/20 focus:outline-none">
+      {icon}
+      {children}
+    </DropdownMenu.Item>
   );
 };
