@@ -25,7 +25,7 @@ const Home: React.FC = () => {
   const [tasks, setTasks] = useState([
     {
       id: Math.random(),
-      task: "zero-one-pagesにページを追加する",
+      task: "zero-one-uiにページを追加する",
       checked: false,
     },
     { id: Math.random(), task: "GraphQLの勉強をする", checked: false },

@@ -14,8 +14,8 @@ export default function Home() {
       )}
     >
       <div className="flex flex-col gap-2 text-center text-zinc-200">
-        <h1 className="text-3xl font-bold">Zero one pages</h1>
-        <p className="text-sm text-zinc-400">0から作った画面をまとめる</p>
+        <h1 className="text-3xl font-bold">Zero one ui</h1>
+        <p className="text-sm text-zinc-400">uiを作る</p>
       </div>
       <div className="mt-[80px] flex max-w-[950px] flex-wrap justify-center gap-5">
         {pages.map((p, i) => {
