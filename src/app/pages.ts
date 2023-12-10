@@ -12,4 +12,10 @@ export const pages: Page[] = [
     title: "todoリスト2",
     description: "一覧性を重視したテーブルレイアウトのtodoリスト。",
   },
+  {
+    href: "/3",
+    title: "変形するメニュー",
+    description:
+      "youtubeの設定メニューを見て作りたくなった。位置決めはちゃんとしてない。",
+  },
 ];
