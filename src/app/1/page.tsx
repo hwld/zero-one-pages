@@ -2,6 +2,7 @@
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarIcon,
   CheckIcon,
@@ -22,16 +23,31 @@ const Home: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([
-    "zero-one-pagesにページを追加する",
-    "GraphQLの勉強をする",
-    "OpenAPIを使ってみる",
+    {
+      id: Math.random(),
+      task: "zero-one-pagesにページを追加する",
+      checked: false,
+    },
+    { id: Math.random(), task: "GraphQLの勉強をする", checked: false },
+    { id: Math.random(), task: "OpenAPIを使ってみる", checked: false },
   ]);
 
   const handleAddTask = (e: SyntheticEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setTasks((t) => [...t, task]);
+    setTasks((t) => [...t, { id: Math.random(), task, checked: false }]);
     setTask("");
+  };
+
+  const handleChangeChecked = (id: number) => {
+    setTasks((tasks) =>
+      tasks.map((t) => {
+        if (t.id === id) {
+          return { ...t, checked: !t.checked };
+        }
+        return t;
+      }),
+    );
   };
 
   const handleDeleteTask = (i: number) => {
@@ -84,21 +100,40 @@ const Home: React.FC = () => {
               <div>今日のタスク</div>
             </h1>
             <div className="flex flex-col gap-2">
-              {tasks.map((task, i) => {
+              {tasks.map(({ id, task, checked }, i) => {
                 return (
                   <div
                     key={i}
                     className="just flex w-full items-center justify-between rounded-md border-2 border-neutral-300 bg-neutral-100 p-2 text-neutral-700"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="relative flex h-[30px] w-[30px] shrink-0 cursor-pointer items-center justify-center">
+                      <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
                         <input
                           id={`todo-${i}`}
                           type="checkbox"
-                          className="peer absolute h-[30px] w-[30px] appearance-none rounded border-2 border-neutral-300"
+                          className="peer absolute h-[25px] w-[25px] appearance-none rounded-full border-2 border-neutral-300"
+                          checked={checked}
+                          onChange={() => handleChangeChecked(id)}
                         ></input>
-                        <div className="pointer-events-none absolute inset-[0.25rem] flex origin-[50%_70%] scale-0 items-center  justify-center rounded bg-neutral-700 text-neutral-100 transition-all duration-200 ease-in-out peer-checked:scale-100">
-                          <CheckIcon strokeWidth={3} />
+                        <AnimatePresence>
+                          {checked && (
+                            <motion.div
+                              className="absolute inset-0 rounded-full bg-neutral-900"
+                              initial={{ scale: 0, opacity: 1 }}
+                              animate={{
+                                scale: 1.4,
+                                opacity: 0,
+                              }}
+                            />
+                          )}
+                        </AnimatePresence>
+                        <div
+                          className={clsx(
+                            "pointer-events-none absolute inset-0 flex origin-[50%_70%] items-center  justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 ease-in-out",
+                            checked ? "opacity-100" : "opacity-0",
+                          )}
+                        >
+                          <CheckIcon size="80%" />
                         </div>
                       </div>
                       <label
@@ -110,7 +145,10 @@ const Home: React.FC = () => {
                     </div>
                     <div className="flex gap-1">
                       <TaskItemButton icon={<PencilIcon />} />
-                      <TaskItemButton onClick={() => handleDeleteTask(i)} icon={<TrashIcon />} />
+                      <TaskItemButton
+                        onClick={() => handleDeleteTask(i)}
+                        icon={<TrashIcon />}
+                      />
                     </div>
                   </div>
                 );
@@ -119,7 +157,7 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="absolute bottom-0 m-5 flex max-w-[95%] items-start gap-2">
-          <div className="flex h-14 w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
+          <div className="flex h-[50px] w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
             <form onSubmit={handleAddTask} className="h-full w-full">
               <input
                 ref={inputRef}
@@ -147,11 +185,11 @@ const Home: React.FC = () => {
 
 export default Home;
 
-const SideBarItem: React.FC<{ children: ReactNode; icon: ReactNode; active?: boolean }> = ({
-  children,
-  icon,
-  active,
-}) => {
+const SideBarItem: React.FC<{
+  children: ReactNode;
+  icon: ReactNode;
+  active?: boolean;
+}> = ({ children, icon, active }) => {
   return (
     <button
       className={clsx(
@@ -166,7 +204,10 @@ const SideBarItem: React.FC<{ children: ReactNode; icon: ReactNode; active?: boo
   );
 };
 
-const TaskItemButton: React.FC<{ icon: ReactNode; onClick?: () => void }> = ({ icon, onClick }) => {
+const TaskItemButton: React.FC<{ icon: ReactNode; onClick?: () => void }> = ({
+  icon,
+  onClick,
+}) => {
   return (
     <button
       onClick={onClick}
@@ -187,7 +228,7 @@ const Menu: React.FC = () => {
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="data-[state=open]:animate-popoverEnter data-[state=closed]:animate-popoverExit min-w-[300px] origin-[100%_100%] rounded-lg bg-neutral-900 p-3 transition-all duration-200"
+          className="min-w-[300px] origin-[100%_100%] rounded-lg bg-neutral-900 p-3 transition-all duration-200 data-[state=closed]:animate-popoverExit data-[state=open]:animate-popoverEnter"
           sideOffset={12}
           side="top"
           align="end"
@@ -201,7 +242,10 @@ const Menu: React.FC = () => {
   );
 };
 
-const MenuItem: React.FC<{ icon: ReactNode; children: ReactNode }> = ({ icon, children }) => {
+const MenuItem: React.FC<{ icon: ReactNode; children: ReactNode }> = ({
+  icon,
+  children,
+}) => {
   return (
     <DropdownMenu.Item className="flex cursor-pointer items-center gap-2 rounded p-2 text-sm text-neutral-200 outline-none transition-all duration-200 hover:bg-white/20 hover:outline-none focus:bg-white/20 focus:outline-none">
       {icon}
