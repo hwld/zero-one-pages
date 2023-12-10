@@ -7,4 +7,9 @@ export const pages: Page[] = [
     description:
       "画面下にあるinput周りのコンポーネントが好き。結構時間かかった。",
   },
+  {
+    href: "/2",
+    title: "todoリスト2",
+    description: "一覧性を重視したテーブルレイアウトのtodoリスト。",
+  },
 ];
