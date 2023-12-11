@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.26.4",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@tabler/icons-react": "^2.43.0",
     "clsx": "^2.0.0",

@@ -15,7 +15,6 @@ export const pages: Page[] = [
   {
     href: "/3",
     title: "変形するメニュー",
-    description:
-      "youtubeの設定メニューを見て作りたくなった。位置決めはちゃんとしてない。",
+    description: "youtubeの設定メニューを見て作りたくなったので作った。",
   },
 ];
