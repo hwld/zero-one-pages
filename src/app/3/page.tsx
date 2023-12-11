@@ -8,10 +8,18 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   LaughIcon,
+  LayoutGrid,
   LucideIcon,
 } from "lucide-react";
 import { NextPage } from "next";
-import { ComponentPropsWithoutRef, ReactNode, useMemo, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  forwardRef,
+  useMemo,
+  useState,
+} from "react";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
 const Page: NextPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,17 +29,10 @@ const Page: NextPage = () => {
   );
   const slimMenu = [...new Array(8)].map((_, i) => `メニュー${i + 1}`);
 
-  const handleClickTrigger = () => {
-    if (isOpen && !initial) {
-      setInitial(true);
-    }
-    setIsOpen((prev) => !prev);
-  };
-
   const menuContent = useMemo(() => {
     if (initial) {
       return (
-        <Menu>
+        <Menu key="menu">
           {initialMenu.map((item, i) => {
             return (
               <MenuItem key={i} icon={AnnoyedIcon}>
@@ -44,7 +45,7 @@ const Page: NextPage = () => {
       );
     } else {
       return (
-        <Menu slim>
+        <Menu slim key="menu">
           <BackMenuItem onClick={() => setInitial(true)} />
           {slimMenu.map((item, i) => {
             return (
@@ -61,20 +62,30 @@ const Page: NextPage = () => {
   return (
     <div className="flex h-[100dvh] justify-center bg-neutral-900 pt-[50px] text-neutral-900">
       <div className="relative flex h-[500px] w-[300px] flex-col items-end justify-end gap-3">
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
-            >
-              <LayoutGroup>{menuContent}</LayoutGroup>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-          <MenuTrigger onClick={handleClickTrigger} />
-        </motion.div>
+        <Dropdown.Root open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+          <Dropdown.Trigger asChild>
+            <MenuTrigger />
+          </Dropdown.Trigger>
+          <AnimatePresence>
+            {isOpen && (
+              <Dropdown.Portal forceMount>
+                <Dropdown.Content
+                  sideOffset={10}
+                  side="top"
+                  align="end"
+                  className="text-neutral-900"
+                  forceMount
+                >
+                  {/* 
+                    radix-uiを使うとレイアウトアニメーションが正しく動かない。 
+                    radix-uiのContentがtransformで位置を調節してることに関係してそう？
+                  */}
+                  {menuContent}
+                </Dropdown.Content>
+              </Dropdown.Portal>
+            )}
+          </AnimatePresence>
+        </Dropdown.Root>
       </div>
     </div>
   );
@@ -87,13 +98,14 @@ const Menu: React.FC<{ children?: ReactNode; slim?: boolean }> = ({
   slim,
 }) => {
   return (
-    <div>
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div className="-mb-[1px] h-[8px] w-full rounded-t-lg bg-neutral-200" />
       <motion.div
-        layout
-        className="-mb-[1px] h-[8px] w-full rounded-t-lg bg-neutral-200"
-      />
-      <motion.div
-        layout
         className={clsx(
           "flex flex-col gap-1 overflow-hidden bg-neutral-200 px-3 py-1",
           slim ? "w-[150px]" : "w-[300px]",
@@ -101,11 +113,8 @@ const Menu: React.FC<{ children?: ReactNode; slim?: boolean }> = ({
       >
         {children}
       </motion.div>
-      <motion.div
-        layout
-        className="-mt-[1px] h-[8px] w-full rounded-b-lg bg-neutral-200"
-      />
-    </div>
+      <motion.div className="-mt-[1px] h-[8px] w-full rounded-b-lg bg-neutral-200" />
+    </motion.div>
   );
 };
 
@@ -118,7 +127,6 @@ const MenuItem: React.FC<{
     <motion.button
       layout="preserve-aspect"
       className="flex gap-1 rounded p-2 transition-colors hover:bg-black/10"
-      onLayoutAnimationStart={() => console.log("start")}
       onClick={onClick}
     >
       <Icon />
@@ -127,16 +135,18 @@ const MenuItem: React.FC<{
   );
 };
 
-const MenuTrigger: React.FC<ComponentPropsWithoutRef<"button">> = (props) => {
-  return (
-    <button
-      {...props}
-      className="flex h-[50px] w-[50px] items-center justify-center self-end rounded-full bg-neutral-200 transition-colors hover:bg-neutral-400"
-    >
-      <IconDots />
-    </button>
-  );
-};
+const MenuTrigger: React.FC<ComponentPropsWithoutRef<"button">> =
+  forwardRef<HTMLButtonElement>(function MenuTrigger(props, ref) {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        className="flex h-[50px] w-[50px] items-center justify-center self-end rounded-full bg-neutral-200 transition-colors hover:bg-neutral-400"
+      >
+        <IconDots />
+      </button>
+    );
+  });
 
 const NextMenuItem: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   return (
