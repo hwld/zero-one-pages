@@ -75,7 +75,7 @@ const Home: React.FC = () => {
 
   return (
     <div className={clsx(inter.className, "flex h-[100dvh] bg-neutral-100 ")}>
-      <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
+      <div className="hidden w-[250px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
         <div className="flex items-center gap-2 font-bold text-neutral-100">
           <CopyCheckIcon size={20} />
           todo-list
@@ -104,7 +104,7 @@ const Home: React.FC = () => {
                 return (
                   <div
                     key={i}
-                    className="just flex w-full items-center justify-between rounded-md border-2 border-neutral-300 bg-neutral-100 p-2 text-neutral-700"
+                    className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700"
                   >
                     <div className="flex items-center gap-2">
                       <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
@@ -193,7 +193,7 @@ const SideBarItem: React.FC<{
   return (
     <button
       className={clsx(
-        "flex w-full items-center justify-start gap-2 rounded p-3 transition-all duration-200",
+        "flex w-full items-center justify-start gap-2 rounded p-2 text-sm transition-all duration-200",
         { "pointer-events-none bg-neutral-100 text-neutral-700": active },
         { "text-neutral-100 hover:bg-white/20": !active },
       )}

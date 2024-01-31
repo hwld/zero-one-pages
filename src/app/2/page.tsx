@@ -49,7 +49,7 @@ const Page: NextPage = () => {
     <div
       className={clsx(
         inter.className,
-        "flex min-h-[100dvh] bg-gray-900 text-gray-200",
+        "flex min-h-[100dvh] bg-gray-900 text-gray-300",
       )}
     >
       <div className="sticky top-0 h-[100dvh] pl-5 pt-5">
@@ -62,7 +62,7 @@ const Page: NextPage = () => {
             <h1 className="text-sm">今日のタスク</h1>
           </div>
         </div>
-        <div className="mt-3 flex w-full  grow flex-col gap-2 rounded-lg bg-gray-800 p-3 shadow-2xl">
+        <div className="mt-3 flex w-full  grow flex-col gap-3 rounded-lg bg-gray-800 p-5 shadow-2xl">
           <AddTaskButton onClick={handleAddTask} />
           <TaskTable tasks={tasks} onDeleteTask={handleDeleteTask} />
         </div>
@@ -113,7 +113,7 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
         <IconPlus size={15} />
         <p className="text-[12px]">タスクを追加する</p>
       </div>
-      <div className="flex items-center rounded bg-gray-300 p-1 text-gray-500 transition-colors group-hover:bg-gray-300">
+      <div className="flex items-center rounded bg-gray-300 px-1 py-[2px] text-gray-500 transition-colors group-hover:bg-gray-300">
         <IconCommand size={15} />
         <p className="mt-[1px] text-[12px]">K</p>
       </div>
@@ -124,29 +124,31 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
 type TableProps = { tasks: Task[]; onDeleteTask: (id: string) => void };
 const TaskTable: React.FC<TableProps> = ({ tasks, onDeleteTask }) => {
   return (
-    <table className="table w-full border-collapse border text-left">
-      <thead className="text-xs">
-        <tr>
-          <TableHeader icon={IconClipboardText} text="タスク名" />
-          <TableHeader icon={IconCheckbox} width={80} text="状況" />
-          <TableHeader icon={IconClockHour5} width={200} text="作成日" />
-          <TableHeader icon={IconClockCheck} width={200} text="達成日" />
-          <TableHeader icon={IconGridDots} width={150} text="操作" />
-        </tr>
-      </thead>
-      <tbody>
-        {tasks.length === 0 && <EmptyTableRow />}
-        {tasks.map((task) => {
-          return (
-            <TaskTableRow
-              key={task.id}
-              task={task}
-              onDeleteTask={onDeleteTask}
-            />
-          );
-        })}
-      </tbody>
-    </table>
+    <div className="overflow-auto rounded-md border border-gray-500">
+      <table className="table w-full border-collapse text-left">
+        <thead className="text-xs">
+          <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
+            <TableHeader icon={IconClipboardText} text="タスク名" />
+            <TableHeader icon={IconCheckbox} width={80} text="状況" />
+            <TableHeader icon={IconClockHour5} width={200} text="作成日" />
+            <TableHeader icon={IconClockCheck} width={200} text="達成日" />
+            <TableHeader icon={IconGridDots} width={150} text="操作" />
+          </tr>
+        </thead>
+        <tbody className="[&_tr:last-child]:border-0">
+          {tasks.length === 0 && <EmptyTableRow />}
+          {tasks.map((task) => {
+            return (
+              <TaskTableRow
+                key={task.id}
+                task={task}
+                onDeleteTask={onDeleteTask}
+              />
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -157,11 +159,11 @@ const TableHeader: React.FC<{
 }> = ({ icon: Icon, text, width }) => {
   return (
     <th
-      className="whitespace-nowrap border border-gray-600 bg-black/10 px-2 py-1 font-medium"
+      className="whitespace-nowrap border-b border-gray-500 bg-black/10 p-2 font-medium text-gray-400"
       style={{ width }}
     >
-      <div className="flex items-center gap-1 text-gray-300">
-        {Icon && <Icon size={20} className="text-gray-400" />}
+      <div className="flex items-center gap-1">
+        {Icon && <Icon size={18} />}
         <p>{text}</p>
       </div>
     </th>
@@ -184,18 +186,18 @@ const TaskTableRow: React.FC<{
   };
 
   return (
-    <tr className="transition-colors hover:bg-white/5">
+    <tr className="border-b border-gray-500 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
       <TaskTableData>{title}</TaskTableData>
       <TaskTableData noWrap>{done ? "完了" : "未完了"}</TaskTableData>
       <TaskTableData noWrap>{createdAt}</TaskTableData>
-      <TaskTableData noWrap>{completedAt}</TaskTableData>
+      <TaskTableData noWrap>{completedAt || "None"}</TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
-          <button className="border border-gray-600 px-2 py-1 text-xs  text-gray-300 transition-colors hover:bg-gray-500">
+          <button className="rounded px-2 py-1  text-xs text-gray-300 transition-colors hover:bg-gray-500">
             <IconPencil size={16} />
           </button>
           <button
-            className="border border-gray-600 px-2 py-1 text-xs  text-gray-300 transition-colors hover:bg-gray-500"
+            className="rounded px-2 py-1  text-xs text-gray-300 transition-colors hover:bg-gray-500"
             onClick={handleDelete}
           >
             <IconTrash size={16} />
@@ -208,7 +210,7 @@ const TaskTableRow: React.FC<{
 
 const EmptyTableRow: React.FC = () => {
   return (
-    <tr className="border border-gray-600">
+    <tr>
       <td colSpan={6}>
         <div className="flex h-[400px] w-full items-center justify-center">
           <div className="flex w-[300px] flex-col items-center text-center">
@@ -231,12 +233,7 @@ const TaskTableData: React.FC<{ children: ReactNode; noWrap?: boolean }> = ({
   noWrap,
 }) => {
   return (
-    <td
-      className={clsx(
-        "border border-gray-600  px-2 py-1 text-sm",
-        noWrap && "whitespace-nowrap",
-      )}
-    >
+    <td className={clsx("px-2 py-1 text-sm", noWrap && "whitespace-nowrap")}>
       <div className="">{children}</div>
     </td>
   );
