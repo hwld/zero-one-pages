@@ -161,7 +161,7 @@ const Home: React.FC = () => {
             <form onSubmit={handleAddTask} className="h-full w-full">
               <input
                 ref={inputRef}
-                className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 focus:outline-none"
+                className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 placeholder:text-neutral-400 focus:outline-none"
                 placeholder="タスクを入力してください..."
                 value={task}
                 onChange={(e) => setTask(e.target.value)}

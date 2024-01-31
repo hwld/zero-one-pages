@@ -1,5 +1,12 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.wordWrap": "on"
+  "editor.wordWrap": "on",
+  "tailwindCSS.classAttributes": [
+    ".*Class",
+    "class",
+    "className",
+    "classNames",
+    "ngClass"
+  ],
 }

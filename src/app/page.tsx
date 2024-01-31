@@ -32,7 +32,7 @@ export default function Home() {
 type Props = { page: Page; number: number; dummy?: false } | { dummy: true };
 const PageCard: React.FC<Props> = (props) => {
   const rootClass =
-    "flex min-h-[120px] w-[300px] flex-col rounded-lg border-2 border-zinc-800 bg-zinc-700 p-4 text-zinc-200 outline outline-2 outline-zinc-700 transition-colors";
+    "flex min-h-[130px] w-[300px] flex-col rounded-lg   bg-zinc-800 p-4 text-zinc-200 transition-colors border border-zinc-700";
 
   if (props.dummy) {
     return <div className={rootClass} />;
@@ -45,12 +45,14 @@ const PageCard: React.FC<Props> = (props) => {
     >
       {!props.dummy && (
         <>
-          <div className="flex items-end gap-2">
-            <div className="text-xl font-bold">{props.number}.</div>
-            <div>{props.page.title}</div>
+          <div className="mt-1 flex items-center gap-1">
+            <p className="text-zinc-400">{props.number}.</p>
+            <p>{props.page.title}</p>
           </div>
-          <div className="mb-4 mt-2 h-[1px] bg-zinc-400" />
-          <p className="text-sm">{props.page.description}</p>
+          <div className="my-3 h-[1px] bg-zinc-700" />
+          <p className="whitespace-pre-wrap text-sm text-zinc-400">
+            {props.page.description}
+          </p>
         </>
       )}
     </Link>

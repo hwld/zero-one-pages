@@ -5,16 +5,17 @@ export const pages: Page[] = [
     href: "/1",
     title: "todoリスト",
     description:
-      "画面下にあるinput周りのコンポーネントが好き。結構時間かかった。",
+      "浮いてるinputを使ったTodoリスト。\ninputの隣のメニューがお気に入り。",
   },
   {
     href: "/2",
     title: "todoリスト2",
-    description: "一覧性を重視したテーブルレイアウトのtodoリスト。",
+    description:
+      "表形式のtodoリスト。\nテーブルの部分だけカードになっているのがお気に入り。",
   },
   {
     href: "/3",
     title: "変形するメニュー",
-    description: "youtubeの設定メニューを見て作りたくなったので作った。",
+    description: "youtubeの設定メニューを見て作りたくなった。\n🥱🥱🥱😀😀😀",
   },
 ];
