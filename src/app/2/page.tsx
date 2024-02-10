@@ -4,10 +4,8 @@ import {
   IconCalendar,
   IconCheckbox,
   IconCircleCheck,
-  IconClipboard,
   IconClipboardText,
   IconClockCheck,
-  IconClockHour4,
   IconClockHour5,
   IconCommand,
   IconGridDots,
@@ -15,7 +13,6 @@ import {
   IconListDetails,
   IconPencil,
   IconPlus,
-  IconRotate,
   IconTrash,
 } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -62,7 +59,7 @@ const Page: NextPage = () => {
             <h1 className="text-sm">今日のタスク</h1>
           </div>
         </div>
-        <div className="mt-3 flex w-full  grow flex-col gap-3 rounded-lg bg-gray-800 p-5 shadow-2xl">
+        <div className="mt-3 flex w-full  grow flex-col gap-5 rounded-lg bg-gray-800 p-8 shadow-2xl">
           <AddTaskButton onClick={handleAddTask} />
           <TaskTable tasks={tasks} onDeleteTask={handleDeleteTask} />
         </div>
@@ -124,7 +121,7 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
 type TableProps = { tasks: Task[]; onDeleteTask: (id: string) => void };
 const TaskTable: React.FC<TableProps> = ({ tasks, onDeleteTask }) => {
   return (
-    <div className="overflow-auto rounded-md border border-gray-500">
+    <div className="overflow-auto rounded-md border border-gray-600">
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
@@ -159,7 +156,7 @@ const TableHeader: React.FC<{
 }> = ({ icon: Icon, text, width }) => {
   return (
     <th
-      className="whitespace-nowrap border-b border-gray-500 bg-black/10 p-2 font-medium text-gray-400"
+      className="whitespace-nowrap border-b border-gray-600 bg-black/10 p-2 font-medium text-gray-400"
       style={{ width }}
     >
       <div className="flex items-center gap-1">
@@ -186,7 +183,7 @@ const TaskTableRow: React.FC<{
   };
 
   return (
-    <tr className="border-b border-gray-500 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
+    <tr className="border-b border-gray-600 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
       <TaskTableData>{title}</TaskTableData>
       <TaskTableData noWrap>{done ? "完了" : "未完了"}</TaskTableData>
       <TaskTableData noWrap>{createdAt}</TaskTableData>
@@ -213,12 +210,10 @@ const EmptyTableRow: React.FC = () => {
     <tr>
       <td colSpan={6}>
         <div className="flex h-[400px] w-full items-center justify-center">
-          <div className="flex w-[300px] flex-col items-center text-center">
-            <IconClipboardText size={100} />
-            <p className="mt-3 text-lg font-bold">
-              今日やるべきことなんですか？
-            </p>
-            <p className="mt-1 w-[230px] text-sm text-gray-300">
+          <div className="flex w-[300px] flex-col items-center gap-3 text-center">
+            <IconClipboardText size={100} strokeWidth={1.5} />
+            <p className="text-lg font-bold">今日やるべきことはなんですか？</p>
+            <p className="w-[230px] text-sm text-gray-300">
               `Cmd+K`または`Ctrl+K`でタスクの入力を開始できます。。
             </p>
           </div>
