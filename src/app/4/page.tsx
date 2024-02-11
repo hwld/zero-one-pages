@@ -3,16 +3,25 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import {
+  AlertCircleIcon,
+  BellIcon,
+  BirdIcon,
+  CatIcon,
+  DogIcon,
+  FishIcon,
   HashIcon,
   LucideIcon,
   MessagesSquareIcon,
   MoreHorizontalIcon,
   PlusCircleIcon,
   PlusIcon,
+  RabbitIcon,
   ReplyIcon,
   SendHorizontalIcon,
+  SettingsIcon,
   SmileIcon,
   TrashIcon,
+  UserIcon,
 } from "lucide-react";
 import { NextPage } from "next";
 import { FormEventHandler, ReactNode, useState } from "react";
@@ -46,22 +55,27 @@ const Page: NextPage = () => {
     <div className="grid h-dvh grid-cols-[70px_250px_1fr] bg-neutral-100 text-neutral-100">
       <div className="flex flex-col items-center justify-between gap-3 bg-neutral-950 py-3">
         <div className="flex flex-col gap-3">
-          <button className="size-[45px] rounded-full bg-neutral-300" />
+          <div className="size-[45px] rounded-full bg-green-500" />
           <div className="h-[1px] w-[45px] bg-neutral-700" />
         </div>
         <div className="flex h-full flex-col gap-3">
-          <button className="size-[45px] rounded-full bg-neutral-400" />
-          <button className="size-[45px] rounded-full bg-neutral-400" />
-          <button className="size-[45px] rounded-full bg-neutral-400" />
+          <ServerItem icon={BirdIcon} />
+          <ServerItem icon={CatIcon} active />
+          <ServerItem icon={DogIcon} />
+          <ServerItem icon={FishIcon} />
+          <ServerItem icon={RabbitIcon} />
         </div>
         <div className="flex flex-col">
-          <button className="grid size-[45px] place-items-center rounded-md bg-neutral-400 text-neutral-600 transition-colors hover:bg-neutral-500 hover:text-neutral-700">
+          <button className="grid size-[45px] place-items-center rounded-md bg-neutral-500 text-neutral-100 transition-colors hover:bg-neutral-600">
             <PlusIcon />
           </button>
         </div>
       </div>
       <div className="grid grid-rows-[40px_1fr_min-content] bg-neutral-900">
-        <div className="flex items-center bg-white/10 p-3 text-sm">server</div>
+        <div className="flex items-center gap-1 bg-white/10 p-3 text-sm">
+          <CatIcon size={18} strokeWidth={1.5} />
+          Cat server
+        </div>
         <div className="flex flex-col items-start gap-1 p-3">
           <ChannelLink active />
           <ChannelLink />
@@ -71,21 +85,22 @@ const Page: NextPage = () => {
           <ChannelLink />
         </div>
         <div className="flex justify-between gap-2 bg-white/10 p-3">
-          <div className="size-[30px] shrink-0 rounded-full bg-neutral-400" />
+          <div className="grid size-[30px] shrink-0 place-items-center rounded-full border border-neutral-400 bg-neutral-700">
+            <UserIcon size={20} className="text-green-500" />
+          </div>
           <div className="w-full text-sm">
             <div>username</div>
             <div className="text-xs">status</div>
           </div>
           <div className="flex gap-1">
-            <div className="size-[20px] rounded-full bg-neutral-400" />
-            <div className="size-[20px] rounded-full bg-neutral-400" />
-            <div className="size-[20px] rounded-full bg-neutral-400" />
+            <UserMenuItem icon={BellIcon} />
+            <UserMenuItem icon={SettingsIcon} />
           </div>
         </div>
       </div>
       <div className="grid grid-rows-[40px_1fr_70px] overflow-hidden bg-neutral-800">
         <div className="flex items-center gap-1 bg-white/10 p-5 text-sm">
-          <HashIcon size={18} className="text-neutral-400" />
+          <HashIcon size={18} className="text-green-500" />
           <div>channnel</div>
         </div>
         <div className="flex flex-col gap-3 overflow-auto p-5">
@@ -106,13 +121,13 @@ const Page: NextPage = () => {
             onSubmit={handleSubmit}
             className="flex h-[45px] w-full items-center gap-2 rounded-md bg-neutral-600 px-3 ring-neutral-400 ring-offset-2 ring-offset-neutral-700 transition-shadow focus-within:ring-2"
           >
-            <PlusCircleIcon />
+            <PlusCircleIcon className="text-green-500" />
             <input
               name={chatInputName}
               autoComplete="off"
               className="h-full w-full bg-transparent focus-visible:outline-none"
             />
-            <SendHorizontalIcon />
+            <SendHorizontalIcon className="text-green-500" />
           </form>
         </div>
       </div>
@@ -121,13 +136,37 @@ const Page: NextPage = () => {
 };
 export default Page;
 
+const UserMenuItem: React.FC<{ icon: LucideIcon }> = ({ icon: Icon }) => {
+  return (
+    <button className="grid size-[30px] place-items-center rounded-full bg-neutral-900 text-neutral-100 transition-colors hover:bg-neutral-600">
+      <Icon size={20} />
+    </button>
+  );
+};
+
+const ServerItem: React.FC<{ icon: LucideIcon; active?: boolean }> = ({
+  icon: Icon,
+  active,
+}) => {
+  return (
+    <button
+      className={clsx(
+        "grid size-[45px] place-items-center rounded-full bg-neutral-300 text-neutral-900 transition-colors hover:bg-neutral-400",
+        active && "ring-2 ring-green-500 ring-offset-2 ring-offset-neutral-800",
+      )}
+    >
+      <Icon />
+    </button>
+  );
+};
+
 const EmptyChat: React.FC = () => {
   return (
     <div className="grid h-full place-content-center place-items-center gap-2">
       <MessagesSquareIcon size={100} strokeWidth={1.1} />
       <div className="flex gap-1 text-xl font-bold">
         <div className="flex items-center gap-1">
-          <HashIcon size={25} className="text-neutral-400" strokeWidth={3} />
+          <HashIcon size={25} className="text-green-500" strokeWidth={3} />
           channel
         </div>
         <div>へようこそ</div>
@@ -141,8 +180,10 @@ const ChatCard: React.FC<{ children: ReactNode; onDelete?: () => void }> = ({
   onDelete,
 }) => {
   return (
-    <div className="group relative grid min-h-fit grid-cols-[min-content_1fr] grid-rows-[min-content_1fr] gap-x-3 gap-y-1 p-4">
-      <div className="row-span-2 size-[40px] rounded-full bg-neutral-500" />
+    <div className="group relative grid min-h-fit grid-cols-[min-content_1fr] grid-rows-[min-content_1fr] gap-x-3 gap-y-1 p-3">
+      <div className="row-span-2 grid size-[40px] place-items-center rounded-full bg-neutral-700 text-green-500">
+        <UserIcon />
+      </div>
       <div className="flex items-center gap-3">
         <div>user-name</div>
         <div className="text-xs text-neutral-400">2024/02/11 11:11:11</div>
@@ -192,10 +233,10 @@ const ChannelLink: React.FC<ChannelLinkProps> = ({ active }) => {
     <button
       className={clsx(
         "flex w-full items-center gap-1 rounded p-2 transition-colors",
-        active ? "bg-neutral-700" : "hover:bg-white/5",
+        active ? "bg-green-500/25" : "hover:bg-green-500/10",
       )}
     >
-      <HashIcon size={18} className="text-neutral-400" />
+      <HashIcon size={18} className="text-green-500" />
       <div>channnel</div>
     </button>
   );
