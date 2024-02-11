@@ -5,6 +5,7 @@ import clsx from "clsx";
 import {
   HashIcon,
   LucideIcon,
+  MessagesSquareIcon,
   MoreHorizontalIcon,
   PlusCircleIcon,
   PlusIcon,
@@ -60,9 +61,7 @@ const Page: NextPage = () => {
         </div>
       </div>
       <div className="grid grid-rows-[40px_1fr_min-content] bg-neutral-900">
-        <div className="flex items-center bg-neutral-600 p-3 text-sm">
-          server
-        </div>
+        <div className="flex items-center bg-white/10 p-3 text-sm">server</div>
         <div className="flex flex-col items-start gap-1 p-3">
           <ChannelLink active />
           <ChannelLink />
@@ -71,7 +70,7 @@ const Page: NextPage = () => {
           <ChannelLink />
           <ChannelLink />
         </div>
-        <div className="flex justify-between gap-2 bg-neutral-600 p-3">
+        <div className="flex justify-between gap-2 bg-white/10 p-3">
           <div className="size-[30px] shrink-0 rounded-full bg-neutral-400" />
           <div className="w-full text-sm">
             <div>username</div>
@@ -85,11 +84,12 @@ const Page: NextPage = () => {
         </div>
       </div>
       <div className="grid grid-rows-[40px_1fr_70px] overflow-hidden bg-neutral-800">
-        <div className="flex items-center gap-1 bg-neutral-700 p-5 text-sm">
+        <div className="flex items-center gap-1 bg-white/10 p-5 text-sm">
           <HashIcon size={18} className="text-neutral-400" />
           <div>channnel</div>
         </div>
         <div className="flex flex-col gap-3 overflow-auto p-5">
+          {chats.length === 0 && <EmptyChat />}
           {chats.map(({ id, text }) => (
             <ChatCard
               key={id}
@@ -104,7 +104,7 @@ const Page: NextPage = () => {
         <div className="flex items-center bg-transparent px-10">
           <form
             onSubmit={handleSubmit}
-            className="flex h-[45px] w-full items-center gap-2 rounded-md bg-neutral-500 px-3 ring-neutral-400 ring-offset-2 ring-offset-neutral-700 transition-shadow focus-within:ring-2"
+            className="flex h-[45px] w-full items-center gap-2 rounded-md bg-neutral-600 px-3 ring-neutral-400 ring-offset-2 ring-offset-neutral-700 transition-shadow focus-within:ring-2"
           >
             <PlusCircleIcon />
             <input
@@ -121,6 +121,21 @@ const Page: NextPage = () => {
 };
 export default Page;
 
+const EmptyChat: React.FC = () => {
+  return (
+    <div className="grid h-full place-content-center place-items-center gap-2">
+      <MessagesSquareIcon size={100} strokeWidth={1.1} />
+      <div className="flex gap-1 text-xl font-bold">
+        <div className="flex items-center gap-1">
+          <HashIcon size={25} className="text-neutral-400" strokeWidth={3} />
+          channel
+        </div>
+        <div>へようこそ</div>
+      </div>
+    </div>
+  );
+};
+
 const ChatCard: React.FC<{ children: ReactNode; onDelete?: () => void }> = ({
   children,
   onDelete,
@@ -133,7 +148,7 @@ const ChatCard: React.FC<{ children: ReactNode; onDelete?: () => void }> = ({
         <div className="text-xs text-neutral-400">2024/02/11 11:11:11</div>
       </div>
       <div className="break-all">{children}</div>
-      <div className="absolute right-0 top-0 flex overflow-hidden rounded bg-neutral-700 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute right-0 top-0 hidden overflow-hidden rounded bg-neutral-700 transition-opacity group-hover:flex">
         <ChatCardMenuItem icon={SmileIcon} label="絵文字をつける" />
         <ChatCardMenuItem icon={ReplyIcon} label="返信" />
         <ChatCardMenuItem icon={TrashIcon} label="削除" onClick={onDelete} />

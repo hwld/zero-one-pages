@@ -18,4 +18,10 @@ export const pages: Page[] = [
     title: "変形するメニュー",
     description: "youtubeの設定メニューを見て作りたくなった。\n🥱🥱🥱😀😀😀",
   },
+  {
+    href: "/4",
+    title: "チャット",
+    description:
+      "DiscordみたいなUI。\nページレイアウトにFlexではなくてGridを使ってみた。",
+  },
 ];
