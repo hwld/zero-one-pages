@@ -24,4 +24,10 @@ export const pages: Page[] = [
     description:
       "DiscordみたいなUI。\nページレイアウトにFlexではなくてGridを使ってみた。",
   },
+  {
+    href: "/5",
+    title: "変形するメニュー2",
+    description:
+      "Dynamic Islandみたいなメニュー。\nframer-motionでspring animationを使ってみた。",
+  },
 ];

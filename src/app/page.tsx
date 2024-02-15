@@ -49,7 +49,7 @@ const PageCard: React.FC<Props> = (props) => {
             <p className="text-zinc-400">{props.number}.</p>
             <p>{props.page.title}</p>
           </div>
-          <div className="my-3 h-[1px] bg-zinc-700" />
+          <div className="my-2 h-[1px] bg-zinc-700" />
           <p className="whitespace-pre-wrap text-sm text-zinc-400">
             {props.page.description}
           </p>
