@@ -1,9 +1,12 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ActivityIcon,
+  AlertCircleIcon,
   CalendarIcon,
   CheckIcon,
   CommandIcon,
@@ -11,48 +14,108 @@ import {
   HomeIcon,
   LayoutListIcon,
   MoreHorizontalIcon,
+  PanelRightOpenIcon,
   PencilIcon,
+  TextIcon,
   TrashIcon,
+  XIcon,
 } from "lucide-react";
 import { Inter } from "next/font/google";
 import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
+type Task = {
+  id: string;
+  title: string;
+  description: string;
+  checked: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const initialTasks: Task[] = [
+  {
+    id: "1",
+    title: "zero-one-uiにページを追加する",
+    description: "",
+    createdAt: new Date().toLocaleString(),
+    updatedAt: new Date().toLocaleString(),
+    checked: false,
+  },
+  {
+    id: "2",
+    title: "GraphQLの勉強をする",
+    description: "",
+    createdAt: new Date().toLocaleString(),
+    updatedAt: new Date().toLocaleString(),
+    checked: false,
+  },
+  {
+    id: "3",
+    title: "OpenAPIを使ってみる",
+    description: "",
+    createdAt: new Date().toLocaleString(),
+    updatedAt: new Date().toLocaleString(),
+    checked: false,
+  },
+];
+
 const Home: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState([
-    {
-      id: Math.random(),
-      task: "zero-one-uiにページを追加する",
-      checked: false,
-    },
-    { id: Math.random(), task: "GraphQLの勉強をする", checked: false },
-    { id: Math.random(), task: "OpenAPIを使ってみる", checked: false },
-  ]);
+  const [title, setTitle] = useState("");
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
   const handleAddTask = (e: SyntheticEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setTasks((t) => [...t, { id: Math.random(), task, checked: false }]);
-    setTask("");
+    setTasks((t) => [
+      ...t,
+      {
+        id: crypto.randomUUID(),
+        title: title,
+        description: "",
+        checked: false,
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString(),
+      },
+    ]);
+    setTitle("");
   };
 
-  const handleChangeChecked = (id: number) => {
-    console.log("!");
+  const handleChangeStatus = (id: string) => {
     setTasks((tasks) =>
       tasks.map((t) => {
         if (t.id === id) {
-          return { ...t, checked: !t.checked };
+          return {
+            ...t,
+            checked: !t.checked,
+            updatedAt: new Date().toLocaleString(),
+          };
         }
         return t;
       }),
     );
   };
 
-  const handleDeleteTask = (i: number) => {
-    setTasks((t) => t.filter((t, index) => index !== i));
+  const handleChangeDesc = (id: string, desc: string) => {
+    console.log(`${id}: ${desc}`);
+    setTasks((tasks) => {
+      return tasks.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            description: desc,
+            updatedAt: new Date().toLocaleString(),
+          };
+        }
+        return t;
+      });
+    });
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setTasks((t) => t.filter((t) => t.id !== id));
   };
 
   const focusInput = () => {
@@ -101,57 +164,15 @@ const Home: React.FC = () => {
               <div>今日のタスク</div>
             </h1>
             <div className="flex flex-col gap-2">
-              {tasks.map(({ id, task, checked }, i) => {
+              {tasks.map((task) => {
                 return (
-                  <div
-                    key={i}
-                    className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
-                        <AnimatePresence>
-                          {checked && (
-                            <motion.div
-                              className="absolute inset-0 rounded-full bg-neutral-900"
-                              initial={{ scale: 0, opacity: 1 }}
-                              animate={{
-                                scale: 1.4,
-                                opacity: 0,
-                              }}
-                            />
-                          )}
-                        </AnimatePresence>
-                        <input
-                          id={`todo-${i}`}
-                          type="checkbox"
-                          className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
-                          checked={checked}
-                          onChange={() => handleChangeChecked(id)}
-                        ></input>
-                        <div
-                          className={clsx(
-                            "pointer-events-none absolute inset-0 flex origin-[50%_70%] items-center  justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 ease-in-out",
-                            checked ? "opacity-100" : "opacity-0",
-                          )}
-                        >
-                          <CheckIcon size="80%" />
-                        </div>
-                      </div>
-                      <label
-                        className="cursor-pointer select-none checked:line-through"
-                        htmlFor={`todo-${i}`}
-                      >
-                        {task}
-                      </label>
-                    </div>
-                    <div className="flex gap-1">
-                      <TaskItemButton icon={<PencilIcon />} />
-                      <TaskItemButton
-                        onClick={() => handleDeleteTask(i)}
-                        icon={<TrashIcon />}
-                      />
-                    </div>
-                  </div>
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onDelete={handleDeleteTask}
+                    onChangeStatus={handleChangeStatus}
+                    onChangeDesc={handleChangeDesc}
+                  />
                 );
               })}
             </div>
@@ -164,8 +185,8 @@ const Home: React.FC = () => {
                 ref={inputRef}
                 className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 placeholder:text-neutral-400 focus:outline-none"
                 placeholder="タスクを入力してください..."
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </form>
             <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
@@ -252,5 +273,210 @@ const MenuItem: React.FC<{ icon: ReactNode; children: ReactNode }> = ({
       {icon}
       {children}
     </DropdownMenu.Item>
+  );
+};
+
+const TaskCard: React.FC<{
+  task: Task;
+  onChangeStatus: (id: string) => void;
+  onDelete: (id: string) => void;
+  onChangeDesc: (id: string, desc: string) => void;
+}> = ({ task, onChangeStatus, onDelete, onChangeDesc }) => {
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  return (
+    <div className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700">
+      <div className="flex items-center gap-2">
+        <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
+          <AnimatePresence>
+            {task.checked && (
+              <motion.div
+                className="absolute inset-0 rounded-full bg-neutral-900"
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{
+                  scale: 1.4,
+                  opacity: 0,
+                }}
+              />
+            )}
+          </AnimatePresence>
+          <input
+            id={task.id}
+            type="checkbox"
+            className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
+            checked={task.checked}
+            onChange={() => onChangeStatus(task.id)}
+          ></input>
+          <div
+            className={clsx(
+              "pointer-events-none absolute inset-0 flex origin-[50%_70%] items-center  justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 ease-in-out",
+              task.checked ? "opacity-100" : "opacity-0",
+            )}
+          >
+            <CheckIcon size="80%" />
+          </div>
+        </div>
+        <label
+          className="cursor-pointer select-none checked:line-through"
+          htmlFor={task.id}
+        >
+          {task.title}
+        </label>
+      </div>
+      <div className="flex gap-1">
+        <TaskDetailSheet
+          key={task.id}
+          task={task}
+          isOpen={isDetailOpen}
+          onOpenChange={setIsDetailOpen}
+          onChangeStatus={onChangeStatus}
+          onChangeDesc={onChangeDesc}
+        />
+        <TaskItemButton icon={<PencilIcon />} />
+        <TaskItemButton
+          icon={<PanelRightOpenIcon />}
+          onClick={() => setIsDetailOpen(true)}
+        />
+        <TaskItemButton
+          onClick={() => onDelete(task.id)}
+          icon={<TrashIcon />}
+        />
+      </div>
+    </div>
+  );
+};
+
+const TaskDetailSheet: React.FC<{
+  task: Task;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onChangeStatus: (id: string) => void;
+  onChangeDesc: (id: string, desc: string) => void;
+}> = ({ task, isOpen, onOpenChange, onChangeStatus, onChangeDesc }) => {
+  return (
+    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      <AnimatePresence>
+        {isOpen && (
+          <Dialog.Portal forceMount>
+            <Dialog.Overlay forceMount asChild>
+              <motion.div
+                className="fixed inset-0 bg-black/10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+            </Dialog.Overlay>
+
+            <Dialog.Content forceMount asChild>
+              <motion.div
+                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700"
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 20, opacity: 0 }}
+              >
+                <Dialog.Close asChild>
+                  <button className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5">
+                    <XIcon />
+                  </button>
+                </Dialog.Close>
+                <div className="space-y-1">
+                  <div className="text-xs text-neutral-500">title</div>
+                  <div className="text-2xl font-bold">{task.title}</div>
+                  <div className="text-xs text-neutral-500">ID: {task.id}</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1 text-sm text-neutral-500">
+                    <ActivityIcon size={18} />
+                    <div>状態</div>
+                  </div>
+                  <div className="ml-2">
+                    <TaskStatusBadge
+                      done={task.checked}
+                      onChangeDone={() => onChangeStatus(task.id)}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1 text-sm text-neutral-500">
+                    <TextIcon size={18} />
+                    <div>説明</div>
+                  </div>
+                  <TaskDescriptionForm
+                    defaultDescription={task.description}
+                    onChangeDescription={(desc) => onChangeDesc(task.id, desc)}
+                  />
+                </div>
+              </motion.div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        )}
+      </AnimatePresence>
+    </Dialog.Root>
+  );
+};
+
+const TaskStatusBadge: React.FC<{
+  done: boolean;
+  onChangeDone: () => void;
+}> = ({ done, onChangeDone }) => {
+  return (
+    <button
+      onClick={onChangeDone}
+      className={clsx(
+        "min-w-[70px] rounded-full border p-1 px-3 font-bold",
+        done
+          ? "border-green-500 bg-green-50 text-green-500"
+          : "border-red-500 bg-red-50 text-red-500",
+      )}
+    >
+      {done ? "完了" : "未完了"}
+    </button>
+  );
+};
+
+const TaskDescriptionForm: React.FC<{
+  defaultDescription: string;
+  onChangeDescription: (desc: string) => void;
+}> = ({ defaultDescription, onChangeDescription }) => {
+  const [desc, setDesc] = useState(defaultDescription);
+  const isDirty = desc !== defaultDescription;
+
+  return (
+    <div className="space-y-1">
+      <textarea
+        className="h-[300px] w-full resize-none rounded border border-neutral-300 bg-transparent p-3 focus-visible:border-neutral-400 focus-visible:outline-neutral-400"
+        value={desc}
+        onChange={(e) => setDesc(e.target.value)}
+      />
+      <AnimatePresence>
+        {isDirty && (
+          <motion.div
+            className="flex justify-between"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+          >
+            <div className="flex items-center gap-1">
+              <AlertCircleIcon size={18} />
+              <div className="text-sm">変更が保存されていません</div>
+            </div>
+            <div className="flex gap-1">
+              <button
+                className="rounded border border-neutral-300 px-3 py-1 text-sm text-neutral-700 transition-colors hover:bg-black/10"
+                onClick={() => setDesc(defaultDescription)}
+              >
+                変更を取り消す
+              </button>
+              <button
+                className="rounded bg-neutral-900 px-3 py-1 text-sm text-neutral-100 transition-colors hover:bg-neutral-700"
+                onClick={() => onChangeDescription(desc)}
+              >
+                保存
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };

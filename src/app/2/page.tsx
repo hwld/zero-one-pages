@@ -16,7 +16,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import clsx from "clsx";
-import { CircleDashedIcon, CircleDotIcon } from "lucide-react";
+import { CircleDashedIcon, CircleDotIcon, SearchIcon } from "lucide-react";
 import { NextPage } from "next";
 import { Inter } from "next/font/google";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
@@ -77,7 +77,21 @@ const Page: NextPage = () => {
           </div>
         </div>
         <div className="mt-3 flex w-full  grow flex-col gap-4 rounded-lg bg-gray-800 p-8 shadow-2xl">
-          <AddTaskButton onClick={handleAddTask} />
+          <div className="flex justify-between gap-1">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <SearchIcon
+                  className="pointer-events-none absolute left-2 top-[50%] -translate-y-[50%]"
+                  size={18}
+                />
+                <input className="h-8 w-[400px] rounded border border-gray-400 bg-transparent py-1 pl-7 text-sm focus-within:border-gray-300 focus-within:outline-none focus-within:ring-1 focus-within:ring-gray-300" />
+              </div>
+              <button className="h-8 shrink-0 rounded bg-gray-300 px-3 py-1 text-xs text-gray-700">
+                検索
+              </button>
+            </div>
+            <AddTaskButton onClick={handleAddTask} />
+          </div>
           <TaskTable
             tasks={tasks}
             onDeleteTask={handleDeleteTask}
@@ -124,14 +138,14 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
 }) => {
   return (
     <button
-      className="group flex w-fit items-center gap-3 rounded bg-gray-400 px-2  py-1 text-gray-700 transition-colors hover:bg-gray-500"
+      className="group flex h-8 w-fit shrink-0 items-center gap-2 rounded bg-gray-300 px-2 text-gray-700 transition-colors hover:bg-gray-400"
       onClick={onClick}
     >
       <div className="flex items-center">
-        <IconPlus size={15} />
-        <p className="text-[12px]">タスクを追加する</p>
+        <IconPlus size={15} className="mb-[1px]" />
+        <p className="text-xs">タスクを追加する</p>
       </div>
-      <div className="flex items-center rounded bg-gray-500 px-1 py-[2px] text-gray-800 transition-colors group-hover:bg-gray-600">
+      <div className="flex items-center rounded bg-black/15 px-1 py-[2px] text-gray-700 transition-colors">
         <IconCommand size={15} />
         <p className="mt-[1px] text-[12px]">K</p>
       </div>
@@ -304,7 +318,7 @@ const TaskTableData: React.FC<{ children: ReactNode; noWrap?: boolean }> = ({
   noWrap,
 }) => {
   return (
-    <td className={clsx("px-2 py-1 text-sm", noWrap && "whitespace-nowrap")}>
+    <td className={clsx("px-3 py-1 text-sm", noWrap && "whitespace-nowrap")}>
       <div className="">{children}</div>
     </td>
   );
