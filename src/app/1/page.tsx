@@ -159,9 +159,9 @@ const Home: React.FC = () => {
       >
         <div className="h-full w-full max-w-5xl shrink-0 ">
           <div className="flex flex-col gap-5 px-3 pb-24 pt-10">
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-neutral-700">
-              <HomeIcon strokeWidth={3} />
-              <div>今日のタスク</div>
+            <h1 className="flex items-center gap-2 font-bold text-neutral-700">
+              <HomeIcon strokeWidth={3} size={20} />
+              <div className="pt-[3px]">今日のタスク</div>
             </h1>
             <div className="flex flex-col gap-2">
               {tasks.map((task) => {
@@ -283,6 +283,7 @@ const TaskCard: React.FC<{
   onChangeDesc: (id: string, desc: string) => void;
 }> = ({ task, onChangeStatus, onDelete, onChangeDesc }) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   return (
     <div className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700">
@@ -324,6 +325,15 @@ const TaskCard: React.FC<{
         </label>
       </div>
       <div className="flex gap-1">
+        <TaskItemButton icon={<PencilIcon />} />
+        <TaskItemButton
+          icon={<PanelRightOpenIcon />}
+          onClick={() => setIsDetailOpen(true)}
+        />
+        <TaskItemButton
+          onClick={() => setIsConfirmDeleteOpen(true)}
+          icon={<TrashIcon />}
+        />
         <TaskDetailSheet
           key={task.id}
           task={task}
@@ -332,14 +342,11 @@ const TaskCard: React.FC<{
           onChangeStatus={onChangeStatus}
           onChangeDesc={onChangeDesc}
         />
-        <TaskItemButton icon={<PencilIcon />} />
-        <TaskItemButton
-          icon={<PanelRightOpenIcon />}
-          onClick={() => setIsDetailOpen(true)}
-        />
-        <TaskItemButton
-          onClick={() => onDelete(task.id)}
-          icon={<TrashIcon />}
+        <ConfirmTaskDeleteDialog
+          task={task}
+          isOpen={isConfirmDeleteOpen}
+          onOpenChange={setIsConfirmDeleteOpen}
+          onConfirm={() => onDelete(task.id)}
         />
       </div>
     </div>
@@ -478,5 +485,65 @@ const TaskDescriptionForm: React.FC<{
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+const ConfirmTaskDeleteDialog: React.FC<{
+  task: Task;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+}> = ({ task, isOpen, onOpenChange, onConfirm }) => {
+  return (
+    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      <AnimatePresence>
+        {isOpen && (
+          <Dialog.Portal forceMount>
+            <Dialog.Overlay asChild>
+              <motion.div className="fixed inset-0 bg-black/15" />
+            </Dialog.Overlay>
+
+            <Dialog.Content asChild>
+              <motion.div
+                className="fixed left-1/2 top-1/2 flex min-h-[200px] w-[500px] flex-col overflow-hidden rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-600"
+                initial={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
+                animate={{ opacity: 1, translateX: "-50%", translateY: "-40%" }}
+                exit={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
+              >
+                <Dialog.Close asChild>
+                  <button className="absolute right-2 top-2 rounded p-1 transition-colors hover:bg-black/5">
+                    <XIcon />
+                  </button>
+                </Dialog.Close>
+                <div className="p-4 text-lg font-bold">タスクの削除</div>
+                <div className="grow px-4 py-2">
+                  タスク`
+                  <span className="mx-1 font-bold text-neutral-900">
+                    {task.title}
+                  </span>
+                  ` を削除してもよろしいですか？
+                  <br />
+                  タスクを削除すると、もとに戻すことはできません。
+                </div>
+                <div className="flex justify-end gap-2 p-4">
+                  <button
+                    className="rounded border border-neutral-300 px-3 py-2 text-sm transition-colors hover:bg-neutral-200"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    className="rounded bg-neutral-900 px-3 py-2 text-sm text-neutral-100 hover:bg-neutral-700"
+                    onClick={onConfirm}
+                  >
+                    削除する
+                  </button>
+                </div>
+              </motion.div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        )}
+      </AnimatePresence>
+    </Dialog.Root>
   );
 };

@@ -40,11 +40,11 @@ export const pages: Page[] = [
       "Dynamic Islandみたいなメニュー。\nframer-motionでspring animationを使ってみた。",
     tags: [],
   },
-  {
-    href: "/6",
-    title: "SNS",
-    description:
-      "TweetDeckを意識したSNSのUI。\nframer-motionでspring animationを使ってみた。",
-    tags: [],
-  },
+  // {
+  //   href: "/6",
+  //   title: "SNS",
+  //   description:
+  //     "TweetDeckを意識したSNSのUI。\nframer-motionでspring animationを使ってみた。",
+  //   tags: [],
+  // },
 ];
