@@ -16,6 +16,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { CircleDashedIcon, CircleDotIcon } from "lucide-react";
 import { NextPage } from "next";
 import { Inter } from "next/font/google";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
@@ -30,7 +31,7 @@ const Page: NextPage = () => {
       {
         id: Math.random().toString(),
         title: "new task",
-        done: false,
+        status: "todo",
         createdAt: new Date().toLocaleString(),
         completedAt: "",
       },
@@ -40,6 +41,22 @@ const Page: NextPage = () => {
 
   const handleDeleteTask = (id: string) => {
     setTasks((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const handleChangeStatus = (id: string, status: Task["status"]) => {
+    setTasks((tasks) =>
+      tasks.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            status,
+            completedAt:
+              status === "done" ? new Date().toLocaleString() : "None",
+          };
+        }
+        return t;
+      }),
+    );
   };
 
   return (
@@ -52,16 +69,20 @@ const Page: NextPage = () => {
       <div className="sticky top-0 h-[100dvh] pl-5 pt-5">
         <Sidebar />
       </div>
-      <div className="m-5 flex w-full flex-col p-3">
+      <div className="mx-3 my-5 flex w-full flex-col p-3">
         <div className="flex items-end justify-between">
           <div className="flex flex-nowrap items-center gap-1">
             <IconHome size={18} />
             <h1 className="text-sm">今日のタスク</h1>
           </div>
         </div>
-        <div className="mt-3 flex w-full  grow flex-col gap-5 rounded-lg bg-gray-800 p-8 shadow-2xl">
+        <div className="mt-3 flex w-full  grow flex-col gap-4 rounded-lg bg-gray-800 p-8 shadow-2xl">
           <AddTaskButton onClick={handleAddTask} />
-          <TaskTable tasks={tasks} onDeleteTask={handleDeleteTask} />
+          <TaskTable
+            tasks={tasks}
+            onDeleteTask={handleDeleteTask}
+            onChangeStatus={handleChangeStatus}
+          />
         </div>
       </div>
     </div>
@@ -72,7 +93,7 @@ export default Page;
 
 const Sidebar: React.FC = () => {
   return (
-    <div className="flex w-[180px] flex-col">
+    <div className="flex w-[200px] flex-col">
       <div className="flex items-center gap-1 whitespace-nowrap text-sm font-bold">
         <IconCircleCheck />
         <p>evodo-openapi</p>
@@ -91,7 +112,7 @@ const SidebarItem: React.FC<{
   label: string;
 }> = ({ icon: Icon, label }) => {
   return (
-    <div className="flex items-center gap-1 whitespace-nowrap rounded-md p-2 text-sm text-gray-200 hover:bg-white/20">
+    <div className="flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-md p-2 text-sm text-gray-200 transition-colors hover:bg-white/20">
       <Icon size={25} />
       <p>{label}</p>
     </div>
@@ -103,14 +124,14 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
 }) => {
   return (
     <button
-      className="group flex w-fit items-center gap-3 rounded bg-gray-200 px-2  py-1 text-gray-700 transition-colors hover:bg-gray-300"
+      className="group flex w-fit items-center gap-3 rounded bg-gray-400 px-2  py-1 text-gray-700 transition-colors hover:bg-gray-500"
       onClick={onClick}
     >
       <div className="flex items-center">
         <IconPlus size={15} />
         <p className="text-[12px]">タスクを追加する</p>
       </div>
-      <div className="flex items-center rounded bg-gray-300 px-1 py-[2px] text-gray-500 transition-colors group-hover:bg-gray-300">
+      <div className="flex items-center rounded bg-gray-500 px-1 py-[2px] text-gray-800 transition-colors group-hover:bg-gray-600">
         <IconCommand size={15} />
         <p className="mt-[1px] text-[12px]">K</p>
       </div>
@@ -118,15 +139,23 @@ const AddTaskButton: React.FC<ComponentPropsWithoutRef<"button">> = ({
   );
 };
 
-type TableProps = { tasks: Task[]; onDeleteTask: (id: string) => void };
-const TaskTable: React.FC<TableProps> = ({ tasks, onDeleteTask }) => {
+type TableProps = {
+  tasks: Task[];
+  onDeleteTask: (id: string) => void;
+  onChangeStatus: (id: string, status: Task["status"]) => void;
+};
+const TaskTable: React.FC<TableProps> = ({
+  tasks,
+  onDeleteTask,
+  onChangeStatus,
+}) => {
   return (
     <div className="overflow-auto rounded-md border border-gray-600">
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
-            <TableHeader icon={IconClipboardText} text="タスク名" />
             <TableHeader icon={IconCheckbox} width={80} text="状況" />
+            <TableHeader icon={IconClipboardText} text="タスク名" />
             <TableHeader icon={IconClockHour5} width={200} text="作成日" />
             <TableHeader icon={IconClockCheck} width={200} text="達成日" />
             <TableHeader icon={IconGridDots} width={150} text="操作" />
@@ -140,6 +169,7 @@ const TaskTable: React.FC<TableProps> = ({ tasks, onDeleteTask }) => {
                 key={task.id}
                 task={task}
                 onDeleteTask={onDeleteTask}
+                onChangeStatus={(val) => onChangeStatus(task.id, val)}
               />
             );
           })}
@@ -156,12 +186,12 @@ const TableHeader: React.FC<{
 }> = ({ icon: Icon, text, width }) => {
   return (
     <th
-      className="whitespace-nowrap border-b border-gray-600 bg-black/10 p-2 font-medium text-gray-400"
+      className="whitespace-nowrap border-b border-gray-600 bg-black/10 p-3 font-medium text-gray-400"
       style={{ width }}
     >
-      <div className="flex items-center gap-1">
+      <div className="text-m flex items-center gap-1">
         {Icon && <Icon size={18} />}
-        <p>{text}</p>
+        <div>{text}</div>
       </div>
     </th>
   );
@@ -170,27 +200,34 @@ const TableHeader: React.FC<{
 type Task = {
   id: string;
   title: string;
-  done: boolean;
+  status: "done" | "todo";
   createdAt: string;
   completedAt: string;
 };
 const TaskTableRow: React.FC<{
   task: Task;
   onDeleteTask: (id: string) => void;
-}> = ({ task: { id, title, done, createdAt, completedAt }, onDeleteTask }) => {
+  onChangeStatus: (value: Task["status"]) => void;
+}> = ({
+  task: { id, title, status, createdAt, completedAt },
+  onDeleteTask,
+  onChangeStatus,
+}) => {
   const handleDelete = () => {
     onDeleteTask(id);
   };
 
   return (
     <tr className="border-b border-gray-600 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
+      <TaskTableData noWrap>
+        <TaskStatusBadge status={status} onChangeStatus={onChangeStatus} />
+      </TaskTableData>
       <TaskTableData>{title}</TaskTableData>
-      <TaskTableData noWrap>{done ? "完了" : "未完了"}</TaskTableData>
       <TaskTableData noWrap>{createdAt}</TaskTableData>
       <TaskTableData noWrap>{completedAt || "None"}</TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
-          <button className="rounded px-2 py-1  text-xs text-gray-300 transition-colors hover:bg-gray-500">
+          <button className="rounded px-2 py-1 text-xs text-gray-300 transition-colors hover:bg-gray-500">
             <IconPencil size={16} />
           </button>
           <button
@@ -202,6 +239,45 @@ const TaskTableRow: React.FC<{
         </div>
       </TaskTableData>
     </tr>
+  );
+};
+
+type TaskStatusBadgeProps = {
+  status: Task["status"];
+  onChangeStatus: (value: Task["status"]) => void;
+};
+const TaskStatusBadge: React.FC<TaskStatusBadgeProps> = ({
+  status,
+  onChangeStatus,
+}) => {
+  const statusClassMap = {
+    done: "border-green-500 text-green-500 hover:bg-green-500/20",
+    todo: "border-red-500 text-red-500 hover:bg-red-500/20",
+  };
+  const options = {
+    done: { text: "完了", icon: CircleDotIcon },
+    todo: { text: "未完了", icon: CircleDashedIcon },
+  };
+
+  const label = options[status].text;
+  const Icon = options[status].icon;
+
+  const handleChangeStatus = () => {
+    const next = status === "done" ? "todo" : "done";
+    onChangeStatus(next);
+  };
+
+  return (
+    <button
+      className={clsx(
+        "flex items-center gap-1 rounded-full border px-2 py-1 text-xs transition-colors",
+        statusClassMap[status],
+      )}
+      onClick={handleChangeStatus}
+    >
+      <Icon size={15} />
+      {label}
+    </button>
   );
 };
 

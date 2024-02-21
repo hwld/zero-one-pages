@@ -41,7 +41,7 @@ const PageCard: React.FC<Props> = (props) => {
   return (
     <Link
       href={props.page.href}
-      className={clsx(rootClass, "hover:bg-zinc-600")}
+      className={clsx(rootClass, "hover:bg-zinc-700")}
     >
       {!props.dummy && (
         <>

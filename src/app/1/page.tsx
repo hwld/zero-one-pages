@@ -40,6 +40,7 @@ const Home: React.FC = () => {
   };
 
   const handleChangeChecked = (id: number) => {
+    console.log("!");
     setTasks((tasks) =>
       tasks.map((t) => {
         if (t.id === id) {
@@ -75,13 +76,13 @@ const Home: React.FC = () => {
 
   return (
     <div className={clsx(inter.className, "flex h-[100dvh] bg-neutral-100 ")}>
-      <div className="hidden w-[250px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
-        <div className="flex items-center gap-2 font-bold text-neutral-100">
+      <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 py-5 lg:flex">
+        <div className="flex items-center gap-2 px-5 font-bold text-neutral-100">
           <CopyCheckIcon size={20} />
           todo-list
         </div>
         <div className="h-[1px] w-full bg-gray-600" />
-        <div className="flex flex-col items-start gap-2">
+        <div className="flex flex-col items-start gap-2 px-2">
           <SideBarItem active icon={<HomeIcon />}>
             今日のタスク
           </SideBarItem>
@@ -108,13 +109,6 @@ const Home: React.FC = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
-                        <input
-                          id={`todo-${i}`}
-                          type="checkbox"
-                          className="peer absolute h-[25px] w-[25px] appearance-none rounded-full border-2 border-neutral-300"
-                          checked={checked}
-                          onChange={() => handleChangeChecked(id)}
-                        ></input>
                         <AnimatePresence>
                           {checked && (
                             <motion.div
@@ -127,6 +121,13 @@ const Home: React.FC = () => {
                             />
                           )}
                         </AnimatePresence>
+                        <input
+                          id={`todo-${i}`}
+                          type="checkbox"
+                          className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
+                          checked={checked}
+                          onChange={() => handleChangeChecked(id)}
+                        ></input>
                         <div
                           className={clsx(
                             "pointer-events-none absolute inset-0 flex origin-[50%_70%] items-center  justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 ease-in-out",
@@ -193,7 +194,7 @@ const SideBarItem: React.FC<{
   return (
     <button
       className={clsx(
-        "flex w-full items-center justify-start gap-2 rounded p-2 text-sm transition-all duration-200",
+        "flex w-full items-center justify-start gap-2 rounded px-3 py-2 text-sm transition-all duration-200",
         { "pointer-events-none bg-neutral-100 text-neutral-700": active },
         { "text-neutral-100 hover:bg-white/20": !active },
       )}
