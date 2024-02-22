@@ -1,9 +1,10 @@
 "use client";
 
 import { useMergeRefs } from "@floating-ui/react";
-import * as Dialog from "@radix-ui/react-dialog";
+import * as RadixDialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
+import { z } from "zod";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -32,17 +33,19 @@ import {
   useState,
 } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const inter = Inter({ subsets: ["latin"] });
 
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  checked: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+const taskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  done: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+type Task = z.infer<typeof taskSchema>;
 
 const initialTasks: Task[] = [
   {
@@ -51,7 +54,7 @@ const initialTasks: Task[] = [
     description: "",
     createdAt: new Date().toLocaleString(),
     updatedAt: new Date().toLocaleString(),
-    checked: false,
+    done: false,
   },
   {
     id: "2",
@@ -59,7 +62,7 @@ const initialTasks: Task[] = [
     description: "",
     createdAt: new Date().toLocaleString(),
     updatedAt: new Date().toLocaleString(),
-    checked: false,
+    done: false,
   },
   {
     id: "3",
@@ -67,7 +70,7 @@ const initialTasks: Task[] = [
     description: "",
     createdAt: new Date().toLocaleString(),
     updatedAt: new Date().toLocaleString(),
-    checked: false,
+    done: false,
   },
 ];
 
@@ -82,7 +85,7 @@ const Home: React.FC = () => {
         id: crypto.randomUUID(),
         title: title,
         description: "",
-        checked: false,
+        done: false,
         createdAt: new Date().toLocaleString(),
         updatedAt: new Date().toLocaleString(),
       },
@@ -95,7 +98,7 @@ const Home: React.FC = () => {
         if (t.id === id) {
           return {
             ...t,
-            checked: !t.checked,
+            done: !t.done,
             updatedAt: new Date().toLocaleString(),
           };
         }
@@ -105,13 +108,27 @@ const Home: React.FC = () => {
   };
 
   const handleChangeDesc = (id: string, desc: string) => {
-    console.log(`${id}: ${desc}`);
     setTasks((tasks) => {
       return tasks.map((t) => {
         if (t.id === id) {
           return {
             ...t,
             description: desc,
+            updatedAt: new Date().toLocaleString(),
+          };
+        }
+        return t;
+      });
+    });
+  };
+
+  const handleChangeTitle = (id: string, title: string) => {
+    setTasks((tasks) => {
+      return tasks.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            title,
             updatedAt: new Date().toLocaleString(),
           };
         }
@@ -144,7 +161,12 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <div className={clsx(inter.className, "flex h-[100dvh] bg-neutral-100 ")}>
+    <div
+      className={clsx(
+        inter.className,
+        "flex h-[100dvh] bg-neutral-100 [&_*]:outline-neutral-500",
+      )}
+    >
       <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 py-5 lg:flex">
         <div className="flex items-center gap-2 px-5 font-bold text-neutral-100">
           <CopyCheckIcon size={20} />
@@ -178,6 +200,7 @@ const Home: React.FC = () => {
                     onDelete={handleDeleteTask}
                     onChangeStatus={handleChangeStatus}
                     onChangeDesc={handleChangeDesc}
+                    onChangeTitle={handleChangeTitle}
                   />
                 );
               })}
@@ -197,7 +220,13 @@ const Home: React.FC = () => {
 
 export default Home;
 
-type TaskFormInput = { title: string };
+const taskFormSchema = z.object({
+  title: z
+    .string()
+    .min(1, "タスクのタイトルを入力してください")
+    .max(100, "タスクのタイトルは100文字以内で入力してください"),
+});
+type TaskFormData = z.infer<typeof taskFormSchema>;
 const TaskForm = forwardRef<
   HTMLInputElement,
   { onAddTask: (title: string) => void }
@@ -208,12 +237,11 @@ const TaskForm = forwardRef<
     handleSubmit: buildHandleSubmit,
     clearErrors,
     reset,
-  } = useForm<TaskFormInput>({
+  } = useForm<TaskFormData>({
     defaultValues: { title: "" },
+    resolver: zodResolver(taskFormSchema),
   });
-  const { ref, onBlur, ...otherRegister } = register("title", {
-    required: "タスクのタイトルを入力してください",
-  });
+  const { ref, onBlur, ...otherRegister } = register("title");
   const inputRef = useMergeRefs([_inputRef, ref]);
 
   const handleBlur: FocusEventHandler<HTMLInputElement> = (e) => {
@@ -221,7 +249,7 @@ const TaskForm = forwardRef<
     clearErrors("title");
   };
 
-  const handleSubmit = buildHandleSubmit((d: TaskFormInput) => {
+  const handleSubmit = buildHandleSubmit((d: TaskFormData) => {
     onAddTask(d.title);
     reset({ title: "" });
   });
@@ -348,16 +376,19 @@ const TaskCard: React.FC<{
   onChangeStatus: (id: string) => void;
   onDelete: (id: string) => void;
   onChangeDesc: (id: string, desc: string) => void;
-}> = ({ task, onChangeStatus, onDelete, onChangeDesc }) => {
+  onChangeTitle: (id: string, title: string) => void;
+}> = ({ task, onChangeStatus, onDelete, onChangeDesc, onChangeTitle }) => {
+  const [editable, setEditable] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
+  const titleInputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700">
-      <div className="flex items-center gap-2">
+      <div className="flex w-full items-center gap-2">
         <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
           <AnimatePresence>
-            {task.checked && (
+            {task.done && (
               <motion.div
                 className="absolute inset-0 rounded-full bg-neutral-900"
                 initial={{ scale: 0, opacity: 1 }}
@@ -372,42 +403,51 @@ const TaskCard: React.FC<{
             id={task.id}
             type="checkbox"
             className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
-            checked={task.checked}
+            checked={task.done}
             onChange={() => onChangeStatus(task.id)}
           ></input>
           <div
             className={clsx(
               "pointer-events-none absolute inset-0 flex origin-[50%_70%] items-center  justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 ease-in-out",
-              task.checked ? "opacity-100" : "opacity-0",
+              task.done ? "opacity-100" : "opacity-0",
             )}
           >
             <CheckIcon size="80%" />
           </div>
         </div>
-        <label
-          className="cursor-pointer select-none checked:line-through"
-          htmlFor={task.id}
-        >
-          {task.title}
-        </label>
+        <EditableTaskTitle
+          key={`${task.title}-${editable}`}
+          ref={titleInputRef}
+          task={task}
+          editable={editable}
+          onChangeEditable={setEditable}
+          onChangeTitle={(title) => onChangeTitle(task.id, title)}
+        />
       </div>
       <div className="flex gap-1">
-        <TaskItemButton icon={<PencilIcon />} />
+        <TaskItemButton
+          icon={<PencilIcon />}
+          onClick={() => {
+            setEditable((s) => !s);
+            setTimeout(() => {
+              titleInputRef.current?.focus();
+            }, 0);
+          }}
+        />
         <TaskItemButton
           icon={<PanelRightOpenIcon />}
           onClick={() => setIsDetailOpen(true)}
         />
-        <TaskItemButton
-          onClick={() => setIsConfirmDeleteOpen(true)}
-          icon={<TrashIcon />}
-        />
         <TaskDetailSheet
-          key={task.id}
           task={task}
           isOpen={isDetailOpen}
           onOpenChange={setIsDetailOpen}
           onChangeStatus={onChangeStatus}
           onChangeDesc={onChangeDesc}
+        />
+        <TaskItemButton
+          onClick={() => setIsConfirmDeleteOpen(true)}
+          icon={<TrashIcon />}
         />
         <ConfirmTaskDeleteDialog
           task={task}
@@ -420,6 +460,87 @@ const TaskCard: React.FC<{
   );
 };
 
+const EditableTaskTitle = forwardRef<
+  HTMLInputElement,
+  {
+    task: Task;
+    editable: boolean;
+    onChangeEditable: (editable: boolean) => void;
+    onChangeTitle: (title: string) => void;
+  }
+>(function EditableTaskTitle(
+  { task, editable, onChangeEditable, onChangeTitle },
+  _inputRef,
+) {
+  const {
+    register,
+    handleSubmit: createHandleSubmit,
+    formState: { errors },
+  } = useForm<TaskFormData>({
+    defaultValues: { title: task.title },
+    resolver: zodResolver(taskFormSchema),
+  });
+  const { ref: _ref, onBlur, ...registers } = register("title");
+
+  const ref = useMergeRefs([_inputRef, _ref]);
+
+  const handleBlur: FocusEventHandler<HTMLInputElement> = (e) => {
+    onBlur(e);
+    onChangeEditable(false);
+  };
+
+  const handleSubmit = createHandleSubmit((data) => {
+    onChangeTitle(data.title);
+    onChangeEditable(false);
+  });
+
+  return editable ? (
+    <Popover.Root open={!!errors.title}>
+      <Popover.Anchor asChild>
+        <form className="w-full" onSubmit={handleSubmit}>
+          <input
+            ref={ref}
+            className="w-full"
+            onBlur={handleBlur}
+            {...registers}
+          />
+        </form>
+      </Popover.Anchor>
+      <AnimatePresence>
+        {errors.title && (
+          <Popover.Portal forceMount>
+            <Popover.Content
+              side="bottom"
+              align="start"
+              sideOffset={4}
+              arrowPadding={10}
+              asChild
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <motion.div
+                className="flex gap-1 rounded bg-neutral-900 p-2 text-xs text-red-300"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+              >
+                <AlertCircleIcon size={15} />
+                {errors.title.message}
+              </motion.div>
+            </Popover.Content>
+          </Popover.Portal>
+        )}
+      </AnimatePresence>
+    </Popover.Root>
+  ) : (
+    <label
+      className="cursor-pointer select-none break-all checked:line-through"
+      htmlFor={task.id}
+    >
+      {task.title}
+    </label>
+  );
+});
+
 const TaskDetailSheet: React.FC<{
   task: Task;
   isOpen: boolean;
@@ -428,31 +549,31 @@ const TaskDetailSheet: React.FC<{
   onChangeDesc: (id: string, desc: string) => void;
 }> = ({ task, isOpen, onOpenChange, onChangeStatus, onChangeDesc }) => {
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+    <RadixDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <AnimatePresence>
         {isOpen && (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay forceMount asChild>
+          <RadixDialog.Portal forceMount>
+            <RadixDialog.Overlay forceMount asChild>
               <motion.div
                 className="fixed inset-0 bg-black/10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               />
-            </Dialog.Overlay>
+            </RadixDialog.Overlay>
 
-            <Dialog.Content forceMount asChild>
+            <RadixDialog.Content forceMount asChild>
               <motion.div
-                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700"
+                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700 [&_*]:outline-neutral-900"
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 20, opacity: 0 }}
               >
-                <Dialog.Close asChild>
+                <RadixDialog.Close asChild>
                   <button className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5">
                     <XIcon />
                   </button>
-                </Dialog.Close>
+                </RadixDialog.Close>
                 <div className="space-y-1">
                   <div className="text-xs text-neutral-500">title</div>
                   <div className="text-2xl font-bold">{task.title}</div>
@@ -465,7 +586,7 @@ const TaskDetailSheet: React.FC<{
                   </div>
                   <div className="ml-2">
                     <TaskStatusBadge
-                      done={task.checked}
+                      done={task.done}
                       onChangeDone={() => onChangeStatus(task.id)}
                     />
                   </div>
@@ -481,11 +602,11 @@ const TaskDetailSheet: React.FC<{
                   />
                 </div>
               </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
+            </RadixDialog.Content>
+          </RadixDialog.Portal>
         )}
       </AnimatePresence>
-    </Dialog.Root>
+    </RadixDialog.Root>
   );
 };
 
@@ -518,7 +639,7 @@ const TaskDescriptionForm: React.FC<{
   return (
     <div className="space-y-1">
       <textarea
-        className="h-[300px] w-full resize-none rounded border border-neutral-300 bg-transparent p-3 focus-visible:border-neutral-400 focus-visible:outline-neutral-400"
+        className="h-[300px] w-full resize-none rounded border border-neutral-300 bg-transparent p-3 focus-visible:border-neutral-400 focus-visible:outline-neutral-900"
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
       />
@@ -555,6 +676,71 @@ const TaskDescriptionForm: React.FC<{
   );
 };
 
+const Dialog: React.FC<{
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  titleText: string;
+  cancelText: string;
+  actionText: string;
+  onAction: () => void;
+  children: ReactNode;
+}> = ({
+  isOpen,
+  onOpenChange,
+  titleText,
+  cancelText,
+  actionText,
+  onAction,
+  children,
+}) => {
+  return (
+    <RadixDialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixDialog.Portal forceMount>
+            <RadixDialog.Overlay asChild>
+              <motion.div className="fixed inset-0 bg-black/15" />
+            </RadixDialog.Overlay>
+
+            <RadixDialog.Content asChild>
+              <motion.div
+                className="fixed left-1/2 top-1/2 flex min-h-[200px] w-[500px] flex-col overflow-hidden rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-600"
+                initial={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
+                animate={{ opacity: 1, translateX: "-50%", translateY: "-40%" }}
+                exit={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
+              >
+                <RadixDialog.Close asChild>
+                  <button className="absolute right-2 top-2 rounded p-1 text-neutral-100 transition-colors hover:bg-white/20">
+                    <XIcon />
+                  </button>
+                </RadixDialog.Close>
+                <div className="bg-neutral-900 p-4 text-lg font-bold text-neutral-100">
+                  {titleText}
+                </div>
+                <div className="grow p-4">{children}</div>
+                <div className="flex justify-end gap-2 p-4">
+                  <button
+                    className="rounded border border-neutral-300 px-3 py-2 text-sm transition-colors hover:bg-neutral-200"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    {cancelText}
+                  </button>
+                  <button
+                    className="rounded bg-neutral-900 px-3 py-2 text-sm text-neutral-100 hover:bg-neutral-700"
+                    onClick={onAction}
+                  >
+                    {actionText}
+                  </button>
+                </div>
+              </motion.div>
+            </RadixDialog.Content>
+          </RadixDialog.Portal>
+        )}
+      </AnimatePresence>
+    </RadixDialog.Root>
+  );
+};
+
 const ConfirmTaskDeleteDialog: React.FC<{
   task: Task;
   isOpen: boolean;
@@ -562,55 +748,23 @@ const ConfirmTaskDeleteDialog: React.FC<{
   onConfirm: () => void;
 }> = ({ task, isOpen, onOpenChange, onConfirm }) => {
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
-      <AnimatePresence>
-        {isOpen && (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild>
-              <motion.div className="fixed inset-0 bg-black/15" />
-            </Dialog.Overlay>
-
-            <Dialog.Content asChild>
-              <motion.div
-                className="fixed left-1/2 top-1/2 flex min-h-[200px] w-[500px] flex-col overflow-hidden rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-600"
-                initial={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
-                animate={{ opacity: 1, translateX: "-50%", translateY: "-40%" }}
-                exit={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
-              >
-                <Dialog.Close asChild>
-                  <button className="absolute right-2 top-2 rounded p-1 transition-colors hover:bg-black/5">
-                    <XIcon />
-                  </button>
-                </Dialog.Close>
-                <div className="p-4 text-lg font-bold">タスクの削除</div>
-                <div className="grow px-4 py-2">
-                  タスク`
-                  <span className="mx-1 font-bold text-neutral-900">
-                    {task.title}
-                  </span>
-                  ` を削除してもよろしいですか？
-                  <br />
-                  タスクを削除すると、もとに戻すことはできません。
-                </div>
-                <div className="flex justify-end gap-2 p-4">
-                  <button
-                    className="rounded border border-neutral-300 px-3 py-2 text-sm transition-colors hover:bg-neutral-200"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    キャンセル
-                  </button>
-                  <button
-                    className="rounded bg-neutral-900 px-3 py-2 text-sm text-neutral-100 hover:bg-neutral-700"
-                    onClick={onConfirm}
-                  >
-                    削除する
-                  </button>
-                </div>
-              </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        )}
-      </AnimatePresence>
-    </Dialog.Root>
+    <Dialog
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      titleText="タスクの削除"
+      cancelText="キャンセル"
+      actionText="削除する"
+      onAction={onConfirm}
+    >
+      <div>
+        タスク`
+        <span className="mx-1 break-all font-bold text-neutral-900">
+          {task.title}
+        </span>
+        ` を削除してもよろしいですか？
+        <br />
+        タスクを削除すると、もとに戻すことはできません。
+      </div>
+    </Dialog>
   );
 };
