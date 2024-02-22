@@ -175,7 +175,7 @@ const Slider: React.FC<{
 
 // Rangeの長さを調節して、Thumbとずれないようにする
 const CustomRange = forwardRef<HTMLSpanElement, RadixSlider.SliderThumbProps>(
-  function CustomRange({ style, ...others }, ref) {
+  function CustomRange({ style, ...others }) {
     let right =
       parseFloat(style?.right?.toString().split("calc(")[0] ?? "0") ?? 0;
     const delta = `${(right - 50) / 4}px`;

@@ -3,7 +3,6 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import {
-  AlertCircleIcon,
   BellIcon,
   BirdIcon,
   CatIcon,

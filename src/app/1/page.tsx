@@ -73,7 +73,6 @@ const initialTasks: Task[] = [
 
 const Home: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
   const handleAddTask = (title: string) => {
@@ -143,8 +142,6 @@ const Home: React.FC = () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
-
-  const [s, setS] = useState(false);
 
   return (
     <div className={clsx(inter.className, "flex h-[100dvh] bg-neutral-100 ")}>
