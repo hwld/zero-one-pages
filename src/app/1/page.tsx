@@ -1,7 +1,9 @@
 "use client";
 
+import { useMergeRefs } from "@floating-ui/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -21,7 +23,15 @@ import {
   XIcon,
 } from "lucide-react";
 import { Inter } from "next/font/google";
-import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
+import {
+  FocusEventHandler,
+  ReactNode,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useForm } from "react-hook-form";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -66,9 +76,7 @@ const Home: React.FC = () => {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
-  const handleAddTask = (e: SyntheticEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleAddTask = (title: string) => {
     setTasks((t) => [
       ...t,
       {
@@ -80,7 +88,6 @@ const Home: React.FC = () => {
         updatedAt: new Date().toLocaleString(),
       },
     ]);
-    setTitle("");
   };
 
   const handleChangeStatus = (id: string) => {
@@ -137,6 +144,8 @@ const Home: React.FC = () => {
     };
   }, []);
 
+  const [s, setS] = useState(false);
+
   return (
     <div className={clsx(inter.className, "flex h-[100dvh] bg-neutral-100 ")}>
       <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 py-5 lg:flex">
@@ -179,23 +188,7 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="absolute bottom-0 m-5 flex max-w-[95%] items-start gap-2">
-          <div className="flex h-[50px] w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
-            <form onSubmit={handleAddTask} className="h-full w-full">
-              <input
-                ref={inputRef}
-                className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 placeholder:text-neutral-400 focus:outline-none"
-                placeholder="タスクを入力してください..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </form>
-            <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
-              <div className="flex items-center text-neutral-50">
-                <CommandIcon size={15} />
-                <div className="select-none text-sm">K</div>
-              </div>
-            </div>
-          </div>
+          <TaskForm onAddTask={handleAddTask} ref={inputRef} />
           <div className="shrink-0">
             <Menu />
           </div>
@@ -206,6 +199,83 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+type TaskFormInput = { title: string };
+const TaskForm = forwardRef<
+  HTMLInputElement,
+  { onAddTask: (title: string) => void }
+>(function TaskForm({ onAddTask }, _inputRef) {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit: buildHandleSubmit,
+    clearErrors,
+    reset,
+  } = useForm<TaskFormInput>({
+    defaultValues: { title: "" },
+  });
+  const { ref, onBlur, ...otherRegister } = register("title", {
+    required: "タスクのタイトルを入力してください",
+  });
+  const inputRef = useMergeRefs([_inputRef, ref]);
+
+  const handleBlur: FocusEventHandler<HTMLInputElement> = (e) => {
+    onBlur(e);
+    clearErrors("title");
+  };
+
+  const handleSubmit = buildHandleSubmit((d: TaskFormInput) => {
+    onAddTask(d.title);
+    reset({ title: "" });
+  });
+
+  return (
+    <Popover.Root open={!!errors.title}>
+      <Popover.Anchor>
+        <div className="flex h-[50px] w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
+          <form onSubmit={handleSubmit} className="h-full w-full">
+            <input
+              ref={inputRef}
+              className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 placeholder:text-neutral-400 focus:outline-none"
+              placeholder="タスクを入力してください..."
+              onBlur={handleBlur}
+              {...otherRegister}
+            />
+          </form>
+          <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
+            <div className="flex items-center text-neutral-50">
+              <CommandIcon size={15} />
+              <div className="select-none text-sm">K</div>
+            </div>
+          </div>
+        </div>
+      </Popover.Anchor>
+      <AnimatePresence>
+        {errors.title && (
+          <Popover.Portal forceMount>
+            <Popover.Content
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              side="top"
+              sideOffset={4}
+              asChild
+            >
+              <motion.div
+                className="flex items-center gap-1 rounded bg-neutral-900 p-2 text-xs text-red-200"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                <AlertCircleIcon size={18} />
+                {errors.title.message}
+                <Popover.Arrow className="fill-neutral-900" />
+              </motion.div>
+            </Popover.Content>
+          </Popover.Portal>
+        )}
+      </AnimatePresence>
+    </Popover.Root>
+  );
+});
 
 const SideBarItem: React.FC<{
   children: ReactNode;
@@ -376,7 +446,7 @@ const TaskDetailSheet: React.FC<{
 
             <Dialog.Content forceMount asChild>
               <motion.div
-                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700"
+                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700"
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 20, opacity: 0 }}
