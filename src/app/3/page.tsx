@@ -41,7 +41,7 @@ const Page: NextPage = () => {
     onOpenChange: (isOpen) => {
       setIsOpen(isOpen);
     },
-    placement: "top-end",
+    placement: "top",
     whileElementsMounted: autoUpdate,
     middleware: [offset(10)],
   });

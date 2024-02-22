@@ -10,10 +10,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ActivityIcon,
   AlertCircleIcon,
+  BoxSelectIcon,
   CalendarIcon,
   CheckIcon,
+  CircleIcon,
   CommandIcon,
-  CopyCheckIcon,
   HomeIcon,
   LayoutListIcon,
   MoreHorizontalIcon,
@@ -47,36 +48,9 @@ const taskSchema = z.object({
 });
 type Task = z.infer<typeof taskSchema>;
 
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    title: "zero-one-uiにページを追加する",
-    description: "",
-    createdAt: new Date().toLocaleString(),
-    updatedAt: new Date().toLocaleString(),
-    done: false,
-  },
-  {
-    id: "2",
-    title: "GraphQLの勉強をする",
-    description: "",
-    createdAt: new Date().toLocaleString(),
-    updatedAt: new Date().toLocaleString(),
-    done: false,
-  },
-  {
-    id: "3",
-    title: "OpenAPIを使ってみる",
-    description: "",
-    createdAt: new Date().toLocaleString(),
-    updatedAt: new Date().toLocaleString(),
-    done: false,
-  },
-];
-
 const Home: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const handleAddTask = (title: string) => {
     setTasks((t) => [
@@ -164,16 +138,16 @@ const Home: React.FC = () => {
     <div
       className={clsx(
         inter.className,
-        "flex h-[100dvh] bg-neutral-100 [&_*]:outline-neutral-500",
+        "flex h-[100dvh] bg-neutral-100 text-neutral-700",
       )}
     >
-      <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 py-5 lg:flex">
-        <div className="flex items-center gap-2 px-5 font-bold text-neutral-100">
-          <CopyCheckIcon size={20} />
-          todo-list
+      <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
+        <div className="flex items-center gap-2 px-3 font-bold text-neutral-100">
+          <CircleIcon strokeWidth={3} />
+          TODODO
         </div>
-        <div className="h-[1px] w-full bg-gray-600" />
-        <div className="flex flex-col items-start gap-2 px-2">
+        <div className="h-[1px] w-full bg-neutral-600" />
+        <div className="flex flex-col items-start gap-2">
           <SideBarItem active icon={<HomeIcon />}>
             今日のタスク
           </SideBarItem>
@@ -185,29 +159,40 @@ const Home: React.FC = () => {
         className="flex grow flex-col items-center overflow-auto"
         style={{ backgroundImage: "url(/1-bg.svg)", backgroundSize: "200px" }}
       >
-        <div className="h-full w-full max-w-5xl shrink-0 ">
-          <div className="flex flex-col gap-5 px-3 pb-24 pt-10">
+        <div className="h-full w-full max-w-3xl shrink-0 ">
+          <div className="flex flex-col gap-4 px-3 pb-24 pt-10">
             <h1 className="flex items-center gap-2 font-bold text-neutral-700">
               <HomeIcon strokeWidth={3} size={20} />
               <div className="pt-[3px]">今日のタスク</div>
             </h1>
             <div className="flex flex-col gap-2">
-              {tasks.map((task) => {
-                return (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onDelete={handleDeleteTask}
-                    onChangeStatus={handleChangeStatus}
-                    onChangeDesc={handleChangeDesc}
-                    onChangeTitle={handleChangeTitle}
-                  />
-                );
-              })}
+              {tasks.length === 0 && <EmptyTask />}
+              <AnimatePresence mode="popLayout">
+                {tasks.map((task) => {
+                  return (
+                    <motion.div
+                      key={task.id}
+                      layout
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDeleteTask}
+                        onChangeStatus={handleChangeStatus}
+                        onChangeDesc={handleChangeDesc}
+                        onChangeTitle={handleChangeTitle}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 m-5 flex max-w-[95%] items-start gap-2">
+        <div className="absolute bottom-0 flex max-w-[95%] items-start gap-2 py-5">
           <TaskForm onAddTask={handleAddTask} ref={inputRef} />
           <div className="shrink-0">
             <Menu />
@@ -219,6 +204,18 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+const EmptyTask: React.FC = () => {
+  return (
+    <div className="grid w-full place-items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-5 py-20">
+      <BoxSelectIcon size={80} />
+      <div className="text-center">
+        <div className="font-bold">タスクが存在しません</div>
+        <div>`Ctrl`+`k`または、`Cmd`+`k`を入力し、タスクを追加できます</div>
+      </div>
+    </div>
+  );
+};
 
 const taskFormSchema = z.object({
   title: z
@@ -256,8 +253,8 @@ const TaskForm = forwardRef<
 
   return (
     <Popover.Root open={!!errors.title}>
-      <Popover.Anchor>
-        <div className="flex h-[50px] w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-500 transition-all duration-300 ease-in-out focus-within:w-[700px]">
+      <Popover.Anchor asChild>
+        <div className="flex h-[50px] w-[300px] max-w-full items-center justify-center overflow-hidden rounded-full bg-neutral-900 shadow-lg  shadow-neutral-800/20 ring-neutral-900 ring-offset-2 ring-offset-neutral-100 transition-all duration-300 ease-in-out focus-within:w-[650px] focus-within:ring">
           <form onSubmit={handleSubmit} className="h-full w-full">
             <input
               ref={inputRef}
@@ -339,7 +336,7 @@ const Menu: React.FC = () => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-neutral-100 transition-all duration-200 hover:bg-neutral-700 focus:outline-none">
+        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-neutral-100 ring-neutral-900 ring-offset-2 ring-offset-neutral-100 transition-colors duration-200 hover:bg-neutral-700 focus-visible:outline-none focus-visible:ring">
           <MoreHorizontalIcon size="60%" />
         </button>
       </DropdownMenu.Trigger>
@@ -564,42 +561,48 @@ const TaskDetailSheet: React.FC<{
 
             <RadixDialog.Content forceMount asChild>
               <motion.div
-                className="fixed bottom-0 right-0 top-0 z-10 m-3 flex w-[450px] flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700 [&_*]:outline-neutral-900"
+                className="fixed bottom-0 right-0 top-0 z-10 w-[450px] max-w-full p-3"
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 20, opacity: 0 }}
               >
-                <RadixDialog.Close asChild>
-                  <button className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5">
-                    <XIcon />
-                  </button>
-                </RadixDialog.Close>
-                <div className="space-y-1">
-                  <div className="text-xs text-neutral-500">title</div>
-                  <div className="text-2xl font-bold">{task.title}</div>
-                  <div className="text-xs text-neutral-500">ID: {task.id}</div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1 text-sm text-neutral-500">
-                    <ActivityIcon size={18} />
-                    <div>状態</div>
+                <div className="relative flex h-full w-full flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700 [&_*]:outline-neutral-900">
+                  <RadixDialog.Close asChild>
+                    <button className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5">
+                      <XIcon />
+                    </button>
+                  </RadixDialog.Close>
+                  <div className="space-y-1">
+                    <div className="text-xs text-neutral-500">title</div>
+                    <div className="text-2xl font-bold">{task.title}</div>
+                    <div className="text-xs text-neutral-500">
+                      ID: {task.id}
+                    </div>
                   </div>
-                  <div className="ml-2">
-                    <TaskStatusBadge
-                      done={task.done}
-                      onChangeDone={() => onChangeStatus(task.id)}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1 text-sm text-neutral-500">
+                      <ActivityIcon size={18} />
+                      <div>状態</div>
+                    </div>
+                    <div className="ml-2">
+                      <TaskStatusBadge
+                        done={task.done}
+                        onChangeDone={() => onChangeStatus(task.id)}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1 text-sm text-neutral-500">
+                      <TextIcon size={18} />
+                      <div>説明</div>
+                    </div>
+                    <TaskDescriptionForm
+                      defaultDescription={task.description}
+                      onChangeDescription={(desc) =>
+                        onChangeDesc(task.id, desc)
+                      }
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1 text-sm text-neutral-500">
-                    <TextIcon size={18} />
-                    <div>説明</div>
-                  </div>
-                  <TaskDescriptionForm
-                    defaultDescription={task.description}
-                    onChangeDescription={(desc) => onChangeDesc(task.id, desc)}
-                  />
                 </div>
               </motion.div>
             </RadixDialog.Content>
@@ -652,18 +655,18 @@ const TaskDescriptionForm: React.FC<{
             exit={{ opacity: 0, y: -5 }}
           >
             <div className="flex items-center gap-1">
-              <AlertCircleIcon size={18} />
-              <div className="text-sm">変更が保存されていません</div>
+              <AlertCircleIcon size={18} className="shrink-0" />
+              <div className="text-xs">変更が保存されていません</div>
             </div>
             <div className="flex gap-1">
               <button
-                className="rounded border border-neutral-300 px-3 py-1 text-sm text-neutral-700 transition-colors hover:bg-black/10"
+                className="whitespace-nowrap rounded border border-neutral-300 px-3 py-1 text-sm text-neutral-700 transition-colors hover:bg-black/10"
                 onClick={() => setDesc(defaultDescription)}
               >
                 変更を取り消す
               </button>
               <button
-                className="rounded bg-neutral-900 px-3 py-1 text-sm text-neutral-100 transition-colors hover:bg-neutral-700"
+                className="whitespace-nowrap rounded bg-neutral-900 px-3 py-1 text-sm text-neutral-100 transition-colors hover:bg-neutral-700"
                 onClick={() => onChangeDescription(desc)}
               >
                 保存
@@ -704,7 +707,7 @@ const Dialog: React.FC<{
 
             <RadixDialog.Content asChild>
               <motion.div
-                className="fixed left-1/2 top-1/2 flex min-h-[200px] w-[500px] flex-col overflow-hidden rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-600"
+                className="fixed left-1/2 top-1/2 flex min-h-[200px] w-[500px] max-w-[95%] flex-col overflow-hidden rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-600"
                 initial={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
                 animate={{ opacity: 1, translateX: "-50%", translateY: "-40%" }}
                 exit={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
