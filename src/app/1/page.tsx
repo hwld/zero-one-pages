@@ -35,7 +35,6 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UiPage } from "@/common/ui-page";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -136,73 +135,71 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <UiPage minWidth={300}>
+    <div
+      className={clsx(
+        inter.className,
+        "flex h-[100dvh] bg-neutral-100 text-neutral-700",
+      )}
+    >
+      <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
+        <div className="flex items-center gap-2 px-3 font-bold text-neutral-100">
+          <CircleIcon strokeWidth={3} />
+          TODODO
+        </div>
+        <div className="h-[1px] w-full bg-neutral-600" />
+        <div className="flex flex-col items-start gap-2">
+          <SideBarItem active icon={<HomeIcon />}>
+            今日のタスク
+          </SideBarItem>
+          <SideBarItem icon={<LayoutListIcon />}>過去のタスク</SideBarItem>
+          <SideBarItem icon={<CalendarIcon />}>予定</SideBarItem>
+        </div>
+      </div>
       <div
-        className={clsx(
-          inter.className,
-          "flex h-[100dvh] bg-neutral-100 text-neutral-700",
-        )}
+        className="flex grow flex-col items-center overflow-auto"
+        style={{ backgroundImage: "url(/1-bg.svg)", backgroundSize: "200px" }}
       >
-        <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
-          <div className="flex items-center gap-2 px-3 font-bold text-neutral-100">
-            <CircleIcon strokeWidth={3} />
-            TODODO
-          </div>
-          <div className="h-[1px] w-full bg-neutral-600" />
-          <div className="flex flex-col items-start gap-2">
-            <SideBarItem active icon={<HomeIcon />}>
-              今日のタスク
-            </SideBarItem>
-            <SideBarItem icon={<LayoutListIcon />}>過去のタスク</SideBarItem>
-            <SideBarItem icon={<CalendarIcon />}>予定</SideBarItem>
+        <div className="h-full w-full max-w-3xl shrink-0 ">
+          <div className="flex flex-col gap-4 px-3 pb-24 pt-10">
+            <h1 className="flex items-center gap-2 font-bold text-neutral-700">
+              <HomeIcon strokeWidth={3} size={20} />
+              <div className="pt-[3px]">今日のタスク</div>
+            </h1>
+            <div className="flex flex-col gap-2">
+              {tasks.length === 0 && <EmptyTask />}
+              <AnimatePresence mode="popLayout">
+                {tasks.map((task) => {
+                  return (
+                    <motion.div
+                      key={task.id}
+                      layout
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDeleteTask}
+                        onChangeStatus={handleChangeStatus}
+                        onChangeDesc={handleChangeDesc}
+                        onChangeTitle={handleChangeTitle}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-        <div
-          className="flex grow flex-col items-center overflow-auto"
-          style={{ backgroundImage: "url(/1-bg.svg)", backgroundSize: "200px" }}
-        >
-          <div className="h-full w-full max-w-3xl shrink-0 ">
-            <div className="flex flex-col gap-4 px-3 pb-24 pt-10">
-              <h1 className="flex items-center gap-2 font-bold text-neutral-700">
-                <HomeIcon strokeWidth={3} size={20} />
-                <div className="pt-[3px]">今日のタスク</div>
-              </h1>
-              <div className="flex flex-col gap-2">
-                {tasks.length === 0 && <EmptyTask />}
-                <AnimatePresence mode="popLayout">
-                  {tasks.map((task) => {
-                    return (
-                      <motion.div
-                        key={task.id}
-                        layout
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                      >
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          onDelete={handleDeleteTask}
-                          onChangeStatus={handleChangeStatus}
-                          onChangeDesc={handleChangeDesc}
-                          onChangeTitle={handleChangeTitle}
-                        />
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-0 flex max-w-[95%] items-start gap-2 py-5">
-            <TaskForm onAddTask={handleAddTask} ref={inputRef} />
-            <div className="shrink-0">
-              <Menu />
-            </div>
+        <div className="absolute bottom-0 flex max-w-[95%] items-start gap-2 py-5">
+          <TaskForm onAddTask={handleAddTask} ref={inputRef} />
+          <div className="shrink-0">
+            <Menu />
           </div>
         </div>
       </div>
-    </UiPage>
+    </div>
   );
 };
 

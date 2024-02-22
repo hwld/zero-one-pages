@@ -15,17 +15,14 @@ import {
 import { NextPage } from "next";
 import { forwardRef, useState } from "react";
 import * as RadixSlider from "@radix-ui/react-slider";
-import { UiPage } from "@/common/ui-page";
 
 const AppControlPage: NextPage = () => {
   return (
-    <UiPage minWidth={300}>
-      <div className="h-dvh w-dvw bg-neutral-200 pt-5">
-        <div className="m-auto w-min">
-          <AppControl />
-        </div>
+    <div className="h-dvh w-dvw bg-neutral-200 pt-5">
+      <div className="m-auto w-min">
+        <AppControl />
       </div>
-    </UiPage>
+    </div>
   );
 };
 

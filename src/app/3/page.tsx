@@ -26,7 +26,6 @@ import {
   useFloating,
   useInteractions,
 } from "@floating-ui/react";
-import { UiPage } from "@/common/ui-page";
 
 const initialMenu = [...new Array(3)].map(
   (_, i) => `長いメニューアイテム${i + 1}`,
@@ -55,28 +54,26 @@ const Page: NextPage = () => {
   ]);
 
   return (
-    <UiPage minWidth={300}>
-      <div className="flex h-[100dvh] justify-center bg-neutral-900 pt-[50px] text-neutral-900">
-        <div className="mt-[500px]">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-            <MenuTrigger ref={refs.setReference} {...getReferenceProps()} />
-          </motion.div>
-          <AnimatePresence>
-            {isOpen && (
-              <div
-                ref={refs.setFloating}
-                style={floatingStyles}
-                {...getFloatingProps()}
-              >
-                <Menu>
-                  <MenuContent page={page} onPageChange={setPage} />
-                </Menu>
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
+    <div className="flex h-[100dvh] justify-center bg-neutral-900 pt-[50px] text-neutral-900">
+      <div className="mt-[500px]">
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+          <MenuTrigger ref={refs.setReference} {...getReferenceProps()} />
+        </motion.div>
+        <AnimatePresence>
+          {isOpen && (
+            <div
+              ref={refs.setFloating}
+              style={floatingStyles}
+              {...getFloatingProps()}
+            >
+              <Menu>
+                <MenuContent page={page} onPageChange={setPage} />
+              </Menu>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
-    </UiPage>
+    </div>
   );
 };
 
