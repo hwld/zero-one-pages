@@ -15,14 +15,17 @@ import {
 import { NextPage } from "next";
 import { forwardRef, useState } from "react";
 import * as RadixSlider from "@radix-ui/react-slider";
+import { UiPage } from "@/common/ui-page";
 
 const AppControlPage: NextPage = () => {
   return (
-    <div className="h-dvh w-dvw bg-neutral-200 pt-5">
-      <div className="m-auto w-min">
-        <AppControl />
+    <UiPage minWidth={300}>
+      <div className="h-dvh w-dvw bg-neutral-200 pt-5">
+        <div className="m-auto w-min">
+          <AppControl />
+        </div>
       </div>
-    </div>
+    </UiPage>
   );
 };
 
@@ -37,12 +40,12 @@ const AppControl: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-2">
-      <motion.div>{content[mode]}</motion.div>
+    <div className="flex max-w-[100dvw] gap-2 px-2">
+      {content[mode]}
       {mode !== "menu" && (
         <button
           onClick={() => setMode("menu")}
-          className="grid size-[36px] place-items-center rounded-full bg-neutral-900 transition-colors hover:bg-neutral-700"
+          className="grid size-[36px] shrink-0 place-items-center rounded-full bg-neutral-900 transition-colors hover:bg-neutral-700"
         >
           <XIcon />
         </button>
@@ -103,7 +106,9 @@ const Search: React.FC = () => {
       transition={{ type: "spring", damping: 20, stiffness: 200 }}
       style={{ borderRadius: "20px" }}
     >
-      <SearchIcon size={20} />
+      <motion.div layout="preserve-aspect">
+        <SearchIcon size={20} />
+      </motion.div>
       <input className="grow bg-transparent text-neutral-100 outline-none" />
     </motion.div>
   );
@@ -161,7 +166,7 @@ const Slider: React.FC<{
         <RadixSlider.Range asChild className="absolute h-full bg-neutral-100">
           <CustomRange />
         </RadixSlider.Range>
-        <div className="absolute left-1 top-0 z-10 flex h-full items-center text-neutral-800">
+        <div className="pointer-events-none absolute left-1 top-0 z-10 flex h-full items-center text-neutral-800">
           <Icon size={20} />
         </div>
       </RadixSlider.Track>

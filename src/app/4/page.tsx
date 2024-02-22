@@ -1,5 +1,6 @@
 "use client";
 
+import { UiPage } from "@/common/ui-page";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import {
@@ -51,86 +52,88 @@ const Page: NextPage = () => {
   };
 
   return (
-    <div className="grid h-dvh grid-cols-[70px_250px_1fr] bg-neutral-100 text-neutral-100">
-      <div className="flex flex-col items-center justify-between gap-3 bg-neutral-950 py-3">
-        <div className="flex flex-col gap-3">
-          <div className="size-[45px] rounded-full bg-green-500" />
-          <div className="h-[1px] w-[45px] bg-neutral-700" />
-        </div>
-        <div className="flex h-full flex-col gap-3">
-          <ServerItem icon={BirdIcon} />
-          <ServerItem icon={CatIcon} active />
-          <ServerItem icon={DogIcon} />
-          <ServerItem icon={FishIcon} />
-          <ServerItem icon={RabbitIcon} />
-        </div>
-        <div className="flex flex-col">
-          <button className="grid size-[45px] place-items-center rounded-md bg-neutral-500 text-neutral-100 transition-colors hover:bg-neutral-600">
-            <PlusIcon />
-          </button>
-        </div>
-      </div>
-      <div className="grid grid-rows-[40px_1fr_min-content] bg-neutral-900">
-        <div className="flex items-center gap-1 bg-white/10 p-3 text-sm">
-          <CatIcon size={18} strokeWidth={1.5} />
-          Cat server
-        </div>
-        <div className="flex flex-col items-start gap-1 p-3">
-          <ChannelLink active />
-          <ChannelLink />
-          <ChannelLink />
-          <ChannelLink />
-          <ChannelLink />
-          <ChannelLink />
-        </div>
-        <div className="flex justify-between gap-2 bg-white/10 p-3">
-          <div className="grid size-[30px] shrink-0 place-items-center rounded-full border border-neutral-400 bg-neutral-700">
-            <UserIcon size={20} className="text-green-500" />
+    <UiPage>
+      <div className="grid h-dvh grid-cols-[70px_250px_1fr] bg-neutral-100 text-neutral-100">
+        <div className="flex flex-col items-center justify-between gap-3 bg-neutral-950 py-3">
+          <div className="flex flex-col gap-3">
+            <div className="size-[45px] rounded-full bg-green-500" />
+            <div className="h-[1px] w-[45px] bg-neutral-700" />
           </div>
-          <div className="w-full text-sm">
-            <div>username</div>
-            <div className="text-xs">status</div>
+          <div className="flex h-full flex-col gap-3">
+            <ServerItem icon={BirdIcon} />
+            <ServerItem icon={CatIcon} active />
+            <ServerItem icon={DogIcon} />
+            <ServerItem icon={FishIcon} />
+            <ServerItem icon={RabbitIcon} />
           </div>
-          <div className="flex gap-1">
-            <UserMenuItem icon={BellIcon} />
-            <UserMenuItem icon={SettingsIcon} />
+          <div className="flex flex-col">
+            <button className="grid size-[45px] place-items-center rounded-md bg-neutral-500 text-neutral-100 transition-colors hover:bg-neutral-600">
+              <PlusIcon />
+            </button>
           </div>
         </div>
-      </div>
-      <div className="grid grid-rows-[40px_1fr_70px] overflow-hidden bg-neutral-800">
-        <div className="flex items-center gap-1 bg-white/10 p-5 text-sm">
-          <HashIcon size={18} className="text-green-500" />
-          <div>channnel</div>
+        <div className="grid grid-rows-[40px_1fr_min-content] bg-neutral-900">
+          <div className="flex items-center gap-1 bg-white/10 p-3 text-sm">
+            <CatIcon size={18} strokeWidth={1.5} />
+            Cat server
+          </div>
+          <div className="flex flex-col items-start gap-1 p-3">
+            <ChannelLink active />
+            <ChannelLink />
+            <ChannelLink />
+            <ChannelLink />
+            <ChannelLink />
+            <ChannelLink />
+          </div>
+          <div className="flex justify-between gap-2 bg-white/10 p-3">
+            <div className="grid size-[30px] shrink-0 place-items-center rounded-full border border-neutral-400 bg-neutral-700">
+              <UserIcon size={20} className="text-green-500" />
+            </div>
+            <div className="w-full text-sm">
+              <div>username</div>
+              <div className="text-xs">status</div>
+            </div>
+            <div className="flex gap-1">
+              <UserMenuItem icon={BellIcon} />
+              <UserMenuItem icon={SettingsIcon} />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-3 overflow-auto p-5">
-          {chats.length === 0 && <EmptyChat />}
-          {chats.map(({ id, text }) => (
-            <ChatCard
-              key={id}
-              onDelete={() => {
-                setChats((c) => c.filter((c) => c.id !== id));
-              }}
+        <div className="grid grid-rows-[40px_1fr_70px] overflow-hidden bg-neutral-800">
+          <div className="flex items-center gap-1 bg-white/10 p-5 text-sm">
+            <HashIcon size={18} className="text-green-500" />
+            <div>channnel</div>
+          </div>
+          <div className="flex flex-col gap-3 overflow-auto p-5">
+            {chats.length === 0 && <EmptyChat />}
+            {chats.map(({ id, text }) => (
+              <ChatCard
+                key={id}
+                onDelete={() => {
+                  setChats((c) => c.filter((c) => c.id !== id));
+                }}
+              >
+                {text}
+              </ChatCard>
+            ))}
+          </div>
+          <div className="flex items-center bg-transparent px-10">
+            <form
+              onSubmit={handleSubmit}
+              className="flex h-[45px] w-full items-center gap-2 rounded-md bg-neutral-600 px-3 ring-neutral-400 ring-offset-2 ring-offset-neutral-700 transition-shadow focus-within:ring-2"
             >
-              {text}
-            </ChatCard>
-          ))}
-        </div>
-        <div className="flex items-center bg-transparent px-10">
-          <form
-            onSubmit={handleSubmit}
-            className="flex h-[45px] w-full items-center gap-2 rounded-md bg-neutral-600 px-3 ring-neutral-400 ring-offset-2 ring-offset-neutral-700 transition-shadow focus-within:ring-2"
-          >
-            <PlusCircleIcon className="text-green-500" />
-            <input
-              name={chatInputName}
-              autoComplete="off"
-              className="h-full w-full bg-transparent focus-visible:outline-none"
-            />
-            <SendHorizontalIcon className="text-green-500" />
-          </form>
+              <PlusCircleIcon className="text-green-500" />
+              <input
+                name={chatInputName}
+                autoComplete="off"
+                className="h-full w-full bg-transparent focus-visible:outline-none"
+              />
+              <SendHorizontalIcon className="text-green-500" />
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </UiPage>
   );
 };
 export default Page;
