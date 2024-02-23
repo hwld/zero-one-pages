@@ -41,6 +41,7 @@ import {
   FormEventHandler,
   ReactNode,
   forwardRef,
+  useId,
   useState,
 } from "react";
 import { radioSettings, switchSettings } from "./data";
@@ -293,56 +294,32 @@ const SettingsDialog: React.FC<{
                 exit={{ opacity: 0, scale: 0.95 }}
               >
                 <SettingsSidebar />
-                <div className="relative grid grid-cols-[700px_1fr] justify-start overflow-auto bg-neutral-700">
-                  <div className="relative grid grid-cols-[1fr_50px] gap-2 px-6 py-14">
-                    <div className="flex h-full flex-col gap-8">
-                      <h1 className="text-lg font-bold">プロフィール</h1>
-                      <div className="flex flex-col gap-10">
-                        <div className="grid grid-cols-[1fr_200px] gap-8">
-                          <div className="flex flex-col gap-4">
-                            <Input label="ユーザー名" />
-                            <Textarea label="プロフィール" rows={8} />
-                          </div>
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="text-sm">アイコン</div>
-                            <button className="group relative grid size-[180px] place-items-center overflow-hidden rounded-full bg-neutral-800">
-                              <UserIcon
-                                size={150}
-                                className="transition-opacity group-hover:opacity-20"
-                              />
-                              <div className="absolute inset-0 grid place-content-center place-items-center gap-3 bg-black/30 text-neutral-100 opacity-0 transition-opacity group-hover:opacity-100">
-                                <PencilIcon size={50} />
-                                <div className="text-xs">
-                                  アイコンを変更する
-                                </div>
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                        <Spacer />
-                        <SettingGroup group="サーバーのデフォルトプライバシー設定">
-                          {switchSettings.map((s) => {
-                            return (
-                              <SwitchSettingEntry key={s.name} setting={s} />
-                            );
-                          })}
-                        </SettingGroup>
-                        <Spacer />
-                        <SettingGroup group="ダイレクトメッセージフィルター">
-                          {radioSettings.map((s) => {
-                            return (
-                              <RadioSettingEntry key={s.name} setting={s} />
-                            );
-                          })}
-                        </SettingGroup>
-                      </div>
+                <div className="grid grid-cols-[700px_50px] justify-start gap-8 overflow-auto bg-neutral-700 px-6 py-14">
+                  <div className="flex h-full flex-col gap-8">
+                    <h1 className="text-lg font-bold">プロフィール</h1>
+                    <div className="flex flex-col gap-10">
+                      <ProfileForm />
+                      <Spacer />
+                      <SettingGroup group="サーバーのデフォルトプライバシー設定">
+                        {switchSettings.map((s) => {
+                          return (
+                            <SwitchSettingEntry key={s.name} setting={s} />
+                          );
+                        })}
+                      </SettingGroup>
+                      <Spacer />
+                      <SettingGroup group="ダイレクトメッセージフィルター">
+                        {radioSettings.map((s) => {
+                          return <RadioSettingEntry key={s.name} setting={s} />;
+                        })}
+                      </SettingGroup>
                     </div>
-                    <div>
-                      <DialogClose className="sticky top-14 flex flex-col items-center gap-1 text-neutral-400 transition-colors hover:text-neutral-100">
-                        <XCircleIcon size={45} strokeWidth={1} />
-                        <div className="text-sm">ESC</div>
-                      </DialogClose>
-                    </div>
+                  </div>
+                  <div>
+                    <DialogClose className="sticky top-0 flex flex-col items-center gap-1 text-neutral-400 transition-colors hover:text-neutral-100">
+                      <XCircleIcon size={45} strokeWidth={2} />
+                      <div className="text-sm">ESC</div>
+                    </DialogClose>
                   </div>
                 </div>
               </motion.div>
@@ -385,6 +362,30 @@ const SettingsSidebar = () => {
           <SettingItem>設定1</SettingItem>
           <SettingItem>設定1</SettingItem>
         </SettingItemGroup>
+      </div>
+    </div>
+  );
+};
+
+const ProfileForm: React.FC = () => {
+  return (
+    <div className="grid grid-cols-[1fr_200px] gap-8">
+      <div className="flex flex-col gap-4">
+        <Input label="ユーザー名" />
+        <Textarea label="プロフィール" rows={8} />
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-sm">アイコン</div>
+        <button className="group relative grid size-[180px] place-items-center overflow-hidden rounded-full bg-neutral-800">
+          <UserIcon
+            size={150}
+            className="transition-opacity group-hover:opacity-20"
+          />
+          <div className="absolute inset-0 grid place-content-center place-items-center gap-3 bg-black/30 text-neutral-100 opacity-0 transition-opacity group-hover:opacity-100">
+            <PencilIcon size={50} />
+            <div className="text-xs">アイコンを変更する</div>
+          </div>
+        </button>
       </div>
     </div>
   );
@@ -445,12 +446,16 @@ const SettingItem: React.FC<{ children: ReactNode; active?: boolean }> = ({
 };
 
 const SettingSwitch: React.FC<{ label: string }> = ({ label }) => {
+  const id = useId();
   const [checked, setChecked] = useState(false);
 
   return (
-    <div className="flex w-full items-center justify-between gap-4">
-      <label>{label}</label>
+    <div className="flex w-full items-center justify-between">
+      <label className="cursor-pointer pr-4" htmlFor={id}>
+        {label}
+      </label>
       <Switch.Root
+        id={id}
         checked={checked}
         onCheckedChange={setChecked}
         className={clsx(
