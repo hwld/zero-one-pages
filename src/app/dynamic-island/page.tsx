@@ -1,20 +1,33 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LucideIcon,
   MicIcon,
   MicOffIcon,
+  Minimize2,
+  PauseIcon,
+  PlayIcon,
   SearchIcon,
   SettingsIcon,
   SmileIcon,
+  TimerIcon,
+  TimerResetIcon,
   Volume2Icon,
   VolumeXIcon,
   XIcon,
 } from "lucide-react";
 import { NextPage } from "next";
-import { forwardRef, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import * as RadixSlider from "@radix-ui/react-slider";
+import clsx from "clsx";
 
 const AppControlPage: NextPage = () => {
   return (
@@ -26,7 +39,7 @@ const AppControlPage: NextPage = () => {
   );
 };
 
-type Mode = "menu" | "settings" | "sound" | "search";
+type Mode = "menu" | "settings" | "sound" | "search" | "stopwatch";
 const AppControl: React.FC = () => {
   const [mode, setMode] = useState<Mode>("menu");
   const content = {
@@ -34,6 +47,7 @@ const AppControl: React.FC = () => {
     search: <Search />,
     settings: <Settings />,
     sound: <Sound />,
+    stopwatch: <Stopwatch />,
   };
 
   return (
@@ -71,6 +85,7 @@ const Menu: React.FC<{ onChangeMode: (mode: Mode) => void }> = ({
         className="flex gap-1 [&>.control-item:first-child]:rounded-l-full [&>.control-item:last-child]:rounded-r-full"
       >
         <MenuItem icon={SearchIcon} onClick={() => onChangeMode("search")} />
+        <MenuItem icon={TimerIcon} onClick={() => onChangeMode("stopwatch")} />
         <MenuItem icon={Volume2Icon} onClick={() => onChangeMode("sound")} />
         <MenuItem
           icon={SettingsIcon}
@@ -177,13 +192,13 @@ const Slider: React.FC<{
 
 // Rangeの長さを調節して、Thumbとずれないようにする
 const CustomRange = forwardRef<HTMLSpanElement, RadixSlider.SliderThumbProps>(
-  function CustomRange({ style, ...others }) {
+  function CustomRange({ style, ...others }, ref) {
     let right =
       parseFloat(style?.right?.toString().split("calc(")[0] ?? "0") ?? 0;
     const delta = `${(right - 50) / 4}px`;
     let newRight = `calc(${right}% - (${delta}))`;
 
-    return <span {...others} style={{ ...style, right: newRight }} />;
+    return <span ref={ref} {...others} style={{ ...style, right: newRight }} />;
   },
 );
 
@@ -214,6 +229,150 @@ const SettingItem: React.FC = () => {
       <SmileIcon />
       設定
     </motion.button>
+  );
+};
+
+const maxSeconds = 359_999;
+const Stopwatch: React.FC = () => {
+  const [seconds, setSeconds] = useState(0);
+  const [isMin, setIsMin] = useState(false);
+  const [state, setState] = useState<"running" | "stopped">("stopped");
+  const timerIdRef = useRef<number | undefined>(undefined);
+
+  const handleStartTimer = () => {
+    window.clearInterval(timerIdRef.current);
+    timerIdRef.current = window.setInterval(() => {
+      setSeconds((s) => {
+        if (s >= maxSeconds) {
+          window.clearInterval(timerIdRef.current);
+          setState("stopped");
+          return s;
+        }
+        return s + 1;
+      });
+    }, 1000);
+
+    setState("running");
+  };
+
+  const handleStopTimer = () => {
+    window.clearInterval(timerIdRef.current);
+    setState("stopped");
+  };
+
+  const handleClearTimer = () => {
+    setSeconds(0);
+  };
+
+  const timerDisplay = useMemo(() => {
+    const hh = `0${Math.floor(seconds / 3600)}`.slice(-2);
+    const mm = `0${Math.floor(seconds / 60) % 60}`.slice(-2);
+    const ss = `0${Math.floor(seconds % 60)}`.slice(-2);
+
+    return `${hh}:${mm}:${ss}`;
+  }, [seconds]);
+
+  const actionButtons = {
+    stopped: (
+      <StopwatchButton
+        onClick={handleStartTimer}
+        disabled={seconds >= maxSeconds}
+      >
+        <PlayIcon className="pl-[2px]" />
+      </StopwatchButton>
+    ),
+    running: (
+      <StopwatchButton onClick={handleStopTimer}>
+        <PauseIcon />
+      </StopwatchButton>
+    ),
+  };
+
+  return isMin ? (
+    <motion.button
+      layoutId="controls"
+      onClick={() => setIsMin(false)}
+      className="w-[200px] overflow-hidden bg-neutral-900 px-3 py-2 text-neutral-100"
+      style={{ borderRadius: "20px" }}
+    >
+      <motion.div
+        layout="preserve-aspect"
+        className="flex items-center justify-between"
+      >
+        <motion.span layoutId="action">
+          <TimerIcon size={20} />
+        </motion.span>
+        <motion.div
+          layoutId="display"
+          className="text-sm tabular-nums text-neutral-300"
+        >
+          {timerDisplay}
+        </motion.div>
+      </motion.div>
+    </motion.button>
+  ) : (
+    <motion.div
+      layoutId="controls"
+      className="relative w-[250px] overflow-hidden bg-neutral-900 p-4 text-neutral-100"
+      style={{ borderRadius: "20px" }}
+    >
+      <motion.div
+        layout="preserve-aspect"
+        className="flex items-center justify-between"
+      >
+        <div className="flex gap-2">
+          <motion.span layoutId="action">{actionButtons[state]}</motion.span>
+          <AnimatePresence>
+            {seconds > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <StopwatchButton onClick={handleClearTimer} secondary>
+                  <TimerResetIcon className="pb-[1px] pr-[2px]" />
+                </StopwatchButton>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            className="rounded p-1 transition-colors hover:bg-white/20"
+            onClick={() => setIsMin(true)}
+          >
+            <Minimize2 size={15} />
+          </button>
+          <motion.div
+            layoutId="display"
+            className="select-none text-xl font-bold tabular-nums"
+          >
+            {timerDisplay}
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const StopwatchButton: React.FC<
+  {
+    children: ReactNode;
+    secondary?: boolean;
+  } & ComponentPropsWithoutRef<"button">
+> = ({ children, secondary, ...props }) => {
+  return (
+    <button
+      className={clsx(
+        "grid size-[35px] place-items-center rounded-full text-neutral-200 transition-colors disabled:cursor-not-allowed ",
+        secondary
+          ? "bg-white/20 enabled:hover:bg-white/30 enabled:hover:text-neutral-50 disabled:bg-neutral-100/10 disabled:text-neutral-400"
+          : "bg-neutral-100 text-neutral-900 enabled:hover:bg-neutral-300 disabled:bg-neutral-400 [&_svg]:fill-neutral-900",
+      )}
+      {...props}
+    >
+      {children}
+    </button>
   );
 };
 
