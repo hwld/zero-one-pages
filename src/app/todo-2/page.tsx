@@ -84,7 +84,7 @@ const Page: NextPage = () => {
                   className="pointer-events-none absolute left-2 top-[50%] -translate-y-[50%]"
                   size={18}
                 />
-                <input className="h-8 w-[400px] rounded border border-gray-400 bg-transparent py-1 pl-7 text-sm focus-within:border-gray-300 focus-within:outline-none focus-within:ring-1 focus-within:ring-gray-300" />
+                <input className="h-8 w-[400px] rounded border border-gray-500 bg-transparent py-1 pl-7 text-sm focus-within:border-gray-300 focus-within:outline-none" />
               </div>
               <button className="h-8 shrink-0 rounded bg-gray-300 px-3 py-1 text-xs text-gray-700">
                 検索
@@ -110,10 +110,10 @@ const Sidebar: React.FC = () => {
     <div className="flex w-[200px] flex-col">
       <div className="flex items-center gap-1 whitespace-nowrap text-sm font-bold">
         <IconCircleCheck />
-        <p>evodo-openapi</p>
+        <p>evodo</p>
       </div>
       <div className="mt-6 flex flex-col gap-1">
-        <SidebarItem icon={IconHome} label="今日のタスク" />
+        <SidebarItem icon={IconHome} label="今日のタスク" active />
         <SidebarItem icon={IconListDetails} label="過去のタスク" />
         <SidebarItem icon={IconCalendar} label="予定" />
       </div>
@@ -124,9 +124,17 @@ const Sidebar: React.FC = () => {
 const SidebarItem: React.FC<{
   icon: React.FC<{ size?: number }>;
   label: string;
-}> = ({ icon: Icon, label }) => {
+  active?: boolean;
+}> = ({ icon: Icon, label, active }) => {
   return (
-    <div className="flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-md p-2 text-sm text-gray-200 transition-colors hover:bg-white/20">
+    <div
+      className={clsx(
+        "flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-md p-2 text-sm transition-colors",
+        active
+          ? "border border-gray-600 bg-gray-700 text-gray-100 shadow-2xl"
+          : "text-gray-200 hover:bg-white/10",
+      )}
+    >
       <Icon size={25} />
       <p>{label}</p>
     </div>
