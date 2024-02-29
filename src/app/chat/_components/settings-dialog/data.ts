@@ -1,4 +1,5 @@
-import { RadioSetting, SwitchSetting } from "./page";
+import { RadioSetting } from "./radio-entry";
+import { SwitchSetting } from "./switch-entry";
 
 export const switchSettings: SwitchSetting[] = [
   {
