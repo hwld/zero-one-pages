@@ -12,16 +12,10 @@ import { TaskTableRow } from "./row";
 
 type TableProps = {
   tasks: Task[];
-  onDeleteTask: (id: string) => void;
-  onChangeStatus: (id: string, status: Task["status"]) => void;
 };
-export const TaskTable: React.FC<TableProps> = ({
-  tasks,
-  onDeleteTask,
-  onChangeStatus,
-}) => {
+export const TaskTable: React.FC<TableProps> = ({ tasks }) => {
   return (
-    <div className="overflow-auto rounded-md border border-gray-600">
+    <div className="overflow-auto rounded-md border border-zinc-600">
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
@@ -35,14 +29,7 @@ export const TaskTable: React.FC<TableProps> = ({
         <tbody className="[&_tr:last-child]:border-0">
           {tasks.length === 0 && <EmptyTableRow />}
           {tasks.map((task) => {
-            return (
-              <TaskTableRow
-                key={task.id}
-                task={task}
-                onDeleteTask={onDeleteTask}
-                onChangeStatus={(val) => onChangeStatus(task.id, val)}
-              />
-            );
+            return <TaskTableRow key={task.id} task={task} />;
           })}
         </tbody>
       </table>
