@@ -5,7 +5,7 @@ import {
   IconClockHour5,
   IconGridDots,
 } from "@tabler/icons-react";
-import { TableHeader } from "./header";
+import { SortableTableHeader, TableHeader } from "./header";
 import { EmptyTableRow } from "./empty-row";
 import { TaskTableRow } from "./row";
 import { usePaginatedTasks } from "../../_contexts/tasks-provider";
@@ -22,9 +22,23 @@ export const TaskTable: React.FC = () => {
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
             <TableHeader icon={IconCheckbox} width={80} text="状況" />
-            <TableHeader icon={IconClipboardText} text="タスク名" />
-            <TableHeader icon={IconClockHour5} width={200} text="作成日" />
-            <TableHeader icon={IconClockCheck} width={200} text="達成日" />
+            <SortableTableHeader
+              icon={IconClipboardText}
+              text="タスク名"
+              fieldName="title"
+            />
+            <SortableTableHeader
+              icon={IconClockHour5}
+              width={200}
+              text="作成日"
+              fieldName="createdAt"
+            />
+            <SortableTableHeader
+              icon={IconClockCheck}
+              width={200}
+              text="達成日"
+              fieldName="completedAt"
+            />
             <TableHeader icon={IconGridDots} width={150} text="操作" />
           </tr>
         </thead>

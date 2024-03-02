@@ -1,8 +1,7 @@
 import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { Task } from "../../page";
 import { TaskTableData } from "./data";
 import { TaskStatusBadge } from "../task-status-badge";
-import { useTaskAction } from "../../_contexts/tasks-provider";
+import { Task, useTaskAction } from "../../_contexts/tasks-provider";
 
 export const TaskTableRow: React.FC<{
   task: Task;
@@ -23,8 +22,10 @@ export const TaskTableRow: React.FC<{
         <TaskStatusBadge status={status} onChangeStatus={handleChangeStatus} />
       </TaskTableData>
       <TaskTableData>{title}</TaskTableData>
-      <TaskTableData noWrap>{createdAt}</TaskTableData>
-      <TaskTableData noWrap>{completedAt || "None"}</TaskTableData>
+      <TaskTableData noWrap>{createdAt.toLocaleString()}</TaskTableData>
+      <TaskTableData noWrap>
+        {completedAt?.toLocaleString() ?? "None"}
+      </TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
           <button className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500">

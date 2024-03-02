@@ -11,14 +11,6 @@ import { AddTaskButton } from "./_components/add-task-button";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export type Task = {
-  id: string;
-  title: string;
-  status: "done" | "todo";
-  createdAt: string;
-  completedAt: string;
-};
-
 const Page: NextPage = () => {
   return (
     <div

@@ -5,9 +5,17 @@ export type Task = {
   title: string;
   description: string;
   status: "done" | "todo";
-  createdAt: string;
-  completedAt: string;
+  createdAt: Date;
+  completedAt: Date | undefined;
 };
+
+export type Order = "asc" | "desc";
+export type SortEntry = {
+  field: Extract<keyof Task, "title" | "createdAt" | "completedAt">;
+  order: Order;
+};
+
+export type TasksData = { tasks: Task[]; sortEntry: SortEntry };
 
 export type TasksAction = {
   addTask: (newTask: Pick<Task, "title" | "description">) => void;
@@ -17,15 +25,47 @@ export type TasksAction = {
     >,
   ) => void;
   deleteTask: (id: string) => void;
+  sort: (entry: SortEntry) => void;
 };
 
-const TasksDataContext = createContext<Task[] | undefined>(undefined);
+const TasksDataContext = createContext<TasksData | undefined>(undefined);
 const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [sortEntry, setSortEntry] = useState<SortEntry>({
+    field: "createdAt",
+    order: "desc",
+  });
+
+  const sortedTasks = useMemo(() => {
+    const { field, order } = sortEntry;
+
+    return tasks.toSorted((a, b) => {
+      switch (field) {
+        case "title": {
+          return a.title.localeCompare(b.title) * (order === "desc" ? -1 : 1);
+        }
+        case "createdAt":
+        case "completedAt": {
+          return (
+            ((a[field]?.getTime() ?? Number.MAX_VALUE) -
+              (b[field]?.getTime() ?? Number.MAX_VALUE)) *
+            (order === "desc" ? -1 : 1)
+          );
+        }
+        default: {
+          throw new Error(field satisfies never);
+        }
+      }
+    });
+  }, [sortEntry, tasks]);
+
+  const data: TasksData = useMemo(() => {
+    return { tasks: sortedTasks, sortEntry };
+  }, [sortEntry, sortedTasks]);
 
   const action: TasksAction = useMemo(() => {
     return {
@@ -37,8 +77,8 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
             title: newTask.title,
             description: newTask.description,
             status: "todo",
-            createdAt: new Date().toLocaleString(),
-            completedAt: "",
+            createdAt: new Date(),
+            completedAt: undefined,
           },
         ]);
       },
@@ -54,7 +94,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
                 title: newTask.title ?? t.title,
                 description: newTask.description ?? t.description,
                 status: newTask.status ?? t.status,
-                completedAt: isCompleted ? new Date().toLocaleString() : "",
+                completedAt: isCompleted ? new Date() : undefined,
               };
             }
             return t;
@@ -65,11 +105,38 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       deleteTask: (id) => {
         setTasks((tasks) => tasks.filter((t) => t.id !== id));
       },
+
+      sort: (entry) => {
+        setSortEntry(entry);
+        setTasks((tasks) => {
+          return tasks.toSorted((a, b) => {
+            switch (entry.field) {
+              case "title": {
+                return (
+                  a.title.localeCompare(b.title) *
+                  (entry.order === "desc" ? -1 : 1)
+                );
+              }
+              case "createdAt":
+              case "completedAt": {
+                return (
+                  ((a[entry.field]?.getTime() ?? Number.MAX_VALUE) -
+                    (b[entry.field]?.getTime() ?? Number.MAX_VALUE)) *
+                  (entry.order === "desc" ? -1 : 1)
+                );
+              }
+              default: {
+                throw new Error(entry.field satisfies never);
+              }
+            }
+          });
+        });
+      },
     };
   }, []);
 
   return (
-    <TasksDataContext.Provider value={tasks}>
+    <TasksDataContext.Provider value={data}>
       <TasksActionContext.Provider value={action}>
         {children}
       </TasksActionContext.Provider>
@@ -77,7 +144,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export const useAllTasks = (): Task[] => {
+export const useAllTasks = (): TasksData => {
   const ctx = useContext(TasksDataContext);
   if (!ctx) {
     throw new Error("TasksProviderが存在しません");
@@ -92,7 +159,7 @@ export const usePaginatedTasks = ({
   page: number;
   limit: number;
 }): { tasks: Task[]; totalTasks: number } => {
-  const tasks = useAllTasks();
+  const { tasks } = useAllTasks();
 
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
