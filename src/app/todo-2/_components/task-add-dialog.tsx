@@ -8,7 +8,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XIcon } from "lucide-react";
 import { useTaskAction } from "../_contexts/tasks-provider";
-import { TaskForm, TaskFormData } from "./task-form";
+import { TaskForm, TaskFormData } from "./task-form/task-form";
 import { useState } from "react";
 
 const taskFormId = "task-form-id";
