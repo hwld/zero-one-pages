@@ -1,0 +1,28 @@
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  Tooltip as RadixTooltip,
+} from "@radix-ui/react-tooltip";
+import { ReactNode } from "react";
+
+type Props = { children: ReactNode; label: string };
+export const Tooltip: React.FC<Props> = ({ children, label }) => {
+  return (
+    <TooltipProvider>
+      <RadixTooltip>
+        <TooltipTrigger>{children}</TooltipTrigger>
+        <TooltipProvider>
+          <TooltipContent
+            side="top"
+            align="center"
+            sideOffset={5}
+            className="rounded border border-zinc-700 bg-zinc-900 p-2 text-xs shadow"
+          >
+            {label}
+          </TooltipContent>
+        </TooltipProvider>
+      </RadixTooltip>
+    </TooltipProvider>
+  );
+};

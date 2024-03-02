@@ -1,11 +1,15 @@
-import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
 import { TaskTableData } from "./data";
 import { TaskStatusBadge } from "../task-status-badge";
 import { Task, useTaskAction } from "../../_contexts/tasks-provider";
+import { ConfirmDialog } from "../confirm-dialog";
+import { useState } from "react";
+import { Tooltip } from "../tooltip";
 
 export const TaskTableRow: React.FC<{
   task: Task;
 }> = ({ task: { id, title, status, createdAt, completedAt } }) => {
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const { deleteTask, updateTask } = useTaskAction();
 
   const handleDelete = () => {
@@ -28,17 +32,28 @@ export const TaskTableRow: React.FC<{
       </TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
-          <button className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500">
-            <IconPencil size={20} />
-          </button>
-          <button
-            className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500"
-            onClick={handleDelete}
-          >
-            <IconTrash size={20} />
-          </button>
+          <Tooltip label="削除">
+            <button
+              className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+            >
+              <IconTrash size={20} />
+            </button>
+          </Tooltip>
         </div>
       </TaskTableData>
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+        confirmText="削除する"
+        title="タスクの削除"
+        onConfirm={handleDelete}
+      >
+        タスク`<span className="font-bold text-zinc-400">{title}</span>
+        `を削除しますか？
+        <br />
+        削除すると、タスクを復元することはできません。
+      </ConfirmDialog>
     </tr>
   );
 };
