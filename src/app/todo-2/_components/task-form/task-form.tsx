@@ -57,7 +57,10 @@ export const TaskForm: React.FC<Props> = ({ onAddTask, id }) => {
           {...titleRegister}
         />
       </TaskFormErrorTooltip>
-      <TaskFormErrorTooltip error={errors.description?.message} side="bottom">
+      <TaskFormErrorTooltip
+        error={errors.description?.message}
+        placement="bottom-start"
+      >
         <textarea
           placeholder="タスクの説明"
           rows={6}

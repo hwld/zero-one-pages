@@ -1,59 +1,65 @@
 import {
-  Popover,
-  PopoverAnchor,
-  PopoverArrow,
-  PopoverContent,
-  PopoverContentProps,
-  PopoverPortal,
-} from "@radix-ui/react-popover";
+  FloatingArrow,
+  FloatingPortal,
+  arrow,
+  autoUpdate,
+  offset,
+  useFloating,
+} from "@floating-ui/react";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { AlertCircleIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 
 type Props = {
   children: ReactNode;
   error?: string;
-  align?: PopoverContentProps["align"];
-  side?: PopoverContentProps["side"];
+  placement?: "top-start" | "bottom-start";
 };
+
+const ARROW_HEIGHT = 10;
 
 export const TaskFormErrorTooltip: React.FC<Props> = ({
   children,
   error,
-  align = "start",
-  side = "top",
+  placement = "top-start",
 }) => {
-  // 祖先コンポーネントのexitアニメーション中にPopoverが表示されないようにする。
+  // 祖先コンポーネントのexitアニメーション中にtooltipが表示されないようにする。
   const isPresent = useIsPresent();
+  const arrowRef = useRef(null);
+  const { refs, floatingStyles, context } = useFloating({
+    placement,
+    middleware: [arrow({ element: arrowRef }), offset(ARROW_HEIGHT + 3)],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const initialY = placement === "top-start" ? 5 : -5;
 
   return (
-    <Popover open={!!error}>
-      <PopoverAnchor>{children}</PopoverAnchor>
+    <>
+      <div ref={refs.setReference}>{children}</div>
       <AnimatePresence>
         {isPresent && error && (
-          <PopoverPortal forceMount>
-            <PopoverContent
-              align={align}
-              side={side}
-              sideOffset={4}
-              asChild
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-            >
+          <FloatingPortal>
+            <div ref={refs.setFloating} style={floatingStyles}>
               <motion.div
                 className="flex gap-1 rounded bg-zinc-950 p-2 text-xs text-red-400 shadow"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, y: initialY }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: initialY }}
               >
                 <AlertCircleIcon size={15} />
                 {error}
-                <PopoverArrow className="fill-zinc-900" />
+                <FloatingArrow
+                  ref={arrowRef}
+                  context={context}
+                  height={ARROW_HEIGHT}
+                  staticOffset={"10px"}
+                />
               </motion.div>
-            </PopoverContent>
-          </PopoverPortal>
+            </div>
+          </FloatingPortal>
         )}
       </AnimatePresence>
-    </Popover>
+    </>
   );
 };
