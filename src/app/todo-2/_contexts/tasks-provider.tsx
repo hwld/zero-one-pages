@@ -77,12 +77,30 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export const useTasks = (): Task[] => {
+export const useAllTasks = (): Task[] => {
   const ctx = useContext(TasksDataContext);
   if (!ctx) {
     throw new Error("TasksProviderが存在しません");
   }
   return ctx;
+};
+
+export const usePaginatedTasks = ({
+  page,
+  limit,
+}: {
+  page: number;
+  limit: number;
+}): { tasks: Task[]; totalTasks: number } => {
+  const tasks = useAllTasks();
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+
+  return {
+    tasks: tasks.slice(startIndex, endIndex),
+    totalTasks: Math.ceil(tasks.length / limit),
+  };
 };
 
 export const useTaskAction = (): TasksAction => {

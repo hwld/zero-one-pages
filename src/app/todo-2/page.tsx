@@ -8,7 +8,6 @@ import { Inter } from "next/font/google";
 import { TaskTable } from "./_components/task-table/task-table";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { AddTaskButton } from "./_components/add-task-button";
-import { useTasks } from "./_contexts/tasks-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +20,6 @@ export type Task = {
 };
 
 const Page: NextPage = () => {
-  const tasks = useTasks();
-
   return (
     <div
       className={clsx(
@@ -54,7 +51,7 @@ const Page: NextPage = () => {
             </div>
             <AddTaskButton />
           </div>
-          <TaskTable tasks={tasks} />
+          <TaskTable />
         </div>
       </div>
     </div>
