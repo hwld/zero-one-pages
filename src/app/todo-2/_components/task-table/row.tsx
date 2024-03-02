@@ -27,14 +27,14 @@ export const TaskTableRow: React.FC<{
       <TaskTableData noWrap>{completedAt || "None"}</TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
-          <button className="rounded px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-500">
-            <IconPencil size={16} />
+          <button className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500">
+            <IconPencil size={20} />
           </button>
           <button
-            className="rounded px-2 py-1  text-xs text-zinc-300 transition-colors hover:bg-zinc-500"
+            className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500"
             onClick={handleDelete}
           >
-            <IconTrash size={16} />
+            <IconTrash size={20} />
           </button>
         </div>
       </TaskTableData>

@@ -1,6 +1,6 @@
 import { IconCommand, IconPlus } from "@tabler/icons-react";
 import { TaskAddDialog } from "./task-add-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const AddTaskButton: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -8,6 +8,16 @@ export const AddTaskButton: React.FC = () => {
   const handleAddTask = () => {
     setIsAddDialogOpen(true);
   };
+
+  useEffect(() => {
+    const openAddDialog = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === "k") {
+        setIsAddDialogOpen(true);
+      }
+    };
+    window.addEventListener("keydown", openAddDialog);
+    return () => window.removeEventListener("keydown", openAddDialog);
+  }, []);
 
   return (
     <>
