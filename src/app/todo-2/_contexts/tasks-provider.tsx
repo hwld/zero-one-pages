@@ -9,7 +9,7 @@ export type Task = {
   completedAt: string;
 };
 
-type TasksAction = {
+export type TasksAction = {
   addTask: (newTask: Pick<Task, "title" | "description">) => void;
   updateTask: (
     data: { id: string } & Partial<
