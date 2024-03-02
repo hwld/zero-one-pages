@@ -46,7 +46,7 @@ export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
-                className="fixed left-1/2 top-1/2 w-full max-w-[550px] overflow-hidden rounded border border-zinc-700 bg-zinc-800 text-zinc-100"
+                className="fixed left-1/2 top-1/2 w-full max-w-[550px] overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-100"
               >
                 <div className="flex justify-between p-4">
                   <div className="grid select-none place-items-center rounded bg-zinc-700 px-2 text-xs text-zinc-400">

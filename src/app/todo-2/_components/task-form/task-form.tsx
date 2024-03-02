@@ -51,7 +51,7 @@ export const TaskForm: React.FC<Props> = ({ onAddTask, id }) => {
           ref={titleRef}
           placeholder="タスクのタイトル"
           className={clsx(
-            "w-full bg-transparent text-lg font-bold placeholder:text-zinc-500 focus-visible:outline-none",
+            "w-full rounded bg-transparent text-lg font-bold placeholder:text-zinc-500 focus-visible:outline-none",
             errors.title && "text-red-400",
           )}
           {...titleRegister}

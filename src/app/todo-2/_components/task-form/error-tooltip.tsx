@@ -6,7 +6,7 @@ import {
   PopoverContentProps,
   PopoverPortal,
 } from "@radix-ui/react-popover";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { AlertCircleIcon } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -23,11 +23,14 @@ export const TaskFormErrorTooltip: React.FC<Props> = ({
   align = "start",
   side = "top",
 }) => {
+  // 祖先コンポーネントのexitアニメーション中にPopoverが表示されないようにする。
+  const isPresent = useIsPresent();
+
   return (
     <Popover open={!!error}>
       <PopoverAnchor>{children}</PopoverAnchor>
       <AnimatePresence>
-        {error && (
+        {isPresent && error && (
           <PopoverPortal forceMount>
             <PopoverContent
               align={align}
