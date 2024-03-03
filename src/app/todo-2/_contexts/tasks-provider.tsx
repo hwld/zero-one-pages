@@ -15,7 +15,16 @@ export type SortEntry = {
   order: Order;
 };
 
-export type TasksData = { tasks: Task[]; sortEntry: SortEntry };
+export type Filter =
+  | { field: "status"; value: "todo" }
+  | { field: "status"; value: "done" };
+
+export type TasksData = {
+  tasks: Task[];
+  sortEntry: SortEntry;
+  filters: Filter[];
+  isFiltered: (filter: Filter) => boolean;
+};
 
 export type TasksAction = {
   addTask: (newTask: Pick<Task, "title" | "description">) => void;
@@ -25,7 +34,12 @@ export type TasksAction = {
     >,
   ) => void;
   deleteTask: (id: string) => void;
+
   sort: (entry: SortEntry) => void;
+
+  addFilter: (filter: Filter) => void;
+  removeFilter: (filter: Filter) => void;
+  removeAllFilter: () => void;
 };
 
 const TasksDataContext = createContext<TasksData | undefined>(undefined);
@@ -34,16 +48,25 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
     order: "desc",
   });
+  const [filters, setFilters] = useState<Filter[]>([]);
 
-  const sortedTasks = useMemo(() => {
+  const tasks = useMemo(() => {
     const { field, order } = sortEntry;
 
-    return [...tasks].sort((a, b) => {
+    const filteredTasks = allTasks.filter((t) => {
+      if (filters.length === 0) {
+        return true;
+      }
+
+      return filters.some((filter) => t[filter.field] === filter.value);
+    });
+
+    return filteredTasks.sort((a, b) => {
       switch (field) {
         case "title": {
           return a.title.localeCompare(b.title) * (order === "desc" ? -1 : 1);
@@ -61,16 +84,25 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         }
       }
     });
-  }, [sortEntry, tasks]);
+  }, [sortEntry, allTasks, filters]);
 
   const data: TasksData = useMemo(() => {
-    return { tasks: sortedTasks, sortEntry };
-  }, [sortEntry, sortedTasks]);
+    return {
+      tasks,
+      sortEntry,
+      filters,
+      isFiltered: (filter) => {
+        return !!filters.find(
+          (f) => f.field === filter.field && f.value === filter.value,
+        );
+      },
+    };
+  }, [filters, sortEntry, tasks]);
 
   const action: TasksAction = useMemo(() => {
     return {
       addTask: (newTask) => {
-        setTasks((t) => [
+        setAllTasks((t) => [
           ...t,
           {
             id: crypto.randomUUID(),
@@ -86,7 +118,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       updateTask: (newTask) => {
         const isCompleted = newTask.status === "done";
 
-        setTasks((tasks) =>
+        setAllTasks((tasks) =>
           tasks.map((t) => {
             if (t.id === newTask.id) {
               return {
@@ -103,11 +135,27 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       },
 
       deleteTask: (id) => {
-        setTasks((tasks) => tasks.filter((t) => t.id !== id));
+        setAllTasks((tasks) => tasks.filter((t) => t.id !== id));
       },
 
       sort: (entry) => {
         setSortEntry(entry);
+      },
+
+      addFilter: (filter) => {
+        setFilters((f) => [...f, filter]);
+      },
+
+      removeFilter: (filter) => {
+        setFilters((f) =>
+          f.filter(
+            (f) => !(f.field === filter.field && f.value === filter.value),
+          ),
+        );
+      },
+
+      removeAllFilter: () => {
+        setFilters([]);
       },
     };
   }, []);
@@ -121,7 +169,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export const useAllTasks = (): TasksData => {
+export const useTasksData = (): TasksData => {
   const ctx = useContext(TasksDataContext);
   if (!ctx) {
     throw new Error("TasksProviderが存在しません");
@@ -136,7 +184,7 @@ export const usePaginatedTasks = ({
   page: number;
   limit: number;
 }): { tasks: Task[]; totalTasks: number } => {
-  const { tasks } = useAllTasks();
+  const { tasks } = useTasksData();
 
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;

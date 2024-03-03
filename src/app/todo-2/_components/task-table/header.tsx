@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import {
   SortEntry,
-  useAllTasks,
+  useTasksData,
   useTaskAction,
 } from "../../_contexts/tasks-provider";
 
@@ -38,7 +38,7 @@ export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
   width,
   fieldName,
 }) => {
-  const { sortEntry } = useAllTasks();
+  const { sortEntry } = useTasksData();
   const { sort } = useTaskAction();
   const isSorted = sortEntry.field === fieldName;
 
