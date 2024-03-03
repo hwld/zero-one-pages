@@ -84,12 +84,12 @@ export const TaskTableFilter: React.FC = () => {
                   })}
                 </FilterGroup>
                 <div className="w-full space-y-1">
-                  <div className="h-[1px] w-full bg-zinc-400" />
+                  <div className="h-[1px] w-full bg-black/10" />
                   <button
                     className="flex w-full items-center gap-1 rounded p-2 text-xs hover:bg-black/15"
                     onClick={removeAllFilter}
                   >
-                    <XIcon size={14} />
+                    <XIcon size={16} />
                     絞り込みを解除する
                   </button>
                 </div>
@@ -107,9 +107,8 @@ const FilterGroup: React.FC<{ children: ReactNode; label: string }> = ({
   label,
 }) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div>
       <p className="p-1 text-xs text-zinc-500">{label}</p>
-      <div className="h-[1px] w-full bg-zinc-400" />
       <div>{children}</div>
     </div>
   );

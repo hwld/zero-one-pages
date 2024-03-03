@@ -5,6 +5,7 @@ import { Task, useTaskAction } from "../../_contexts/tasks-provider";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useState } from "react";
 import { Tooltip } from "../tooltip";
+import { format } from "../../_lib/date";
 
 export const TaskTableRow: React.FC<{
   task: Task;
@@ -26,9 +27,9 @@ export const TaskTableRow: React.FC<{
         <TaskStatusBadge status={status} onChangeStatus={handleChangeStatus} />
       </TaskTableData>
       <TaskTableData>{title}</TaskTableData>
-      <TaskTableData noWrap>{createdAt.toLocaleString()}</TaskTableData>
+      <TaskTableData noWrap>{format(createdAt)}</TaskTableData>
       <TaskTableData noWrap>
-        {completedAt?.toLocaleString() ?? "None"}
+        {completedAt ? format(completedAt) : "None"}
       </TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">

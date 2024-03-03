@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@floating-ui/react": "^0.26.4",
+    "@formkit/tempo": "^0.0.13",
     "@hookform/resolvers": "^3.3.4",
     "@mantine/hooks": "^7.6.0",
     "@radix-ui/react-dialog": "^1.0.5",

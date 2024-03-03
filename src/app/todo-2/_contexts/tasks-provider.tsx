@@ -1,4 +1,5 @@
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
+import { initialTasks } from "./data";
 
 export type Task = {
   id: string;
@@ -50,7 +51,7 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>(initialTasks);
   const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
