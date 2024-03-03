@@ -11,7 +11,7 @@ export const Tooltip: React.FC<Props> = ({ children, label }) => {
   return (
     <TooltipProvider>
       <RadixTooltip>
-        <TooltipTrigger>{children}</TooltipTrigger>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipProvider>
           <TooltipContent
             side="top"

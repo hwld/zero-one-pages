@@ -43,7 +43,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const sortedTasks = useMemo(() => {
     const { field, order } = sortEntry;
 
-    return tasks.toSorted((a, b) => {
+    return [...tasks].sort((a, b) => {
       switch (field) {
         case "title": {
           return a.title.localeCompare(b.title) * (order === "desc" ? -1 : 1);
@@ -108,29 +108,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 
       sort: (entry) => {
         setSortEntry(entry);
-        setTasks((tasks) => {
-          return tasks.toSorted((a, b) => {
-            switch (entry.field) {
-              case "title": {
-                return (
-                  a.title.localeCompare(b.title) *
-                  (entry.order === "desc" ? -1 : 1)
-                );
-              }
-              case "createdAt":
-              case "completedAt": {
-                return (
-                  ((a[entry.field]?.getTime() ?? Number.MAX_VALUE) -
-                    (b[entry.field]?.getTime() ?? Number.MAX_VALUE)) *
-                  (entry.order === "desc" ? -1 : 1)
-                );
-              }
-              default: {
-                throw new Error(entry.field satisfies never);
-              }
-            }
-          });
-        });
       },
     };
   }, []);
