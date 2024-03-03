@@ -55,7 +55,7 @@ export const TaskTableFilter: React.FC = () => {
               sideOffset={4}
             >
               <motion.div
-                className="flex w-[200px] flex-col gap-2 rounded bg-zinc-300 p-1 text-zinc-700"
+                className="flex w-[200px] flex-col gap-1 rounded bg-zinc-300 p-1 text-zinc-700"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
@@ -86,7 +86,7 @@ export const TaskTableFilter: React.FC = () => {
                 <div className="w-full space-y-1">
                   <div className="h-[1px] w-full bg-zinc-400" />
                   <button
-                    className="flex w-full items-center gap-1 rounded p-1 text-xs hover:bg-black/15"
+                    className="flex w-full items-center gap-1 rounded p-2 text-xs hover:bg-black/15"
                     onClick={removeAllFilter}
                   >
                     <XIcon size={14} />
@@ -136,7 +136,7 @@ const FilterItem: React.FC<FilterItemProps> = ({
 
   return (
     <DropdownMenuItem
-      className="flex cursor-pointer items-center justify-end gap-1 rounded p-1 text-sm transition-colors hover:bg-black/15 focus-visible:bg-black/15 focus-visible:outline-none"
+      className="flex cursor-pointer items-center justify-end gap-1 rounded px-2 py-1 text-sm transition-colors hover:bg-black/15 focus-visible:bg-black/15 focus-visible:outline-none"
       onSelect={handleSelect}
     >
       <div className="flex grow select-none items-center gap-1">

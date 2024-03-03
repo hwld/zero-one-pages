@@ -35,6 +35,8 @@ export type TasksAction = {
   ) => void;
   deleteTask: (id: string) => void;
 
+  search: (text: string) => void;
+
   sort: (entry: SortEntry) => void;
 
   addFilter: (filter: Filter) => void;
@@ -49,6 +51,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
     order: "desc",
@@ -66,7 +69,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       return filters.some((filter) => t[filter.field] === filter.value);
     });
 
-    return filteredTasks.sort((a, b) => {
+    const sortedTasks = filteredTasks.sort((a, b) => {
       switch (field) {
         case "title": {
           return a.title.localeCompare(b.title) * (order === "desc" ? -1 : 1);
@@ -84,7 +87,15 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         }
       }
     });
-  }, [sortEntry, allTasks, filters]);
+
+    const searchedTasks = sortedTasks.filter((task) => {
+      return (
+        task.title.includes(searchText) || task.description.includes(searchText)
+      );
+    });
+
+    return searchedTasks;
+  }, [sortEntry, allTasks, filters, searchText]);
 
   const data: TasksData = useMemo(() => {
     return {
@@ -136,6 +147,10 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 
       deleteTask: (id) => {
         setAllTasks((tasks) => tasks.filter((t) => t.id !== id));
+      },
+
+      search: (text) => {
+        setSearchText(text);
       },
 
       sort: (entry) => {
