@@ -1,15 +1,24 @@
-import { ReactNode, createContext, useContext, useMemo, useState } from "react";
-import { initialTasks } from "./data";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { paginate } from "../_lib/utils";
+import { z } from "zod";
 
-export type Task = {
-  id: string;
-  title: string;
-  description: string;
-  status: "done" | "todo";
-  createdAt: Date;
-  completedAt: Date | undefined;
-};
+const taskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  status: z.union([z.literal("done"), z.literal("todo")]),
+  createdAt: z.coerce.date(),
+  completedAt: z.union([z.coerce.date(), z.undefined()]),
+});
+
+export type Task = z.infer<typeof taskSchema>;
 
 export type Order = "asc" | "desc";
 export type SortEntry = {
@@ -59,7 +68,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(30);
-  const [allTasks, setAllTasks] = useState<Task[]>(initialTasks);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
@@ -211,6 +220,16 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       },
     };
   }, [paginatedTasks.length]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const res = await fetch("./initial-data.json");
+      const data = await res.json();
+      setAllTasks(data.map(taskSchema.parse));
+    };
+
+    fetchInitialData();
+  }, []);
 
   return (
     <TasksDataContext.Provider value={data}>

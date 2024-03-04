@@ -1,9 +1,12 @@
-import { Task } from "./tasks-provider";
 import { faker } from "@faker-js/faker/locale/ja";
+import { Task } from "../_contexts/tasks-provider";
 
-faker.seed(111);
+/**
+ *  fakerの依存をバンドルに含めたくなかったので、RouteHandlerとして実行して、
+ *  ビルド時にダミーデータが生成されるようにしてみる
+ */
 
-export const initialTasks: Task[] = [...new Array(121)].map(() => {
+const initialTasks: Task[] = [...new Array(121)].map(() => {
   const createdAt = faker.date.past();
 
   const statusEntry = faker.helpers.arrayElement([
@@ -22,3 +25,7 @@ export const initialTasks: Task[] = [...new Array(121)].map(() => {
     ...statusEntry,
   };
 });
+
+export const GET = async () => {
+  return Response.json(initialTasks);
+};
