@@ -5,7 +5,7 @@ import { Task, useTaskAction } from "../../_contexts/tasks-provider";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useState } from "react";
 import { Tooltip } from "../tooltip";
-import { format } from "../../_lib/date";
+import { format } from "../../_lib/utils";
 
 export const TaskTableRow: React.FC<{
   task: Task;

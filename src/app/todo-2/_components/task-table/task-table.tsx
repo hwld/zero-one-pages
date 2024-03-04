@@ -8,13 +8,12 @@ import {
 import { SortableTableHeader, TableHeader } from "./header";
 import { EmptyTableRow } from "./empty-row";
 import { TaskTableRow } from "./row";
-import { usePaginatedTasks } from "../../_contexts/tasks-provider";
-import { useState } from "react";
+import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { Pagination } from "../pagination";
 
 export const TaskTable: React.FC = () => {
-  const [page, setPage] = useState(1);
-  const { tasks, totalTasks } = usePaginatedTasks({ page, limit: 30 });
+  const { page, totalTasks, paginatedTasks } = useTasksData();
+  const { setPage } = useTaskAction();
 
   return (
     <div className="flex grow flex-col overflow-auto rounded-md border border-zinc-600">
@@ -43,8 +42,8 @@ export const TaskTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tasks.length === 0 && <EmptyTableRow />}
-          {tasks.map((task) => {
+          {paginatedTasks.length === 0 && <EmptyTableRow />}
+          {paginatedTasks.map((task) => {
             return <TaskTableRow key={task.id} task={task} />;
           })}
         </tbody>

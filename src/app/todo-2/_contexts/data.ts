@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker/locale/ja";
 
 faker.seed(111);
 
-export const initialTasks: Task[] = [...new Array(100)].map(() => {
+export const initialTasks: Task[] = [...new Array(121)].map(() => {
   const createdAt = faker.date.past();
 
   const statusEntry = faker.helpers.arrayElement([

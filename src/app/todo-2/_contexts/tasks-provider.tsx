@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 import { initialTasks } from "./data";
+import { paginate } from "../_lib/utils";
 
 export type Task = {
   id: string;
@@ -21,7 +22,9 @@ export type Filter =
   | { field: "status"; value: "done" };
 
 export type TasksData = {
-  tasks: Task[];
+  paginatedTasks: Task[];
+  totalTasks: number;
+  page: number;
   sortEntry: SortEntry;
   filters: Filter[];
   isFiltered: (filter: Filter) => boolean;
@@ -43,6 +46,9 @@ export type TasksAction = {
   addFilter: (filter: Filter) => void;
   removeFilter: (filter: Filter) => void;
   removeAllFilter: () => void;
+
+  setPage: (page: number) => void;
+  setLimit: (limit: number) => void;
 };
 
 const TasksDataContext = createContext<TasksData | undefined>(undefined);
@@ -51,6 +57,8 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(30);
   const [allTasks, setAllTasks] = useState<Task[]>(initialTasks);
   const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
@@ -98,9 +106,15 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
     return searchedTasks;
   }, [sortEntry, allTasks, filters, searchText]);
 
+  const paginatedTasks = useMemo(() => {
+    return paginate(tasks, { page, limit });
+  }, [limit, page, tasks]);
+
   const data: TasksData = useMemo(() => {
     return {
-      tasks,
+      paginatedTasks,
+      page,
+      totalTasks: Math.ceil(tasks.length / limit),
       sortEntry,
       filters,
       isFiltered: (filter) => {
@@ -109,7 +123,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         );
       },
     };
-  }, [filters, sortEntry, tasks]);
+  }, [filters, limit, page, paginatedTasks, sortEntry, tasks.length]);
 
   const action: TasksAction = useMemo(() => {
     return {
@@ -147,19 +161,30 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       },
 
       deleteTask: (id) => {
+        if (paginatedTasks.length === 1) {
+          setPage((p) => {
+            if (p > 1) {
+              return p - 1;
+            }
+            return p;
+          });
+        }
         setAllTasks((tasks) => tasks.filter((t) => t.id !== id));
       },
 
       search: (text) => {
         setSearchText(text);
+        setPage(1);
       },
 
       sort: (entry) => {
         setSortEntry(entry);
+        setPage(1);
       },
 
       addFilter: (filter) => {
         setFilters((f) => [...f, filter]);
+        setPage(1);
       },
 
       removeFilter: (filter) => {
@@ -168,13 +193,24 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
             (f) => !(f.field === filter.field && f.value === filter.value),
           ),
         );
+        setPage(1);
       },
 
       removeAllFilter: () => {
         setFilters([]);
+        setPage(1);
+      },
+
+      setPage: (page) => {
+        setPage(page);
+      },
+
+      setLimit: (limit) => {
+        setLimit(limit);
+        setPage(1);
       },
     };
-  }, []);
+  }, [paginatedTasks.length]);
 
   return (
     <TasksDataContext.Provider value={data}>
@@ -191,24 +227,6 @@ export const useTasksData = (): TasksData => {
     throw new Error("TasksProviderが存在しません");
   }
   return ctx;
-};
-
-export const usePaginatedTasks = ({
-  page,
-  limit,
-}: {
-  page: number;
-  limit: number;
-}): { tasks: Task[]; totalTasks: number } => {
-  const { tasks } = useTasksData();
-
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-
-  return {
-    tasks: tasks.slice(startIndex, endIndex),
-    totalTasks: Math.ceil(tasks.length / limit),
-  };
 };
 
 export const useTaskAction = (): TasksAction => {

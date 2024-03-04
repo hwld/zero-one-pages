@@ -86,8 +86,9 @@ export const TaskTableFilter: React.FC = () => {
                 <div className="w-full space-y-1">
                   <div className="h-[1px] w-full bg-black/10" />
                   <button
-                    className="flex w-full items-center gap-1 rounded p-2 text-xs hover:bg-black/15"
+                    className="flex w-full items-center gap-1 rounded p-2 text-xs enabled:hover:bg-black/15 disabled:text-zinc-400"
                     onClick={removeAllFilter}
+                    disabled={filters.length === 0}
                   >
                     <XIcon size={16} />
                     絞り込みを解除する
