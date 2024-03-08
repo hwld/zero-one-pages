@@ -39,7 +39,7 @@ export const TaskTable: React.FC = () => {
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-5 [&_th:last-child]:pr-5">
-            <TableHeader width={80}>
+            <TableHeader width={50}>
               <TaskTableCheckbox
                 checked={areAllTasksSelectedOnPage}
                 onChange={handleToggleTaskSelection}

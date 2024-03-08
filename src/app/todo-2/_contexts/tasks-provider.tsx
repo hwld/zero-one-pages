@@ -1,9 +1,11 @@
 import {
   ReactNode,
+  RefObject,
   createContext,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { paginate } from "../_lib/utils";
@@ -45,6 +47,7 @@ export type TasksData = {
   page: number;
   sortEntry: SortEntry;
   filters: Filter[];
+  scrollTargetRef: RefObject<HTMLDivElement>;
 };
 
 export type TasksAction = {
@@ -80,10 +83,13 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(30);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const scrollTargetRef = useRef<HTMLDivElement>(null);
+
+  // これらの情報はquery paramsで持った方が良いが、UIを作ることが目的なので・・・
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(30);
   const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
@@ -148,6 +154,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       totalTasks: Math.ceil(tasks.length / limit),
       sortEntry,
       filters,
+      scrollTargetRef,
     };
   }, [
     filters,
@@ -245,6 +252,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 
       setPage: (page) => {
         setPage(page);
+        scrollTargetRef.current?.scrollTo(0, 0);
       },
 
       setLimit: (limit) => {
