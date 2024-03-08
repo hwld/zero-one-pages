@@ -43,7 +43,7 @@ const allStatusFilterContents = [
     label: "Done",
     icon: CircleDotIcon,
   },
-] as const satisfies FilterContent[];
+] satisfies FilterContent[];
 
 const allSelectionFilterContents = [
   {
@@ -61,7 +61,7 @@ const allSelectionFilterContents = [
     predicate: (task, { selectedTaskIds }) =>
       !selectedTaskIds.includes(task.id),
   },
-] as const satisfies FilterContent[];
+] satisfies FilterContent[];
 
 export const TaskTableFilter: React.FC = () => {
   const { filters } = useTasksData();
