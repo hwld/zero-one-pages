@@ -8,7 +8,9 @@ import {
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  BoxSelectIcon,
   CheckIcon,
+  CheckSquareIcon,
   CircleDashedIcon,
   CircleDotIcon,
   FilterIcon,
@@ -22,13 +24,47 @@ import {
   useTaskAction,
 } from "../../_contexts/tasks-provider";
 
-const allFilterItems = [
-  { field: "status", value: "todo", label: "Todo", icon: CircleDashedIcon },
-  { field: "status", value: "done", label: "Done", icon: CircleDotIcon },
-] satisfies (Filter & { label: string; icon: LucideIcon })[];
+type FilterContent = Filter & { label: string; icon: LucideIcon };
+
+const allStatusFilterContents = [
+  {
+    id: crypto.randomUUID(),
+    type: "field",
+    field: "status",
+    value: "todo",
+    label: "Todo",
+    icon: CircleDashedIcon,
+  },
+  {
+    id: crypto.randomUUID(),
+    type: "field",
+    field: "status",
+    value: "done",
+    label: "Done",
+    icon: CircleDotIcon,
+  },
+] as const satisfies FilterContent[];
+
+const allSelectionFilterContents = [
+  {
+    id: crypto.randomUUID(),
+    type: "predicate",
+    icon: CheckSquareIcon,
+    label: "選択済み",
+    predicate: (task, { selectedTaskIds }) => selectedTaskIds.includes(task.id),
+  },
+  {
+    id: crypto.randomUUID(),
+    type: "predicate",
+    icon: BoxSelectIcon,
+    label: "未選択",
+    predicate: (task, { selectedTaskIds }) =>
+      !selectedTaskIds.includes(task.id),
+  },
+] as const satisfies FilterContent[];
 
 export const TaskTableFilter: React.FC = () => {
-  const { isFiltered, filters } = useTasksData();
+  const { filters } = useTasksData();
   const { addFilter, removeFilter, removeAllFilter } = useTaskAction();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -61,11 +97,40 @@ export const TaskTableFilter: React.FC = () => {
                 exit={{ opacity: 0, y: -5 }}
               >
                 <FilterGroup label="状況">
-                  {allFilterItems.map((filter, i) => {
-                    const isSelected = isFiltered(filter);
+                  {allStatusFilterContents.map((filter, i) => {
+                    const isSelected = !!filters.find(
+                      (f) => f.id === filter.id,
+                    );
+
                     const handleSelect = () => {
                       if (isSelected) {
-                        removeFilter(filter);
+                        removeFilter(filter.id);
+                      } else {
+                        addFilter(filter);
+                      }
+                    };
+
+                    return (
+                      <FilterItem
+                        key={i}
+                        label={filter.label}
+                        icon={filter.icon}
+                        filter={filter}
+                        isSelected={isSelected}
+                        onSelect={handleSelect}
+                      />
+                    );
+                  })}
+                </FilterGroup>
+                <FilterGroup label="選択">
+                  {allSelectionFilterContents.map((filter, i) => {
+                    const isSelected = !!filters.find(
+                      (f) => f.id === filter.id,
+                    );
+
+                    const handleSelect = () => {
+                      if (isSelected) {
+                        removeFilter(filter.id);
                       } else {
                         addFilter(filter);
                       }

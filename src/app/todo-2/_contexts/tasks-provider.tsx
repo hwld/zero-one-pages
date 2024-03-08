@@ -26,9 +26,17 @@ export type SortEntry = {
   order: Order;
 };
 
-export type Filter =
-  | { field: "status"; value: "todo" }
-  | { field: "status"; value: "done" };
+export type FieldFilter =
+  | { id: string; type: "field"; field: "status"; value: "todo" }
+  | { id: string; type: "field"; field: "status"; value: "done" };
+
+export type PredicateFilter = {
+  id: string;
+  type: "predicate";
+  predicate: (task: Task, context: { selectedTaskIds: string[] }) => boolean;
+};
+
+export type Filter = FieldFilter | PredicateFilter;
 
 export type TasksData = {
   paginatedTasks: Task[];
@@ -37,7 +45,6 @@ export type TasksData = {
   page: number;
   sortEntry: SortEntry;
   filters: Filter[];
-  isFiltered: (filter: Filter) => boolean;
 };
 
 export type TasksAction = {
@@ -54,7 +61,7 @@ export type TasksAction = {
   sort: (entry: SortEntry) => void;
 
   addFilter: (filter: Filter) => void;
-  removeFilter: (filter: Filter) => void;
+  removeFilter: (filterId: string) => void;
   removeAllFilter: () => void;
 
   setPage: (page: number) => void;
@@ -85,12 +92,18 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const tasks = useMemo(() => {
     const { field, order } = sortEntry;
 
-    const filteredTasks = allTasks.filter((t) => {
+    const filteredTasks = allTasks.filter((task) => {
       if (filters.length === 0) {
         return true;
       }
 
-      return filters.some((filter) => t[filter.field] === filter.value);
+      return filters.some((filter) => {
+        if (filter.type === "predicate") {
+          return filter.predicate(task, { selectedTaskIds });
+        }
+
+        return task[filter.field] === filter.value;
+      });
     });
 
     const sortedTasks = filteredTasks.sort((a, b) => {
@@ -119,7 +132,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
     });
 
     return searchedTasks;
-  }, [sortEntry, allTasks, filters, searchText]);
+  }, [sortEntry, allTasks, filters, selectedTaskIds, searchText]);
 
   const paginatedTasks = useMemo(() => {
     return paginate(tasks, { page, limit });
@@ -133,11 +146,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       totalTasks: Math.ceil(tasks.length / limit),
       sortEntry,
       filters,
-      isFiltered: (filter) => {
-        return !!filters.find(
-          (f) => f.field === filter.field && f.value === filter.value,
-        );
-      },
     };
   }, [
     filters,
@@ -212,12 +220,8 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         setPage(1);
       },
 
-      removeFilter: (filter) => {
-        setFilters((f) =>
-          f.filter(
-            (f) => !(f.field === filter.field && f.value === filter.value),
-          ),
-        );
+      removeFilter: (id) => {
+        setFilters((filters) => filters.filter((f) => f.id !== id));
         setPage(1);
       },
 
