@@ -8,14 +8,34 @@ import {
   useTasksData,
   useTaskAction,
 } from "../../_contexts/tasks-provider";
+import { ReactNode } from "react";
 
-type Props = {
+type TableHeaderProps = { children: ReactNode; width?: number };
+
+export const TableHeader: React.FC<TableHeaderProps> = ({
+  children,
+  width,
+}) => {
+  return (
+    <th
+      className="whitespace-nowrap border-b border-zinc-600 bg-black/10 p-2 font-medium text-zinc-400"
+      style={{ width }}
+    >
+      {children}
+    </th>
+  );
+};
+
+type LabelTableHeaderProps = {
   icon?: React.FC<{ size?: number; className?: string }>;
   text: string;
   width?: number;
 };
-
-export const TableHeader: React.FC<Props> = ({ icon: Icon, text, width }) => {
+export const LabelTableHeader: React.FC<LabelTableHeaderProps> = ({
+  icon: Icon,
+  text,
+  width,
+}) => {
   return (
     <th
       className="whitespace-nowrap border-b border-zinc-600 bg-black/10 p-2 font-medium text-zinc-400"
@@ -29,7 +49,7 @@ export const TableHeader: React.FC<Props> = ({ icon: Icon, text, width }) => {
   );
 };
 
-type SortableTableHeaderProps = Props & {
+type SortableTableHeaderProps = LabelTableHeaderProps & {
   fieldName: SortEntry["field"];
 };
 export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({

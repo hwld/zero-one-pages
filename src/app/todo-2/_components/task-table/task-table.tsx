@@ -5,22 +5,47 @@ import {
   IconClockHour5,
   IconGridDots,
 } from "@tabler/icons-react";
-import { SortableTableHeader, TableHeader } from "./header";
+import { SortableTableHeader, LabelTableHeader, TableHeader } from "./header";
 import { EmptyTableRow } from "./empty-row";
 import { TaskTableRow } from "./row";
 import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { Pagination } from "../pagination";
+import { TaskTableCheckbox } from "./checkbox";
+import { useMemo } from "react";
 
 export const TaskTable: React.FC = () => {
-  const { page, totalTasks, paginatedTasks } = useTasksData();
-  const { setPage } = useTaskAction();
+  const { page, totalTasks, paginatedTasks, selectedTaskIds } = useTasksData();
+  const { setPage, selectAllTasksOnPage, unselectAllTasksOnPage } =
+    useTaskAction();
+
+  const areAllTasksSelectedOnPage = useMemo(() => {
+    if (paginatedTasks.length === 0) {
+      return false;
+    }
+
+    return paginatedTasks.every((t) => selectedTaskIds.includes(t.id));
+  }, [paginatedTasks, selectedTaskIds]);
+
+  const handleToggleTaskSelection = () => {
+    if (areAllTasksSelectedOnPage) {
+      unselectAllTasksOnPage();
+    } else {
+      selectAllTasksOnPage();
+    }
+  };
 
   return (
     <div className="flex grow flex-col overflow-auto rounded-md border border-zinc-600">
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
-          <tr className="[&_th:first-child]:pl-3 [&_th:last-child]:pr-3">
-            <TableHeader icon={IconCheckbox} width={80} text="状況" />
+          <tr className="[&_th:first-child]:pl-5 [&_th:last-child]:pr-5">
+            <TableHeader width={80}>
+              <TaskTableCheckbox
+                checked={areAllTasksSelectedOnPage}
+                onChange={handleToggleTaskSelection}
+              />
+            </TableHeader>
+            <LabelTableHeader icon={IconCheckbox} width={80} text="状況" />
             <SortableTableHeader
               icon={IconClipboardText}
               text="タスク名"
@@ -38,7 +63,7 @@ export const TaskTable: React.FC = () => {
               text="達成日"
               fieldName="completedAt"
             />
-            <TableHeader icon={IconGridDots} width={150} text="操作" />
+            <LabelTableHeader icon={IconGridDots} width={150} text="操作" />
           </tr>
         </thead>
         <tbody>

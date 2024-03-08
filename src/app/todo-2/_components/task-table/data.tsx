@@ -7,7 +7,7 @@ export const TaskTableData: React.FC<{
 }> = ({ children, noWrap }) => {
   return (
     <td className={clsx("px-3 py-1 text-sm", noWrap && "whitespace-nowrap")}>
-      <div className="tabular-nums" suppressHydrationWarning>
+      <div className="flex items-center tabular-nums" suppressHydrationWarning>
         {children}
       </div>
     </td>

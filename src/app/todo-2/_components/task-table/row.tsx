@@ -1,17 +1,27 @@
 import { IconTrash } from "@tabler/icons-react";
 import { TaskTableData } from "./data";
 import { TaskStatusBadge } from "../task-status-badge";
-import { Task, useTaskAction } from "../../_contexts/tasks-provider";
+import {
+  Task,
+  useTaskAction,
+  useTasksData,
+} from "../../_contexts/tasks-provider";
 import { ConfirmDialog } from "../confirm-dialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Tooltip } from "../tooltip";
 import { format } from "../../_lib/utils";
+import { TaskTableCheckbox } from "./checkbox";
 
 export const TaskTableRow: React.FC<{
   task: Task;
 }> = ({ task: { id, title, status, createdAt, completedAt } }) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const { deleteTask, updateTask } = useTaskAction();
+  const { selectedTaskIds } = useTasksData();
+  const { deleteTask, updateTask, toggleTaskSelection } = useTaskAction();
+
+  const isSelected = useMemo(() => {
+    return selectedTaskIds.includes(id);
+  }, [id, selectedTaskIds]);
 
   const handleDelete = () => {
     deleteTask(id);
@@ -23,6 +33,12 @@ export const TaskTableRow: React.FC<{
 
   return (
     <tr className="border-b border-zinc-600 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
+      <TaskTableData>
+        <TaskTableCheckbox
+          checked={isSelected}
+          onChange={() => toggleTaskSelection(id)}
+        />
+      </TaskTableData>
       <TaskTableData noWrap>
         <TaskStatusBadge status={status} onChangeStatus={handleChangeStatus} />
       </TaskTableData>

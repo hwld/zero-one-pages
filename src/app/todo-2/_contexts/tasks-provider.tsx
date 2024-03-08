@@ -32,6 +32,7 @@ export type Filter =
 
 export type TasksData = {
   paginatedTasks: Task[];
+  selectedTaskIds: string[];
   totalTasks: number;
   page: number;
   sortEntry: SortEntry;
@@ -58,6 +59,10 @@ export type TasksAction = {
 
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
+
+  toggleTaskSelection: (id: string) => void;
+  selectAllTasksOnPage: () => void;
+  unselectAllTasksOnPage: () => void;
 };
 
 const TasksDataContext = createContext<TasksData | undefined>(undefined);
@@ -69,6 +74,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(30);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [searchText, setSearchText] = useState("");
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",
@@ -122,6 +128,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const data: TasksData = useMemo(() => {
     return {
       paginatedTasks,
+      selectedTaskIds,
       page,
       totalTasks: Math.ceil(tasks.length / limit),
       sortEntry,
@@ -132,7 +139,15 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         );
       },
     };
-  }, [filters, limit, page, paginatedTasks, sortEntry, tasks.length]);
+  }, [
+    filters,
+    limit,
+    page,
+    paginatedTasks,
+    selectedTaskIds,
+    sortEntry,
+    tasks.length,
+  ]);
 
   const action: TasksAction = useMemo(() => {
     return {
@@ -179,6 +194,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
           });
         }
         setAllTasks((tasks) => tasks.filter((t) => t.id !== id));
+        setSelectedTaskIds((ids) => ids.filter((i) => i !== id));
       },
 
       search: (text) => {
@@ -218,8 +234,33 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         setLimit(limit);
         setPage(1);
       },
+
+      toggleTaskSelection: (id: string) => {
+        setSelectedTaskIds((st) => {
+          if (st.includes(id)) {
+            return st.filter((i) => i !== id);
+          }
+          return [...st, id];
+        });
+      },
+
+      selectAllTasksOnPage: () => {
+        setSelectedTaskIds((ids) => {
+          return Array.from(
+            new Set([...ids, ...paginatedTasks.map((t) => t.id)]),
+          );
+        });
+      },
+
+      unselectAllTasksOnPage: () => {
+        setSelectedTaskIds((ids) => {
+          return ids.filter((id) => {
+            return !paginatedTasks.find((t) => t.id === id);
+          });
+        });
+      },
     };
-  }, [paginatedTasks.length]);
+  }, [paginatedTasks]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
