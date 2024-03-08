@@ -4,7 +4,7 @@ import {
   DialogOverlay,
   DialogPortal,
 } from "@radix-ui/react-dialog";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { ReactNode } from "react";
 
 type Props = {
@@ -24,10 +24,12 @@ export const ConfirmDialog: React.FC<Props> = ({
   confirmText,
   children,
 }) => {
+  const isPrecent = useIsPresent();
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <AnimatePresence>
-        {isOpen && (
+        {isPrecent && isOpen && (
           <DialogPortal forceMount>
             <DialogOverlay asChild>
               <motion.div

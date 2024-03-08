@@ -69,7 +69,11 @@ export const TaskTableFilter: React.FC = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
-    <DropdownMenu open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+    <DropdownMenu
+      open={isFilterOpen}
+      onOpenChange={setIsFilterOpen}
+      modal={false}
+    >
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-1 rounded bg-zinc-300 p-2 text-xs text-zinc-700">
           <FilterIcon size={15} />

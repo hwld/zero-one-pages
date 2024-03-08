@@ -9,6 +9,7 @@ import { Sidebar } from "./_components/side-bar/side-bar";
 import { AddTaskButton } from "./_components/add-task-button";
 import { TaskTableFilter } from "./_components/task-table/filter";
 import { TaskSearch } from "./_components/task-search";
+import { TaskSelectionMenu } from "./_components/task-selection-menu/task-selection-menu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +18,7 @@ const Page: NextPage = () => {
     <div
       className={clsx(
         inter.className,
-        "flex min-h-[100dvh] gap-6 bg-zinc-900 p-6 text-zinc-300",
+        "flex min-h-screen gap-6 bg-zinc-900 p-6 text-zinc-300",
       )}
     >
       <div className="sticky top-0">
@@ -39,6 +40,7 @@ const Page: NextPage = () => {
           <TaskTable />
         </div>
       </div>
+      <TaskSelectionMenu />
     </div>
   );
 };

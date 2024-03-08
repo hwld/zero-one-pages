@@ -54,6 +54,7 @@ export type TasksAction = {
       Pick<Task, "title" | "description" | "status">
     >,
   ) => void;
+  updateTasksStatus: (ids: string[], status: Task["status"]) => void;
   deleteTask: (id: string) => void;
 
   search: (text: string) => void;
@@ -70,6 +71,7 @@ export type TasksAction = {
   toggleTaskSelection: (id: string) => void;
   selectAllTasksOnPage: () => void;
   unselectAllTasksOnPage: () => void;
+  unselectAllTasks: () => void;
 };
 
 const TasksDataContext = createContext<TasksData | undefined>(undefined);
@@ -192,6 +194,17 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         );
       },
 
+      updateTasksStatus: (ids, status) => {
+        setAllTasks((tasks) =>
+          tasks.map((t) => {
+            if (ids.includes(t.id)) {
+              return { ...t, status };
+            }
+            return t;
+          }),
+        );
+      },
+
       deleteTask: (id) => {
         if (paginatedTasks.length === 1) {
           setPage((p) => {
@@ -262,6 +275,10 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
             return !paginatedTasks.find((t) => t.id === id);
           });
         });
+      },
+
+      unselectAllTasks: () => {
+        setSelectedTaskIds([]);
       },
     };
   }, [paginatedTasks]);
