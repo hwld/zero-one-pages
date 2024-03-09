@@ -30,6 +30,7 @@ const allStatusFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "field",
+    group: "status",
     field: "status",
     value: "todo",
     label: "Todo",
@@ -38,6 +39,7 @@ const allStatusFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "field",
+    group: "status",
     field: "status",
     value: "done",
     label: "Done",
@@ -49,6 +51,7 @@ const allSelectionFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "predicate",
+    group: "selection",
     icon: CheckSquareIcon,
     label: "選択済み",
     predicate: (task, { selectedTaskIds }) => selectedTaskIds.includes(task.id),
@@ -56,6 +59,7 @@ const allSelectionFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "predicate",
+    group: "selection",
     icon: BoxSelectIcon,
     label: "未選択",
     predicate: (task, { selectedTaskIds }) =>

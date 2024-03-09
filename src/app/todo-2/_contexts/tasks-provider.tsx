@@ -29,16 +29,18 @@ export type SortEntry = {
 };
 
 export type FieldFilter =
-  | { id: string; type: "field"; field: "status"; value: "todo" }
-  | { id: string; type: "field"; field: "status"; value: "done" };
+  | { type: "field"; field: "status"; value: "todo" }
+  | { type: "field"; field: "status"; value: "done" };
 
 export type PredicateFilter = {
-  id: string;
   type: "predicate";
   predicate: (task: Task, context: { selectedTaskIds: string[] }) => boolean;
 };
 
-export type Filter = FieldFilter | PredicateFilter;
+export type Filter = { id: string; group: "status" | "selection" } & (
+  | FieldFilter
+  | PredicateFilter
+);
 
 export type TasksData = {
   paginatedTasks: Task[];
@@ -105,13 +107,32 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         return true;
       }
 
-      return filters.some((filter) => {
-        if (filter.type === "predicate") {
-          return filter.predicate(task, { selectedTaskIds });
+      const matchesFilter = (filter: Filter) => {
+        const type = filter.type;
+        switch (type) {
+          case "predicate": {
+            return filter.predicate(task, { selectedTaskIds });
+          }
+          case "field": {
+            return task[filter.field] === filter.value;
+          }
+          default: {
+            throw new Error(type as never);
+          }
         }
+      };
 
-        return task[filter.field] === filter.value;
-      });
+      const statusFilters = filters.filter((f) => f.group === "status");
+      const isMatchingStatusFilter =
+        statusFilters.length > 0 ? statusFilters.some(matchesFilter) : true;
+
+      const selectionFilters = filters.filter((f) => f.group === "selection");
+      const isMatchingSelectionFilter =
+        selectionFilters.length > 0
+          ? selectionFilters.some(matchesFilter)
+          : true;
+
+      return isMatchingStatusFilter && isMatchingSelectionFilter;
     });
 
     const sortedTasks = filteredTasks.sort((a, b) => {
