@@ -1,18 +1,30 @@
-import { Checkbox, CheckboxIndicator } from "@radix-ui/react-checkbox";
+"use client";
+
 import { IconCheck } from "@tabler/icons-react";
+import clsx from "clsx";
 
 type Props = { checked: boolean; onChange: (checked: boolean) => void };
 
 export const TaskTableCheckbox: React.FC<Props> = ({ checked, onChange }) => {
   return (
-    <Checkbox
-      checked={checked}
-      onCheckedChange={onChange}
-      className="block size-[18px] appearance-none rounded border border-zinc-500 transition-colors data-[state=checked]:border-zinc-300 data-[state=checked]:bg-zinc-300 hover:data-[state=unchecked]:bg-white/10"
+    <div
+      className={clsx(
+        "relative block size-[18px] overflow-hidden rounded border border-zinc-500 outline-2 outline-[#4c84e5] transition-colors has-[:focus-visible]:outline",
+        checked ? "border-zinc-300 bg-zinc-300" : " hover:bg-white/10",
+      )}
     >
-      <CheckboxIndicator className="grid place-items-center text-zinc-700">
-        <IconCheck size={18} className="pr-[3px]" />
-      </CheckboxIndicator>
-    </Checkbox>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={() => onChange(!checked)}
+        className="h-full w-full cursor-pointer appearance-none opacity-0"
+      />
+      {checked && (
+        <IconCheck
+          className="pointer-events-none absolute inset-0 text-zinc-700"
+          size={15}
+        />
+      )}
+    </div>
   );
 };
