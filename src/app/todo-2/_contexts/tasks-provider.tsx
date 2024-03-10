@@ -3,24 +3,21 @@ import {
   RefObject,
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { paginate } from "../_lib/utils";
-import { z } from "zod";
+import { initialTasks } from "../_lib/initial-data";
 
-const taskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.union([z.literal("done"), z.literal("todo")]),
-  createdAt: z.coerce.date(),
-  completedAt: z.union([z.coerce.date(), z.undefined()]),
-});
-
-export type Task = z.infer<typeof taskSchema>;
+export type Task = {
+  id: string;
+  title: string;
+  description: string;
+  status: "done" | "todo";
+  createdAt: Date;
+  completedAt?: Date | undefined;
+};
 
 export type Order = "asc" | "desc";
 export type SortEntry = {
@@ -86,7 +83,7 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>(initialTasks);
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const scrollTargetRef = useRef<HTMLDivElement>(null);
 
@@ -316,16 +313,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       },
     };
   }, [paginatedTasks]);
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      const res = await fetch("/todo-2/initial-data.json");
-      const data = await res.json();
-      setAllTasks(data.map(taskSchema.parse));
-    };
-
-    fetchInitialData();
-  }, []);
 
   return (
     <TasksDataContext.Provider value={data}>

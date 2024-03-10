@@ -15,7 +15,6 @@ import { z } from "zod";
 const TaskDetailPage: NextPage = () => {
   const { getTask } = useTasksData();
   const searchParams = useSearchParams();
-  // TODO: リロードするとundefined
   const id = z.string().parse(searchParams.get("id"));
   const task = getTask(id);
 
@@ -60,7 +59,9 @@ const Row: React.FC<{
         <Icon size={18} />
         {title}
       </div>
-      <div className="ml-2">{value}</div>
+      <div className="ml-2" suppressHydrationWarning>
+        {value}
+      </div>
     </div>
   );
 };
