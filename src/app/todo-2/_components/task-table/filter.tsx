@@ -81,7 +81,7 @@ export const TaskTableFilter: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-1 rounded bg-zinc-300 p-2 text-xs text-zinc-700">
           <FilterIcon size={15} />
-          <p className="mt-[1px]">絞り込み</p>
+          <p className="mt-[1px] whitespace-nowrap">絞り込み</p>
           {filters.length > 0 && (
             <div className="size-[16px] rounded-full bg-zinc-700 text-zinc-100">
               {filters.length}

@@ -11,6 +11,7 @@ import { useMemo, useState } from "react";
 import { Tooltip } from "../tooltip";
 import { format } from "../../_lib/utils";
 import { TaskTableCheckbox } from "./checkbox";
+import Link from "next/link";
 
 export const TaskTableRow: React.FC<{
   task: Task;
@@ -42,7 +43,15 @@ export const TaskTableRow: React.FC<{
       <TaskTableData noWrap>
         <TaskStatusBadge status={status} onChangeStatus={handleChangeStatus} />
       </TaskTableData>
-      <TaskTableData>{title}</TaskTableData>
+      <TaskTableData>
+        <Link
+          // static exportを使うのでpathではなくsearchParamsにidを指定する
+          href={`detail?id=${id}`}
+          className="hover:text-zinc-50 hover:underline"
+        >
+          {title}
+        </Link>
+      </TaskTableData>
       <TaskTableData noWrap>{format(createdAt)}</TaskTableData>
       <TaskTableData noWrap>
         {completedAt ? format(completedAt) : "None"}

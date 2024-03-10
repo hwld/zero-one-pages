@@ -50,6 +50,7 @@ export type TasksData = {
   sortEntry: SortEntry;
   filters: Filter[];
   scrollTargetRef: RefObject<HTMLDivElement>;
+  getTask: (id: string) => Task | undefined;
 };
 
 export type TasksAction = {
@@ -176,8 +177,12 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       sortEntry,
       filters,
       scrollTargetRef,
+      getTask: (id: string) => {
+        return allTasks.find((t) => t.id === id);
+      },
     };
   }, [
+    allTasks,
     filters,
     limit,
     page,
@@ -314,7 +319,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const res = await fetch("./initial-data.json");
+      const res = await fetch("/todo-2/initial-data.json");
       const data = await res.json();
       setAllTasks(data.map(taskSchema.parse));
     };
