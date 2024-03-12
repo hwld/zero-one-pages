@@ -3,6 +3,13 @@ import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { CircleDotIcon, LucideIcon, Trash2Icon, XIcon } from "lucide-react";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useState } from "react";
+import {
+  autoUpdate,
+  offset,
+  useFloating,
+  useHover,
+  useInteractions,
+} from "@floating-ui/react";
 
 export const TaskSelectionMenu: React.FC = () => {
   const { selectedTaskIds } = useTasksData();
@@ -42,6 +49,8 @@ export const TaskSelectionMenu: React.FC = () => {
             </button>
           </div>
 
+          <div className="h-[25px] w-[1px] bg-zinc-400" />
+
           <TaskSelectionMenuButton
             icon={Trash2Icon}
             label="削除する"
@@ -78,13 +87,46 @@ const TaskSelectionMenuButton: React.FC<{
   label: string;
   onClick?: () => void;
 }> = ({ icon: Icon, label, onClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    placement: "top",
+    middleware: [offset(10)],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const hover = useHover(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
   return (
-    <button
-      className="flex h-[25px] items-center gap-1 rounded bg-zinc-900 px-2 text-xs text-zinc-100 transition-colors hover:bg-zinc-700"
-      onClick={onClick}
-    >
-      <Icon size={15} />
-      <div className="mt-[1px]">{label}</div>
-    </button>
+    <>
+      <button
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className="flex h-[25px] items-center gap-1 rounded bg-zinc-900 px-2 text-xs text-zinc-100 transition-colors hover:bg-zinc-700"
+        onClick={onClick}
+      >
+        <Icon size={15} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+          >
+            <motion.div
+              className="rounded border border-zinc-600 bg-zinc-900 p-2 text-xs text-zinc-100"
+              initial={{ opacity: 0, y: 3 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 3 }}
+            >
+              {label}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
