@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 export const Sidebar: React.FC = () => {
   const path = usePathname();
-  console.log(path);
+
   return (
     <div className="flex w-[200px] flex-col gap-4">
       <div className="flex items-center gap-1 whitespace-nowrap text-sm font-bold">
