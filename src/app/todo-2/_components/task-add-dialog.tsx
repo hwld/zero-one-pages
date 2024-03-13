@@ -76,7 +76,7 @@ export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
                     </label>
                   </div>
                   <button
-                    className="flex min-w-[50px] items-center gap-1 rounded bg-zinc-300 p-2 text-xs text-zinc-700"
+                    className="flex min-w-[50px] items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 hover:bg-white/20"
                     type="submit"
                     form={taskFormId}
                   >

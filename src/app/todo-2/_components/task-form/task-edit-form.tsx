@@ -23,27 +23,24 @@ export const TaskEditForm: React.FC<Props> = ({
     resolver: zodResolver(taskFormSchema),
   });
 
-  const add = (data: TaskFormData) => {
-    onUpdateTask(data);
-  };
+  const inputBaseClass =
+    "rounded bg-transparent outline outline-1 outline-zinc-500 focus-visible:outline-1 focus-visible:outline-zinc-100";
 
   return (
     <form
       className={taskDetailViewClass.wrapper}
       id={formId}
-      onSubmit={handleSubmit(add)}
+      onSubmit={handleSubmit(onUpdateTask)}
     >
       <input
-        className={clsx(
-          taskDetailViewClass.title,
-          "rounded border border-zinc-500 bg-transparent focus-visible:border-zinc-100 focus-visible:outline-none",
-        )}
+        className={clsx(taskDetailViewClass.title, inputBaseClass)}
         {...register("title")}
       />
       <textarea
         className={clsx(
           taskDetailViewClass.description,
-          "resize-none rounded border border-zinc-500 bg-transparent focus-visible:border-zinc-100 focus-visible:outline-none",
+          inputBaseClass,
+          "resize-none",
         )}
         {...register("description")}
       />

@@ -38,7 +38,7 @@ export const TaskSearch: React.FC = () => {
       </div>
       <button
         onClick={handleSearch}
-        className="h-8 shrink-0 rounded bg-zinc-300 px-3 py-1 text-xs text-zinc-700"
+        className="h-8 shrink-0 rounded border border-zinc-500 bg-white/15 px-3 py-1 text-xs text-zinc-100 hover:bg-white/20"
       >
         検索
       </button>

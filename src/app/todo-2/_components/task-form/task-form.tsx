@@ -14,7 +14,7 @@ export const taskFormSchema = z.object({
     .string()
     .min(1, "タイトルの入力は必須です。")
     .max(100, "タスクは100文字以下で入力してください。"),
-  description: z.string().max(500, "説明は500文字以下で入力してください。"),
+  description: z.string().max(10000, "説明は10000文字以下で入力してください。"),
 }) satisfies z.ZodType<TaskFormData>;
 
 type Props = {

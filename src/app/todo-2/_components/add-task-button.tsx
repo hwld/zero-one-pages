@@ -22,14 +22,14 @@ export const AddTaskButton: React.FC = () => {
   return (
     <>
       <button
-        className="group flex h-8 w-fit shrink-0 items-center gap-2 rounded bg-zinc-300 px-2 text-zinc-700 transition-colors hover:bg-zinc-400"
+        className="group flex h-8 w-fit shrink-0 items-center gap-2 rounded border border-zinc-500 bg-white/15 px-2 text-zinc-100 transition-colors hover:bg-white/20"
         onClick={handleAddTask}
       >
         <div className="flex items-center">
           <IconPlus size={15} className="mb-[1px]" />
           <p className="text-xs">タスクを追加する</p>
         </div>
-        <div className="flex items-center rounded bg-black/15 px-1 py-[2px] text-zinc-700 transition-colors">
+        <div className="flex items-center rounded bg-white/20 px-1 text-zinc-300 transition-colors">
           <IconCommand size={15} />
           <p className="mt-[1px] text-[12px]">K</p>
         </div>

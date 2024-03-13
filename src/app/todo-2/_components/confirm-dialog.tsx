@@ -46,17 +46,19 @@ export const ConfirmDialog: React.FC<Props> = ({
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
               >
-                <div className="p-4 text-lg font-bold">{title}</div>
-                <div className="min-h-[100px] px-4 pb-4">{children}</div>
+                <div className="p-4">{title}</div>
+                <div className="min-h-[100px] px-4 pb-4 text-sm">
+                  {children}
+                </div>
                 <div className="flex items-center justify-end gap-4 border-t border-zinc-700 bg-black/30 p-4">
                   <button
-                    className="rounded border border-zinc-500 p-2 text-xs transition-colors hover:bg-white/10"
+                    className="rounded p-2 text-xs transition-colors hover:bg-white/10"
                     onClick={() => onOpenChange(false)}
                   >
                     キャンセルする
                   </button>
                   <button
-                    className="rounded bg-zinc-100 p-2 text-xs text-zinc-700 transition-colors hover:bg-zinc-300"
+                    className="rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 transition-colors hover:bg-white/20"
                     onClick={onConfirm}
                   >
                     {confirmText}
