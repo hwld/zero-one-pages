@@ -13,6 +13,7 @@ import { useTaskAction, useTasksData } from "../_contexts/tasks-provider";
 import { z } from "zod";
 import Link from "next/link";
 import { TaskStatusBadge } from "../_components/task-status-badge";
+import { TaskDetailContentCard } from "../_components/task-detail-content-card";
 
 const TaskDetailPage: NextPage = () => {
   const { getTask } = useTasksData();
@@ -30,20 +31,16 @@ const TaskDetailPage: NextPage = () => {
       <h1 className="text-sm">
         <Link
           href="/todo-2"
-          className="rounded p-1 transition-colors hover:bg-zinc-700"
+          className="rounded px-2 py-1 transition-colors hover:bg-zinc-700"
         >
           home
         </Link>
         <span className="mx-1">/</span>
-        <span className="rounded bg-zinc-700 p-1">{task.id}</span>
+        <span className="rounded p-1 px-2">{task.id}</span>
       </h1>
+
       <div className="grid grow grid-cols-[1fr_300px] gap-4">
-        <Card>
-          <div className="flex h-full flex-col gap-4">
-            <h2 className="text-xl font-bold">{task.title}</h2>
-            <div className="grow">{task.description}</div>
-          </div>
-        </Card>
+        <TaskDetailContentCard task={task} />
         <Card>
           <div className="flex flex-col gap-4">
             <Row

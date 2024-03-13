@@ -9,7 +9,7 @@ import clsx from "clsx";
 
 export type TaskFormData = Parameters<TasksAction["addTask"]>[0];
 
-const taskFormSchema = z.object({
+export const taskFormSchema = z.object({
   title: z
     .string()
     .min(1, "タイトルの入力は必須です。")
