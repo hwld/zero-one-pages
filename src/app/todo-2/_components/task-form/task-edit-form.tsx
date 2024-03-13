@@ -4,6 +4,7 @@ import { TaskFormData, taskFormSchema } from "./task-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { taskDetailViewClass } from "../task-detail-content-card";
 import clsx from "clsx";
+import { TaskFormErrorTooltip } from "./error-tooltip";
 
 type Props = {
   defaultTask: Task;
@@ -15,7 +16,11 @@ export const TaskEditForm: React.FC<Props> = ({
   formId,
   onUpdateTask,
 }) => {
-  const { register, handleSubmit } = useForm<TaskFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TaskFormData>({
     defaultValues: {
       title: defaultTask.title,
       description: defaultTask.description,
@@ -32,18 +37,26 @@ export const TaskEditForm: React.FC<Props> = ({
       id={formId}
       onSubmit={handleSubmit(onUpdateTask)}
     >
-      <input
-        className={clsx(taskDetailViewClass.title, inputBaseClass)}
-        {...register("title")}
-      />
-      <textarea
-        className={clsx(
-          taskDetailViewClass.description,
-          inputBaseClass,
-          "resize-none",
-        )}
-        {...register("description")}
-      />
+      <TaskFormErrorTooltip error={errors.title?.message}>
+        <input
+          className={clsx(taskDetailViewClass.title, inputBaseClass)}
+          {...register("title")}
+        />
+      </TaskFormErrorTooltip>
+      <TaskFormErrorTooltip
+        className="h-full w-full"
+        error={errors.description?.message}
+        placement="bottom-start"
+      >
+        <textarea
+          className={clsx(
+            taskDetailViewClass.description,
+            inputBaseClass,
+            "resize-none",
+          )}
+          {...register("description")}
+        />
+      </TaskFormErrorTooltip>
     </form>
   );
 };

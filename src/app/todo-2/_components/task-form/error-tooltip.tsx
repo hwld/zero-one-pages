@@ -11,6 +11,7 @@ import { AlertCircleIcon } from "lucide-react";
 import { ReactNode, useRef } from "react";
 
 type Props = {
+  className?: string;
   children: ReactNode;
   error?: string;
   placement?: "top-start" | "bottom-start";
@@ -19,6 +20,7 @@ type Props = {
 const ARROW_HEIGHT = 10;
 
 export const TaskFormErrorTooltip: React.FC<Props> = ({
+  className,
   children,
   error,
   placement = "top-start",
@@ -36,7 +38,9 @@ export const TaskFormErrorTooltip: React.FC<Props> = ({
 
   return (
     <>
-      <div ref={refs.setReference}>{children}</div>
+      <div className={className} ref={refs.setReference}>
+        {children}
+      </div>
       <AnimatePresence>
         {isPresent && error && (
           <FloatingPortal>

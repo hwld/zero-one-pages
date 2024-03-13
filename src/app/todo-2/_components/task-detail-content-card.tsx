@@ -7,8 +7,8 @@ import { TaskFormData } from "./task-form/task-form";
 
 export const taskDetailViewClass = {
   wrapper: "flex h-full flex-col gap-2",
-  title: "text-xl font-bold p-1",
-  description: "grow p-1 break-all whitespace-pre-wrap",
+  title: "text-xl font-bold p-1 w-full",
+  description: "grow p-1 break-all whitespace-pre-wrap w-full h-full",
 };
 
 type Props = { task: Task };
