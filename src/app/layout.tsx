@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlobalNavigation } from "./global-navigation";
 
 export const metadata: Metadata = {
   title: "Zero one ui",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalNavigation />
+      </body>
     </html>
   );
 }

@@ -16,7 +16,12 @@ export default function Home() {
     >
       <div className="mx-5 flex w-[500px] max-w-full flex-col gap-2 text-center text-zinc-200">
         <h1 className="text-3xl font-bold">Zero one ui</h1>
-        <p className="text-sm text-zinc-400">uiを作る</p>
+        <p className="text-center text-sm text-zinc-400">
+          いろんなUIを作ります
+          <br />
+          <span className="text-zinc-300">`/`</span>
+          キーでどこからでも好きなページに移動できます
+        </p>
       </div>
       <div className="mt-[80px] grid max-w-[950px] grid-cols-1 gap-5 p-5 md:grid-cols-2 lg:grid-cols-3">
         {pages.map((p, i) => {
