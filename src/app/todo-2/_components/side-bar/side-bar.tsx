@@ -16,15 +16,15 @@ export const Sidebar: React.FC = () => {
         <SidebarItem
           icon={IconHome}
           label="今日のタスク"
-          path="/todo-2/"
-          active={path === "/todo-2/"}
+          path="/todo-2"
+          active={path === "/todo-2"}
         />
         <SidebarItem
           icon={IconListDetails}
           label="過去のタスク"
-          path="/todo-2/"
+          path="/todo-2"
         />
-        <SidebarItem icon={IconCalendar} label="予定" path="/todo-2/" />
+        <SidebarItem icon={IconCalendar} label="予定" path="/todo-2" />
       </div>
     </div>
   );

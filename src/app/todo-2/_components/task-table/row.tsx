@@ -46,7 +46,7 @@ export const TaskTableRow: React.FC<{
       <TaskTableData>
         <Link
           // static exportを使うのでpathではなくsearchParamsにidを指定する
-          href={`detail?id=${id}`}
+          href={`/todo-2/detail?id=${id}`}
           prefetch={false}
           className="hover:text-zinc-50 hover:underline"
         >
