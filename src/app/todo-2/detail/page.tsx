@@ -30,7 +30,6 @@ const TaskDetailPage: NextPage = () => {
     <>
       <h1 className="text-sm">
         <Link
-          prefetch={false}
           href="/todo-2"
           className="rounded px-2 py-1 transition-colors hover:bg-zinc-700"
         >

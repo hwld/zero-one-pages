@@ -9,7 +9,6 @@ export const SidebarItem: React.FC<{
 }> = ({ icon: Icon, label, active, path }) => {
   return (
     <Link
-      prefetch={false}
       href={path}
       className={clsx(
         "flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-md border-zinc-600 p-2 text-sm transition-colors",
