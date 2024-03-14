@@ -57,22 +57,26 @@ export const GlobalNavigation: React.FC = () => {
             </DialogOverlay>
             <DialogContent asChild>
               <motion.div
-                className="fixed left-1/2 top-1/2 min-h-[300px] w-[500px] rounded-lg border border-zinc-700 bg-zinc-900 p-4 text-zinc-200"
+                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200"
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
               >
-                <Command className="flex flex-col gap-2">
-                  <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-zinc-300">
-                    Navigation
+                <Command className="flex h-full flex-col gap-2">
+                  <div className="flex flex-col gap-2 px-4 pt-4">
+                    <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-zinc-400">
+                      Navigation
+                    </div>
+                    <CommandInput
+                      placeholder="Where would you like to go?"
+                      className="bg-transparent p-1 text-sm placeholder:text-zinc-500 focus-visible:outline-none"
+                    />
                   </div>
-                  <CommandInput
-                    placeholder="Where would you like to go?"
-                    className="bg-transparent p-1 placeholder:text-zinc-500 focus-visible:outline-none"
-                  />
+
                   <div className="h-[1px] w-full bg-zinc-600" />
-                  <CommandList className="flex flex-col">
-                    <CommandEmpty className="mt-4 w-full text-center text-zinc-300">
+
+                  <CommandList className="flex flex-col overflow-auto px-4 pb-4">
+                    <CommandEmpty className="mt-4 w-full text-center text-sm text-zinc-300">
                       No results found.
                     </CommandEmpty>
                     <NavItem
@@ -124,7 +128,7 @@ const NavItem: React.FC<NavItemProps> = ({
 
   return (
     <CommandItem
-      className="h-10 rounded px-2 transition-colors aria-selected:bg-white/10"
+      className="h-8 rounded px-2 text-sm transition-colors aria-selected:bg-white/10"
       onSelect={handleNavigate}
     >
       <Link
@@ -132,7 +136,7 @@ const NavItem: React.FC<NavItemProps> = ({
         className="flex h-full items-center gap-2"
         onClick={onBeforeNavigate}
       >
-        <Icon size={18} />
+        <Icon size={15} />
         {label}
       </Link>
     </CommandItem>
