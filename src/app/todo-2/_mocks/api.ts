@@ -158,16 +158,6 @@ export const updateTaskStatuses = async (
   return;
 };
 
-export const deleteTask = async (id: string): Promise<Task> => {
-  const res = await fetch(Todo2API.task(id), {
-    method: "DELETE",
-  });
-  const json = await res.json();
-  const task = taskSchema.parse(json);
-
-  return task;
-};
-
 export const deleteTasks = async (ids: string[]): Promise<void> => {
   await fetch(Todo2API.deleteTasks(), {
     method: "DELETE",
@@ -177,7 +167,7 @@ export const deleteTasks = async (ids: string[]): Promise<void> => {
   return;
 };
 
-export const handlers = [
+export const todo2Handlers = [
   http.get(Todo2API.getTasks(), ({ request }) => {
     const searchParam = new URL(request.url).searchParams;
     const input = JSON.parse(searchParam.get("input") ?? "{}");
@@ -297,14 +287,6 @@ export const handlers = [
     const updatedTask = allTasks.find((t) => t.id === input.id);
 
     return HttpResponse.json(updatedTask);
-  }),
-  http.delete(Todo2API.task(), ({ params }) => {
-    const id = z.string().parse(params.id);
-
-    const deletedTask = allTasks.find((t) => t.id === id);
-    allTasks = allTasks.filter((t) => t.id !== id);
-
-    return HttpResponse.json(deletedTask);
   }),
   http.patch(Todo2API.updateTaskStatuses(), async ({ request }) => {
     const input = updateTaskStatusesInputSchema.parse(await request.json());

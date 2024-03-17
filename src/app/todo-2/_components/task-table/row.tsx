@@ -8,16 +8,16 @@ import { Tooltip } from "../tooltip";
 import { format } from "../../_lib/utils";
 import { TaskTableCheckbox } from "./checkbox";
 import Link from "next/link";
-import { useDeleteTask } from "../../_queries/useDeleteTask";
 import { useUpdateTask } from "../../_queries/useUpdateTask";
 import { Task } from "../../_mocks/api";
+import { useDeleteTasks } from "../../_queries/useDeleteTasks";
 
 export const TaskTableRow: React.FC<{
   task: Task;
 }> = ({ task }) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const { selectedTaskIds } = useTasksData();
-  const deleteTaskMutation = useDeleteTask();
+  const deleteTaskMutation = useDeleteTasks();
   const updateTaskMutation = useUpdateTask();
   const { toggleTaskSelection } = useTaskAction();
 
@@ -26,7 +26,7 @@ export const TaskTableRow: React.FC<{
   }, [task.id, selectedTaskIds]);
 
   const handleDelete = () => {
-    deleteTaskMutation.mutate(task.id);
+    deleteTaskMutation.mutate([task.id]);
   };
 
   const handleChangeStatus = (status: Task["status"]) => {

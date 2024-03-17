@@ -66,7 +66,7 @@ export const TaskTableFilter: React.FC = () => {
           <FilterIcon size={15} />
           <p className="mt-[1px] whitespace-nowrap">絞り込み</p>
           {filtered && (
-            <div className="size-[16px] rounded-full bg-zinc-700 text-zinc-100">
+            <div className="size-[16px] rounded-full bg-white/30 text-zinc-100">
               {filterCount}
             </div>
           )}
