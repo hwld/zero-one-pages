@@ -5,7 +5,6 @@ import {
   DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BoxSelectIcon,
@@ -18,19 +17,16 @@ import {
   XIcon,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
-import {
-  Filter,
-  useTasksData,
-  useTaskAction,
-} from "../../_contexts/tasks-provider";
+import { useTasksData, useTaskAction } from "../../_contexts/tasks-provider";
+import { FieldFilter } from "../../_mocks/api";
+import clsx from "clsx";
 
-type FilterContent = Filter & { label: string; icon: LucideIcon };
+type FieldFilterContent = FieldFilter & { label: string; icon: LucideIcon };
 
 const allStatusFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "field",
-    group: "status",
     field: "status",
     value: "todo",
     label: "Todo",
@@ -39,38 +35,25 @@ const allStatusFilterContents = [
   {
     id: crypto.randomUUID(),
     type: "field",
-    group: "status",
     field: "status",
     value: "done",
     label: "Done",
     icon: CircleDotIcon,
   },
-] satisfies FilterContent[];
-
-const allSelectionFilterContents = [
-  {
-    id: crypto.randomUUID(),
-    type: "predicate",
-    group: "selection",
-    icon: CheckSquareIcon,
-    label: "選択済み",
-    predicate: (task, { selectedTaskIds }) => selectedTaskIds.includes(task.id),
-  },
-  {
-    id: crypto.randomUUID(),
-    type: "predicate",
-    group: "selection",
-    icon: BoxSelectIcon,
-    label: "未選択",
-    predicate: (task, { selectedTaskIds }) =>
-      !selectedTaskIds.includes(task.id),
-  },
-] satisfies FilterContent[];
+] satisfies FieldFilterContent[];
 
 export const TaskTableFilter: React.FC = () => {
-  const { filters } = useTasksData();
-  const { addFilter, removeFilter, removeAllFilter } = useTaskAction();
+  const { fieldFilters, selectionFilter } = useTasksData();
+  const {
+    addFieldFilter,
+    removeFieldFilter,
+    removeAllFilter,
+    setSelectionFilter,
+  } = useTaskAction();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const filtered = fieldFilters.length > 0 || selectionFilter !== null;
+  const filterCount = fieldFilters.length + (selectionFilter !== null ? 1 : 0);
 
   return (
     <DropdownMenu
@@ -82,9 +65,9 @@ export const TaskTableFilter: React.FC = () => {
         <button className="flex items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 hover:bg-white/20">
           <FilterIcon size={15} />
           <p className="mt-[1px] whitespace-nowrap">絞り込み</p>
-          {filters.length > 0 && (
+          {filtered && (
             <div className="size-[16px] rounded-full bg-zinc-700 text-zinc-100">
-              {filters.length}
+              {filterCount}
             </div>
           )}
         </button>
@@ -106,15 +89,15 @@ export const TaskTableFilter: React.FC = () => {
               >
                 <FilterGroup label="状況">
                   {allStatusFilterContents.map((filter, i) => {
-                    const isSelected = !!filters.find(
+                    const isSelected = !!fieldFilters.find(
                       (f) => f.id === filter.id,
                     );
 
                     const handleSelect = () => {
                       if (isSelected) {
-                        removeFilter(filter.id);
+                        removeFieldFilter(filter.id);
                       } else {
-                        addFilter(filter);
+                        addFieldFilter(filter);
                       }
                     };
 
@@ -123,45 +106,38 @@ export const TaskTableFilter: React.FC = () => {
                         key={i}
                         label={filter.label}
                         icon={filter.icon}
-                        filter={filter}
                         isSelected={isSelected}
                         onSelect={handleSelect}
                       />
                     );
                   })}
                 </FilterGroup>
+
                 <FilterGroup label="選択">
-                  {allSelectionFilterContents.map((filter, i) => {
-                    const isSelected = !!filters.find(
-                      (f) => f.id === filter.id,
-                    );
-
-                    const handleSelect = () => {
-                      if (isSelected) {
-                        removeFilter(filter.id);
-                      } else {
-                        addFilter(filter);
-                      }
-                    };
-
-                    return (
-                      <FilterItem
-                        key={i}
-                        label={filter.label}
-                        icon={filter.icon}
-                        filter={filter}
-                        isSelected={isSelected}
-                        onSelect={handleSelect}
-                      />
-                    );
-                  })}
+                  <FilterItem
+                    label="選択済み"
+                    icon={CheckSquareIcon}
+                    isSelected={selectionFilter === "selected"}
+                    onSelect={() => {
+                      setSelectionFilter("selected");
+                    }}
+                  />
+                  <FilterItem
+                    label="未選択"
+                    icon={BoxSelectIcon}
+                    isSelected={selectionFilter === "unselected"}
+                    onSelect={() => {
+                      setSelectionFilter("unselected");
+                    }}
+                  />
                 </FilterGroup>
+
                 <div className="w-full space-y-1">
                   <div className="h-[1px] w-full bg-black/10" />
                   <button
                     className="flex w-full items-center gap-1 rounded p-2 text-xs enabled:hover:bg-black/15 disabled:text-zinc-400"
                     onClick={removeAllFilter}
-                    disabled={filters.length === 0}
+                    disabled={!filtered}
                   >
                     <XIcon size={16} />
                     絞り込みを解除する
@@ -192,19 +168,17 @@ type FilterItemProps = {
   label: string;
   icon: LucideIcon;
   isSelected: boolean;
-  filter: Filter;
-  onSelect: (filter: Filter) => void;
+  onSelect: () => void;
 };
-const FilterItem: React.FC<FilterItemProps> = ({
+export const FilterItem: React.FC<FilterItemProps> = ({
   label,
   icon: Icon,
   isSelected = true,
-  filter,
   onSelect,
 }) => {
   const handleSelect = (e: Event) => {
     e.preventDefault();
-    onSelect(filter);
+    onSelect();
   };
 
   return (

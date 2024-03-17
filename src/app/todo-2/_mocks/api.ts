@@ -54,7 +54,7 @@ export const selectionFilterSchema = z
   .nullable();
 export type SelectionFilter = z.infer<typeof selectionFilterSchema>;
 
-const allTasks: Task[] = initialTasks;
+let allTasks: Task[] = initialTasks;
 
 const paginatedTasksInputSchema = z.object({
   sortEntry: sortEntrySchema,
@@ -64,7 +64,7 @@ const paginatedTasksInputSchema = z.object({
   searchText: z.string(),
   selectedTaskIds: z.array(z.string()),
 });
-type PaginatedTasksInput = z.infer<typeof paginatedTasksInputSchema>;
+export type PaginatedTasksInput = z.infer<typeof paginatedTasksInputSchema>;
 
 const paginatedTasksEntrySchema = z.object({
   tasks: z.array(taskSchema),
@@ -72,19 +72,45 @@ const paginatedTasksEntrySchema = z.object({
 });
 type PaginatedTasksEntry = z.infer<typeof paginatedTasksEntrySchema>;
 
+const createTaskInputSchema = taskSchema.pick({
+  title: true,
+  description: true,
+});
+export type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
+
+const updateTaskInputSchema = taskSchema.pick({
+  id: true,
+  title: true,
+  description: true,
+  status: true,
+});
+export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
+
+const updateTaskStatusesInputSchema = z
+  .object({
+    selectedTaskIds: z.array(z.string()),
+  })
+  .merge(taskSchema.pick({ status: true }));
+export type UpdateTaskStatusesInput = z.infer<
+  typeof updateTaskStatusesInputSchema
+>;
+
 export const Todo2API = {
   base: "/todo-2/api",
-  tasks: (input?: PaginatedTasksInput) =>
+  getTasks: (input?: PaginatedTasksInput) =>
     `${Todo2API.base}/tasks${
       input ? `?input=${encodeURIComponent(JSON.stringify(input))}` : ""
     }`,
   task: (id?: string) => `${Todo2API.base}/tasks/${id ?? ":id"}`,
+  createTask: () => `${Todo2API.base}/tasks`,
+  updateTaskStatuses: () => `${Todo2API.base}/update-task-statuses`,
+  deleteTasks: () => `${Todo2API.base}/delete-tasks`,
 };
 
 export const fetchPaginatedTasks = async (
   input: PaginatedTasksInput,
 ): Promise<PaginatedTasksEntry> => {
-  const res = await fetch(Todo2API.tasks(input));
+  const res = await fetch(Todo2API.getTasks(input));
   const json = await res.json();
   const tasks = paginatedTasksEntrySchema.parse(json);
 
@@ -99,8 +125,60 @@ export const fetchTask = async (id: string): Promise<Task | undefined> => {
   return task;
 };
 
+export const createTask = async (input: CreateTaskInput): Promise<Task> => {
+  const res = await fetch(Todo2API.createTask(), {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  const json = await res.json();
+  const task = taskSchema.parse(json);
+
+  return task;
+};
+
+export const updateTask = async (input: UpdateTaskInput): Promise<Task> => {
+  const res = await fetch(Todo2API.task(), {
+    method: "PUT",
+    body: JSON.stringify(input),
+  });
+  const json = await res.json();
+  const task = taskSchema.parse(json);
+
+  return task;
+};
+
+export const updateTaskStatuses = async (
+  input: UpdateTaskStatusesInput,
+): Promise<void> => {
+  await fetch(Todo2API.updateTaskStatuses(), {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+
+  return;
+};
+
+export const deleteTask = async (id: string): Promise<Task> => {
+  const res = await fetch(Todo2API.task(id), {
+    method: "DELETE",
+  });
+  const json = await res.json();
+  const task = taskSchema.parse(json);
+
+  return task;
+};
+
+export const deleteTasks = async (ids: string[]): Promise<void> => {
+  await fetch(Todo2API.deleteTasks(), {
+    method: "DELETE",
+    body: JSON.stringify(ids),
+  });
+
+  return;
+};
+
 export const handlers = [
-  http.get(Todo2API.tasks(), ({ request }) => {
+  http.get(Todo2API.getTasks(), ({ request }) => {
     const searchParam = new URL(request.url).searchParams;
     const input = JSON.parse(searchParam.get("input") ?? "{}");
 
@@ -116,7 +194,7 @@ export const handlers = [
     const { field, order } = sortEntry;
 
     const filteredTasks = allTasks.filter((task) => {
-      if (fieldFilters.length === 0) {
+      if (fieldFilters.length === 0 && selectionFilter === null) {
         return true;
       }
 
@@ -183,5 +261,74 @@ export const handlers = [
     const id = z.string().parse(params.id);
     const task = allTasks.find((t) => t.id === id);
     return HttpResponse.json(task);
+  }),
+  http.post(Todo2API.createTask(), async ({ request }) => {
+    const input = createTaskInputSchema.parse(await request.json());
+
+    const newTask: Task = {
+      id: crypto.randomUUID(),
+      title: input.title,
+      description: input.description,
+      status: "todo",
+      createdAt: new Date(),
+      completedAt: undefined,
+    };
+    allTasks = [...allTasks, newTask];
+
+    return HttpResponse.json(newTask);
+  }),
+  http.put(Todo2API.task(), async ({ request }) => {
+    const input = updateTaskInputSchema.parse(await request.json());
+
+    allTasks = allTasks.map((t) => {
+      if (t.id === input.id) {
+        return {
+          ...t,
+          title: input.title,
+          description: input.description,
+          status: input.status,
+          completedAt: input.status === "done" ? new Date() : undefined,
+        };
+      }
+
+      return t;
+    });
+
+    const updatedTask = allTasks.find((t) => t.id === input.id);
+
+    return HttpResponse.json(updatedTask);
+  }),
+  http.delete(Todo2API.task(), ({ params }) => {
+    const id = z.string().parse(params.id);
+
+    const deletedTask = allTasks.find((t) => t.id === id);
+    allTasks = allTasks.filter((t) => t.id !== id);
+
+    return HttpResponse.json(deletedTask);
+  }),
+  http.patch(Todo2API.updateTaskStatuses(), async ({ request }) => {
+    const input = updateTaskStatusesInputSchema.parse(await request.json());
+
+    allTasks = allTasks.map((t) => {
+      if (t.status !== input.status && input.selectedTaskIds.includes(t.id)) {
+        return {
+          ...t,
+          status: input.status,
+          completedAt: input.status === "done" ? new Date() : undefined,
+        };
+      }
+      return t;
+    });
+
+    return HttpResponse.json({});
+  }),
+  http.delete(Todo2API.deleteTasks(), async ({ request }) => {
+    const ids = z.array(z.string()).parse(await request.json());
+
+    allTasks = allTasks.filter((t) => {
+      return !ids.includes(t.id);
+    });
+
+    return HttpResponse.json({});
   }),
 ];

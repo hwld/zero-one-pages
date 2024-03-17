@@ -7,9 +7,12 @@ import {
 } from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XIcon } from "lucide-react";
-import { useTaskAction } from "../_contexts/tasks-provider";
-import { TaskForm, TaskFormData } from "./task-form/task-form";
+import {
+  TaskCreateForm,
+  TaskCreateFormData,
+} from "./task-form/task-create-form";
 import { useState } from "react";
+import { useAddTask } from "../_queries/useAddTask";
 
 const taskFormId = "task-form-id";
 
@@ -17,10 +20,13 @@ type Props = { isOpen: boolean; onOpenChange: (open: boolean) => void };
 export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
   const [formkey, setFormKey] = useState(crypto.randomUUID());
   const [moreAdd, setmoreAdd] = useState(false);
-  const { addTask } = useTaskAction();
+  const addTaskMutation = useAddTask();
 
-  const handleAddTask = (data: TaskFormData) => {
-    addTask({ title: data.title, description: data.description });
+  const handleAddTask = (data: TaskCreateFormData) => {
+    addTaskMutation.mutate({
+      title: data.title,
+      description: data.description,
+    });
     setFormKey(crypto.randomUUID());
 
     if (!moreAdd) {
@@ -56,7 +62,7 @@ export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
                     <XIcon size={20} />
                   </DialogClose>
                 </div>
-                <TaskForm
+                <TaskCreateForm
                   key={formkey}
                   id={taskFormId}
                   onAddTask={handleAddTask}

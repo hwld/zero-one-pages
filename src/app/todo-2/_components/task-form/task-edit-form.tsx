@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
-import { Task } from "../../_contexts/tasks-provider";
-import { TaskFormData, taskFormSchema } from "./task-form";
+import { TaskCreateFormData, taskCreateFormSchema } from "./task-create-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { taskDetailViewClass } from "../task-detail-content-card";
 import clsx from "clsx";
 import { TaskFormErrorTooltip } from "./error-tooltip";
+import { Task } from "../../_mocks/api";
 
 type Props = {
   defaultTask: Task;
   formId: string;
-  onUpdateTask: (data: TaskFormData) => void;
+  // Todo UpdateTaskInputを使う
+  onUpdateTask: (data: TaskCreateFormData) => void;
 };
 export const TaskEditForm: React.FC<Props> = ({
   defaultTask,
@@ -20,12 +21,12 @@ export const TaskEditForm: React.FC<Props> = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TaskFormData>({
+  } = useForm<TaskCreateFormData>({
     defaultValues: {
       title: defaultTask.title,
       description: defaultTask.description,
     },
-    resolver: zodResolver(taskFormSchema),
+    resolver: zodResolver(taskCreateFormSchema),
   });
 
   const inputBaseClass =

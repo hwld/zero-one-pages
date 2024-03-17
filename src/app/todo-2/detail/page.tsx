@@ -9,28 +9,20 @@ import {
   IconClockHour5,
 } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
-import { useTaskAction, useTasksData } from "../_contexts/tasks-provider";
 import { z } from "zod";
 import Link from "next/link";
 import { TaskStatusBadge } from "../_components/task-status-badge";
 import { TaskDetailContentCard } from "../_components/task-detail-content-card";
-import { useQuery } from "@tanstack/react-query";
-import { fetchTask } from "../_mocks/api";
+import { useTask } from "../_queries/useTask";
+import { useUpdateTask } from "../_queries/useUpdateTask";
 
 const TaskDetailPage: NextPage = () => {
-  const { getTask } = useTasksData();
-  const { updateTask } = useTaskAction();
+  const updateTaskMutation = useUpdateTask();
   const searchParams = useSearchParams();
   const id = z.string().parse(searchParams.get("id"));
-  const { data } = useQuery({
-    queryKey: ["tasks", id],
-    queryFn: () => {
-      return fetchTask(id);
-    },
-  });
-  console.log(data);
-  const task = getTask(id);
-
+  const { data } = useTask(id);
+  // TODO
+  const task = data;
   if (!task) {
     return null;
   }
@@ -59,8 +51,8 @@ const TaskDetailPage: NextPage = () => {
                 <TaskStatusBadge
                   status={task.status}
                   onChangeStatus={() => {
-                    updateTask({
-                      id: task.id,
+                    updateTaskMutation.mutate({
+                      ...task,
                       status: task.status === "done" ? "todo" : "done",
                     });
                   }}

@@ -12,27 +12,54 @@ import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { Pagination } from "../pagination";
 import { TaskTableCheckbox } from "./checkbox";
 import { useMemo } from "react";
+import { usePaginatedTasks } from "../../_queries/usePaginatedTasks";
 
 export const TaskTable: React.FC = () => {
-  const { page, totalTasks, paginatedTasks, selectedTaskIds } = useTasksData();
-  const { setPage, selectAllTasksOnPage, unselectAllTasksOnPage } =
-    useTaskAction();
+  const {
+    page,
+    selectedTaskIds,
+    limit,
+    sortEntry,
+    fieldFilters,
+    selectionFilter,
+    searchText,
+  } = useTasksData();
+  const { setPage, selectTaskIds, unselectTaskIds } = useTaskAction();
+
+  const { data, status } = usePaginatedTasks({
+    searchText,
+    sortEntry,
+    paginationEntry: { page, limit },
+    fieldFilters,
+    selectionFilter,
+    selectedTaskIds,
+  });
 
   const areAllTasksSelectedOnPage = useMemo(() => {
-    if (paginatedTasks.length === 0) {
+    if (data?.tasks.length === 0) {
       return false;
     }
 
-    return paginatedTasks.every((t) => selectedTaskIds.includes(t.id));
-  }, [paginatedTasks, selectedTaskIds]);
+    return !!data?.tasks.every((t) => selectedTaskIds.includes(t.id));
+  }, [data?.tasks, selectedTaskIds]);
 
-  const handleToggleTaskSelection = () => {
+  const handleTogglePageTaskSelection = () => {
+    const taskIds = data?.tasks.map((t) => t.id) ?? [];
+
     if (areAllTasksSelectedOnPage) {
-      unselectAllTasksOnPage();
+      unselectTaskIds(taskIds);
     } else {
-      selectAllTasksOnPage();
+      selectTaskIds(taskIds);
     }
   };
+
+  if (status === "error") {
+    return <div>error</div>;
+  } else if (status === "pending") {
+    return null;
+  }
+
+  const { tasks, totalPages } = data;
 
   return (
     <div className="flex grow flex-col overflow-auto rounded-md border border-zinc-600">
@@ -42,7 +69,7 @@ export const TaskTable: React.FC = () => {
             <TableHeader width={50}>
               <TaskTableCheckbox
                 checked={areAllTasksSelectedOnPage}
-                onChange={handleToggleTaskSelection}
+                onChange={handleTogglePageTaskSelection}
               />
             </TableHeader>
             <LabelTableHeader icon={IconCheckbox} width={80} text="状況" />
@@ -67,16 +94,16 @@ export const TaskTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {paginatedTasks.length === 0 && <EmptyTableRow />}
-          {paginatedTasks.map((task) => {
+          {tasks.length === 0 && <EmptyTableRow />}
+          {tasks.map((task) => {
             return <TaskTableRow key={task.id} task={task} />;
           })}
         </tbody>
       </table>
       <div className="shrink grow" />
       <div className="flex h-[60px] items-center justify-end border-t border-zinc-600 px-2">
-        {totalTasks > 1 && (
-          <Pagination page={page} onChangePage={setPage} total={totalTasks} />
+        {totalPages > 1 && (
+          <Pagination page={page} onChangePage={setPage} total={totalPages} />
         )}
       </div>
     </div>

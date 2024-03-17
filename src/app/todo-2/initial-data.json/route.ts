@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker/locale/ja";
-import { Task } from "../_contexts/tasks-provider";
+import { Task } from "../_mocks/api";
 
 const initialTasks: Task[] = [...new Array(121)].map(() => {
   const createdAt = faker.date.past();

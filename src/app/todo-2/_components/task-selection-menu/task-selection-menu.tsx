@@ -10,19 +10,24 @@ import {
   useHover,
   useInteractions,
 } from "@floating-ui/react";
+import { useUpdateTaskStatuses } from "../../_queries/useUpdateTaskStatuses";
+import { useDeleteTasks } from "../../_queries/useDeleteTasks";
 
 export const TaskSelectionMenu: React.FC = () => {
   const { selectedTaskIds } = useTasksData();
-  const { unselectAllTasks, updateTasksStatus, deleteTask } = useTaskAction();
+
+  const updateTaskStatusesMutation = useUpdateTaskStatuses();
+  const deleteTasksMutation = useDeleteTasks();
+  const { unselectAllTasks } = useTaskAction();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const handleConfirm = () => {
-    selectedTaskIds.forEach(deleteTask);
+    deleteTasksMutation.mutate(selectedTaskIds);
     setIsDeleteConfirmOpen(false);
   };
 
   const handleMarkDone = () => {
-    updateTasksStatus(selectedTaskIds, "done");
+    updateTaskStatusesMutation.mutate({ selectedTaskIds, status: "done" });
   };
 
   return (

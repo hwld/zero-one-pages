@@ -1,9 +1,10 @@
 import { IconPencil } from "@tabler/icons-react";
-import { Task, useTaskAction } from "../_contexts/tasks-provider";
 import { Card } from "./card";
 import { useId, useState } from "react";
 import { TaskEditForm } from "./task-form/task-edit-form";
-import { TaskFormData } from "./task-form/task-form";
+import { TaskCreateFormData } from "./task-form/task-create-form";
+import { useUpdateTask } from "../_queries/useUpdateTask";
+import { Task } from "../_mocks/api";
 
 export const taskDetailViewClass = {
   wrapper: "flex h-full flex-col gap-2",
@@ -13,7 +14,7 @@ export const taskDetailViewClass = {
 
 type Props = { task: Task };
 export const TaskDetailContentCard: React.FC<Props> = ({ task }) => {
-  const { updateTask } = useTaskAction();
+  const updateTaskMutation = useUpdateTask();
   const [isEditing, setIsEditing] = useState(false);
   const editFormId = useId();
 
@@ -21,10 +22,10 @@ export const TaskDetailContentCard: React.FC<Props> = ({ task }) => {
     setIsEditing(false);
   };
 
-  const handleUpdateTask = (data: TaskFormData) => {
+  const handleUpdateTask = (data: TaskCreateFormData) => {
     setIsEditing(false);
-    updateTask({
-      id: task.id,
+    updateTaskMutation.mutate({
+      ...task,
       title: data.title,
       description: data.description,
     });

@@ -3,12 +3,9 @@ import {
   ChevronUpIcon,
   ChevronsUpDownIcon,
 } from "lucide-react";
-import {
-  SortEntry,
-  useTasksData,
-  useTaskAction,
-} from "../../_contexts/tasks-provider";
+import { useTasksData, useTaskAction } from "../../_contexts/tasks-provider";
 import { ReactNode } from "react";
+import { SortEntry } from "../../_mocks/api";
 
 type TableHeaderProps = { children: ReactNode; width?: number };
 

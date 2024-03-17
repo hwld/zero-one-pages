@@ -1,35 +1,36 @@
 import { IconTrash } from "@tabler/icons-react";
 import { TaskTableData } from "./data";
 import { TaskStatusBadge } from "../task-status-badge";
-import {
-  Task,
-  useTaskAction,
-  useTasksData,
-} from "../../_contexts/tasks-provider";
+import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useMemo, useState } from "react";
 import { Tooltip } from "../tooltip";
 import { format } from "../../_lib/utils";
 import { TaskTableCheckbox } from "./checkbox";
 import Link from "next/link";
+import { useDeleteTask } from "../../_queries/useDeleteTask";
+import { useUpdateTask } from "../../_queries/useUpdateTask";
+import { Task } from "../../_mocks/api";
 
 export const TaskTableRow: React.FC<{
   task: Task;
-}> = ({ task: { id, title, status, createdAt, completedAt } }) => {
+}> = ({ task }) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const { selectedTaskIds } = useTasksData();
-  const { deleteTask, updateTask, toggleTaskSelection } = useTaskAction();
+  const deleteTaskMutation = useDeleteTask();
+  const updateTaskMutation = useUpdateTask();
+  const { toggleTaskSelection } = useTaskAction();
 
   const isSelected = useMemo(() => {
-    return selectedTaskIds.includes(id);
-  }, [id, selectedTaskIds]);
+    return selectedTaskIds.includes(task.id);
+  }, [task.id, selectedTaskIds]);
 
   const handleDelete = () => {
-    deleteTask(id);
+    deleteTaskMutation.mutate(task.id);
   };
 
   const handleChangeStatus = (status: Task["status"]) => {
-    updateTask({ id, status });
+    updateTaskMutation.mutate({ ...task, status });
   };
 
   return (
@@ -37,24 +38,27 @@ export const TaskTableRow: React.FC<{
       <TaskTableData>
         <TaskTableCheckbox
           checked={isSelected}
-          onChange={() => toggleTaskSelection(id)}
+          onChange={() => toggleTaskSelection(task.id)}
         />
       </TaskTableData>
       <TaskTableData noWrap>
-        <TaskStatusBadge status={status} onChangeStatus={handleChangeStatus} />
+        <TaskStatusBadge
+          status={task.status}
+          onChangeStatus={handleChangeStatus}
+        />
       </TaskTableData>
       <TaskTableData>
         <Link
           // static exportを使うのでpathではなくsearchParamsにidを指定する
-          href={`/todo-2/detail?id=${id}`}
+          href={`/todo-2/detail?id=${task.id}`}
           className="hover:text-zinc-50 hover:underline"
         >
-          {title}
+          {task.title}
         </Link>
       </TaskTableData>
-      <TaskTableData noWrap>{format(createdAt)}</TaskTableData>
+      <TaskTableData noWrap>{format(task.createdAt)}</TaskTableData>
       <TaskTableData noWrap>
-        {completedAt ? format(completedAt) : "None"}
+        {task.completedAt ? format(task.completedAt) : "None"}
       </TaskTableData>
       <TaskTableData>
         <div className="flex gap-2">
@@ -75,7 +79,7 @@ export const TaskTableRow: React.FC<{
         title="タスクの削除"
         onConfirm={handleDelete}
       >
-        タスク`<span className="font-bold text-zinc-400">{title}</span>
+        タスク`<span className="font-bold text-zinc-400">{task.title}</span>
         `を削除しますか？
         <br />
         削除すると、タスクを復元することはできません。
