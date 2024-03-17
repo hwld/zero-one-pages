@@ -8,8 +8,48 @@ import { TaskTableFilter } from "./_components/task-table/filter";
 import { TaskSearch } from "./_components/task-search";
 import { TaskSelectionMenu } from "./_components/task-selection-menu/task-selection-menu";
 import { Card } from "./_components/card";
+import { useTasksData } from "./_contexts/tasks-provider";
+import { usePaginatedTasks } from "./_queries/usePaginatedTasks";
+import { useMemo } from "react";
+import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
+import { ErrorTaskTable } from "./_components/task-table/error-task-table";
 
 const Page: NextPage = () => {
+  const {
+    page,
+    selectedTaskIds,
+    limit,
+    sortEntry,
+    fieldFilters,
+    selectionFilter,
+    searchText,
+  } = useTasksData();
+
+  const { data, status, refetch } = usePaginatedTasks({
+    searchText,
+    sortEntry,
+    paginationEntry: { page, limit },
+    fieldFilters,
+    selectionFilter,
+    selectedTaskIds,
+  });
+
+  const content = useMemo(() => {
+    switch (status) {
+      case "success": {
+        return (
+          <TaskTable paginatedTasks={data.tasks} totalPages={data.totalPages} />
+        );
+      }
+      case "pending": {
+        return <LoadingTaskTable />;
+      }
+      case "error": {
+        return <ErrorTaskTable onReload={refetch} />;
+      }
+    }
+  }, [data?.tasks, data?.totalPages, refetch, status]);
+
   return (
     <>
       <div className="flex flex-nowrap items-center gap-1">
@@ -25,7 +65,7 @@ const Page: NextPage = () => {
             </div>
             <AddTaskButton />
           </div>
-          <TaskTable />
+          {content}
         </div>
       </Card>
       <TaskSelectionMenu />
