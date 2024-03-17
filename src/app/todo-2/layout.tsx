@@ -6,11 +6,15 @@ import "./style.css";
 import clsx from "clsx";
 import { Inter } from "next/font/google";
 import { Sidebar } from "./_components/side-bar/side-bar";
+import { useSetupWorker } from "@/mocks/browser";
+import { handlers } from "./_mocks/api";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
+
+  useSetupWorker(handlers);
 
   return (
     <div

@@ -14,12 +14,21 @@ import { z } from "zod";
 import Link from "next/link";
 import { TaskStatusBadge } from "../_components/task-status-badge";
 import { TaskDetailContentCard } from "../_components/task-detail-content-card";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTask } from "../_mocks/api";
 
 const TaskDetailPage: NextPage = () => {
   const { getTask } = useTasksData();
   const { updateTask } = useTaskAction();
   const searchParams = useSearchParams();
   const id = z.string().parse(searchParams.get("id"));
+  const { data } = useQuery({
+    queryKey: ["tasks", id],
+    queryFn: () => {
+      return fetchTask(id);
+    },
+  });
+  console.log(data);
   const task = getTask(id);
 
   if (!task) {
