@@ -13,6 +13,7 @@ import {
 } from "./task-form/task-create-form";
 import { useState } from "react";
 import { useAddTask } from "../_queries/useAddTask";
+import { Button } from "./button";
 
 const taskFormId = "task-form-id";
 
@@ -75,20 +76,16 @@ export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
                       onChange={() => setmoreAdd((s) => !s)}
                       type="checkbox"
                       id="switch"
-                      className="relative block h-[20px] w-[35px] appearance-none rounded-full bg-zinc-500 before:absolute before:top-[3px] before:h-[14px] before:w-[14px] before:translate-x-[3px] before:rounded-full before:bg-zinc-100 before:transition-transform before:content-[''] checked:bg-green-500 checked:before:translate-x-[18px]"
+                      className="relative block h-[20px] w-[35px] cursor-pointer appearance-none rounded-full bg-zinc-500 before:absolute before:top-[3px] before:h-[14px] before:w-[14px] before:translate-x-[3px] before:rounded-full before:bg-zinc-100 before:transition-transform before:content-[''] checked:bg-green-500 checked:before:translate-x-[18px]"
                     />
-                    <label htmlFor="switch" className="text-xs">
+                    <label htmlFor="switch" className="cursor-pointer text-xs">
                       続けて作成する
                     </label>
                   </div>
-                  <button
-                    className="flex min-w-[50px] items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 hover:bg-white/20"
-                    type="submit"
-                    form={taskFormId}
-                  >
+                  <Button type="submit" form={taskFormId}>
                     <PlusIcon size={15} />
                     作成する
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </DialogContent>

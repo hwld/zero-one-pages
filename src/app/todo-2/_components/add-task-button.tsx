@@ -1,6 +1,7 @@
 import { IconCommand, IconPlus } from "@tabler/icons-react";
 import { TaskAddDialog } from "./task-add-dialog";
 import { useEffect, useState } from "react";
+import { Button } from "./button";
 
 export const AddTaskButton: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -21,19 +22,16 @@ export const AddTaskButton: React.FC = () => {
 
   return (
     <>
-      <button
-        className="group flex h-8 w-fit shrink-0 items-center gap-2 rounded border border-zinc-500 bg-white/15 px-2 text-zinc-100 transition-colors hover:bg-white/20"
-        onClick={handleAddTask}
-      >
+      <Button onClick={handleAddTask}>
         <div className="flex items-center">
           <IconPlus size={15} className="mb-[1px]" />
           <p className="text-xs">タスクを追加する</p>
         </div>
         <div className="flex items-center rounded bg-white/20 px-1 text-zinc-300 transition-colors">
-          <IconCommand size={15} />
-          <p className="mt-[1px] text-[12px]">K</p>
+          <IconCommand size={13} />
+          <p className="text-[10px]">K</p>
         </div>
-      </button>
+      </Button>
       <TaskAddDialog
         isOpen={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}

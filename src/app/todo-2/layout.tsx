@@ -16,7 +16,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     <div
       className={clsx(
         inter.className,
-        "flex h-screen gap-6 overflow-hidden bg-zinc-900 text-zinc-300",
+        "flex h-screen gap-6 overflow-hidden bg-zinc-900 text-zinc-200",
       )}
     >
       <div className="sticky top-0 py-6 pl-6">

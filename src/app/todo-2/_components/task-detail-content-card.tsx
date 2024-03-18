@@ -5,6 +5,7 @@ import { TaskEditForm } from "./task-form/task-edit-form";
 import { TaskCreateFormData } from "./task-form/task-create-form";
 import { useUpdateTask } from "../_queries/useUpdateTask";
 import { Task } from "../_mocks/api";
+import { Button } from "./button";
 
 export const taskDetailViewClass = {
   wrapper: "flex h-full flex-col gap-2",
@@ -40,28 +41,18 @@ export const TaskDetailContentCard: React.FC<Props> = ({ task }) => {
           </div>
           {isEditing ? (
             <div className="flex items-center gap-1">
-              <button
-                className="flex h-[26px] items-center gap-1 rounded p-2 text-xs text-zinc-100 transition-colors hover:bg-white/20"
-                onClick={handleCancelEdit}
-              >
+              <Button variant="ghost" onClick={handleCancelEdit}>
                 キャンセル
-              </button>
-              <button
-                className="flex h-[26px] items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 transition-colors hover:bg-white/20"
-                form={editFormId}
-                type="submit"
-              >
+              </Button>
+              <Button form={editFormId} type="submit">
                 保存する
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
-              className="flex h-[26px] items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 transition-colors hover:bg-white/20"
-              onClick={() => setIsEditing(true)}
-            >
+            <Button onClick={() => setIsEditing(true)}>
               <IconPencil size={15} className="mb-[1px]" />
               編集する
-            </button>
+            </Button>
           )}
         </div>
         {isEditing ? (

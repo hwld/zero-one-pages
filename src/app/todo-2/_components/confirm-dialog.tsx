@@ -6,6 +6,7 @@ import {
 } from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { ReactNode } from "react";
+import { Button } from "./button";
 
 type Props = {
   isOpen: boolean;
@@ -50,19 +51,11 @@ export const ConfirmDialog: React.FC<Props> = ({
                 <div className="min-h-[100px] px-4 pb-4 text-sm">
                   {children}
                 </div>
-                <div className="flex items-center justify-end gap-4 border-t border-zinc-700 bg-black/30 p-4">
-                  <button
-                    className="rounded p-2 text-xs transition-colors hover:bg-white/10"
-                    onClick={() => onOpenChange(false)}
-                  >
+                <div className="flex items-center justify-end gap-2 border-t border-zinc-700 bg-black/30 p-4">
+                  <Button variant="ghost" onClick={() => onOpenChange(false)}>
                     キャンセルする
-                  </button>
-                  <button
-                    className="rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 transition-colors hover:bg-white/20"
-                    onClick={onConfirm}
-                  >
-                    {confirmText}
-                  </button>
+                  </Button>
+                  <Button onClick={onConfirm}>{confirmText}</Button>
                 </div>
               </motion.div>
             </DialogContent>

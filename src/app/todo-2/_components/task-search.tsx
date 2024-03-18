@@ -1,6 +1,7 @@
 import { SearchIcon, XIcon } from "lucide-react";
 import { useTaskAction } from "../_contexts/tasks-provider";
 import { useState } from "react";
+import { Button } from "./button";
 
 export const TaskSearch: React.FC = () => {
   const [searchText, setSearchText] = useState("");
@@ -36,12 +37,7 @@ export const TaskSearch: React.FC = () => {
           </button>
         )}
       </div>
-      <button
-        onClick={handleSearch}
-        className="h-8 shrink-0 rounded border border-zinc-500 bg-white/15 px-3 py-1 text-xs text-zinc-100 hover:bg-white/20"
-      >
-        検索
-      </button>
+      <Button onClick={handleSearch}>検索</Button>
     </div>
   );
 };

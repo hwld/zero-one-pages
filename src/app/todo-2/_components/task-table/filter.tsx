@@ -20,6 +20,7 @@ import { ReactNode, useState } from "react";
 import { useTasksData, useTaskAction } from "../../_contexts/tasks-provider";
 import { FieldFilter } from "../../_mocks/api";
 import clsx from "clsx";
+import { Button } from "../button";
 
 type FieldFilterContent = FieldFilter & { label: string; icon: LucideIcon };
 
@@ -62,7 +63,7 @@ export const TaskTableFilter: React.FC = () => {
       modal={false}
     >
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-1 rounded border border-zinc-500 bg-white/15 p-2 text-xs text-zinc-100 hover:bg-white/20">
+        <Button>
           <FilterIcon size={15} />
           <p className="mt-[1px] whitespace-nowrap">絞り込み</p>
           {filtered && (
@@ -70,7 +71,7 @@ export const TaskTableFilter: React.FC = () => {
               {filterCount}
             </div>
           )}
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <AnimatePresence>
         {isFilterOpen && (
@@ -82,7 +83,7 @@ export const TaskTableFilter: React.FC = () => {
               sideOffset={4}
             >
               <motion.div
-                className="flex w-[200px] flex-col gap-1 rounded bg-zinc-300 p-1 text-zinc-700"
+                className="flex w-[200px] flex-col gap-1 rounded border border-zinc-600 bg-zinc-700 p-1"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
@@ -133,15 +134,16 @@ export const TaskTableFilter: React.FC = () => {
                 </FilterGroup>
 
                 <div className="w-full space-y-1">
-                  <div className="h-[1px] w-full bg-black/10" />
-                  <button
-                    className="flex w-full items-center gap-1 rounded p-2 text-xs enabled:hover:bg-black/15 disabled:text-zinc-400"
+                  <div className="h-[1px] w-full bg-zinc-600" />
+                  <Button
+                    variant="ghost"
+                    className="w-full"
                     onClick={removeAllFilter}
                     disabled={!filtered}
                   >
                     <XIcon size={16} />
                     絞り込みを解除する
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </DropdownMenuContent>
@@ -158,7 +160,7 @@ const FilterGroup: React.FC<{ children: ReactNode; label: string }> = ({
 }) => {
   return (
     <div>
-      <p className="p-1 text-xs text-zinc-500">{label}</p>
+      <p className="p-1 text-xs text-zinc-400">{label}</p>
       <div>{children}</div>
     </div>
   );
@@ -183,23 +185,26 @@ export const FilterItem: React.FC<FilterItemProps> = ({
 
   return (
     <DropdownMenuItem
-      className="flex cursor-pointer items-center justify-end gap-1 rounded px-2 py-1 text-sm transition-colors hover:bg-black/15 focus-visible:bg-black/15 focus-visible:outline-none"
+      asChild
+      className="focus-visible:bg-white/15 focus-visible:outline-none"
       onSelect={handleSelect}
     >
-      <div className="flex grow select-none items-center gap-1">
-        <Icon size={12} />
-        <p>{label}</p>
-      </div>
-      <div
-        className={clsx(
-          "grid size-[16px] appearance-none place-items-center overflow-hidden rounded border border-zinc-500",
-          isSelected ? "bg-zinc-700" : "bg-transparent",
-        )}
-      >
-        {isSelected && (
-          <CheckIcon className="text-zinc-100" size={12} strokeWidth={3} />
-        )}
-      </div>
+      <Button variant="ghost" className="w-full">
+        <div className="flex grow select-none items-center gap-1">
+          <Icon size={12} />
+          <p>{label}</p>
+        </div>
+        <div
+          className={clsx(
+            "grid size-[16px] appearance-none place-items-center overflow-hidden rounded border border-zinc-500",
+            isSelected ? "bg-zinc-100" : "bg-transparent",
+          )}
+        >
+          {isSelected && (
+            <CheckIcon className="text-zinc-700" size={12} strokeWidth={3} />
+          )}
+        </div>
+      </Button>
     </DropdownMenuItem>
   );
 };
