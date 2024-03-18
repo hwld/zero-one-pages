@@ -6,9 +6,17 @@ import {
 } from "lucide-react";
 
 type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART";
+export type PageLink =
+  | "/"
+  | "/todo-1"
+  | "/todo-2"
+  | "/dynamic-menu"
+  | "/chat"
+  | "/dynamic-island";
+
 export type Page = {
   icon: LucideIcon;
-  href: string;
+  href: PageLink;
   title: string;
   description: string;
   tags: Tag[];

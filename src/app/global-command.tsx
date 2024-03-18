@@ -19,7 +19,7 @@ import { pages } from "./pages";
 import Link from "next/link";
 import { HomeIcon, LucideIcon } from "lucide-react";
 import { Command } from "cmdk";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export type CommandItem = {
   id: string;
@@ -28,24 +28,29 @@ export type CommandItem = {
   action: () => Promise<unknown> | void;
 };
 
-const CommandItemsContext = createContext<CommandItem[] | undefined>(undefined);
-export const useCommandItems = (): CommandItem[] => {
-  const context = useContext(CommandItemsContext);
+type GlobalCommandData = { commands: CommandItem[] };
+
+const GlobalCommandDataContext = createContext<GlobalCommandData | undefined>(
+  undefined,
+);
+export const useGlobalCommandData = (): GlobalCommandData => {
+  const context = useContext(GlobalCommandDataContext);
   if (context === undefined) {
     throw new Error("GlobalCommandProviderが存在しません。");
   }
   return context;
 };
 
-type CommandItemsAction = {
+type GlobalCommandAction = {
   addCommandItems: (items: CommandItem[]) => void;
   removeCommandItems: (ids: string[]) => void;
 };
-const CommandItemsActionContext = createContext<CommandItemsAction | undefined>(
-  undefined,
-);
-export const useCommandItemsAction = (): CommandItemsAction => {
-  const context = useContext(CommandItemsActionContext);
+
+const GlobalCommandActionContext = createContext<
+  GlobalCommandAction | undefined
+>(undefined);
+const useGlobalCommandAction = (): GlobalCommandAction => {
+  const context = useContext(GlobalCommandActionContext);
   if (context === undefined) {
     throw new Error("GLobalCOmmandProviderが存在しません。");
   }
@@ -55,34 +60,62 @@ export const useCommandItemsAction = (): CommandItemsAction => {
 export const GlobalCommandProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [commandItems, setCommandItems] = useState<CommandItem[]>([]);
+  const [data, setData] = useState<GlobalCommandData>({
+    commands: [],
+  });
 
-  const action: CommandItemsAction = useMemo(() => {
+  const action: GlobalCommandAction = useMemo(() => {
     return {
       addCommandItems: (newItems) => {
-        setCommandItems((items) => {
-          return Array.from(new Set([...items, ...newItems]));
+        setData((data) => {
+          return {
+            ...data,
+            commands: Array.from(new Set([...data.commands, ...newItems])),
+          };
         });
       },
       removeCommandItems: (itemIds) => {
-        setCommandItems((items) => {
-          return items.filter((i) => !itemIds.includes(i.id));
+        setData((data) => {
+          return {
+            ...data,
+            commands: data.commands.filter((i) => !itemIds.includes(i.id)),
+          };
         });
       },
     };
   }, []);
 
   return (
-    <CommandItemsContext.Provider value={commandItems}>
-      <CommandItemsActionContext.Provider value={action}>
+    <GlobalCommandDataContext.Provider value={data}>
+      <GlobalCommandActionContext.Provider value={action}>
         {children}
-      </CommandItemsActionContext.Provider>
-    </CommandItemsContext.Provider>
+      </GlobalCommandActionContext.Provider>
+    </GlobalCommandDataContext.Provider>
   );
 };
 
+export type GlobalCommandConfig = {
+  newCommands: CommandItem[];
+};
+export const useGlobalCommandConfig = ({
+  newCommands,
+}: GlobalCommandConfig) => {
+  const { addCommandItems, removeCommandItems } = useGlobalCommandAction();
+
+  useEffect(() => {
+    addCommandItems(newCommands);
+
+    return () => {
+      removeCommandItems(newCommands.map((c) => c.id));
+    };
+  }, [addCommandItems, newCommands, removeCommandItems]);
+};
+
 export const GlobalCommand: React.FC = () => {
-  const commands = useCommandItems();
+  const pathname = usePathname();
+  const currentPage = `/${pathname.split("/")[1]}`;
+
+  const { commands } = useGlobalCommandData();
   const [isOpen, setIsOpen] = useState(false);
 
   const onCloseDialog = () => {
@@ -127,54 +160,56 @@ export const GlobalCommand: React.FC = () => {
                 <Command className="flex h-full flex-col gap-2">
                   <div className="flex flex-col gap-2 px-4 pt-4">
                     <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-zinc-400">
-                      Command
+                      {currentPage}
                     </div>
                     <Command.Input
-                      placeholder="Where would you like to go?"
+                      placeholder="Type a page or command..."
                       className="bg-transparent p-1 text-sm placeholder:text-zinc-500 focus-visible:outline-none"
                     />
                   </div>
 
                   <div className="h-[1px] w-full bg-zinc-600" />
-                  <Command.List className="flex flex-col overflow-auto px-2 pb-4">
-                    <Command.Empty className="mt-4 w-full text-center text-sm text-zinc-300">
-                      No results found.
-                    </Command.Empty>
-                    <div className="space-y-2">
-                      <Group heading="pages">
-                        <NavItem
-                          icon={HomeIcon}
-                          label="ホーム"
-                          href="/"
-                          onBeforeNavigate={onCloseDialog}
-                        />
-                        {pages.map((p) => {
-                          return (
-                            <NavItem
-                              key={p.title}
-                              icon={p.icon}
-                              label={p.title}
-                              href={p.href}
-                              onBeforeNavigate={onCloseDialog}
-                            />
-                          );
-                        })}
-                      </Group>
-                      {commands.length > 0 && (
-                        <Group heading="commands">
-                          {commands.map((command) => {
+                  <div className="overflow-hidden pb-2 pl-2">
+                    <Command.List className="flex h-full flex-col overflow-auto pr-2">
+                      <Command.Empty className="mt-4 w-full text-center text-sm text-zinc-300">
+                        No results found.
+                      </Command.Empty>
+                      <div className="space-y-2">
+                        <Group heading="pages">
+                          <NavItem
+                            icon={HomeIcon}
+                            label="ホーム"
+                            href="/"
+                            onBeforeNavigate={onCloseDialog}
+                          />
+                          {pages.map((p) => {
                             return (
-                              <CommandItem
-                                key={command.id}
-                                command={command}
-                                onAfterAction={onCloseDialog}
+                              <NavItem
+                                key={p.title}
+                                icon={p.icon}
+                                label={p.title}
+                                href={p.href}
+                                onBeforeNavigate={onCloseDialog}
                               />
                             );
                           })}
                         </Group>
-                      )}
-                    </div>
-                  </Command.List>
+                        {commands.length > 0 && (
+                          <Group heading="commands">
+                            {commands.map((command) => {
+                              return (
+                                <CommandItem
+                                  key={command.id}
+                                  command={command}
+                                  onAfterAction={onCloseDialog}
+                                />
+                              );
+                            })}
+                          </Group>
+                        )}
+                      </div>
+                    </Command.List>
+                  </div>
                 </Command>
               </motion.div>
             </DialogContent>
@@ -225,11 +260,14 @@ const NavItem: React.FC<NavItemProps> = ({
     >
       <Link
         href={href}
-        className="flex h-full items-center gap-2"
+        className="flex h-full items-center justify-between"
         onClick={onBeforeNavigate}
       >
-        <Icon size={15} />
-        {label}
+        <div className="flex items-center gap-2">
+          <Icon size={15} />
+          <div>{label}</div>
+        </div>
+        <div className="text-xs text-zinc-400">{href}</div>
       </Link>
     </Command.Item>
   );
@@ -244,7 +282,7 @@ const CommandItem: React.FC<CommandItemProps> = ({
 
   return (
     <Command.Item
-      className="flex h-8 items-center gap-2 rounded px-2 text-sm transition-colors aria-selected:bg-white/10"
+      className="flex h-8 cursor-pointer items-center gap-2 rounded px-2 text-sm transition-colors aria-selected:bg-white/10"
       onSelect={async () => {
         await command.action();
         onAfterAction?.();
