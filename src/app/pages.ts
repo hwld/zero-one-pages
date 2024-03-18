@@ -1,8 +1,10 @@
 import {
-  DockIcon,
-  ListTodoIcon,
+  CircleEllipsisIcon,
+  LayoutListIcon,
   LucideIcon,
   MessageSquareMoreIcon,
+  RectangleEllipsisIcon,
+  TablePropertiesIcon,
 } from "lucide-react";
 
 type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART";
@@ -24,7 +26,7 @@ export type Page = {
 
 export const pages: Page[] = [
   {
-    icon: ListTodoIcon,
+    icon: LayoutListIcon,
     href: "/todo-1",
     title: "todoリスト",
     description:
@@ -32,7 +34,7 @@ export const pages: Page[] = [
     tags: ["PC", "MOBILE", "LAYOUT"],
   },
   {
-    icon: ListTodoIcon,
+    icon: TablePropertiesIcon,
     href: "/todo-2",
     title: "todoリスト2",
     description:
@@ -40,7 +42,7 @@ export const pages: Page[] = [
     tags: ["PC", "LAYOUT"],
   },
   {
-    icon: DockIcon,
+    icon: CircleEllipsisIcon,
     href: "/dynamic-menu",
     title: "変形するメニュー",
     description: "youtubeの設定メニューを見て作りたくなった。\n🥱🥱🥱😀😀😀",
@@ -55,7 +57,7 @@ export const pages: Page[] = [
     tags: ["PC", "LAYOUT"],
   },
   {
-    icon: DockIcon,
+    icon: RectangleEllipsisIcon,
     href: "/dynamic-island",
     title: "変形するメニュー2",
     description:

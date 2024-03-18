@@ -8,6 +8,7 @@ export const Providers: React.FC<{ children: ReactNode }> = ({ children }) => {
     () =>
       new QueryClient({
         defaultOptions: {
+          queries: { retry: 1 },
           mutations: {
             onSettled: async () => {
               await queryClient.invalidateQueries();

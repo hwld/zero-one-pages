@@ -176,7 +176,7 @@ export const GlobalCommand: React.FC = () => {
                       </Command.Empty>
                       <div className="space-y-2">
                         <Group heading="pages">
-                          <NavItem
+                          <PageItem
                             icon={HomeIcon}
                             label="ホーム"
                             href="/"
@@ -184,7 +184,7 @@ export const GlobalCommand: React.FC = () => {
                           />
                           {pages.map((p) => {
                             return (
-                              <NavItem
+                              <PageItem
                                 key={p.title}
                                 icon={p.icon}
                                 label={p.title}
@@ -234,13 +234,13 @@ const Group: React.FC<{ heading: string; children: ReactNode }> = ({
   );
 };
 
-type NavItemProps = {
+type PageItemProps = {
   icon: LucideIcon;
   href: string;
   label: string;
   onBeforeNavigate: () => void;
 };
-const NavItem: React.FC<NavItemProps> = ({
+const PageItem: React.FC<PageItemProps> = ({
   icon: Icon,
   href,
   label,
@@ -257,6 +257,7 @@ const NavItem: React.FC<NavItemProps> = ({
     <Command.Item
       className="h-8 rounded px-2 text-sm transition-colors aria-selected:bg-white/10"
       onSelect={handleNavigate}
+      keywords={["page"]}
     >
       <Link
         href={href}
@@ -282,6 +283,7 @@ const CommandItem: React.FC<CommandItemProps> = ({
 
   return (
     <Command.Item
+      keywords={["command"]}
       className="flex h-8 cursor-pointer items-center gap-2 rounded px-2 text-sm transition-colors aria-selected:bg-white/10"
       onSelect={async () => {
         await command.action();

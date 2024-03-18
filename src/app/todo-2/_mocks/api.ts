@@ -1,8 +1,8 @@
 "use client";
 import { HttpResponse, http } from "msw";
-import { initialTasks } from "../_lib/initial-data";
 import { paginate } from "../_lib/utils";
 import { z } from "zod";
+import { taskStore } from "./task-store";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -53,8 +53,6 @@ export const selectionFilterSchema = z
   .union([z.literal("selected"), z.literal("unselected")])
   .nullable();
 export type SelectionFilter = z.infer<typeof selectionFilterSchema>;
-
-let allTasks: Task[] = initialTasks;
 
 const paginatedTasksInputSchema = z.object({
   sortEntry: sortEntrySchema,
@@ -183,7 +181,7 @@ export const todo2Handlers = [
 
     const { field, order } = sortEntry;
 
-    const filteredTasks = allTasks.filter((task) => {
+    const filteredTasks = taskStore.getAll().filter((task) => {
       if (fieldFilters.length === 0 && selectionFilter === null) {
         return true;
       }
@@ -249,67 +247,30 @@ export const todo2Handlers = [
   }),
   http.get(Todo2API.task(), ({ params }) => {
     const id = z.string().parse(params.id);
-    const task = allTasks.find((t) => t.id === id);
+    const task = taskStore.find(id);
     return HttpResponse.json(task);
   }),
   http.post(Todo2API.createTask(), async ({ request }) => {
     const input = createTaskInputSchema.parse(await request.json());
+    const createdTask = taskStore.add(input);
 
-    const newTask: Task = {
-      id: crypto.randomUUID(),
-      title: input.title,
-      description: input.description,
-      status: "todo",
-      createdAt: new Date(),
-      completedAt: undefined,
-    };
-    allTasks = [...allTasks, newTask];
-
-    return HttpResponse.json(newTask);
+    return HttpResponse.json(createdTask);
   }),
   http.put(Todo2API.task(), async ({ request }) => {
     const input = updateTaskInputSchema.parse(await request.json());
-
-    allTasks = allTasks.map((t) => {
-      if (t.id === input.id) {
-        return {
-          ...t,
-          title: input.title,
-          description: input.description,
-          status: input.status,
-          completedAt: input.status === "done" ? new Date() : undefined,
-        };
-      }
-
-      return t;
-    });
-
-    const updatedTask = allTasks.find((t) => t.id === input.id);
+    const updatedTask = taskStore.update(input);
 
     return HttpResponse.json(updatedTask);
   }),
   http.patch(Todo2API.updateTaskStatuses(), async ({ request }) => {
     const input = updateTaskStatusesInputSchema.parse(await request.json());
-
-    allTasks = allTasks.map((t) => {
-      if (t.status !== input.status && input.selectedTaskIds.includes(t.id)) {
-        return {
-          ...t,
-          status: input.status,
-          completedAt: input.status === "done" ? new Date() : undefined,
-        };
-      }
-      return t;
-    });
+    taskStore.updateTaskStatuses(input);
 
     return HttpResponse.json({});
   }),
   http.delete(Todo2API.deleteTasks(), async ({ request }) => {
     const ids = z.array(z.string()).parse(await request.json());
-
-    allTasks = allTasks.filter((t) => {
-      return !ids.includes(t.id);
-    });
+    taskStore.remove(ids);
 
     return HttpResponse.json({});
   }),
