@@ -2,10 +2,10 @@ import { IconPencil } from "@tabler/icons-react";
 import { Card } from "./card";
 import { useId, useState } from "react";
 import { TaskEditForm } from "./task-form/task-edit-form";
-import { TaskCreateFormData } from "./task-form/task-create-form";
 import { useUpdateTask } from "../_queries/useUpdateTask";
-import { Task } from "../_mocks/api";
 import { Button } from "./button";
+import { Task } from "../_mocks/task-store";
+import { CreateTaskInput } from "../_mocks/api";
 
 export const taskDetailViewClass = {
   wrapper: "flex h-full flex-col gap-2",
@@ -23,7 +23,7 @@ export const TaskDetailContentCard: React.FC<Props> = ({ task }) => {
     setIsEditing(false);
   };
 
-  const handleUpdateTask = (data: TaskCreateFormData) => {
+  const handleUpdateTask = (data: CreateTaskInput) => {
     setIsEditing(false);
     updateTaskMutation.mutate({
       ...task,

@@ -1,6 +1,6 @@
 import { CircleDashedIcon, CircleDotIcon } from "lucide-react";
 import clsx from "clsx";
-import { Task } from "../_mocks/api";
+import { Task } from "../_mocks/task-store";
 
 type TaskStatusBadgeProps = {
   status: Task["status"];

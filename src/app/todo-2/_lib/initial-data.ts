@@ -1,4 +1,4 @@
-import { Task } from "../_mocks/api";
+import { Task } from "../_mocks/task-store";
 
 export const initialTasks: Task[] = [
   {

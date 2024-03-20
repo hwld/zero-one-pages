@@ -3,8 +3,8 @@ import { TaskTableRow } from "./row";
 import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { Pagination } from "../pagination";
 import { useMemo } from "react";
-import { Task } from "../../_mocks/api";
 import { TaskTableShell } from "./shell";
+import { Task } from "../../_mocks/task-store";
 
 type Props = { paginatedTasks: Task[]; totalPages: number };
 export const TaskTable: React.FC<Props> = ({ paginatedTasks, totalPages }) => {

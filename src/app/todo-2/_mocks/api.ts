@@ -2,17 +2,7 @@
 import { HttpResponse, http } from "msw";
 import { paginate } from "../_lib/utils";
 import { z } from "zod";
-import { taskStore } from "./task-store";
-
-export const taskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.union([z.literal("done"), z.literal("todo")]),
-  createdAt: z.coerce.date(),
-  completedAt: z.coerce.date().optional(),
-});
-export type Task = z.infer<typeof taskSchema>;
+import { Task, taskSchema, taskStore } from "./task-store";
 
 export const sortOrderSchema = z.union([z.literal("asc"), z.literal("desc")]);
 export type SortOrder = z.infer<typeof sortOrderSchema>;
@@ -70,18 +60,26 @@ const paginatedTasksEntrySchema = z.object({
 });
 type PaginatedTasksEntry = z.infer<typeof paginatedTasksEntrySchema>;
 
-const createTaskInputSchema = taskSchema.pick({
-  title: true,
-  description: true,
+export const createTaskInputSchema = z.object({
+  title: z
+    .string()
+    .min(1, "タイトルの入力は必須です。")
+    .max(100, "タスクは100文字以下で入力してください。"),
+  description: z.string().max(10000, "説明は10000文字以下で入力してください。"),
 });
 export type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
 
-const updateTaskInputSchema = taskSchema.pick({
-  id: true,
-  title: true,
-  description: true,
-  status: true,
-});
+export const updateTaskInputSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "タイトルの入力は必須です。")
+      .max(100, "タスクは100文字以下で入力してください。"),
+    description: z
+      .string()
+      .max(10000, "説明は10000文字以下で入力してください。"),
+  })
+  .merge(taskSchema.pick({ status: true }));
 export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
 
 const updateTaskStatusesInputSchema = z
@@ -134,8 +132,10 @@ export const createTask = async (input: CreateTaskInput): Promise<Task> => {
   return task;
 };
 
-export const updateTask = async (input: UpdateTaskInput): Promise<Task> => {
-  const res = await fetch(Todo2API.task(), {
+export const updateTask = async (
+  input: UpdateTaskInput & { id: string },
+): Promise<Task> => {
+  const res = await fetch(Todo2API.task(input.id), {
     method: "PUT",
     body: JSON.stringify(input),
   });
@@ -256,15 +256,24 @@ export const todo2Handlers = [
 
     return HttpResponse.json(createdTask);
   }),
-  http.put(Todo2API.task(), async ({ request }) => {
+  http.put(Todo2API.task(), async ({ params, request }) => {
+    const id = z.string().parse(params.id);
     const input = updateTaskInputSchema.parse(await request.json());
-    const updatedTask = taskStore.update(input);
+    const updatedTask = taskStore.update({
+      id: id,
+      title: input.title,
+      description: input.description,
+      status: input.status,
+    });
 
     return HttpResponse.json(updatedTask);
   }),
   http.patch(Todo2API.updateTaskStatuses(), async ({ request }) => {
     const input = updateTaskStatusesInputSchema.parse(await request.json());
-    taskStore.updateTaskStatuses(input);
+    taskStore.updateTaskStatuses({
+      selectedTaskIds: input.selectedTaskIds,
+      status: input.status,
+    });
 
     return HttpResponse.json({});
   }),

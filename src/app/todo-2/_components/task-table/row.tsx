@@ -9,8 +9,8 @@ import { format } from "../../_lib/utils";
 import { TaskTableCheckbox } from "./checkbox";
 import Link from "next/link";
 import { useUpdateTask } from "../../_queries/useUpdateTask";
-import { Task } from "../../_mocks/api";
 import { useDeleteTasks } from "../../_queries/useDeleteTasks";
+import { Task } from "../../_mocks/task-store";
 
 export const TaskTableRow: React.FC<{
   task: Task;

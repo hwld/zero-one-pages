@@ -7,13 +7,11 @@ import {
 } from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XIcon } from "lucide-react";
-import {
-  TaskCreateForm,
-  TaskCreateFormData,
-} from "./task-form/task-create-form";
+import { TaskCreateForm } from "./task-form/task-create-form";
 import { useState } from "react";
 import { useAddTask } from "../_queries/useAddTask";
 import { Button } from "./button";
+import { CreateTaskInput } from "../_mocks/api";
 
 const taskFormId = "task-form-id";
 
@@ -23,7 +21,7 @@ export const TaskAddDialog: React.FC<Props> = ({ isOpen, onOpenChange }) => {
   const [moreAdd, setmoreAdd] = useState(false);
   const addTaskMutation = useAddTask();
 
-  const handleAddTask = (data: TaskCreateFormData) => {
+  const handleAddTask = (data: CreateTaskInput) => {
     addTaskMutation.mutate({
       title: data.title,
       description: data.description,

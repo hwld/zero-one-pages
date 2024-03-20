@@ -1,24 +1,13 @@
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMergeRefs } from "@floating-ui/react";
 import { useEffect, useRef } from "react";
 import { TaskFormErrorTooltip } from "./error-tooltip";
 import clsx from "clsx";
-import { CreateTaskInput } from "../../_mocks/api";
-
-export type TaskCreateFormData = CreateTaskInput;
-
-export const taskCreateFormSchema = z.object({
-  title: z
-    .string()
-    .min(1, "タイトルの入力は必須です。")
-    .max(100, "タスクは100文字以下で入力してください。"),
-  description: z.string().max(10000, "説明は10000文字以下で入力してください。"),
-}) satisfies z.ZodType<TaskCreateFormData>;
+import { CreateTaskInput, createTaskInputSchema } from "../../_mocks/api";
 
 type Props = {
-  onAddTask: (data: TaskCreateFormData) => void;
+  onAddTask: (data: CreateTaskInput) => void;
   id: string;
 };
 
@@ -27,9 +16,9 @@ export const TaskCreateForm: React.FC<Props> = ({ onAddTask, id }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TaskCreateFormData>({
+  } = useForm<CreateTaskInput>({
     defaultValues: { title: "", description: "" },
-    resolver: zodResolver(taskCreateFormSchema),
+    resolver: zodResolver(createTaskInputSchema),
   });
 
   const innerTitleRef = useRef<HTMLInputElement>(null);

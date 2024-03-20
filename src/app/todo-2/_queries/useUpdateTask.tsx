@@ -3,7 +3,7 @@ import { UpdateTaskInput, updateTask } from "../_mocks/api";
 
 export const useUpdateTask = () => {
   return useMutation({
-    mutationFn: (data: UpdateTaskInput) => {
+    mutationFn: (data: UpdateTaskInput & { id: string }) => {
       return updateTask(data);
     },
   });

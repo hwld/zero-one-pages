@@ -1,10 +1,15 @@
+import { z } from "zod";
 import { initialTasks } from "../_lib/initial-data";
-import {
-  CreateTaskInput,
-  Task,
-  UpdateTaskInput,
-  UpdateTaskStatusesInput,
-} from "./api";
+
+export const taskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  status: z.union([z.literal("done"), z.literal("todo")]),
+  createdAt: z.coerce.date(),
+  completedAt: z.coerce.date().optional(),
+});
+export type Task = z.infer<typeof taskSchema>;
 
 class TaskStore {
   private allTasks: Task[] = initialTasks;
@@ -21,7 +26,7 @@ class TaskStore {
     return this.allTasks.find((t) => t.id === id);
   }
 
-  public add(input: CreateTaskInput): Task {
+  public add(input: { title: string; description: string }): Task {
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
@@ -36,7 +41,12 @@ class TaskStore {
     return newTask;
   }
 
-  public update(input: UpdateTaskInput): Task | undefined {
+  public update(input: {
+    id: string;
+    title: string;
+    description: string;
+    status: Task["status"];
+  }): Task | undefined {
     this.allTasks = this.allTasks.map((t) => {
       if (t.id === input.id) {
         return {
@@ -55,7 +65,10 @@ class TaskStore {
     return updatedTask;
   }
 
-  public updateTaskStatuses(input: UpdateTaskStatusesInput) {
+  public updateTaskStatuses(input: {
+    status: Task["status"];
+    selectedTaskIds: string[];
+  }) {
     this.allTasks = this.allTasks.map((t) => {
       if (t.status !== input.status && input.selectedTaskIds.includes(t.id)) {
         return {
