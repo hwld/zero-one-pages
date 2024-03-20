@@ -161,6 +161,7 @@ export const GlobalCommand: React.FC = () => {
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
+                style={{ colorScheme: "dark" }}
               >
                 <Command className="flex h-full flex-col">
                   <div className="flex flex-col gap-2 px-4 pt-4">
