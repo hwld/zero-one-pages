@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { initialTasks } from "../_lib/initial-data";
 import { CreateTaskInput, UpdateTaskInput } from "./api";
+import { initialTasks } from "./data";
 
 export const taskSchema = z.object({
   id: z.string(),

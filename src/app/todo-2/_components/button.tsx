@@ -18,7 +18,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     <button
       ref={ref}
       className={clsx(
-        "flex h-7 items-center gap-1 rounded px-2 text-xs transition-colors",
+        "flex h-7 items-center gap-1 text-nowrap rounded px-2 text-xs transition-colors",
         buttonClass[variant],
         className,
       )}

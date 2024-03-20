@@ -108,18 +108,20 @@ const Page: NextPage = () => {
         <IconHome size={18} />
         <h1 className="text-sm">今日のタスク</h1>
       </div>
-      <Card>
-        <div className="flex h-full grow flex-col gap-4">
-          <div className="flex justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <TaskSearch />
-              <TaskTableFilter />
+      <div className="min-w-[800px] grow">
+        <Card>
+          <div className="flex h-full grow flex-col gap-4">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <TaskSearch />
+                <TaskTableFilter />
+              </div>
+              <AddTaskButton />
             </div>
-            <AddTaskButton />
+            {content}
           </div>
-          {content}
-        </div>
-      </Card>
+        </Card>
+      </div>
       <TaskSelectionMenu />
     </>
   );

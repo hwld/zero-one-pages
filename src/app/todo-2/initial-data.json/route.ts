@@ -15,7 +15,7 @@ const initialTasks: Task[] = [...new Array(121)].map(() => {
   return {
     id: crypto.randomUUID(),
     title: faker.lorem.sentence({ min: 5, max: 8 }),
-    description: faker.lorem.paragraph({ min: 5, max: 40 }),
+    description: faker.lorem.lines({ min: 5, max: 40 }),
     createdAt,
     ...statusEntry,
   };
