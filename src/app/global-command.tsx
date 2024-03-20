@@ -157,12 +157,12 @@ export const GlobalCommand: React.FC = () => {
             </DialogOverlay>
             <DialogContent asChild>
               <motion.div
-                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200"
+                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200"
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
               >
-                <Command className="flex h-full flex-col gap-2">
+                <Command className="flex h-full flex-col">
                   <div className="flex flex-col gap-2 px-4 pt-4">
                     <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-zinc-400">
                       {currentPage}
@@ -173,48 +173,47 @@ export const GlobalCommand: React.FC = () => {
                     />
                   </div>
 
-                  <div className="h-[1px] w-full bg-zinc-600" />
-                  <div className="overflow-hidden pb-2 pl-2">
-                    <Command.List className="flex h-full flex-col overflow-auto pr-2">
-                      <Command.Empty className="mt-4 w-full text-center text-sm text-zinc-300">
-                        No results found.
-                      </Command.Empty>
-                      <div className="space-y-2">
-                        <Group heading="pages">
-                          <PageItem
-                            icon={HomeIcon}
-                            label="ホーム"
-                            href="/"
-                            onBeforeNavigate={onCloseDialog}
-                          />
-                          {pages.map((p) => {
+                  <div className="mt-2 h-[1px] w-full bg-zinc-600" />
+
+                  <Command.List className="flex h-full scroll-p-2 flex-col overflow-auto p-2">
+                    <Command.Empty className="mt-4 w-full text-center text-sm text-zinc-300">
+                      No results found.
+                    </Command.Empty>
+                    <div className="space-y-2">
+                      <Group heading="pages">
+                        <PageItem
+                          icon={HomeIcon}
+                          label="ホーム"
+                          href="/"
+                          onBeforeNavigate={onCloseDialog}
+                        />
+                        {pages.map((p) => {
+                          return (
+                            <PageItem
+                              key={p.title}
+                              icon={p.icon}
+                              label={p.title}
+                              href={p.href}
+                              onBeforeNavigate={onCloseDialog}
+                            />
+                          );
+                        })}
+                      </Group>
+                      {commands.length > 0 && (
+                        <Group heading="commands">
+                          {commands.map((command) => {
                             return (
-                              <PageItem
-                                key={p.title}
-                                icon={p.icon}
-                                label={p.title}
-                                href={p.href}
-                                onBeforeNavigate={onCloseDialog}
+                              <CommandItem
+                                key={command.id}
+                                command={command}
+                                onAfterAction={onCloseDialog}
                               />
                             );
                           })}
                         </Group>
-                        {commands.length > 0 && (
-                          <Group heading="commands">
-                            {commands.map((command) => {
-                              return (
-                                <CommandItem
-                                  key={command.id}
-                                  command={command}
-                                  onAfterAction={onCloseDialog}
-                                />
-                              );
-                            })}
-                          </Group>
-                        )}
-                      </div>
-                    </Command.List>
-                  </div>
+                      )}
+                    </div>
+                  </Command.List>
                 </Command>
               </motion.div>
             </DialogContent>
