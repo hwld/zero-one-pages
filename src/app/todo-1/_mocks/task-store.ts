@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CreateTaskInput, UpdateTaskInput } from "./api";
+import { initialTasks } from "./data";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -12,7 +13,7 @@ export const taskSchema = z.object({
 export type Task = z.infer<typeof taskSchema>;
 
 class TaskStore {
-  private tasks: Task[] = [];
+  private tasks: Task[] = initialTasks;
 
   public getAll(): Task[] {
     return this.tasks;

@@ -10,17 +10,10 @@ import { TaskSelectionMenu } from "./_components/task-selection-menu/task-select
 import { Card } from "./_components/card";
 import { useTasksData } from "./_contexts/tasks-provider";
 import { usePaginatedTasks } from "./_queries/usePaginatedTasks";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
 import { ErrorTaskTable } from "./_components/task-table/error-task-table";
-import { useGlobalCommandConfig } from "../global-command";
-import {
-  BoxSelectIcon,
-  RefreshCcwIcon,
-  TriangleAlertIcon,
-  TriangleIcon,
-} from "lucide-react";
-import { taskStore } from "./_mocks/task-store";
+import { useTodo2HomeCommands } from "./commands";
 
 const Page: NextPage = () => {
   const {
@@ -58,49 +51,7 @@ const Page: NextPage = () => {
     }
   }, [data?.tasks, data?.totalPages, refetch, status]);
 
-  const [error, setError] = useState(false);
-  useGlobalCommandConfig(
-    useMemo(() => {
-      return {
-        newCommands: [
-          {
-            id: crypto.randomUUID(),
-            icon: error ? TriangleIcon : TriangleAlertIcon,
-            label: error
-              ? "タスク取得エラーを止める"
-              : "タスク取得エラーを発生させる",
-            action: async () => {
-              setError((s) => !s);
-              if (error) {
-                taskStore.stopSimulateError();
-              } else {
-                taskStore.simulateError();
-              }
-              refetch();
-            },
-          },
-          {
-            id: crypto.randomUUID(),
-            icon: BoxSelectIcon,
-            label: "タスクを空にする",
-            action: async () => {
-              taskStore.clear();
-              refetch();
-            },
-          },
-          {
-            id: crypto.randomUUID(),
-            icon: RefreshCcwIcon,
-            label: "タスクを初期化する",
-            action: async () => {
-              taskStore.reset();
-              refetch();
-            },
-          },
-        ],
-      };
-    }, [error, refetch]),
-  );
+  useTodo2HomeCommands();
 
   return (
     <>

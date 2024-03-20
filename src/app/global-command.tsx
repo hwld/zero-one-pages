@@ -95,7 +95,7 @@ export const GlobalCommandProvider: React.FC<{ children: ReactNode }> = ({
 };
 
 export type GlobalCommandConfig = {
-  newCommands: CommandItem[];
+  newCommands: Omit<CommandItem, "id">[];
 };
 export const useGlobalCommandConfig = ({
   newCommands,
@@ -103,10 +103,15 @@ export const useGlobalCommandConfig = ({
   const { addCommandItems, removeCommandItems } = useGlobalCommandAction();
 
   useEffect(() => {
-    addCommandItems(newCommands);
+    const commands = newCommands.map((c) => ({
+      ...c,
+      id: crypto.randomUUID(),
+    }));
+
+    addCommandItems(commands);
 
     return () => {
-      removeCommandItems(newCommands.map((c) => c.id));
+      removeCommandItems(commands.map((c) => c.id));
     };
   }, [addCommandItems, newCommands, removeCommandItems]);
 };
