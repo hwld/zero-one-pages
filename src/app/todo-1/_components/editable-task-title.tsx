@@ -1,12 +1,12 @@
 import { FocusEventHandler, forwardRef } from "react";
-import { Task } from "../page";
 import { useForm } from "react-hook-form";
-import { TaskFormData, taskFormSchema } from "./task-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMergeRefs } from "@floating-ui/react";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircleIcon } from "lucide-react";
+import { Task } from "../_mocks/task-store";
+import { UpdateTaskInput, updateTaskInputSchema } from "../_mocks/api";
 
 export const EditableTaskTitle = forwardRef<
   HTMLInputElement,
@@ -24,9 +24,9 @@ export const EditableTaskTitle = forwardRef<
     register,
     handleSubmit: createHandleSubmit,
     formState: { errors },
-  } = useForm<TaskFormData>({
-    defaultValues: { title: task.title },
-    resolver: zodResolver(taskFormSchema),
+  } = useForm<UpdateTaskInput>({
+    defaultValues: task,
+    resolver: zodResolver(updateTaskInputSchema),
   });
   const { ref: _ref, onBlur, ...registers } = register("title");
 
@@ -48,7 +48,7 @@ export const EditableTaskTitle = forwardRef<
         <form className="w-full" onSubmit={handleSubmit}>
           <input
             ref={ref}
-            className="w-full"
+            className="w-full bg-transparent"
             onBlur={handleBlur}
             {...registers}
           />

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { initialTasks } from "../_lib/initial-data";
+import { CreateTaskInput, UpdateTaskInput } from "./api";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -22,11 +23,11 @@ class TaskStore {
     return this.allTasks;
   }
 
-  public find(id: string) {
+  public get(id: string) {
     return this.allTasks.find((t) => t.id === id);
   }
 
-  public add(input: { title: string; description: string }): Task {
+  public add(input: CreateTaskInput): Task {
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
@@ -41,12 +42,7 @@ class TaskStore {
     return newTask;
   }
 
-  public update(input: {
-    id: string;
-    title: string;
-    description: string;
-    status: Task["status"];
-  }): Task | undefined {
+  public update(input: UpdateTaskInput & { id: string }): Task | undefined {
     this.allTasks = this.allTasks.map((t) => {
       if (t.id === input.id) {
         return {
@@ -61,7 +57,7 @@ class TaskStore {
       return t;
     });
 
-    const updatedTask = this.find(input.id);
+    const updatedTask = this.get(input.id);
     return updatedTask;
   }
 

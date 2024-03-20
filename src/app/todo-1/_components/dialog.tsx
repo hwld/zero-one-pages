@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { XIcon } from "lucide-react";
 
 export const Dialog: React.FC<{
@@ -20,10 +20,12 @@ export const Dialog: React.FC<{
   onAction,
   children,
 }) => {
+  const isPresent = useIsPresent();
+
   return (
     <RadixDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && isPresent && (
           <RadixDialog.Portal forceMount>
             <RadixDialog.Overlay asChild>
               <motion.div className="fixed inset-0 bg-black/15" />

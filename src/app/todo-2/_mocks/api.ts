@@ -247,7 +247,7 @@ export const todo2Handlers = [
   }),
   http.get(Todo2API.task(), ({ params }) => {
     const id = z.string().parse(params.id);
-    const task = taskStore.find(id);
+    const task = taskStore.get(id);
     return HttpResponse.json(task);
   }),
   http.post(Todo2API.createTask(), async ({ request }) => {

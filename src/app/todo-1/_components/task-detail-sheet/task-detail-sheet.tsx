@@ -1,17 +1,18 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Task } from "../../page";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { ActivityIcon, TextIcon, XIcon } from "lucide-react";
 import { TaskStatusBadge } from "../task-status-badge";
 import { TaskDescriptionForm } from "./task-description-form";
+import { Task } from "../../_mocks/task-store";
+import { useUpdateTask } from "../../_queries/useUpdateTask";
 
 export const TaskDetailSheet: React.FC<{
   task: Task;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onChangeStatus: (id: string) => void;
-  onChangeDesc: (id: string, desc: string) => void;
-}> = ({ task, isOpen, onOpenChange, onChangeStatus, onChangeDesc }) => {
+}> = ({ task, isOpen, onOpenChange }) => {
+  const updateTaskMutation = useUpdateTask();
+
   return (
     <RadixDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <AnimatePresence>
@@ -55,7 +56,12 @@ export const TaskDetailSheet: React.FC<{
                     <div className="ml-2">
                       <TaskStatusBadge
                         done={task.done}
-                        onChangeDone={() => onChangeStatus(task.id)}
+                        onChangeDone={() => {
+                          updateTaskMutation.mutate({
+                            ...task,
+                            done: !task.done,
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -66,9 +72,12 @@ export const TaskDetailSheet: React.FC<{
                     </div>
                     <TaskDescriptionForm
                       defaultDescription={task.description}
-                      onChangeDescription={(desc) =>
-                        onChangeDesc(task.id, desc)
-                      }
+                      onChangeDescription={(desc) => {
+                        updateTaskMutation.mutate({
+                          ...task,
+                          description: desc,
+                        });
+                      }}
                     />
                   </div>
                 </div>

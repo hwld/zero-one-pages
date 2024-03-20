@@ -1,0 +1,115 @@
+import { HttpResponse, http } from "msw";
+import { z } from "zod";
+import { Task, taskSchema, taskStore } from "./task-store";
+
+export const createTaskInputSchema = z.object({
+  title: z
+    .string()
+    .min(1, "タスクのタイトルを入力してください")
+    .max(100, "タスクのタイトルは100文字以内で入力してください"),
+});
+export type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
+
+export const updateTaskInputSchema = z.object({
+  title: z
+    .string()
+    .min(1, "タスクのタイトルを入力してください")
+    .max(100, "タスクのタイトルは100文字以内で入力してください"),
+  description: z
+    .string()
+    .max(10000, "タスクの説明は10000文字以内で入力してください"),
+  done: z.boolean(),
+});
+export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
+
+export const Todo1API = {
+  base: "/todo-1/api",
+  tasks: () => `${Todo1API.base}/tasks`,
+  task: (id?: string) => `${Todo1API.base}/tasks/${id ?? ":id"}`,
+};
+
+export const fetchTasks = async (): Promise<Task[]> => {
+  const res = await fetch(Todo1API.tasks());
+  const json = await res.json();
+  const tasks = z.array(taskSchema).parse(json);
+
+  return tasks;
+};
+
+export const fetchTask = async (id: string): Promise<Task | undefined> => {
+  const res = await fetch(Todo1API.task(id));
+  const json = await res.json();
+  const task = taskSchema.optional().parse(json);
+
+  return task;
+};
+
+export const createTask = async (input: CreateTaskInput): Promise<Task> => {
+  const res = await fetch(Todo1API.tasks(), {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  const json = await res.json();
+  const task = taskSchema.parse(json);
+
+  return task;
+};
+
+export const updateTask = async ({
+  id,
+  ...input
+}: UpdateTaskInput & { id: string }): Promise<Task | undefined> => {
+  const res = await fetch(Todo1API.task(id), {
+    method: "PUT",
+    body: JSON.stringify(input),
+  });
+  const json = await res.json();
+  const task = taskSchema.optional().parse(json);
+
+  return task;
+};
+
+export const deleteTask = async (id: string) => {
+  await fetch(Todo1API.task(id), {
+    method: "DELETE",
+  });
+
+  return;
+};
+
+export const todo1Handlers = [
+  http.get(Todo1API.tasks(), () => {
+    const tasks = taskStore.getAll();
+
+    return HttpResponse.json(tasks);
+  }),
+
+  http.get(Todo1API.task(), ({ params }) => {
+    const id = z.string().parse(params.id);
+    const task = taskStore.get(id);
+
+    return HttpResponse.json(task);
+  }),
+
+  http.post(Todo1API.tasks(), async ({ request }) => {
+    const input = createTaskInputSchema.parse(await request.json());
+    const createdTask = taskStore.add(input);
+
+    return HttpResponse.json(createdTask);
+  }),
+
+  http.put(Todo1API.task(), async ({ params, request }) => {
+    const id = z.string().parse(params.id);
+    const input = updateTaskInputSchema.parse(await request.json());
+    const updatedTask = taskStore.update({ ...input, id });
+
+    return HttpResponse.json(updatedTask);
+  }),
+
+  http.delete(Todo1API.task(), ({ params }) => {
+    const id = z.string().parse(params.id);
+    taskStore.remove(id);
+
+    return HttpResponse.json({});
+  }),
+];

@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { Task } from "../../page";
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import {
@@ -12,21 +11,23 @@ import { EditableTaskTitle } from "../editable-task-title";
 import { TaskCardButton } from "./task-card-button";
 import { TaskDetailSheet } from "../task-detail-sheet/task-detail-sheet";
 import { ConfirmTaskDeleteDialog } from "../confirm-task-delete-dialog";
+import { Task } from "../../_mocks/task-store";
+import { useUpdateTask } from "../../_queries/useUpdateTask";
+import { useDeleteTask } from "../../_queries/useDeleteTask";
 
 export const TaskCard: React.FC<{
   task: Task;
-  onChangeStatus: (id: string) => void;
-  onDelete: (id: string) => void;
-  onChangeDesc: (id: string, desc: string) => void;
-  onChangeTitle: (id: string, title: string) => void;
-}> = ({ task, onChangeStatus, onDelete, onChangeDesc, onChangeTitle }) => {
+}> = ({ task }) => {
   const [editable, setEditable] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
+
   const titleInputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className="just flex w-full items-center justify-between rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700">
+    <div className="just flex w-full items-center justify-between gap-1 rounded-lg border-2 border-neutral-300 bg-neutral-100 p-3 py-2 text-neutral-700">
       <div className="flex w-full items-center gap-2">
         <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
           <AnimatePresence>
@@ -46,7 +47,9 @@ export const TaskCard: React.FC<{
             type="checkbox"
             className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
             checked={task.done}
-            onChange={() => onChangeStatus(task.id)}
+            onChange={() => {
+              updateTaskMutation.mutate({ ...task, done: !task.done });
+            }}
           ></input>
           <div
             className={clsx(
@@ -63,7 +66,9 @@ export const TaskCard: React.FC<{
           task={task}
           editable={editable}
           onChangeEditable={setEditable}
-          onChangeTitle={(title) => onChangeTitle(task.id, title)}
+          onChangeTitle={(title) => {
+            updateTaskMutation.mutate({ ...task, title });
+          }}
         />
       </div>
       <div className="flex gap-1">
@@ -84,8 +89,6 @@ export const TaskCard: React.FC<{
           task={task}
           isOpen={isDetailOpen}
           onOpenChange={setIsDetailOpen}
-          onChangeStatus={onChangeStatus}
-          onChangeDesc={onChangeDesc}
         />
         <TaskCardButton
           onClick={() => setIsConfirmDeleteOpen(true)}
@@ -95,7 +98,9 @@ export const TaskCard: React.FC<{
           task={task}
           isOpen={isConfirmDeleteOpen}
           onOpenChange={setIsConfirmDeleteOpen}
-          onConfirm={() => onDelete(task.id)}
+          onConfirm={() => {
+            deleteTaskMutation.mutate(task.id);
+          }}
         />
       </div>
     </div>

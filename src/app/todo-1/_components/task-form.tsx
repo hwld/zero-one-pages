@@ -5,30 +5,24 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircleIcon, CommandIcon } from "lucide-react";
 import { FocusEventHandler, forwardRef } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useAddTask } from "../_queries/useAddTask";
+import { CreateTaskInput, createTaskInputSchema } from "../_mocks/api";
 
-export const taskFormSchema = z.object({
-  title: z
-    .string()
-    .min(1, "タスクのタイトルを入力してください")
-    .max(100, "タスクのタイトルは100文字以内で入力してください"),
-});
-export type TaskFormData = z.infer<typeof taskFormSchema>;
-
-export const TaskForm = forwardRef<
-  HTMLInputElement,
-  { onAddTask: (title: string) => void }
->(function TaskForm({ onAddTask }, _inputRef) {
+export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(
+  {},
+  _inputRef,
+) {
   const {
     register,
     formState: { errors },
     handleSubmit: buildHandleSubmit,
     clearErrors,
     reset,
-  } = useForm<TaskFormData>({
+  } = useForm<CreateTaskInput>({
     defaultValues: { title: "" },
-    resolver: zodResolver(taskFormSchema),
+    resolver: zodResolver(createTaskInputSchema),
   });
+  const addTaskMutation = useAddTask();
   const { ref, onBlur, ...otherRegister } = register("title");
   const inputRef = useMergeRefs([_inputRef, ref]);
 
@@ -37,8 +31,8 @@ export const TaskForm = forwardRef<
     clearErrors("title");
   };
 
-  const handleSubmit = buildHandleSubmit((d: TaskFormData) => {
-    onAddTask(d.title);
+  const handleSubmit = buildHandleSubmit((data: CreateTaskInput) => {
+    addTaskMutation.mutate(data);
     reset({ title: "" });
   });
 

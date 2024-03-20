@@ -1,4 +1,4 @@
-import { Task } from "../page";
+import { Task } from "../_mocks/task-store";
 import { Dialog } from "./dialog";
 
 export const ConfirmTaskDeleteDialog: React.FC<{
