@@ -34,7 +34,7 @@ export const useTodo2HomeCommands = () => {
           },
           {
             icon: BoxSelectIcon,
-            label: "タスクを空にする",
+            label: "タスク一覧を空にする",
             action: async () => {
               taskStore.clear();
               client.refetchQueries();
@@ -42,7 +42,7 @@ export const useTodo2HomeCommands = () => {
           },
           {
             icon: RefreshCcwIcon,
-            label: "タスクを初期化する",
+            label: "タスク一覧を初期化する",
             action: async () => {
               taskStore.reset();
               client.refetchQueries();

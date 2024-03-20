@@ -11,6 +11,7 @@ import { TaskCard } from "./_components/task-card/task-card";
 import { Menu } from "./_components/menu/menu";
 import { SideBar } from "./_components/side-bar/side-bar";
 import { useTasks } from "./_queries/useTasks";
+import { useTodo1HomeCommands } from "./commands";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,8 @@ const Home: React.FC = () => {
       inputRef.current.focus();
     }
   };
+
+  useTodo1HomeCommands();
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {

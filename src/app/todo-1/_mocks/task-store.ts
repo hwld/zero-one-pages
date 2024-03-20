@@ -60,6 +60,14 @@ class TaskStore {
   public remove(id: string) {
     this.tasks = this.tasks.filter((t) => t.id !== id);
   }
+
+  public clear() {
+    this.tasks = [];
+  }
+
+  public reset() {
+    this.tasks = initialTasks;
+  }
 }
 
 export const taskStore = new TaskStore();
