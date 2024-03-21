@@ -26,7 +26,7 @@ const Page: NextPage = () => {
     searchText,
   } = useTasksData();
 
-  const { data, status, refetch } = usePaginatedTasks({
+  const { data, status } = usePaginatedTasks({
     searchText,
     sortEntry,
     paginationEntry: { page, limit },
@@ -46,10 +46,10 @@ const Page: NextPage = () => {
         return <LoadingTaskTable />;
       }
       case "error": {
-        return <ErrorTaskTable onReload={refetch} />;
+        return <ErrorTaskTable />;
       }
     }
-  }, [data?.tasks, data?.totalPages, refetch, status]);
+  }, [data?.tasks, data?.totalPages, status]);
 
   useTodo2HomeCommands();
 

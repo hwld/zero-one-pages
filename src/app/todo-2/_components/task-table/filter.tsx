@@ -83,7 +83,7 @@ export const TaskTableFilter: React.FC = () => {
               sideOffset={4}
             >
               <motion.div
-                className="flex w-[200px] flex-col gap-1 rounded border border-zinc-600 bg-zinc-700 p-1"
+                className="flex w-[200px] flex-col gap-1 rounded border border-zinc-600 bg-zinc-700 p-1 text-zinc-200"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}

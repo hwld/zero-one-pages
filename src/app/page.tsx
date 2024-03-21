@@ -14,7 +14,7 @@ export default function Home() {
         "flex h-[100dvh] flex-col items-center overflow-auto bg-zinc-900 pb-6 pt-[200px]",
       )}
     >
-      <div className="mx-5 flex w-[500px] max-w-full flex-col gap-2 text-center text-zinc-200">
+      <div className="flex w-[500px] max-w-full flex-col gap-2 px-5 text-center text-zinc-200">
         <h1 className="text-3xl font-bold">Zero one ui</h1>
         <p className="text-center text-sm text-zinc-400">
           いろんなUIを作ります

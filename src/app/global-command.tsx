@@ -157,7 +157,7 @@ export const GlobalCommand: React.FC = () => {
             </DialogOverlay>
             <DialogContent asChild>
               <motion.div
-                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200"
+                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] overflow-hidden rounded-lg border border-neutral-700 bg-neutral-900 text-neutral-200"
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
@@ -165,19 +165,19 @@ export const GlobalCommand: React.FC = () => {
               >
                 <Command className="flex h-full flex-col">
                   <div className="flex flex-col gap-2 px-4 pt-4">
-                    <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-zinc-400">
+                    <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-neutral-400">
                       {currentPage}
                     </div>
                     <Command.Input
                       placeholder="Type a page or command..."
-                      className="bg-transparent p-1 text-sm placeholder:text-zinc-500 focus-visible:outline-none"
+                      className="bg-transparent p-1 text-sm placeholder:text-neutral-500 focus-visible:outline-none"
                     />
                   </div>
 
-                  <div className="mt-2 h-[1px] w-full bg-zinc-600" />
+                  <div className="mt-2 h-[1px] w-full bg-neutral-600" />
 
                   <Command.List className="flex h-full scroll-p-2 flex-col overflow-auto p-2">
-                    <Command.Empty className="mt-4 w-full text-center text-sm text-zinc-300">
+                    <Command.Empty className="mt-4 w-full text-center text-sm text-neutral-300">
                       No results found.
                     </Command.Empty>
                     <div className="space-y-2">
@@ -232,7 +232,7 @@ const Group: React.FC<{ heading: string; children: ReactNode }> = ({
   return (
     <Command.Group
       heading={heading}
-      className="[&>*[cmdk-group-heading]]:mb-1 [&>*[cmdk-group-heading]]:text-xs [&>*[cmdk-group-heading]]:text-zinc-400"
+      className="[&>*[cmdk-group-heading]]:mb-1 [&>*[cmdk-group-heading]]:text-xs [&>*[cmdk-group-heading]]:text-neutral-400"
     >
       {children}
     </Command.Group>
@@ -273,7 +273,7 @@ const PageItem: React.FC<PageItemProps> = ({
           <Icon size={15} />
           <div>{label}</div>
         </div>
-        <div className="text-xs text-zinc-400">{href}</div>
+        <div className="text-xs text-neutral-400">{href}</div>
       </Link>
     </Command.Item>
   );
