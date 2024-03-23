@@ -4,10 +4,7 @@ import { ReactNode, Suspense } from "react";
 import { TasksProvider, useTasksData } from "./_contexts/tasks-provider";
 import "./style.css";
 import clsx from "clsx";
-import { Inter } from "next/font/google";
 import { Sidebar } from "./_components/side-bar/side-bar";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
@@ -15,7 +12,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <div
       className={clsx(
-        inter.className,
         "flex h-screen gap-6 overflow-hidden bg-zinc-900 text-zinc-200",
       )}
     >

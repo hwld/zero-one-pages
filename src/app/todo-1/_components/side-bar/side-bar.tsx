@@ -8,7 +8,7 @@ import { SideBarItem } from "./sidebar-item";
 
 export const SideBar: React.FC = () => {
   return (
-    <div className="hidden w-[300px]  flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
+    <div className="hidden w-[300px]  shrink-0 flex-col gap-5 rounded-e-md bg-neutral-800 p-5 lg:flex">
       <div className="flex items-center gap-2 px-3 font-bold text-neutral-100">
         <CircleIcon strokeWidth={3} />
         TODODO

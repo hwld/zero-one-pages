@@ -20,9 +20,9 @@ const TaskDetailPage: NextPage = () => {
   const updateTaskMutation = useUpdateTask();
   const searchParams = useSearchParams();
   const id = z.string().parse(searchParams.get("id"));
-  const { data } = useTask(id);
-  // TODO
-  const task = data;
+  const { data: task } = useTask(id);
+
+  // TODO:
   if (!task) {
     return null;
   }

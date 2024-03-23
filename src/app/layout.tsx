@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GlobalCommand } from "./_providers/global-command-provider";
 import { Providers } from "./_providers/providers";
+import { Inter } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Zero one ui",
   description: "page layouts",
 };
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -15,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
+      <body className={inter.className}>
         <Providers>
           {children}
           <GlobalCommand />

@@ -1,16 +1,12 @@
 import clsx from "clsx";
-import { Inter } from "next/font/google";
 import Link from "next/link";
 import { Page, pages } from "./pages";
 import { ReactNode } from "react";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
     <div
       className={clsx(
-        inter.className,
         "flex h-[100dvh] flex-col items-center overflow-auto bg-zinc-900 pb-6 pt-[200px]",
       )}
     >
