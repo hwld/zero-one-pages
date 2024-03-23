@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useGlobalCommandConfig } from "../global-command";
+import { useGlobalCommandConfig } from "../_providers/global-command-provider";
 import { useMemo } from "react";
 import { BoxSelectIcon, RefreshCcwIcon } from "lucide-react";
 import { taskStore } from "./_mocks/task-store";

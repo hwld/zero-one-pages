@@ -15,7 +15,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { pages } from "./pages";
+import { pages } from "../pages";
 import Link from "next/link";
 import { HomeIcon, LucideIcon } from "lucide-react";
 import { Command } from "cmdk";

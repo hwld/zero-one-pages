@@ -17,7 +17,7 @@ export default function Home() {
       <div className="flex w-[500px] max-w-full flex-col gap-2 px-5 text-center text-zinc-200">
         <h1 className="text-3xl font-bold">Zero one ui</h1>
         <p className="text-center text-sm text-zinc-400">
-          いろんなUIを作ります
+          ReactでいろんなUIを作ります
           <br />
           <span className="text-zinc-300">`/`</span>
           キーでどこからでも好きなページに移動できます

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GlobalCommand } from "./global-command";
-import { Providers } from "./providers";
-import { SetupMsw } from "@/mocks/setup-msw";
+import { GlobalCommand } from "./_providers/global-command-provider";
+import { Providers } from "./_providers/providers";
 
 export const metadata: Metadata = {
   title: "Zero one ui",
@@ -20,7 +19,6 @@ export default function RootLayout({
         <Providers>
           {children}
           <GlobalCommand />
-          <SetupMsw />
         </Providers>
       </body>
     </html>

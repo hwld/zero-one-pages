@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useGlobalCommandConfig } from "../global-command";
+import { useGlobalCommandConfig } from "../_providers/global-command-provider";
 import {
   BoxSelectIcon,
   RefreshCcwIcon,
@@ -23,6 +23,9 @@ export const useTodo2HomeCommands = () => {
               ? "タスク取得エラーを止める"
               : "タスク取得エラーを発生させる",
             action: async () => {
+              // TODO:
+              // tsakStoreはグローバルなので、このhookを使っているコンポーネントがアンマウントされると
+              // 状態が食い違う
               setIsErrorMode((s) => !s);
               if (isErrorMode) {
                 taskStore.stopSimulateError();

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { TasksProvider, useTasksData } from "./_contexts/tasks-provider";
 import "./style.css";
 import clsx from "clsx";
@@ -26,7 +26,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         ref={scrollTargetRef}
         className="flex w-full flex-col gap-4 overflow-auto py-6 pr-6"
       >
-        {children}
+        <Suspense>{children}</Suspense>
       </div>
     </div>
   );
