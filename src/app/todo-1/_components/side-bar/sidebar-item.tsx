@@ -1,13 +1,16 @@
 import clsx from "clsx";
+import Link from "next/link";
 import { ReactNode } from "react";
 
 export const SideBarItem: React.FC<{
   children: ReactNode;
   icon: ReactNode;
+  href: string;
   active?: boolean;
-}> = ({ children, icon, active }) => {
+}> = ({ children, href, icon, active }) => {
   return (
-    <button
+    <Link
+      href={href}
       className={clsx(
         "flex w-full items-center justify-start gap-2 rounded p-2 text-sm transition-all duration-200",
         { "pointer-events-none bg-neutral-100 text-neutral-700": active },
@@ -16,6 +19,6 @@ export const SideBarItem: React.FC<{
     >
       {icon}
       {children}
-    </button>
+    </Link>
   );
 };
