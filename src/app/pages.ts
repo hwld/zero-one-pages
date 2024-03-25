@@ -1,5 +1,6 @@
 import {
   CircleEllipsisIcon,
+  FullscreenIcon,
   LayoutListIcon,
   LucideIcon,
   MessageSquareMoreIcon,
@@ -14,7 +15,8 @@ export type PageLink =
   | "/todo-2"
   | "/dynamic-menu"
   | "/chat"
-  | "/dynamic-island";
+  | "/dynamic-island"
+  | "/continuty-transition";
 
 export type Page = {
   icon: LucideIcon;
@@ -63,5 +65,13 @@ export const pages: Page[] = [
     description:
       "Dynamic Islandみたいなメニュー。\nframer-motionでspring animationを使ってみた。",
     tags: ["PC", "MOBILE", "PART"],
+  },
+  {
+    icon: FullscreenIcon,
+    href: "/continuty-transition",
+    title: "ページトランジション",
+    description:
+      "モバイルでよくありそうなページトランジションをWebで作ってみた。",
+    tags: ["PC", "MOBILE", "LAYOUT"],
   },
 ];
