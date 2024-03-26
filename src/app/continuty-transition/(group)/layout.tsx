@@ -18,12 +18,12 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         className="max-w-screen fixed inset-0 max-h-screen min-h-screen overflow-hidden bg-neutral-900 text-neutral-100"
         style={{ colorScheme: "dark", borderRadius: "0" }}
       >
-        <motion.span
-          layoutId="menu-items"
-          className="fixed left-0 top-0 size-1 opacity-0"
-        />
         <div className="max-h-screen min-h-screen overflow-auto">
           <div className="relative m-auto flex max-w-screen-lg px-3 pt-6">
+            <motion.span
+              layoutId="menu-items"
+              className="absolute left-0 top-0 size-1 opacity-0"
+            />
             <Link
               href={`/continuty-transition${isMenuOpen ? "?isOpen=true" : ""}`}
               className="absolute right-6 top-6"
