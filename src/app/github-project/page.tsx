@@ -1,9 +1,19 @@
-import clsx from "clsx";
+"use client";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArchiveIcon,
   ChevronDown,
   ChevronDownIcon,
   CircleDashedIcon,
   CircleDotIcon,
+  EyeOffIcon,
   GitPullRequestIcon,
   InboxIcon,
   KanbanSquareIcon,
@@ -13,11 +23,14 @@ import {
   MenuIcon,
   MoreHorizontalIcon,
   PanelRightOpenIcon,
+  PenIcon,
   PlusIcon,
   SearchIcon,
+  Settings2Icon,
   TerminalIcon,
+  TrashIcon,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { ReactNode } from "react";
 
 type Kanban = {
@@ -149,7 +162,7 @@ const Kanban: React.FC<{
   description: string;
 }> = ({ color, status, count, description }) => {
   return (
-    <div className="flex h-full w-[350px] shrink-0 flex-col rounded-md border border-neutral-700 bg-neutral-900">
+    <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
         <div className="flex items-center gap-2">
           <StatusIcon color={color} />
@@ -157,9 +170,11 @@ const Kanban: React.FC<{
           <CountBadge count={count} />
         </div>
         <div className="flex items-center">
-          <button className="grid size-6 place-items-center rounded-md text-neutral-400 transition-colors hover:bg-white/15">
-            <MoreHorizontalIcon size={20} />
-          </button>
+          <KanbanMenuTrigger>
+            <button className="grid size-6 place-items-center rounded-md text-neutral-400 transition-colors hover:bg-white/15">
+              <MoreHorizontalIcon size={20} />
+            </button>
+          </KanbanMenuTrigger>
         </div>
       </div>
       <div className="px-4 pb-2 text-sm text-neutral-400">{description}</div>
@@ -192,6 +207,82 @@ const KanbanItem: React.FC = () => {
       </div>
       <div className="text-sm">task title</div>
     </div>
+  );
+};
+
+const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <AnimatePresence>
+        {isOpen && (
+          <DropdownMenuPortal forceMount>
+            <DropdownMenuContent
+              asChild
+              side="bottom"
+              align="end"
+              sideOffset={8}
+            >
+              <motion.div
+                className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-xl"
+                initial={{ y: -5, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -5, opacity: 0 }}
+              >
+                <MenuGroup group="Items">
+                  <MenuItem icon={ArchiveIcon} title="Archive all" />
+                  <MenuItem icon={TrashIcon} title="Delete all" red />
+                </MenuGroup>
+                <div className="h-[1px] w-full bg-neutral-700" />
+                <MenuGroup group="Column">
+                  <MenuItem icon={Settings2Icon} title="Set limit" />
+                  <MenuItem icon={PenIcon} title="Edit details" />
+                  <MenuItem icon={EyeOffIcon} title="Hide from view" />
+                  <MenuItem icon={TrashIcon} title="Delete" red />
+                </MenuGroup>
+              </motion.div>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        )}
+      </AnimatePresence>
+    </DropdownMenu>
+  );
+};
+
+const MenuGroup: React.FC<{ group: string; children: ReactNode }> = ({
+  group,
+  children,
+}) => {
+  return (
+    <div className="flex flex-col">
+      <div className="px-4 pb-1 pt-2 text-xs text-neutral-400">{group}</div>
+      <div className="px-2">{children}</div>
+    </div>
+  );
+};
+
+const MenuItem: React.FC<{
+  icon: LucideIcon;
+  title: string;
+  red?: boolean;
+}> = ({ icon: Icon, title, red }) => {
+  return (
+    <button
+      className={clsx(
+        "flex h-8 w-full items-center gap-2 rounded-md px-2 transition-colors",
+        red
+          ? "text-red-500 hover:bg-red-500/15"
+          : "text-neutral-100 hover:bg-white/15",
+      )}
+    >
+      <Icon
+        size={16}
+        className={clsx("text-neutral-400", red && "text-red-500")}
+      />
+      <div className="text-sm">{title}</div>
+    </button>
   );
 };
 
@@ -293,16 +384,14 @@ const Tab: React.FC<{
   return (
     <Wrapper
       className={clsx(
-        "-mb-[1px] flex h-10 items-center gap-4 rounded-t-md border-neutral-600 px-4",
+        "-mb-[1px] flex items-center gap-2 border-neutral-600 px-4 py-2",
         active
-          ? "border-x border-t bg-neutral-800 text-neutral-100"
-          : "text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100",
+          ? "rounded-t-md border-x border-t bg-neutral-800 text-neutral-100"
+          : "rounded-md text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100",
       )}
     >
-      <div className="flex items-center gap-2">
-        <Icon size={20} />
-        <div className="text-sm">{children}</div>
-      </div>
+      <Icon size={20} />
+      <div className="text-sm">{children}</div>
       {active && (
         <button className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200">
           <ChevronDownIcon size={16} />
