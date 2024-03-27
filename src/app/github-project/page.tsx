@@ -20,7 +20,10 @@ import { ReactNode } from "react";
 
 const GitHubProjectPage: React.FC = () => {
   return (
-    <div className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_1fr] bg-neutral-900 text-neutral-100">
+    <div
+      className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden bg-neutral-900 text-neutral-100"
+      style={{ colorScheme: "dark" }}
+    >
       <Header />
       <div className="flex items-center justify-between px-8">
         <div className="text-lg font-bold">zero-one-ui</div>
@@ -35,7 +38,7 @@ const GitHubProjectPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-rows-[min-content_1fr]">
+      <div className="grid grid-rows-[min-content_minmax(0,1fr)]">
         <div className="flex gap-1 border-b border-neutral-600 px-8">
           <Tab active>Kanban1</Tab>
           <Tab>Kanban2</Tab>
@@ -60,13 +63,13 @@ const SlicerPanel: React.FC = () => {
       </button>
       <ul className="w-full [&>li:last-child]:border-b-0">
         <SlicerListItem
-          active
           color="green"
           label="Todo"
           description="This item hasn't been started"
           count={10}
         />
         <SlicerListItem
+          active
           color="orange"
           label="In Progress"
           description="This is actively being worked on"
