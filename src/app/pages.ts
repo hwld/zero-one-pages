@@ -1,6 +1,7 @@
 import {
   CircleEllipsisIcon,
   FullscreenIcon,
+  KanbanSquareIcon,
   LayoutListIcon,
   LucideIcon,
   MessageSquareMoreIcon,
@@ -8,7 +9,7 @@ import {
   TablePropertiesIcon,
 } from "lucide-react";
 
-type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART";
+type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART" | "WIP";
 export type PageLink =
   | "/"
   | "/todo-1"
@@ -16,7 +17,8 @@ export type PageLink =
   | "/dynamic-menu"
   | "/chat"
   | "/dynamic-island"
-  | "/continuty-transition";
+  | "/continuty-transition"
+  | "/github-project";
 
 export type Page = {
   icon: LucideIcon;
@@ -73,5 +75,12 @@ export const pages: Page[] = [
     description:
       "モバイルでよくありそうなページトランジションをWebで作ってみた。",
     tags: ["PC", "MOBILE", "LAYOUT"],
+  },
+  {
+    icon: KanbanSquareIcon,
+    href: "/github-project",
+    title: "GitHub Project",
+    description: "GitHubのProjectsのレイアウトを作ってみた。",
+    tags: ["PC", "LAYOUT", "WIP"],
   },
 ];

@@ -9,6 +9,7 @@ export default function Home() {
       className={clsx(
         "flex h-[100dvh] flex-col items-center overflow-auto bg-zinc-900 pb-6 pt-[200px]",
       )}
+      style={{ colorScheme: "dark" }}
     >
       <div className="flex w-[500px] max-w-full flex-col gap-2 px-5 text-center text-zinc-200">
         <h1 className="text-3xl font-bold">Zero one ui</h1>
