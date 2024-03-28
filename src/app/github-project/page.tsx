@@ -1,18 +1,23 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+import * as RadixDropdown from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArchiveIcon,
+  ArrowDownToLineIcon,
+  ArrowUpToLine,
+  BookDownIcon,
+  BookMarkedIcon,
+  BookOpenIcon,
+  BuildingIcon,
   ChevronDown,
   ChevronDownIcon,
+  ChevronDownSquareIcon,
   CircleDashedIcon,
   CircleDotIcon,
+  CodeIcon,
+  ComputerIcon,
+  CopyIcon,
   EyeOffIcon,
   GitPullRequestIcon,
   InboxIcon,
@@ -21,14 +26,23 @@ import {
   ListFilterIcon,
   LucideIcon,
   MenuIcon,
+  MessageSquareIcon,
+  MilestoneIcon,
   MoreHorizontalIcon,
+  MoveHorizontalIcon,
   PanelRightOpenIcon,
   PenIcon,
   PlusIcon,
+  RocketIcon,
   SearchIcon,
   Settings2Icon,
+  SettingsIcon,
+  TagIcon,
   TerminalIcon,
   TrashIcon,
+  UsersIcon,
+  WorkflowIcon,
+  XIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import { ReactNode } from "react";
@@ -88,7 +102,9 @@ const GitHubProjectPage: React.FC = () => {
           <div className="flex items-center">
             <ButtonGroupItem position="left" icon={LineChartIcon} />
             <ButtonGroupItem icon={PanelRightOpenIcon} />
-            <ButtonGroupItem position="right" icon={MoreHorizontalIcon} />
+            <ProjectMenuTrigger>
+              <ButtonGroupItem position="right" icon={MoreHorizontalIcon} />
+            </ProjectMenuTrigger>
           </div>
         </div>
       </div>
@@ -200,9 +216,11 @@ const KanbanItem: React.FC = () => {
         <div className="flex items-center gap-1 text-neutral-400">
           <CircleDashedIcon size={16} strokeWidth={3} />
           <div className="text-xs">Draft</div>
-          <button className="grid size-5 place-items-center rounded opacity-0 transition-colors hover:bg-white/15 group-hover:opacity-100">
-            <MoreHorizontalIcon size={18} />
-          </button>
+          <KanbanItemMenuTrigger>
+            <button className="grid size-5 place-items-center rounded opacity-0 transition-all hover:bg-white/15 group-hover:opacity-100 data-[state=open]:bg-white/15 data-[state=open]:opacity-100">
+              <MoreHorizontalIcon size={18} />
+            </button>
+          </KanbanItemMenuTrigger>
         </div>
       </div>
       <div className="text-sm">task title</div>
@@ -210,71 +228,179 @@ const KanbanItem: React.FC = () => {
   );
 };
 
-const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <AnimatePresence>
-        {isOpen && (
-          <DropdownMenuPortal forceMount>
-            <DropdownMenuContent
-              asChild
-              side="bottom"
-              align="end"
-              sideOffset={8}
-            >
-              <motion.div
-                className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-xl"
-                initial={{ y: -5, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -5, opacity: 0 }}
-              >
-                <MenuGroup group="Items">
-                  <MenuItem icon={ArchiveIcon} title="Archive all" />
-                  <MenuItem icon={TrashIcon} title="Delete all" red />
-                </MenuGroup>
-                <div className="h-[1px] w-full bg-neutral-700" />
-                <MenuGroup group="Column">
-                  <MenuItem icon={Settings2Icon} title="Set limit" />
-                  <MenuItem icon={PenIcon} title="Edit details" />
-                  <MenuItem icon={EyeOffIcon} title="Hide from view" />
-                  <MenuItem icon={TrashIcon} title="Delete" red />
-                </MenuGroup>
-              </motion.div>
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
-        )}
-      </AnimatePresence>
+    <DropdownMenu trigger={children} align="end">
+      <MenuItemList>
+        <MenuItem icon={WorkflowIcon} title="Workflows" />
+        <MenuItem icon={ArchiveIcon} title="Archived items" />
+        <MenuItem icon={SettingsIcon} title="Settings" />
+        <MenuItem icon={CopyIcon} title="Make a copy" />
+      </MenuItemList>
+      <DropdownMenuDivider />
+      <MenuItemGroup group="GitHub Projects">
+        <MenuItem icon={RocketIcon} title="What's new" />
+        <MenuItem icon={MessageSquareIcon} title="Give feedback" />
+        <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
+      </MenuItemGroup>
     </DropdownMenu>
   );
 };
 
-const MenuGroup: React.FC<{ group: string; children: ReactNode }> = ({
+const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <DropdownMenu trigger={children} align="end">
+      <MenuItemList>
+        <MenuItem icon={BookMarkedIcon} title="New repository" />
+        <MenuItem icon={BookDownIcon} title="Import repository" />
+      </MenuItemList>
+      <DropdownMenuDivider />
+      <MenuItemList>
+        <MenuItem icon={ComputerIcon} title="New codespace" />
+        <MenuItem icon={CodeIcon} title="New gist" />
+      </MenuItemList>
+      <DropdownMenuDivider />
+      <MenuItemList>
+        <MenuItem icon={BuildingIcon} title="New organization" />
+        <MenuItem icon={KanbanSquareIcon} title="New project" />
+      </MenuItemList>
+    </DropdownMenu>
+  );
+};
+
+const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <DropdownMenu trigger={children} align="start">
+      <MenuItemGroup group="Slice by">
+        <MenuItem icon={UsersIcon} title="Assigness" />
+        <MenuItem icon={ChevronDownSquareIcon} title="Status" />
+        <MenuItem icon={TagIcon} title="Labels" />
+        <MenuItem icon={BookMarkedIcon} title="Repository" />
+        <MenuItem icon={MilestoneIcon} title="Milestone" />
+        <MenuItem icon={XIcon} title="No slicing" />
+      </MenuItemGroup>
+    </DropdownMenu>
+  );
+};
+
+const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return (
+    <DropdownMenu trigger={children}>
+      <MenuItemGroup group="Items">
+        <MenuItem icon={ArchiveIcon} title="Archive all" />
+        <MenuItem icon={TrashIcon} title="Delete all" red />
+      </MenuItemGroup>
+      <DropdownMenuDivider />
+      <MenuItemGroup group="Column">
+        <MenuItem icon={Settings2Icon} title="Set limit" />
+        <MenuItem icon={PenIcon} title="Edit details" />
+        <MenuItem icon={EyeOffIcon} title="Hide from view" />
+        <MenuItem icon={TrashIcon} title="Delete" red />
+      </MenuItemGroup>
+    </DropdownMenu>
+  );
+};
+
+const KanbanItemMenuTrigger: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <DropdownMenu trigger={children} align="start">
+      <MenuItemList>
+        <MenuItem icon={CircleDotIcon} title="Convert to issue" />
+        <MenuItem icon={CopyIcon} title="Copy link in project" />
+      </MenuItemList>
+      <DropdownMenuDivider />
+      <MenuItemList>
+        <MenuItem icon={ArrowUpToLine} title="Move to top" />
+        <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
+        <MenuItem icon={MoveHorizontalIcon} title="Move to column" disabled />
+      </MenuItemList>
+      <DropdownMenuDivider />
+      <MenuItemList>
+        <MenuItem icon={ArchiveIcon} title="Archive" />
+        <MenuItem icon={TrashIcon} title="Delete from project" red />
+      </MenuItemList>
+    </DropdownMenu>
+  );
+};
+
+const DropdownMenuDivider: React.FC = () => {
+  return <div className="h-[1px] w-full bg-neutral-700" />;
+};
+
+const DropdownMenu: React.FC<{
+  trigger: ReactNode;
+  children: ReactNode;
+  align?: "center" | "end" | "start";
+}> = ({ trigger, children, align = "end" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixDropdown.Portal forceMount>
+            <RadixDropdown.Content
+              loop
+              asChild
+              side="bottom"
+              align={align}
+              sideOffset={4}
+            >
+              <motion.div
+                className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
+                initial={{ y: -5, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -5, opacity: 0 }}
+              >
+                {children}
+              </motion.div>
+            </RadixDropdown.Content>
+          </RadixDropdown.Portal>
+        )}
+      </AnimatePresence>
+    </RadixDropdown.Root>
+  );
+};
+
+const MenuItemGroup: React.FC<{ group: string; children: ReactNode }> = ({
   group,
   children,
 }) => {
   return (
     <div className="flex flex-col">
       <div className="px-4 pb-1 pt-2 text-xs text-neutral-400">{group}</div>
-      <div className="px-2">{children}</div>
+      <MenuItemList>{children}</MenuItemList>
     </div>
   );
+};
+
+const MenuItemList: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return <div className="px-2">{children}</div>;
 };
 
 const MenuItem: React.FC<{
   icon: LucideIcon;
   title: string;
   red?: boolean;
-}> = ({ icon: Icon, title, red }) => {
+  disabled?: boolean;
+}> = ({ icon: Icon, title, red, disabled }) => {
   return (
-    <button
+    <RadixDropdown.Item
+      disabled={disabled}
       className={clsx(
-        "flex h-8 w-full items-center gap-2 rounded-md px-2 transition-colors",
+        "flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         red
-          ? "text-red-500 hover:bg-red-500/15"
-          : "text-neutral-100 hover:bg-white/15",
+          ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
+          : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
       )}
     >
       <Icon
@@ -282,17 +408,19 @@ const MenuItem: React.FC<{
         className={clsx("text-neutral-400", red && "text-red-500")}
       />
       <div className="text-sm">{title}</div>
-    </button>
+    </RadixDropdown.Item>
   );
 };
 
 const SlicerPanel: React.FC = () => {
   return (
     <div className="flex w-[350px] shrink-0 flex-col gap-2 overflow-auto border-r border-neutral-600 p-4">
-      <button className="flex h-8 w-fit items-center gap-1 rounded-md px-2 text-sm hover:bg-white/10">
-        <span>Status</span>
-        <ChevronDownIcon size={16} />
-      </button>
+      <SliceByMenuTrigger>
+        <button className="flex h-8 w-fit items-center gap-1 rounded-md px-2 text-sm hover:bg-white/10">
+          <span>Status</span>
+          <ChevronDownIcon size={16} />
+        </button>
+      </SliceByMenuTrigger>
       <ul className="w-full [&>li:last-child]:border-b-0">
         {kanbans.map((kanban, i) => {
           return <SlicerListItem key={i} {...kanban} label={kanban.status} />;
@@ -401,10 +529,13 @@ const Tab: React.FC<{
   );
 };
 
-const ButtonGroupItem: React.FC<{
-  icon: LucideIcon;
-  position?: "left" | "center" | "right";
-}> = ({ icon: Icon, position = "center" }) => {
+const ButtonGroupItem = React.forwardRef<
+  HTMLButtonElement,
+  {
+    icon: LucideIcon;
+    position?: "left" | "center" | "right";
+  }
+>(function ButtonGroupItem({ icon: Icon, position = "center", ...props }, ref) {
   const positionClass = {
     left: "border-x rounded-l-md",
     center: "",
@@ -413,6 +544,8 @@ const ButtonGroupItem: React.FC<{
 
   return (
     <button
+      {...props}
+      ref={ref}
       className={clsx(
         "flex h-8 w-9 items-center justify-center border-y border-neutral-700 bg-neutral-800 text-neutral-300 transition-colors hover:bg-neutral-600",
         positionClass[position],
@@ -421,7 +554,7 @@ const ButtonGroupItem: React.FC<{
       <Icon size={20} />
     </button>
   );
-};
+});
 
 const Header: React.FC = () => {
   return (
@@ -455,7 +588,9 @@ const Header: React.FC = () => {
           </div>
         </button>
         <div className="h-5 w-[1px] bg-neutral-600" />
-        <HeaderButton icon={PlusIcon} rightIcon={ChevronDown} />
+        <CreateNewMenuTrigger>
+          <HeaderButton icon={PlusIcon} rightIcon={ChevronDown} />
+        </CreateNewMenuTrigger>
         <HeaderButton icon={CircleDotIcon} />
         <HeaderButton icon={GitPullRequestIcon} />
         <HeaderButton icon={InboxIcon} />
@@ -485,12 +620,14 @@ const BreadCrumbItem: React.FC<{ children: ReactNode; active?: boolean }> = ({
   );
 };
 
-const HeaderButton: React.FC<{ icon: LucideIcon; rightIcon?: LucideIcon }> = ({
-  icon: Icon,
-  rightIcon: RightIcon,
-}) => {
+const HeaderButton = React.forwardRef<
+  HTMLButtonElement,
+  { icon: LucideIcon; rightIcon?: LucideIcon }
+>(function HeaderButton({ icon: Icon, rightIcon: RightIcon, ...props }, ref) {
   return (
     <button
+      {...props}
+      ref={ref}
       className={clsx(
         "flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1 rounded-md border border-neutral-600 text-neutral-400 transition-colors hover:bg-white/10",
         RightIcon ? "px-2" : "w-8",
@@ -500,4 +637,4 @@ const HeaderButton: React.FC<{ icon: LucideIcon; rightIcon?: LucideIcon }> = ({
       {RightIcon && <RightIcon size={18} />}
     </button>
   );
-};
+});
