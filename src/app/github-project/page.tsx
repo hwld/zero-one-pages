@@ -12,7 +12,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArchiveIcon,
   ArrowDownToLineIcon,
-  ArrowLeftIcon,
   ArrowUpToLine,
   BookDownIcon,
   BookMarkedIcon,
@@ -22,6 +21,8 @@ import {
   ChevronDown,
   ChevronDownIcon,
   ChevronDownSquareIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   CircleDashedIcon,
   CircleDotIcon,
   CodeIcon,
@@ -356,16 +357,18 @@ const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
-  const [isMainOpen, setIsMainOpen] = useState(false);
-  const [isSubOpen, setIsSubOpen] = useState(false);
+  const [mode, setMode] = useState<"close" | "main" | "moveToColumn">("close");
 
   const trigger = useMemo(() => {
     return (
       <button
+        onClick={() => {
+          setMode("main");
+        }}
         key="trigger"
         className={clsx(
           "grid size-5 place-items-center rounded transition-all hover:bg-white/15",
-          isMainOpen || isSubOpen
+          mode != "close"
             ? "bg-white/15 opacity-100"
             : "opacity-0 group-hover:opacity-100",
         )}
@@ -373,103 +376,161 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
         <MoreHorizontalIcon size={18} />
       </button>
     );
-  }, [isMainOpen, isSubOpen]);
+  }, [mode]);
+
+  const content = useMemo(() => {
+    switch (mode) {
+      case "close": {
+        return trigger;
+      }
+      case "main": {
+        return (
+          <KanbanItemMenu
+            isOpen={mode == "main"}
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
+          />
+        );
+      }
+      case "moveToColumn": {
+        return (
+          <MoveToColumnMenu
+            kanban={kanban}
+            isOpen={mode == "moveToColumn"}
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      default: {
+        throw new Error(mode satisfies never);
+      }
+    }
+  }, [kanban, mode, trigger]);
+
+  return <AnimatePresence mode="wait">{content}</AnimatePresence>;
+};
+
+const KanbanItemMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onOpenMoveToColumnMenu: () => void;
+  }
+>(function KanbanItemMenu(
+  { trigger, isOpen, onClose, onOpenMoveToColumnMenu },
+  ref,
+) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      onClose();
+    }
+  };
 
   return (
-    <AnimatePresence mode="wait">
-      {isSubOpen ? (
-        <Popover open={isSubOpen} onOpenChange={setIsSubOpen} key="sub" modal>
-          <PopoverAnchor asChild>{trigger}</PopoverAnchor>
-          {isSubOpen && (
-            <PopoverPortal forceMount>
-              <PopoverContent
-                asChild
-                align="start"
-                side="bottom"
-                onEscapeKeyDown={(e) => {
+    <RadixDropdown.Root
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      key="main"
+    >
+      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+      {isOpen && (
+        <RadixDropdown.Portal forceMount>
+          <DropdownMenuContent align="start" ref={ref}>
+            <MenuItemList>
+              <MenuItem icon={CircleDotIcon} title="Convert to issue" />
+              <MenuItem icon={CopyIcon} title="Copy link in project" />
+            </MenuItemList>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <MenuItem icon={ArrowUpToLine} title="Move to top" />
+              <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
+              <MenuItem
+                icon={MoveHorizontalIcon}
+                leftIcon={ChevronRightIcon}
+                title="Move to column"
+                onSelect={(e) => {
                   e.preventDefault();
-                  setIsSubOpen(false);
-                  setIsMainOpen(true);
+                  onOpenMoveToColumnMenu();
                 }}
-                onPointerDownOutside={() => {
-                  setIsSubOpen(false);
-                  setIsMainOpen(false);
-                }}
-              >
-                <FloatingCard width={250}>
-                  <div className="flex h-8 w-full items-center gap-2 px-2">
-                    <button
-                      className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
-                      onClick={() => {
-                        setIsSubOpen(false);
-                        setIsMainOpen(true);
-                      }}
-                    >
-                      <ArrowLeftIcon size={18} />
-                    </button>
-                    <input
-                      className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
-                      placeholder="Filter options..."
-                      autoFocus
-                    />
-                  </div>
-                  <DropdownMenuDivider />
-                  <MenuItemList>
-                    {kanbans.map((k, i) => {
-                      return (
-                        <MoveToColumnItem
-                          key={i}
-                          kanban={k}
-                          active={k.status === kanban.status}
-                        />
-                      );
-                    })}
-                  </MenuItemList>
-                </FloatingCard>
-              </PopoverContent>
-            </PopoverPortal>
-          )}
-        </Popover>
-      ) : (
-        <RadixDropdown.Root
-          open={isMainOpen}
-          onOpenChange={setIsMainOpen}
-          key="main"
-        >
-          <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
-          {isMainOpen && (
-            <RadixDropdown.Portal forceMount>
-              <DropdownMenuContent align="start">
-                <MenuItemList>
-                  <MenuItem icon={CircleDotIcon} title="Convert to issue" />
-                  <MenuItem icon={CopyIcon} title="Copy link in project" />
-                </MenuItemList>
-                <DropdownMenuDivider />
-                <MenuItemList>
-                  <MenuItem icon={ArrowUpToLine} title="Move to top" />
-                  <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
-                  <MenuItem
-                    icon={MoveHorizontalIcon}
-                    title="Move to column"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setIsSubOpen(true);
-                    }}
-                  />
-                </MenuItemList>
-                <DropdownMenuDivider />
-                <MenuItemList>
-                  <MenuItem icon={ArchiveIcon} title="Archive" />
-                  <MenuItem icon={TrashIcon} title="Delete from project" red />
-                </MenuItemList>
-              </DropdownMenuContent>
-            </RadixDropdown.Portal>
-          )}
-        </RadixDropdown.Root>
+              />
+            </MenuItemList>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <MenuItem icon={ArchiveIcon} title="Archive" />
+              <MenuItem icon={TrashIcon} title="Delete from project" red />
+            </MenuItemList>
+          </DropdownMenuContent>
+        </RadixDropdown.Portal>
       )}
-    </AnimatePresence>
+    </RadixDropdown.Root>
   );
-};
+});
+
+const MoveToColumnMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    kanban: Kanban;
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function MoveToColumnMenu({ kanban, trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <Popover open={isOpen} key="sub" modal>
+      <PopoverAnchor asChild>{trigger}</PopoverAnchor>
+      {isOpen && (
+        <PopoverPortal forceMount>
+          <PopoverContent
+            ref={ref}
+            asChild
+            align="start"
+            side="bottom"
+            sideOffset={4}
+            onEscapeKeyDown={(e) => {
+              e.preventDefault();
+              onBack();
+            }}
+            onPointerDownOutside={onClose}
+          >
+            <FloatingCard width={250}>
+              <div className="flex h-8 w-full items-center gap-2 px-2">
+                <button
+                  className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+                  onClick={onBack}
+                >
+                  <ChevronLeftIcon size={18} />
+                </button>
+                <input
+                  className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+                  placeholder="Filter options..."
+                  autoFocus
+                />
+              </div>
+              <DropdownMenuDivider />
+              <MenuItemList>
+                {kanbans.map((k, i) => {
+                  return (
+                    <MoveToColumnItem
+                      key={i}
+                      kanban={k}
+                      active={k.status === kanban.status}
+                    />
+                  );
+                })}
+              </MenuItemList>
+            </FloatingCard>
+          </PopoverContent>
+        </PopoverPortal>
+      )}
+    </Popover>
+  );
+});
 
 const MoveToColumnItem: React.FC<{ kanban: Kanban; active?: boolean }> = ({
   kanban,
@@ -562,9 +623,10 @@ const MenuItem = React.forwardRef<
     red?: boolean;
     disabled?: boolean;
     onSelect?: (e: Event) => void;
+    leftIcon?: LucideIcon;
   }
 >(function MenuItem(
-  { icon: Icon, title, red, disabled, onSelect, ...props },
+  { icon: Icon, title, red, disabled, onSelect, leftIcon: LeftIcon, ...props },
   ref,
 ) {
   return (
@@ -574,17 +636,20 @@ const MenuItem = React.forwardRef<
       onSelect={onSelect}
       disabled={disabled}
       className={clsx(
-        "flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         red
           ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
           : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
       )}
     >
-      <Icon
-        size={16}
-        className={clsx("text-neutral-400", red && "text-red-500")}
-      />
-      <div className="text-sm">{title}</div>
+      <div className="flex items-center gap-2">
+        <Icon
+          size={16}
+          className={clsx("text-neutral-400", red && "text-red-500")}
+        />
+        <div className="text-sm">{title}</div>
+      </div>
+      {LeftIcon && <LeftIcon size={16} className="text-neutral-400" />}
     </RadixDropdown.Item>
   );
 });
