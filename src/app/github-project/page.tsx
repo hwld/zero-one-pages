@@ -1,11 +1,18 @@
 "use client";
 import * as RadixDropdown from "@radix-ui/react-dropdown-menu";
 import { MenuContentProps } from "@radix-ui/react-dropdown-menu";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverPortal,
+} from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArchiveIcon,
   ArrowDownToLineIcon,
+  ArrowLeftIcon,
   ArrowUpToLine,
   BookDownIcon,
   BookMarkedIcon,
@@ -34,7 +41,6 @@ import {
   PanelRightOpenIcon,
   PenIcon,
   PlusIcon,
-  RefreshCwIcon,
   RocketIcon,
   SearchIcon,
   Settings2Icon,
@@ -46,7 +52,7 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useMemo, useState } from "react";
 import { ReactNode } from "react";
 
 type Kanban = {
@@ -218,11 +224,7 @@ const KanbanItem: React.FC = () => {
         <div className="flex items-center gap-1 text-neutral-400">
           <CircleDashedIcon size={16} strokeWidth={3} />
           <div className="text-xs">Draft</div>
-          <KanbanItemMenuTrigger>
-            <button className="grid size-5 place-items-center rounded opacity-0 transition-all hover:bg-white/15 group-hover:opacity-100 data-[state=open]:bg-white/15 data-[state=open]:opacity-100">
-              <MoreHorizontalIcon size={18} />
-            </button>
-          </KanbanItemMenuTrigger>
+          <KanbanItemMenuTrigger />
         </div>
       </div>
       <div className="text-sm">task title</div>
@@ -233,206 +235,247 @@ const KanbanItem: React.FC = () => {
 const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <DropdownMenu trigger={children}>
-      <DropdownMenuContent align="end">
-        <MenuItemList>
-          <MenuItem icon={WorkflowIcon} title="Workflows" />
-          <MenuItem icon={ArchiveIcon} title="Archived items" />
-          <MenuItem icon={SettingsIcon} title="Settings" />
-          <MenuItem icon={CopyIcon} title="Make a copy" />
-        </MenuItemList>
-        <DropdownMenuDivider />
-        <MenuItemGroup group="GitHub Projects">
-          <MenuItem icon={RocketIcon} title="What's new" />
-          <MenuItem icon={MessageSquareIcon} title="Give feedback" />
-          <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
-        </MenuItemGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixDropdown.Portal forceMount>
+            <DropdownMenuContent align="end">
+              <MenuItemList>
+                <MenuItem icon={WorkflowIcon} title="Workflows" />
+                <MenuItem icon={ArchiveIcon} title="Archived items" />
+                <MenuItem icon={SettingsIcon} title="Settings" />
+                <MenuItem icon={CopyIcon} title="Make a copy" />
+              </MenuItemList>
+              <DropdownMenuDivider />
+              <MenuItemGroup group="GitHub Projects">
+                <MenuItem icon={RocketIcon} title="What's new" />
+                <MenuItem icon={MessageSquareIcon} title="Give feedback" />
+                <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
+              </MenuItemGroup>
+            </DropdownMenuContent>
+          </RadixDropdown.Portal>
+        )}
+      </AnimatePresence>
+    </RadixDropdown.Root>
   );
 };
 
 const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <DropdownMenu trigger={children}>
-      <DropdownMenuContent align="end">
-        <MenuItemList>
-          <MenuItem icon={BookMarkedIcon} title="New repository" />
-          <MenuItem icon={BookDownIcon} title="Import repository" />
-        </MenuItemList>
-        <DropdownMenuDivider />
-        <MenuItemList>
-          <MenuItem icon={ComputerIcon} title="New codespace" />
-          <MenuItem icon={CodeIcon} title="New gist" />
-        </MenuItemList>
-        <DropdownMenuDivider />
-        <MenuItemList>
-          <MenuItem icon={BuildingIcon} title="New organization" />
-          <MenuItem icon={KanbanSquareIcon} title="New project" />
-        </MenuItemList>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixDropdown.Portal forceMount>
+            <DropdownMenuContent align="end">
+              <MenuItemList>
+                <MenuItem icon={BookMarkedIcon} title="New repository" />
+                <MenuItem icon={BookDownIcon} title="Import repository" />
+              </MenuItemList>
+              <DropdownMenuDivider />
+              <MenuItemList>
+                <MenuItem icon={ComputerIcon} title="New codespace" />
+                <MenuItem icon={CodeIcon} title="New gist" />
+              </MenuItemList>
+              <DropdownMenuDivider />
+              <MenuItemList>
+                <MenuItem icon={BuildingIcon} title="New organization" />
+                <MenuItem icon={KanbanSquareIcon} title="New project" />
+              </MenuItemList>
+            </DropdownMenuContent>
+          </RadixDropdown.Portal>
+        )}
+      </AnimatePresence>
+    </RadixDropdown.Root>
   );
 };
 
 const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  return (
-    <DropdownMenu trigger={children}>
-      <DropdownMenuContent align="start">
-        <MenuItemGroup group="Slice by">
-          <MenuItem icon={UsersIcon} title="Assigness" />
-          <MenuItem icon={ChevronDownSquareIcon} title="Status" />
-          <MenuItem icon={TagIcon} title="Labels" />
-          <MenuItem icon={BookMarkedIcon} title="Repository" />
-          <MenuItem icon={MilestoneIcon} title="Milestone" />
-          <MenuItem icon={XIcon} title="No slicing" />
-        </MenuItemGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
-  return (
-    <DropdownMenu trigger={children}>
-      <DropdownMenuContent>
-        <MenuItemGroup group="Items">
-          <MenuItem icon={ArchiveIcon} title="Archive all" />
-          <MenuItem icon={TrashIcon} title="Delete all" red />
-        </MenuItemGroup>
-        <DropdownMenuDivider />
-        <MenuItemGroup group="Column">
-          <MenuItem icon={Settings2Icon} title="Set limit" />
-          <MenuItem icon={PenIcon} title="Edit details" />
-          <MenuItem icon={EyeOffIcon} title="Hide from view" />
-          <MenuItem icon={TrashIcon} title="Delete" red />
-        </MenuItemGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-const KanbanItemMenuTrigger: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [isSub, setIsSub] = useState(false);
-
-  return (
-    <DropdownMenu
-      trigger={children}
-      onClose={() => {
-        setIsSub(false);
-      }}
-    >
-      {isSub ? (
-        <ColumnSelectMenuContent
-          onClose={() => {
-            setIsSub(false);
-          }}
-        />
-      ) : (
-        <DropdownMenuContent align="start" key="main">
-          <MenuItemList>
-            <MenuItem icon={CircleDotIcon} title="Convert to issue" />
-            <MenuItem icon={CopyIcon} title="Copy link in project" />
-          </MenuItemList>
-          <DropdownMenuDivider />
-          <MenuItemList>
-            <MenuItem icon={ArrowUpToLine} title="Move to top" />
-            <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
-            <MenuItem
-              icon={MoveHorizontalIcon}
-              title="Move to column"
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsSub(true);
-              }}
-            />
-          </MenuItemList>
-          <DropdownMenuDivider />
-          <MenuItemList>
-            <MenuItem icon={ArchiveIcon} title="Archive" />
-            <MenuItem icon={TrashIcon} title="Delete from project" red />
-          </MenuItemList>
-        </DropdownMenuContent>
-      )}
-    </DropdownMenu>
-  );
-};
-
-const ColumnSelectMenuContent = React.forwardRef<
-  HTMLDivElement,
-  { onClose?: () => void }
->(function ColumnSelectMenuContent({ onClose, ...props }, ref) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    window.setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
-  }, []);
-
-  return (
-    <DropdownMenuContent
-      {...props}
-      ref={ref}
-      align="start"
-      onEscapeKeydown={(e) => {
-        e.preventDefault();
-        onClose?.();
-      }}
-    >
-      <MenuItemList>
-        <input
-          ref={inputRef}
-          className="rounded-md border border-neutral-700 bg-neutral-900"
-        />
-        <MenuItem
-          icon={RefreshCwIcon}
-          title="switch"
-          onSelect={(e) => {
-            e.preventDefault();
-            onClose?.();
-          }}
-        />
-      </MenuItemList>
-    </DropdownMenuContent>
-  );
-});
-
-const DropdownMenuDivider: React.FC = () => {
-  return <div className="h-[1px] w-full bg-neutral-700" />;
-};
-
-const DropdownMenu: React.FC<{
-  trigger: ReactNode;
-  children: ReactNode;
-  onClose?: () => void;
-}> = ({ trigger, children, onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      onClose?.();
-    }
-    setIsOpen(open);
-  };
-
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
       <AnimatePresence>
         {isOpen && (
-          <RadixDropdown.Portal forceMount>{children}</RadixDropdown.Portal>
+          <RadixDropdown.Portal forceMount>
+            <DropdownMenuContent align="start">
+              <MenuItemGroup group="Slice by">
+                <MenuItem icon={UsersIcon} title="Assigness" />
+                <MenuItem icon={ChevronDownSquareIcon} title="Status" />
+                <MenuItem icon={TagIcon} title="Labels" />
+                <MenuItem icon={BookMarkedIcon} title="Repository" />
+                <MenuItem icon={MilestoneIcon} title="Milestone" />
+                <MenuItem icon={XIcon} title="No slicing" />
+              </MenuItemGroup>
+            </DropdownMenuContent>
+          </RadixDropdown.Portal>
         )}
       </AnimatePresence>
     </RadixDropdown.Root>
   );
+};
+
+const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixDropdown.Portal forceMount>
+            <DropdownMenuContent>
+              <MenuItemGroup group="Items">
+                <MenuItem icon={ArchiveIcon} title="Archive all" />
+                <MenuItem icon={TrashIcon} title="Delete all" red />
+              </MenuItemGroup>
+              <DropdownMenuDivider />
+              <MenuItemGroup group="Column">
+                <MenuItem icon={Settings2Icon} title="Set limit" />
+                <MenuItem icon={PenIcon} title="Edit details" />
+                <MenuItem icon={EyeOffIcon} title="Hide from view" />
+                <MenuItem icon={TrashIcon} title="Delete" red />
+              </MenuItemGroup>
+            </DropdownMenuContent>
+          </RadixDropdown.Portal>
+        )}
+      </AnimatePresence>
+    </RadixDropdown.Root>
+  );
+};
+
+const KanbanItemMenuTrigger = () => {
+  const [isMainOpen, setIsMainOpen] = useState(false);
+  const [isSubOpen, setIsSubOpen] = useState(false);
+
+  const trigger = useMemo(() => {
+    return (
+      <button
+        className={clsx(
+          "grid size-5 place-items-center rounded transition-all hover:bg-white/15",
+          isMainOpen || isSubOpen
+            ? "bg-white/15 opacity-100"
+            : "opacity-0 group-hover:opacity-100",
+        )}
+      >
+        <MoreHorizontalIcon size={18} />
+      </button>
+    );
+  }, [isMainOpen, isSubOpen]);
+
+  return (
+    <>
+      {isSubOpen ? (
+        <motion.div exit={{ scale: 10, opacity: 0 }}>
+          <Popover open={isSubOpen} onOpenChange={setIsSubOpen}>
+            <PopoverAnchor>{trigger}</PopoverAnchor>
+            <AnimatePresence>
+              {isSubOpen && (
+                <PopoverPortal forceMount>
+                  <PopoverContent
+                    asChild
+                    align="start"
+                    side="bottom"
+                    onEscapeKeyDown={(e) => {
+                      e.preventDefault();
+                      setIsSubOpen(false);
+                      setIsMainOpen(true);
+                    }}
+                    onPointerDownOutside={() => {
+                      setIsSubOpen(false);
+                      setIsMainOpen(false);
+                    }}
+                  >
+                    <FloatingCard width={250}>
+                      <div className="space-y-1">
+                        <div className="px-2 text-xs">Select an items</div>
+                        <div className="flex h-8 w-full items-center gap-2 px-2">
+                          <button
+                            className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+                            onClick={() => {
+                              setIsSubOpen(false);
+                              setIsMainOpen(true);
+                            }}
+                          >
+                            <ArrowLeftIcon size={18} />
+                          </button>
+                          <input
+                            className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+                            placeholder="Filter options..."
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                      <DropdownMenuDivider />
+                      <MenuItemList>
+                        <div>Todo</div>
+                        <div>In Progress</div>
+                        <div>Todo</div>
+                        <div>Todo</div>
+                      </MenuItemList>
+                    </FloatingCard>
+                  </PopoverContent>
+                </PopoverPortal>
+              )}
+            </AnimatePresence>
+          </Popover>
+        </motion.div>
+      ) : (
+        <RadixDropdown.Root open={isMainOpen} onOpenChange={setIsMainOpen}>
+          <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+          <AnimatePresence>
+            {isMainOpen && (
+              <RadixDropdown.Portal forceMount>
+                <DropdownMenuContent align="start" key="main">
+                  <MenuItemList>
+                    <MenuItem icon={CircleDotIcon} title="Convert to issue" />
+                    <MenuItem icon={CopyIcon} title="Copy link in project" />
+                  </MenuItemList>
+                  <DropdownMenuDivider />
+                  <MenuItemList>
+                    <MenuItem icon={ArrowUpToLine} title="Move to top" />
+                    <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
+                    <MenuItem
+                      icon={MoveHorizontalIcon}
+                      title="Move to column"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setIsSubOpen(true);
+                      }}
+                    />
+                  </MenuItemList>
+                  <DropdownMenuDivider />
+                  <MenuItemList>
+                    <MenuItem icon={ArchiveIcon} title="Archive" />
+                    <MenuItem
+                      icon={TrashIcon}
+                      title="Delete from project"
+                      red
+                    />
+                  </MenuItemList>
+                </DropdownMenuContent>
+              </RadixDropdown.Portal>
+            )}
+          </AnimatePresence>
+        </RadixDropdown.Root>
+      )}
+    </>
+  );
+};
+
+const DropdownMenuDivider: React.FC = () => {
+  return <div className="h-[1px] w-full bg-neutral-700" />;
 };
 
 const DropdownMenuContent = React.forwardRef<
@@ -448,6 +491,8 @@ const DropdownMenuContent = React.forwardRef<
 ) {
   return (
     <RadixDropdown.Content
+      ref={ref}
+      {...props}
       onEscapeKeyDown={onEscapeKeydown}
       loop
       asChild
@@ -455,17 +500,26 @@ const DropdownMenuContent = React.forwardRef<
       align={align}
       sideOffset={4}
     >
-      <motion.div
-        {...props}
-        ref={ref}
-        className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
-        initial={{ y: -5, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -5, opacity: 0 }}
-      >
-        {children}
-      </motion.div>
+      <FloatingCard>{children}</FloatingCard>
     </RadixDropdown.Content>
+  );
+});
+
+const FloatingCard = forwardRef<
+  HTMLDivElement,
+  { children: ReactNode; width?: number }
+>(function Card({ children, width = 200, ...props }, ref) {
+  return (
+    <motion.div
+      {...props}
+      ref={ref}
+      className="flex flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
+      initial={{ y: -5, opacity: 0, width }}
+      animate={{ y: 0, opacity: 1, width }}
+      exit={{ y: -5, opacity: 0, width }}
+    >
+      {children}
+    </motion.div>
   );
 });
 
