@@ -1,5 +1,6 @@
 "use client";
 import * as RadixDropdown from "@radix-ui/react-dropdown-menu";
+import { MenuContentProps } from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -33,6 +34,7 @@ import {
   PanelRightOpenIcon,
   PenIcon,
   PlusIcon,
+  RefreshCwIcon,
   RocketIcon,
   SearchIcon,
   Settings2Icon,
@@ -44,7 +46,7 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ReactNode } from "react";
 
 type Kanban = {
@@ -232,19 +234,21 @@ const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   return (
-    <DropdownMenu trigger={children} align="end">
-      <MenuItemList>
-        <MenuItem icon={WorkflowIcon} title="Workflows" />
-        <MenuItem icon={ArchiveIcon} title="Archived items" />
-        <MenuItem icon={SettingsIcon} title="Settings" />
-        <MenuItem icon={CopyIcon} title="Make a copy" />
-      </MenuItemList>
-      <DropdownMenuDivider />
-      <MenuItemGroup group="GitHub Projects">
-        <MenuItem icon={RocketIcon} title="What's new" />
-        <MenuItem icon={MessageSquareIcon} title="Give feedback" />
-        <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
-      </MenuItemGroup>
+    <DropdownMenu trigger={children}>
+      <DropdownMenuContent align="end">
+        <MenuItemList>
+          <MenuItem icon={WorkflowIcon} title="Workflows" />
+          <MenuItem icon={ArchiveIcon} title="Archived items" />
+          <MenuItem icon={SettingsIcon} title="Settings" />
+          <MenuItem icon={CopyIcon} title="Make a copy" />
+        </MenuItemList>
+        <DropdownMenuDivider />
+        <MenuItemGroup group="GitHub Projects">
+          <MenuItem icon={RocketIcon} title="What's new" />
+          <MenuItem icon={MessageSquareIcon} title="Give feedback" />
+          <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
+        </MenuItemGroup>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };
@@ -253,21 +257,23 @@ const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   return (
-    <DropdownMenu trigger={children} align="end">
-      <MenuItemList>
-        <MenuItem icon={BookMarkedIcon} title="New repository" />
-        <MenuItem icon={BookDownIcon} title="Import repository" />
-      </MenuItemList>
-      <DropdownMenuDivider />
-      <MenuItemList>
-        <MenuItem icon={ComputerIcon} title="New codespace" />
-        <MenuItem icon={CodeIcon} title="New gist" />
-      </MenuItemList>
-      <DropdownMenuDivider />
-      <MenuItemList>
-        <MenuItem icon={BuildingIcon} title="New organization" />
-        <MenuItem icon={KanbanSquareIcon} title="New project" />
-      </MenuItemList>
+    <DropdownMenu trigger={children}>
+      <DropdownMenuContent align="end">
+        <MenuItemList>
+          <MenuItem icon={BookMarkedIcon} title="New repository" />
+          <MenuItem icon={BookDownIcon} title="Import repository" />
+        </MenuItemList>
+        <DropdownMenuDivider />
+        <MenuItemList>
+          <MenuItem icon={ComputerIcon} title="New codespace" />
+          <MenuItem icon={CodeIcon} title="New gist" />
+        </MenuItemList>
+        <DropdownMenuDivider />
+        <MenuItemList>
+          <MenuItem icon={BuildingIcon} title="New organization" />
+          <MenuItem icon={KanbanSquareIcon} title="New project" />
+        </MenuItemList>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };
@@ -276,15 +282,17 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   return (
-    <DropdownMenu trigger={children} align="start">
-      <MenuItemGroup group="Slice by">
-        <MenuItem icon={UsersIcon} title="Assigness" />
-        <MenuItem icon={ChevronDownSquareIcon} title="Status" />
-        <MenuItem icon={TagIcon} title="Labels" />
-        <MenuItem icon={BookMarkedIcon} title="Repository" />
-        <MenuItem icon={MilestoneIcon} title="Milestone" />
-        <MenuItem icon={XIcon} title="No slicing" />
-      </MenuItemGroup>
+    <DropdownMenu trigger={children}>
+      <DropdownMenuContent align="start">
+        <MenuItemGroup group="Slice by">
+          <MenuItem icon={UsersIcon} title="Assigness" />
+          <MenuItem icon={ChevronDownSquareIcon} title="Status" />
+          <MenuItem icon={TagIcon} title="Labels" />
+          <MenuItem icon={BookMarkedIcon} title="Repository" />
+          <MenuItem icon={MilestoneIcon} title="Milestone" />
+          <MenuItem icon={XIcon} title="No slicing" />
+        </MenuItemGroup>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };
@@ -292,17 +300,19 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
 const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <DropdownMenu trigger={children}>
-      <MenuItemGroup group="Items">
-        <MenuItem icon={ArchiveIcon} title="Archive all" />
-        <MenuItem icon={TrashIcon} title="Delete all" red />
-      </MenuItemGroup>
-      <DropdownMenuDivider />
-      <MenuItemGroup group="Column">
-        <MenuItem icon={Settings2Icon} title="Set limit" />
-        <MenuItem icon={PenIcon} title="Edit details" />
-        <MenuItem icon={EyeOffIcon} title="Hide from view" />
-        <MenuItem icon={TrashIcon} title="Delete" red />
-      </MenuItemGroup>
+      <DropdownMenuContent>
+        <MenuItemGroup group="Items">
+          <MenuItem icon={ArchiveIcon} title="Archive all" />
+          <MenuItem icon={TrashIcon} title="Delete all" red />
+        </MenuItemGroup>
+        <DropdownMenuDivider />
+        <MenuItemGroup group="Column">
+          <MenuItem icon={Settings2Icon} title="Set limit" />
+          <MenuItem icon={PenIcon} title="Edit details" />
+          <MenuItem icon={EyeOffIcon} title="Hide from view" />
+          <MenuItem icon={TrashIcon} title="Delete" red />
+        </MenuItemGroup>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };
@@ -310,26 +320,90 @@ const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
 const KanbanItemMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [isSub, setIsSub] = useState(false);
+
   return (
-    <DropdownMenu trigger={children} align="start">
-      <MenuItemList>
-        <MenuItem icon={CircleDotIcon} title="Convert to issue" />
-        <MenuItem icon={CopyIcon} title="Copy link in project" />
-      </MenuItemList>
-      <DropdownMenuDivider />
-      <MenuItemList>
-        <MenuItem icon={ArrowUpToLine} title="Move to top" />
-        <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
-        <MenuItem icon={MoveHorizontalIcon} title="Move to column" disabled />
-      </MenuItemList>
-      <DropdownMenuDivider />
-      <MenuItemList>
-        <MenuItem icon={ArchiveIcon} title="Archive" />
-        <MenuItem icon={TrashIcon} title="Delete from project" red />
-      </MenuItemList>
+    <DropdownMenu
+      trigger={children}
+      onClose={() => {
+        setIsSub(false);
+      }}
+    >
+      {isSub ? (
+        <ColumnSelectMenuContent
+          onClose={() => {
+            setIsSub(false);
+          }}
+        />
+      ) : (
+        <DropdownMenuContent align="start" key="main">
+          <MenuItemList>
+            <MenuItem icon={CircleDotIcon} title="Convert to issue" />
+            <MenuItem icon={CopyIcon} title="Copy link in project" />
+          </MenuItemList>
+          <DropdownMenuDivider />
+          <MenuItemList>
+            <MenuItem icon={ArrowUpToLine} title="Move to top" />
+            <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
+            <MenuItem
+              icon={MoveHorizontalIcon}
+              title="Move to column"
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsSub(true);
+              }}
+            />
+          </MenuItemList>
+          <DropdownMenuDivider />
+          <MenuItemList>
+            <MenuItem icon={ArchiveIcon} title="Archive" />
+            <MenuItem icon={TrashIcon} title="Delete from project" red />
+          </MenuItemList>
+        </DropdownMenuContent>
+      )}
     </DropdownMenu>
   );
 };
+
+const ColumnSelectMenuContent = React.forwardRef<
+  HTMLDivElement,
+  { onClose?: () => void }
+>(function ColumnSelectMenuContent({ onClose, ...props }, ref) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  }, []);
+
+  return (
+    <DropdownMenuContent
+      {...props}
+      ref={ref}
+      align="start"
+      onEscapeKeydown={(e) => {
+        e.preventDefault();
+        onClose?.();
+      }}
+    >
+      <MenuItemList>
+        <input
+          ref={inputRef}
+          className="rounded-md border border-neutral-700 bg-neutral-900"
+        />
+        <MenuItem
+          icon={RefreshCwIcon}
+          title="switch"
+          onSelect={(e) => {
+            e.preventDefault();
+            onClose?.();
+          }}
+        />
+      </MenuItemList>
+    </DropdownMenuContent>
+  );
+});
 
 const DropdownMenuDivider: React.FC = () => {
   return <div className="h-[1px] w-full bg-neutral-700" />;
@@ -338,38 +412,62 @@ const DropdownMenuDivider: React.FC = () => {
 const DropdownMenu: React.FC<{
   trigger: ReactNode;
   children: ReactNode;
-  align?: "center" | "end" | "start";
-}> = ({ trigger, children, align = "end" }) => {
+  onClose?: () => void;
+}> = ({ trigger, children, onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      onClose?.();
+    }
+    setIsOpen(open);
+  };
+
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
       <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
       <AnimatePresence>
         {isOpen && (
-          <RadixDropdown.Portal forceMount>
-            <RadixDropdown.Content
-              loop
-              asChild
-              side="bottom"
-              align={align}
-              sideOffset={4}
-            >
-              <motion.div
-                className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
-                initial={{ y: -5, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -5, opacity: 0 }}
-              >
-                {children}
-              </motion.div>
-            </RadixDropdown.Content>
-          </RadixDropdown.Portal>
+          <RadixDropdown.Portal forceMount>{children}</RadixDropdown.Portal>
         )}
       </AnimatePresence>
     </RadixDropdown.Root>
   );
 };
+
+const DropdownMenuContent = React.forwardRef<
+  HTMLDivElement,
+  {
+    children: ReactNode;
+    align?: "center" | "end" | "start";
+    onEscapeKeydown?: MenuContentProps["onEscapeKeyDown"];
+  }
+>(function DropdownMenuContent(
+  { children, align = "end", onEscapeKeydown, ...props },
+  ref,
+) {
+  return (
+    <RadixDropdown.Content
+      onEscapeKeyDown={onEscapeKeydown}
+      loop
+      asChild
+      side="bottom"
+      align={align}
+      sideOffset={4}
+    >
+      <motion.div
+        {...props}
+        ref={ref}
+        className="flex w-[200px] flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
+        initial={{ y: -5, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -5, opacity: 0 }}
+      >
+        {children}
+      </motion.div>
+    </RadixDropdown.Content>
+  );
+});
 
 const MenuItemGroup: React.FC<{ group: string; children: ReactNode }> = ({
   group,
@@ -387,14 +485,24 @@ const MenuItemList: React.FC<{ children: ReactNode }> = ({ children }) => {
   return <div className="px-2">{children}</div>;
 };
 
-const MenuItem: React.FC<{
-  icon: LucideIcon;
-  title: string;
-  red?: boolean;
-  disabled?: boolean;
-}> = ({ icon: Icon, title, red, disabled }) => {
+const MenuItem = React.forwardRef<
+  HTMLDivElement,
+  {
+    icon: LucideIcon;
+    title: string;
+    red?: boolean;
+    disabled?: boolean;
+    onSelect?: (e: Event) => void;
+  }
+>(function MenuItem(
+  { icon: Icon, title, red, disabled, onSelect, ...props },
+  ref,
+) {
   return (
     <RadixDropdown.Item
+      {...props}
+      ref={ref}
+      onSelect={onSelect}
       disabled={disabled}
       className={clsx(
         "flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -410,7 +518,7 @@ const MenuItem: React.FC<{
       <div className="text-sm">{title}</div>
     </RadixDropdown.Item>
   );
-};
+});
 
 const SlicerPanel: React.FC = () => {
   return (
