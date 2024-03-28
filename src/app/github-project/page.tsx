@@ -18,6 +18,7 @@ import {
   BookMarkedIcon,
   BookOpenIcon,
   BuildingIcon,
+  CheckIcon,
   ChevronDown,
   ChevronDownIcon,
   ChevronDownSquareIcon,
@@ -150,7 +151,7 @@ const MainPanel: React.FC = () => {
       </div>
       <div className="flex grow gap-4 overflow-x-scroll px-4 py-2">
         {kanbans.map((kanban, i) => {
-          return <Kanban key={i} {...kanban} />;
+          return <Kanban key={i} kanban={kanban} />;
         })}
       </div>
     </div>
@@ -180,18 +181,15 @@ const Button: React.FC<{
 };
 
 const Kanban: React.FC<{
-  color: StatusIconColor;
-  status: string;
-  count: number;
-  description: string;
-}> = ({ color, status, count, description }) => {
+  kanban: Kanban;
+}> = ({ kanban }) => {
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
         <div className="flex items-center gap-2">
-          <StatusIcon color={color} />
-          <div className="font-bold">{status}</div>
-          <CountBadge count={count} />
+          <StatusIcon color={kanban.color} />
+          <div className="font-bold">{kanban.status}</div>
+          <CountBadge count={kanban.count} />
         </div>
         <div className="flex items-center">
           <KanbanMenuTrigger>
@@ -201,10 +199,12 @@ const Kanban: React.FC<{
           </KanbanMenuTrigger>
         </div>
       </div>
-      <div className="px-4 pb-2 text-sm text-neutral-400">{description}</div>
+      <div className="px-4 pb-2 text-sm text-neutral-400">
+        {kanban.description}
+      </div>
       <div className="flex grow flex-col gap-2 overflow-auto scroll-auto p-2">
-        {[...new Array(count)].map((_, i) => {
-          return <KanbanItem key={i} />;
+        {[...new Array(kanban.count)].map((_, i) => {
+          return <KanbanItem key={i} kanban={kanban} />;
         })}
       </div>
       <div className="grid place-items-center p-1">
@@ -217,14 +217,14 @@ const Kanban: React.FC<{
   );
 };
 
-const KanbanItem: React.FC = () => {
+const KanbanItem: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   return (
     <div className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1 text-neutral-400">
           <CircleDashedIcon size={16} strokeWidth={3} />
           <div className="text-xs">Draft</div>
-          <KanbanItemMenuTrigger />
+          <KanbanItemMenuTrigger kanban={kanban} />
         </div>
       </div>
       <div className="text-sm">task title</div>
@@ -355,13 +355,14 @@ const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-const KanbanItemMenuTrigger = () => {
+const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   const [isMainOpen, setIsMainOpen] = useState(false);
   const [isSubOpen, setIsSubOpen] = useState(false);
 
   const trigger = useMemo(() => {
     return (
       <button
+        key="trigger"
         className={clsx(
           "grid size-5 place-items-center rounded transition-all hover:bg-white/15",
           isMainOpen || isSubOpen
@@ -375,102 +376,116 @@ const KanbanItemMenuTrigger = () => {
   }, [isMainOpen, isSubOpen]);
 
   return (
-    <>
+    <AnimatePresence mode="wait">
       {isSubOpen ? (
-        <motion.div exit={{ scale: 10, opacity: 0 }}>
-          <Popover open={isSubOpen} onOpenChange={setIsSubOpen}>
-            <PopoverAnchor>{trigger}</PopoverAnchor>
-            <AnimatePresence>
-              {isSubOpen && (
-                <PopoverPortal forceMount>
-                  <PopoverContent
-                    asChild
-                    align="start"
-                    side="bottom"
-                    onEscapeKeyDown={(e) => {
-                      e.preventDefault();
-                      setIsSubOpen(false);
-                      setIsMainOpen(true);
-                    }}
-                    onPointerDownOutside={() => {
-                      setIsSubOpen(false);
-                      setIsMainOpen(false);
-                    }}
-                  >
-                    <FloatingCard width={250}>
-                      <div className="space-y-1">
-                        <div className="px-2 text-xs">Select an items</div>
-                        <div className="flex h-8 w-full items-center gap-2 px-2">
-                          <button
-                            className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
-                            onClick={() => {
-                              setIsSubOpen(false);
-                              setIsMainOpen(true);
-                            }}
-                          >
-                            <ArrowLeftIcon size={18} />
-                          </button>
-                          <input
-                            className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
-                            placeholder="Filter options..."
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-                      <DropdownMenuDivider />
-                      <MenuItemList>
-                        <div>Todo</div>
-                        <div>In Progress</div>
-                        <div>Todo</div>
-                        <div>Todo</div>
-                      </MenuItemList>
-                    </FloatingCard>
-                  </PopoverContent>
-                </PopoverPortal>
-              )}
-            </AnimatePresence>
-          </Popover>
-        </motion.div>
-      ) : (
-        <RadixDropdown.Root open={isMainOpen} onOpenChange={setIsMainOpen}>
-          <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
-          <AnimatePresence>
-            {isMainOpen && (
-              <RadixDropdown.Portal forceMount>
-                <DropdownMenuContent align="start" key="main">
-                  <MenuItemList>
-                    <MenuItem icon={CircleDotIcon} title="Convert to issue" />
-                    <MenuItem icon={CopyIcon} title="Copy link in project" />
-                  </MenuItemList>
-                  <DropdownMenuDivider />
-                  <MenuItemList>
-                    <MenuItem icon={ArrowUpToLine} title="Move to top" />
-                    <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
-                    <MenuItem
-                      icon={MoveHorizontalIcon}
-                      title="Move to column"
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        setIsSubOpen(true);
+        <Popover open={isSubOpen} onOpenChange={setIsSubOpen} key="sub" modal>
+          <PopoverAnchor asChild>{trigger}</PopoverAnchor>
+          {isSubOpen && (
+            <PopoverPortal forceMount>
+              <PopoverContent
+                asChild
+                align="start"
+                side="bottom"
+                onEscapeKeyDown={(e) => {
+                  e.preventDefault();
+                  setIsSubOpen(false);
+                  setIsMainOpen(true);
+                }}
+                onPointerDownOutside={() => {
+                  setIsSubOpen(false);
+                  setIsMainOpen(false);
+                }}
+              >
+                <FloatingCard width={250}>
+                  <div className="flex h-8 w-full items-center gap-2 px-2">
+                    <button
+                      className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+                      onClick={() => {
+                        setIsSubOpen(false);
+                        setIsMainOpen(true);
                       }}
+                    >
+                      <ArrowLeftIcon size={18} />
+                    </button>
+                    <input
+                      className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+                      placeholder="Filter options..."
+                      autoFocus
                     />
-                  </MenuItemList>
+                  </div>
                   <DropdownMenuDivider />
                   <MenuItemList>
-                    <MenuItem icon={ArchiveIcon} title="Archive" />
-                    <MenuItem
-                      icon={TrashIcon}
-                      title="Delete from project"
-                      red
-                    />
+                    {kanbans.map((k, i) => {
+                      return (
+                        <MoveToColumnItem
+                          key={i}
+                          kanban={k}
+                          active={k.status === kanban.status}
+                        />
+                      );
+                    })}
                   </MenuItemList>
-                </DropdownMenuContent>
-              </RadixDropdown.Portal>
-            )}
-          </AnimatePresence>
+                </FloatingCard>
+              </PopoverContent>
+            </PopoverPortal>
+          )}
+        </Popover>
+      ) : (
+        <RadixDropdown.Root
+          open={isMainOpen}
+          onOpenChange={setIsMainOpen}
+          key="main"
+        >
+          <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+          {isMainOpen && (
+            <RadixDropdown.Portal forceMount>
+              <DropdownMenuContent align="start">
+                <MenuItemList>
+                  <MenuItem icon={CircleDotIcon} title="Convert to issue" />
+                  <MenuItem icon={CopyIcon} title="Copy link in project" />
+                </MenuItemList>
+                <DropdownMenuDivider />
+                <MenuItemList>
+                  <MenuItem icon={ArrowUpToLine} title="Move to top" />
+                  <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
+                  <MenuItem
+                    icon={MoveHorizontalIcon}
+                    title="Move to column"
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsSubOpen(true);
+                    }}
+                  />
+                </MenuItemList>
+                <DropdownMenuDivider />
+                <MenuItemList>
+                  <MenuItem icon={ArchiveIcon} title="Archive" />
+                  <MenuItem icon={TrashIcon} title="Delete from project" red />
+                </MenuItemList>
+              </DropdownMenuContent>
+            </RadixDropdown.Portal>
+          )}
         </RadixDropdown.Root>
       )}
-    </>
+    </AnimatePresence>
+  );
+};
+
+const MoveToColumnItem: React.FC<{ kanban: Kanban; active?: boolean }> = ({
+  kanban,
+  active = false,
+}) => {
+  return (
+    <button className="flex min-h-12 w-full items-start gap-2 rounded-md px-2 py-[6px] transition-colors hover:bg-white/10">
+      <StatusIcon color={kanban.color} />
+      <div className="flex w-full flex-col items-start gap-[2px]">
+        <div className="flex w-full items-start justify-between gap-1 text-sm">
+          {kanban.status}
+          {active && <CheckIcon size={20} />}
+        </div>
+        <div className="text-xs text-neutral-400">{kanban.description}</div>
+      </div>
+    </button>
   );
 };
 
@@ -516,7 +531,7 @@ const FloatingCard = forwardRef<
       className="flex flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
       initial={{ y: -5, opacity: 0, width }}
       animate={{ y: 0, opacity: 1, width }}
-      exit={{ y: -5, opacity: 0, width }}
+      exit={{ y: -5, opacity: 0, width, transition: { duration: 0.1 } }}
     >
       {children}
     </motion.div>
