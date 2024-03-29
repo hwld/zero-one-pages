@@ -8,6 +8,7 @@ import {
   PopoverPortal,
 } from "@radix-ui/react-popover";
 import clsx from "clsx";
+import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArchiveIcon,
@@ -498,33 +499,41 @@ const MoveToColumnMenu = React.forwardRef<
             }}
             onPointerDownOutside={onClose}
           >
-            <FloatingCard width={250}>
-              <div className="flex h-8 w-full items-center gap-2 px-2">
-                <button
-                  className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
-                  onClick={onBack}
-                >
-                  <ChevronLeftIcon size={18} />
-                </button>
-                <input
-                  className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
-                  placeholder="Filter options..."
-                  autoFocus
-                />
-              </div>
-              <DropdownMenuDivider />
-              <MenuItemList>
-                {kanbans.map((k, i) => {
-                  return (
-                    <MoveToColumnItem
-                      key={i}
-                      kanban={k}
-                      active={k.status === kanban.status}
-                    />
-                  );
-                })}
-              </MenuItemList>
-            </FloatingCard>
+            <Command>
+              <FloatingCard width={250}>
+                <div className="flex h-8 w-full items-center gap-2 px-2">
+                  <button
+                    className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+                    onClick={onBack}
+                  >
+                    <ChevronLeftIcon size={18} />
+                  </button>
+                  <Command.Input
+                    className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+                    placeholder="Filter options..."
+                    autoFocus
+                  />
+                </div>
+                <DropdownMenuDivider />
+                <Command.List asChild>
+                  <MenuItemList>
+                    <Command.Empty className="grid h-20 place-items-center text-sm text-neutral-400">
+                      No results found.
+                    </Command.Empty>
+                    {kanbans.map((k) => {
+                      return (
+                        <Command.Item asChild key={k.status}>
+                          <MoveToColumnItem
+                            kanban={k}
+                            active={k.status === kanban.status}
+                          />
+                        </Command.Item>
+                      );
+                    })}
+                  </MenuItemList>
+                </Command.List>
+              </FloatingCard>
+            </Command>
           </PopoverContent>
         </PopoverPortal>
       )}
@@ -532,12 +541,16 @@ const MoveToColumnMenu = React.forwardRef<
   );
 });
 
-const MoveToColumnItem: React.FC<{ kanban: Kanban; active?: boolean }> = ({
-  kanban,
-  active = false,
-}) => {
+const MoveToColumnItem = React.forwardRef<
+  HTMLButtonElement,
+  { kanban: Kanban; active?: boolean }
+>(function MoveToColumnItem({ kanban, active = false, ...props }, ref) {
   return (
-    <button className="flex min-h-12 w-full items-start gap-2 rounded-md px-2 py-[6px] transition-colors hover:bg-white/10">
+    <button
+      {...props}
+      ref={ref}
+      className="flex min-h-12 w-full items-start gap-2 rounded-md px-2 py-[6px] transition-colors hover:bg-white/10 data-[selected=true]:bg-white/10"
+    >
       <StatusIcon color={kanban.color} />
       <div className="flex w-full flex-col items-start gap-[2px]">
         <div className="flex w-full items-start justify-between gap-1 text-sm">
@@ -548,7 +561,7 @@ const MoveToColumnItem: React.FC<{ kanban: Kanban; active?: boolean }> = ({
       </div>
     </button>
   );
-};
+});
 
 const DropdownMenuDivider: React.FC = () => {
   return <div className="h-[1px] w-full bg-neutral-700" />;
