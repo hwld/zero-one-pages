@@ -27,30 +27,39 @@ import {
   CircleDashedIcon,
   CircleDotIcon,
   CodeIcon,
+  Columns2Icon,
   ComputerIcon,
   CopyIcon,
   EyeOffIcon,
+  GalleryHorizontalEndIcon,
   GitPullRequestIcon,
   InboxIcon,
   KanbanSquareIcon,
+  LayersIcon,
   LineChartIcon,
   ListFilterIcon,
+  ListIcon,
   LucideIcon,
   MenuIcon,
   MessageSquareIcon,
   MilestoneIcon,
   MoreHorizontalIcon,
   MoveHorizontalIcon,
+  MoveVerticalIcon,
   PanelRightOpenIcon,
   PenIcon,
   PlusIcon,
   RocketIcon,
+  Rows2Icon,
   SearchIcon,
   Settings2Icon,
   SettingsIcon,
+  TableRowsSplitIcon,
   TagIcon,
   TerminalIcon,
+  TextIcon,
   TrashIcon,
+  UploadIcon,
   UsersIcon,
   WorkflowIcon,
   XIcon,
@@ -209,8 +218,8 @@ const Kanban: React.FC<{
           return <KanbanItem key={i} kanban={kanban} />;
         })}
       </div>
-      <div className="grid place-items-center p-1">
-        <button className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-neutral-800">
+      <div className="grid place-items-center p-2">
+        <button className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-white/15">
           <PlusIcon size={16} />
           <span className="text-sm">Add Item</span>
         </button>
@@ -233,6 +242,558 @@ const KanbanItem: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
     </div>
   );
 };
+
+type ViewOptionMenuMode =
+  | "close"
+  | "main"
+  | "fieldsConfig"
+  | "columnByConfig"
+  | "groupByConfig"
+  | "sortByConfig"
+  | "fieldSumConfig"
+  | "sliceByConfig";
+
+const ViewOptionMenuTrigger: React.FC = () => {
+  const [mode, setMode] = useState<ViewOptionMenuMode>("close");
+
+  const trigger = useMemo(() => {
+    return (
+      <button
+        key="trigger"
+        className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
+        onClick={() => setMode("main")}
+      >
+        <ChevronDownIcon size={16} />
+      </button>
+    );
+  }, []);
+
+  const content = useMemo(() => {
+    switch (mode) {
+      case "close": {
+        return trigger;
+      }
+      case "main": {
+        return (
+          <ViewOptionMenu isOpen trigger={trigger} onChangeMode={setMode} />
+        );
+      }
+      case "fieldsConfig": {
+        return (
+          <FieldsConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      case "columnByConfig": {
+        return (
+          <ColumnByConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      case "groupByConfig": {
+        return (
+          <GroupByConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      case "sortByConfig": {
+        return (
+          <SortByConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      case "fieldSumConfig": {
+        return (
+          <FieldSumConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      case "sliceByConfig": {
+        return (
+          <SliceByConfigMenu
+            isOpen
+            trigger={trigger}
+            onClose={() => setMode("close")}
+            onBack={() => setMode("main")}
+          />
+        );
+      }
+      default: {
+        throw new Error(mode satisfies never);
+      }
+    }
+  }, [mode, trigger]);
+
+  return <AnimatePresence mode="wait">{content}</AnimatePresence>;
+};
+
+const ViewOptionMenu: React.FC<{
+  trigger: ReactNode;
+  isOpen: boolean;
+  onChangeMode: (mode: ViewOptionMenuMode) => void;
+}> = ({ trigger, isOpen, onChangeMode }) => {
+  return (
+    <RadixDropdown.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onChangeMode("close");
+        }
+      }}
+    >
+      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
+      {isOpen && (
+        <RadixDropdown.Portal forceMount>
+          <DropdownMenuContent align="start" width={320}>
+            <MenuItemGroup group="configuration">
+              <ViewConfigMenuItem
+                icon={TextIcon}
+                title="Fields"
+                value="Title, Assignees, Status, Foo, Bar"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("fieldsConfig");
+                }}
+              />
+              <ViewConfigMenuItem
+                icon={Columns2Icon}
+                title="Column by:"
+                value="Status"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("columnByConfig");
+                }}
+              />
+              <ViewConfigMenuItem
+                icon={Rows2Icon}
+                title="Group by"
+                value="none"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("groupByConfig");
+                }}
+              />
+              <ViewConfigMenuItem
+                icon={MoveVerticalIcon}
+                title="Sort by"
+                value="manual"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("sortByConfig");
+                }}
+              />
+              <ViewConfigMenuItem
+                icon={LayersIcon}
+                title="Field sum"
+                value="Count"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("fieldSumConfig");
+                }}
+              />
+              <ViewConfigMenuItem
+                icon={TableRowsSplitIcon}
+                title="Slice by"
+                value="Status"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onChangeMode("sliceByConfig");
+                }}
+              />
+            </MenuItemGroup>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <MenuItem icon={LineChartIcon} title="Generate chart" />
+            </MenuItemList>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <MenuItem icon={PenIcon} title="Rename view" />
+              <MenuItem
+                icon={GalleryHorizontalEndIcon}
+                title="Save changes to new view"
+              />
+              <MenuItem icon={TrashIcon} title="Delete view" red />
+            </MenuItemList>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <MenuItem icon={UploadIcon} title="Export view data" />
+            </MenuItemList>
+            <DropdownMenuDivider />
+            <MenuItemList>
+              <div className="grid h-8 grid-cols-2 gap-2">
+                <button className="grow rounded-md text-neutral-300 transition-colors hover:bg-white/15">
+                  Discard
+                </button>
+                <button className="grow rounded-md border border-green-500 text-green-500 transition-colors hover:bg-green-500/15">
+                  Save
+                </button>
+              </div>
+            </MenuItemList>
+          </DropdownMenuContent>
+        </RadixDropdown.Portal>
+      )}
+    </RadixDropdown.Root>
+  );
+};
+
+const FieldsConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function FieldsConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      header={
+        <button className="mx-2 flex h-8 items-center gap-2 rounded-md px-2 transition-colors hover:bg-white/15">
+          <PlusIcon size={16} />
+          <div className="text-sm">New field</div>
+        </button>
+      }
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Fields..."
+    >
+      <Command.Item asChild key="title">
+        <ConfigMenuItem icon={ListIcon} title="Title" isSelected={true} />
+      </Command.Item>
+      <Command.Item asChild key="assignees">
+        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={true} />
+      </Command.Item>
+      <Command.Item asChild key="status">
+        <ConfigMenuItem
+          icon={ChevronDownSquareIcon}
+          title="Status"
+          isSelected={true}
+        />
+      </Command.Item>
+      <Command.Item asChild key="labels">
+        <ConfigMenuItem icon={TagIcon} title="Labels" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="linked pull requests">
+        <ConfigMenuItem
+          icon={GitPullRequestIcon}
+          title="Linked pull requests"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="reviewers">
+        <ConfigMenuItem icon={UsersIcon} title="Reviewers" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="repository">
+        <ConfigMenuItem
+          icon={BookMarkedIcon}
+          title="repository"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="milestone">
+        <ConfigMenuItem
+          icon={MilestoneIcon}
+          title="Milestone"
+          isSelected={false}
+        />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const ColumnByConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function ColumnByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Column by..."
+    >
+      <Command.Item asChild key="status">
+        <ConfigMenuItem
+          icon={ChevronDownSquareIcon}
+          title="Status"
+          isSelected={true}
+        />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const GroupByConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function GroupByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Group by..."
+    >
+      <Command.Item asChild key="assignees">
+        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="status">
+        <ConfigMenuItem
+          icon={ChevronDownSquareIcon}
+          title="Status"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="repository">
+        <ConfigMenuItem
+          icon={BookMarkedIcon}
+          title="repository"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="milestone">
+        <ConfigMenuItem
+          icon={MilestoneIcon}
+          title="Milestone"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="no grouping">
+        <ConfigMenuItem icon={XIcon} title="No grouping" isSelected={true} />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const SortByConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function SortByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Sort by..."
+    >
+      <Command.Item asChild key="title">
+        <ConfigMenuItem icon={ListIcon} title="Title" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="assignees">
+        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="status">
+        <ConfigMenuItem
+          icon={ChevronDownSquareIcon}
+          title="Status"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="labels">
+        <ConfigMenuItem icon={TagIcon} title="Labels" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="linked pull requests">
+        <ConfigMenuItem
+          icon={GitPullRequestIcon}
+          title="Linked pull requests"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="reviewers">
+        <ConfigMenuItem icon={UsersIcon} title="Reviewers" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="repository">
+        <ConfigMenuItem
+          icon={BookMarkedIcon}
+          title="repository"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="milestone">
+        <ConfigMenuItem
+          icon={MilestoneIcon}
+          title="Milestone"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="no sorting">
+        <ConfigMenuItem icon={XIcon} title="No sorting" isSelected={true} />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const FieldSumConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function FieldSumConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Field sum..."
+    >
+      <Command.Item asChild key="count">
+        <ConfigMenuItem title="Count" isSelected={true} />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const SliceByConfigMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function SliceByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Slice by..."
+    >
+      <Command.Item asChild key="assignees">
+        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
+      </Command.Item>
+      <Command.Item asChild key="status">
+        <ConfigMenuItem
+          icon={ChevronDownSquareIcon}
+          title="Status"
+          isSelected={true}
+        />
+      </Command.Item>
+      <Command.Item asChild key="repository">
+        <ConfigMenuItem
+          icon={BookMarkedIcon}
+          title="repository"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="milestone">
+        <ConfigMenuItem
+          icon={MilestoneIcon}
+          title="Milestone"
+          isSelected={false}
+        />
+      </Command.Item>
+      <Command.Item asChild key="no grouping">
+        <ConfigMenuItem icon={XIcon} title="No slicing" isSelected={false} />
+      </Command.Item>
+    </SelectionMenu>
+  );
+});
+
+const ConfigMenuItem = React.forwardRef<
+  HTMLButtonElement,
+  { icon?: LucideIcon; title: string; isSelected: boolean }
+>(function ConfigMenuItem({ icon: Icon, title, isSelected, ...props }, ref) {
+  return (
+    <button
+      {...props}
+      ref={ref}
+      className="flex min-h-8 w-full items-center justify-between rounded-md px-2 transition-colors hover:bg-white/15 data-[selected=true]:bg-white/15"
+    >
+      <div className="flex items-center gap-2">
+        {Icon && <Icon size={16} className="text-neutral-400" />}
+        <div className="text-sm">{title}</div>
+      </div>
+      {isSelected && <CheckIcon size={20} />}
+    </button>
+  );
+});
+
+const ViewConfigMenuItem = React.forwardRef<
+  HTMLDivElement,
+  {
+    icon: LucideIcon;
+    title: string;
+    value: string;
+    disabled?: boolean;
+    onSelect?: (e: Event) => void;
+  }
+>(function ViewConfigMenuItem(
+  { icon: Icon, title, value, disabled, onSelect, ...props },
+  ref,
+) {
+  return (
+    <RadixDropdown.Item
+      {...props}
+      ref={ref}
+      onSelect={onSelect}
+      disabled={disabled}
+      className={clsx(
+        "flex h-8 w-full cursor-pointer items-center justify-between gap-4 rounded-md px-2 text-neutral-100 transition-colors hover:bg-white/15 focus-visible:bg-white/15 focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      )}
+    >
+      <div className="flex items-center gap-2 text-neutral-400">
+        <Icon size={16} />
+        <div className="text-sm">{title}:</div>
+      </div>
+      <div className="flex min-w-0 items-center gap-1">
+        <div className="truncate text-nowrap text-sm">{value}</div>
+        <ChevronRightIcon size={16} className="text-neutral-400" />
+      </div>
+    </RadixDropdown.Item>
+  );
+});
 
 const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
@@ -387,7 +948,7 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
       case "main": {
         return (
           <KanbanItemMenu
-            isOpen={mode == "main"}
+            isOpen={true}
             trigger={trigger}
             onClose={() => setMode("close")}
             onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
@@ -398,7 +959,7 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
         return (
           <MoveToColumnMenu
             kanban={kanban}
-            isOpen={mode == "moveToColumn"}
+            isOpen={true}
             trigger={trigger}
             onClose={() => setMode("close")}
             onBack={() => setMode("main")}
@@ -433,11 +994,7 @@ const KanbanItemMenu = React.forwardRef<
   };
 
   return (
-    <RadixDropdown.Root
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-      key="main"
-    >
+    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
       <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
       {isOpen && (
         <RadixDropdown.Portal forceMount>
@@ -472,18 +1029,33 @@ const KanbanItemMenu = React.forwardRef<
   );
 });
 
-const MoveToColumnMenu = React.forwardRef<
+const SelectionMenu = React.forwardRef<
   HTMLDivElement,
   {
-    kanban: Kanban;
-    trigger: ReactNode;
     isOpen: boolean;
+    width?: number;
+    trigger: ReactNode;
+    header?: ReactNode;
     onClose: () => void;
-    onBack: () => void;
+    onBack?: () => void;
+    children: ReactNode;
+    placeholder?: string;
   }
->(function MoveToColumnMenu({ kanban, trigger, isOpen, onClose, onBack }, ref) {
+>(function SelectCommandMenu(
+  {
+    isOpen,
+    width = 250,
+    trigger,
+    header,
+    onClose,
+    onBack,
+    children,
+    placeholder,
+  },
+  ref,
+) {
   return (
-    <Popover open={isOpen} key="sub" modal>
+    <Popover open={isOpen} modal>
       <PopoverAnchor asChild>{trigger}</PopoverAnchor>
       {isOpen && (
         <PopoverPortal forceMount>
@@ -495,41 +1067,44 @@ const MoveToColumnMenu = React.forwardRef<
             sideOffset={4}
             onEscapeKeyDown={(e) => {
               e.preventDefault();
-              onBack();
+              if (onBack) {
+                onBack();
+              } else {
+                onClose();
+              }
             }}
             onPointerDownOutside={onClose}
           >
             <Command>
-              <FloatingCard width={250}>
-                <div className="flex h-8 w-full items-center gap-2 px-2">
-                  <button
-                    className="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
-                    onClick={onBack}
-                  >
-                    <ChevronLeftIcon size={18} />
-                  </button>
+              <FloatingCard width={width}>
+                <div className="flex h-8 w-full items-center px-2">
+                  {onBack && (
+                    <button
+                      className=" grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+                      onClick={onBack}
+                    >
+                      <ChevronLeftIcon size={18} className="mr-[2px]" />
+                    </button>
+                  )}
                   <Command.Input
-                    className="block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
-                    placeholder="Filter options..."
+                    className="mx-2 block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+                    placeholder={placeholder}
                     autoFocus
                   />
                 </div>
                 <DropdownMenuDivider />
+                {header && (
+                  <>
+                    {header}
+                    <DropdownMenuDivider />
+                  </>
+                )}
                 <Command.List asChild>
                   <MenuItemList>
                     <Command.Empty className="grid h-20 place-items-center text-sm text-neutral-400">
                       No results found.
                     </Command.Empty>
-                    {kanbans.map((k) => {
-                      return (
-                        <Command.Item asChild key={k.status}>
-                          <MoveToColumnItem
-                            kanban={k}
-                            active={k.status === kanban.status}
-                          />
-                        </Command.Item>
-                      );
-                    })}
+                    {children}
                   </MenuItemList>
                 </Command.List>
               </FloatingCard>
@@ -538,6 +1113,36 @@ const MoveToColumnMenu = React.forwardRef<
         </PopoverPortal>
       )}
     </Popover>
+  );
+});
+
+const MoveToColumnMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    kanban: Kanban;
+    trigger: ReactNode;
+    isOpen: boolean;
+    onClose: () => void;
+    onBack: () => void;
+  }
+>(function MoveToColumnMenu({ kanban, trigger, isOpen, onClose, onBack }, ref) {
+  return (
+    <SelectionMenu
+      ref={ref}
+      isOpen={isOpen}
+      trigger={trigger}
+      onClose={onClose}
+      onBack={onBack}
+      placeholder="Column..."
+    >
+      {kanbans.map((k) => {
+        return (
+          <Command.Item asChild key={k.status}>
+            <MoveToColumnItem kanban={k} active={k.status === kanban.status} />
+          </Command.Item>
+        );
+      })}
+    </SelectionMenu>
   );
 });
 
@@ -573,9 +1178,10 @@ const DropdownMenuContent = React.forwardRef<
     children: ReactNode;
     align?: "center" | "end" | "start";
     onEscapeKeydown?: MenuContentProps["onEscapeKeyDown"];
+    width?: number;
   }
 >(function DropdownMenuContent(
-  { children, align = "end", onEscapeKeydown, ...props },
+  { children, align = "end", onEscapeKeydown, width, ...props },
   ref,
 ) {
   return (
@@ -589,7 +1195,7 @@ const DropdownMenuContent = React.forwardRef<
       align={align}
       sideOffset={4}
     >
-      <FloatingCard>{children}</FloatingCard>
+      <FloatingCard width={width}>{children}</FloatingCard>
     </RadixDropdown.Content>
   );
 });
@@ -775,11 +1381,7 @@ const Tab: React.FC<{
     >
       <Icon size={20} />
       <div className="text-sm">{children}</div>
-      {active && (
-        <button className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200">
-          <ChevronDownIcon size={16} />
-        </button>
-      )}
+      {active && <ViewOptionMenuTrigger />}
     </Wrapper>
   );
 };
