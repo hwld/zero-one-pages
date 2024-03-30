@@ -5,6 +5,7 @@ import {
   Popover,
   PopoverAnchor,
   PopoverContent,
+  PopoverContentProps,
   PopoverPortal,
 } from "@radix-ui/react-popover";
 import clsx from "clsx";
@@ -64,7 +65,7 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, { forwardRef, useMemo, useState } from "react";
+import React, { forwardRef, useMemo, useRef, useState } from "react";
 import { ReactNode } from "react";
 
 type Kanban = {
@@ -256,12 +257,23 @@ type ViewOptionMenuMode =
 const ViewOptionMenuTrigger: React.FC = () => {
   const [mode, setMode] = useState<ViewOptionMenuMode>("close");
 
+  const changeMode = (mode: ViewOptionMenuMode) => {
+    if (mode === "close") {
+      window.setTimeout(() => {
+        triggerRef.current?.focus();
+      }, 150);
+    }
+    setMode(mode);
+  };
+
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const trigger = useMemo(() => {
     return (
       <button
+        ref={triggerRef}
         key="trigger"
         className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
-        onClick={() => setMode("main")}
+        onClick={() => changeMode("main")}
       >
         <ChevronDownIcon size={16} />
       </button>
@@ -275,7 +287,7 @@ const ViewOptionMenuTrigger: React.FC = () => {
       }
       case "main": {
         return (
-          <ViewOptionMenu isOpen trigger={trigger} onChangeMode={setMode} />
+          <ViewOptionMenu isOpen trigger={trigger} onChangeMode={changeMode} />
         );
       }
       case "fieldsConfig": {
@@ -283,8 +295,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <FieldsConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -293,8 +305,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <ColumnByConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -303,8 +315,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <GroupByConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -313,8 +325,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <SortByConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -323,8 +335,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <FieldSumConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -333,8 +345,8 @@ const ViewOptionMenuTrigger: React.FC = () => {
           <SliceByConfigMenu
             isOpen
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -918,18 +930,29 @@ const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
+type KanbanItemMenuMode = "close" | "main" | "moveToColumn";
 const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
-  const [mode, setMode] = useState<"close" | "main" | "moveToColumn">("close");
+  const [mode, setMode] = useState<KanbanItemMenuMode>("close");
 
+  const changeMode = (mode: KanbanItemMenuMode) => {
+    if (mode === "close") {
+      // triggerを使いまわしているため、Menuをcloseしてもtriggerにfocusが当たらないので手動でfocusを当てる
+      window.setTimeout(() => {
+        triggerRef.current?.focus();
+      }, 150);
+    }
+    setMode(mode);
+  };
+
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const trigger = useMemo(() => {
     return (
       <button
-        onClick={() => {
-          setMode("main");
-        }}
+        ref={triggerRef}
+        onClick={() => changeMode("main")}
         key="trigger"
         className={clsx(
-          "grid size-5 place-items-center rounded transition-all hover:bg-white/15",
+          "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus-visible:bg-white/15 focus-visible:opacity-100",
           mode != "close"
             ? "bg-white/15 opacity-100"
             : "opacity-0 group-hover:opacity-100",
@@ -950,8 +973,8 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
           <KanbanItemMenu
             isOpen={true}
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
+            onClose={() => changeMode("close")}
+            onOpenMoveToColumnMenu={() => changeMode("moveToColumn")}
           />
         );
       }
@@ -961,8 +984,8 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
             kanban={kanban}
             isOpen={true}
             trigger={trigger}
-            onClose={() => setMode("close")}
-            onBack={() => setMode("main")}
+            onClose={() => changeMode("close")}
+            onBack={() => changeMode("main")}
           />
         );
       }
@@ -1040,6 +1063,7 @@ const SelectionMenu = React.forwardRef<
     onBack?: () => void;
     children: ReactNode;
     placeholder?: string;
+    onCloseAutoFocus?: PopoverContentProps["onCloseAutoFocus"];
   }
 >(function SelectCommandMenu(
   {
@@ -1051,6 +1075,7 @@ const SelectionMenu = React.forwardRef<
     onBack,
     children,
     placeholder,
+    onCloseAutoFocus,
   },
   ref,
 ) {
@@ -1065,6 +1090,7 @@ const SelectionMenu = React.forwardRef<
             align="start"
             side="bottom"
             sideOffset={4}
+            onCloseAutoFocus={onCloseAutoFocus}
             onEscapeKeyDown={(e) => {
               e.preventDefault();
               if (onBack) {
@@ -1178,17 +1204,17 @@ const DropdownMenuContent = React.forwardRef<
     children: ReactNode;
     align?: "center" | "end" | "start";
     onEscapeKeydown?: MenuContentProps["onEscapeKeyDown"];
+    onCloseAutoFocus?: MenuContentProps["onCloseAutoFocus"];
     width?: number;
   }
 >(function DropdownMenuContent(
-  { children, align = "end", onEscapeKeydown, width, ...props },
+  { children, align = "end", width, ...props },
   ref,
 ) {
   return (
     <RadixDropdown.Content
       ref={ref}
       {...props}
-      onEscapeKeyDown={onEscapeKeydown}
       loop
       asChild
       side="bottom"
@@ -1200,7 +1226,7 @@ const DropdownMenuContent = React.forwardRef<
   );
 });
 
-const FloatingCard = forwardRef<
+export const FloatingCard = forwardRef<
   HTMLDivElement,
   { children: ReactNode; width?: number }
 >(function Card({ children, width = 200, ...props }, ref) {
