@@ -8,6 +8,7 @@ import {
   PopoverContentProps,
   PopoverPortal,
 } from "@radix-ui/react-popover";
+import * as RadixTooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
@@ -65,7 +66,13 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, { forwardRef, useMemo, useRef, useState } from "react";
+import React, {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ReactNode } from "react";
 
 type Kanban = {
@@ -121,8 +128,13 @@ const GitHubProjectPage: React.FC = () => {
             Add status update
           </button>
           <div className="flex items-center">
-            <ButtonGroupItem position="left" icon={LineChartIcon} />
-            <ButtonGroupItem icon={PanelRightOpenIcon} />
+            <Tooltip label="Insight">
+              <ButtonGroupItem position="left" icon={LineChartIcon} />
+            </Tooltip>
+            <Tooltip label="Project details">
+              <ButtonGroupItem icon={PanelRightOpenIcon} />
+            </Tooltip>
+
             <ProjectMenuTrigger>
               <ButtonGroupItem position="right" icon={MoreHorizontalIcon} />
             </ProjectMenuTrigger>
@@ -204,7 +216,7 @@ const Kanban: React.FC<{
           <CountBadge count={kanban.count} />
         </div>
         <div className="flex items-center">
-          <KanbanMenuTrigger>
+          <KanbanMenuTrigger kanban={kanban}>
             <button className="grid size-6 place-items-center rounded-md text-neutral-400 transition-colors hover:bg-white/15">
               <MoreHorizontalIcon size={20} />
             </button>
@@ -256,6 +268,7 @@ type ViewOptionMenuMode =
 
 const ViewOptionMenuTrigger: React.FC = () => {
   const [mode, setMode] = useState<ViewOptionMenuMode>("close");
+  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
 
   const changeMode = (mode: ViewOptionMenuMode) => {
     if (mode === "close") {
@@ -263,6 +276,7 @@ const ViewOptionMenuTrigger: React.FC = () => {
         triggerRef.current?.focus();
       }, 150);
     }
+    setIsTooltipDisabled(true);
     setMode(mode);
   };
 
@@ -271,6 +285,7 @@ const ViewOptionMenuTrigger: React.FC = () => {
     return (
       <button
         ref={triggerRef}
+        onBlur={() => setIsTooltipDisabled(false)}
         key="trigger"
         className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
         onClick={() => changeMode("main")}
@@ -283,7 +298,11 @@ const ViewOptionMenuTrigger: React.FC = () => {
   const content = useMemo(() => {
     switch (mode) {
       case "close": {
-        return trigger;
+        return (
+          <Tooltip disabled={isTooltipDisabled} label="View options">
+            {trigger}
+          </Tooltip>
+        );
       }
       case "main": {
         return (
@@ -354,7 +373,7 @@ const ViewOptionMenuTrigger: React.FC = () => {
         throw new Error(mode satisfies never);
       }
     }
-  }, [mode, trigger]);
+  }, [isTooltipDisabled, mode, trigger]);
 
   return <AnimatePresence mode="wait">{content}</AnimatePresence>;
 };
@@ -811,10 +830,23 @@ const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsTooltipDisabled(true);
+    setIsOpen(open);
+  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
+      <Tooltip disabled={isTooltipDisabled} label="View more options">
+        <RadixDropdown.Trigger
+          onBlur={() => setIsTooltipDisabled(false)}
+          asChild
+        >
+          {children}
+        </RadixDropdown.Trigger>
+      </Tooltip>
       <AnimatePresence>
         {isOpen && (
           <RadixDropdown.Portal forceMount>
@@ -843,10 +875,23 @@ const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsTooltipDisabled(true);
+    setIsOpen(open);
+  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
+      <Tooltip disabled={isTooltipDisabled} label="Create new...">
+        <RadixDropdown.Trigger
+          asChild
+          onBlur={() => setIsTooltipDisabled(false)}
+        >
+          {children}
+        </RadixDropdown.Trigger>
+      </Tooltip>
       <AnimatePresence>
         {isOpen && (
           <RadixDropdown.Portal forceMount>
@@ -901,12 +946,31 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
+const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
+  kanban,
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsTooltipDisabled(true);
+    setIsOpen(open);
+  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
+    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
+      <Tooltip
+        disabled={isTooltipDisabled}
+        label={`Actions for column: ${kanban.status}`}
+      >
+        <RadixDropdown.Trigger
+          asChild
+          onBlur={() => setIsTooltipDisabled(false)}
+        >
+          {children}
+        </RadixDropdown.Trigger>
+      </Tooltip>
       <AnimatePresence>
         {isOpen && (
           <RadixDropdown.Portal forceMount>
@@ -933,14 +997,20 @@ const KanbanMenuTrigger: React.FC<{ children: ReactNode }> = ({ children }) => {
 type KanbanItemMenuMode = "close" | "main" | "moveToColumn";
 const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   const [mode, setMode] = useState<KanbanItemMenuMode>("close");
+  const [tooltipDisabled, setTooltipDisabled] = useState(false);
 
   const changeMode = (mode: KanbanItemMenuMode) => {
     if (mode === "close") {
       // triggerを使いまわしているため、Menuをcloseしてもtriggerにfocusが当たらないので手動でfocusを当てる
       window.setTimeout(() => {
         triggerRef.current?.focus();
-      }, 150);
+      }, 250);
+
+      // menuを閉じてフォーカスがあたったときのtooltipを抑制する。
+      // triggerをblurしたときに解除する
+      setTooltipDisabled(true);
     }
+
     setMode(mode);
   };
 
@@ -949,10 +1019,11 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
     return (
       <button
         ref={triggerRef}
+        onBlur={() => setTooltipDisabled(false)}
         onClick={() => changeMode("main")}
         key="trigger"
         className={clsx(
-          "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus-visible:bg-white/15 focus-visible:opacity-100",
+          "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus:bg-white/15 focus:opacity-100 focus-visible:bg-white/15 focus-visible:opacity-100",
           mode != "close"
             ? "bg-white/15 opacity-100"
             : "opacity-0 group-hover:opacity-100",
@@ -966,7 +1037,11 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   const content = useMemo(() => {
     switch (mode) {
       case "close": {
-        return trigger;
+        return (
+          <Tooltip disabled={tooltipDisabled} label={`Actions for task`}>
+            {trigger}
+          </Tooltip>
+        );
       }
       case "main": {
         return (
@@ -993,7 +1068,7 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
         throw new Error(mode satisfies never);
       }
     }
-  }, [kanban, mode, trigger]);
+  }, [kanban, mode, tooltipDisabled, trigger]);
 
   return <AnimatePresence mode="wait">{content}</AnimatePresence>;
 };
@@ -1021,7 +1096,11 @@ const KanbanItemMenu = React.forwardRef<
       <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
       {isOpen && (
         <RadixDropdown.Portal forceMount>
-          <DropdownMenuContent align="start" ref={ref}>
+          <DropdownMenuContent
+            align="start"
+            ref={ref}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <MenuItemList>
               <MenuItem icon={CircleDotIcon} title="Convert to issue" />
               <MenuItem icon={CopyIcon} title="Copy link in project" />
@@ -1160,6 +1239,7 @@ const MoveToColumnMenu = React.forwardRef<
       onClose={onClose}
       onBack={onBack}
       placeholder="Column..."
+      onCloseAutoFocus={(e) => e.preventDefault()}
     >
       {kanbans.map((k) => {
         return (
@@ -1474,9 +1554,15 @@ const Header: React.FC = () => {
         <CreateNewMenuTrigger>
           <HeaderButton icon={PlusIcon} rightIcon={ChevronDown} />
         </CreateNewMenuTrigger>
-        <HeaderButton icon={CircleDotIcon} />
-        <HeaderButton icon={GitPullRequestIcon} />
-        <HeaderButton icon={InboxIcon} />
+        <Tooltip label="Issues">
+          <HeaderButton icon={CircleDotIcon} />
+        </Tooltip>
+        <Tooltip label="Pull requests">
+          <HeaderButton icon={GitPullRequestIcon} />
+        </Tooltip>
+        <Tooltip label="You have no unread notifications">
+          <HeaderButton icon={InboxIcon} />
+        </Tooltip>
         <div className="size-8 rounded-full bg-neutral-300" />
       </div>
     </div>
@@ -1505,7 +1591,10 @@ const BreadCrumbItem: React.FC<{ children: ReactNode; active?: boolean }> = ({
 
 const HeaderButton = React.forwardRef<
   HTMLButtonElement,
-  { icon: LucideIcon; rightIcon?: LucideIcon }
+  {
+    icon: LucideIcon;
+    rightIcon?: LucideIcon;
+  } & ComponentPropsWithoutRef<"button">
 >(function HeaderButton({ icon: Icon, rightIcon: RightIcon, ...props }, ref) {
   return (
     <button
@@ -1521,3 +1610,27 @@ const HeaderButton = React.forwardRef<
     </button>
   );
 });
+
+const Tooltip: React.FC<{
+  children: ReactNode;
+  label: string;
+  disabled?: boolean;
+}> = ({ children, label, disabled }) => {
+  return (
+    <RadixTooltip.Provider>
+      <RadixTooltip.Root>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          {!disabled && (
+            <RadixTooltip.Content
+              className="flex h-6 items-center rounded bg-neutral-700 px-2 text-xs text-neutral-300"
+              sideOffset={8}
+            >
+              {label}
+            </RadixTooltip.Content>
+          )}
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
+  );
+};
