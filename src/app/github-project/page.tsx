@@ -1,17 +1,7 @@
 "use client";
-import * as RadixDropdown from "@radix-ui/react-dropdown-menu";
-import { MenuContentProps } from "@radix-ui/react-dropdown-menu";
-import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverContentProps,
-  PopoverPortal,
-} from "@radix-ui/react-popover";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import { Command } from "cmdk";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   ArchiveIcon,
   ArrowDownToLineIcon,
@@ -66,14 +56,22 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { ComponentPropsWithoutRef, useMemo, useState } from "react";
 import { ReactNode } from "react";
+import { DropdownProvider } from "./_components/dropdown/provider";
+import { DropdownTrigger } from "./_components/dropdown/trigger";
+import {
+  DropdownContent,
+  DropdownMultiContent,
+} from "./_components/dropdown/content";
+import {
+  DropdownItem,
+  DropdownItemGroup,
+  DropdownItemList,
+  ViewConfigMenuItem,
+} from "./_components/dropdown/item";
+import { DropdownDivider } from "./_components/dropdown/divider";
+import { FloatingCard } from "./_components/floating-card";
 
 type Kanban = {
   color: StatusIconColor;
@@ -268,246 +266,160 @@ type ViewOptionMenuMode =
 
 const ViewOptionMenuTrigger: React.FC = () => {
   const [mode, setMode] = useState<ViewOptionMenuMode>("close");
-  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
 
-  const changeMode = (mode: ViewOptionMenuMode) => {
-    if (mode === "close") {
-      window.setTimeout(() => {
-        triggerRef.current?.focus();
-      }, 150);
-    }
-    setIsTooltipDisabled(true);
-    setMode(mode);
-  };
-
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const trigger = useMemo(() => {
-    return (
-      <button
-        ref={triggerRef}
-        onBlur={() => setIsTooltipDisabled(false)}
-        key="trigger"
-        className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
-        onClick={() => changeMode("main")}
-      >
-        <ChevronDownIcon size={16} />
-      </button>
-    );
+  const contents = useMemo((): Record<ViewOptionMenuMode, ReactNode> => {
+    return {
+      close: null,
+      main: <ViewOptionMenu onChangeMode={setMode} />,
+      fieldsConfig: <FieldsConfigMenu onBack={() => setMode("main")} />,
+      columnByConfig: <ColumnByConfigMenu onBack={() => setMode("main")} />,
+      groupByConfig: <GroupByConfigMenu onBack={() => setMode("main")} />,
+      sortByConfig: <SortByConfigMenu onBack={() => setMode("main")} />,
+      fieldSumConfig: <FieldSumConfigMenu onBack={() => setMode("main")} />,
+      sliceByConfig: <SliceByConfigMenu onBack={() => setMode("main")} />,
+    };
   }, []);
 
-  const content = useMemo(() => {
-    switch (mode) {
-      case "close": {
-        return (
-          <Tooltip disabled={isTooltipDisabled} label="View options">
-            {trigger}
-          </Tooltip>
-        );
-      }
-      case "main": {
-        return (
-          <ViewOptionMenu isOpen trigger={trigger} onChangeMode={changeMode} />
-        );
-      }
-      case "fieldsConfig": {
-        return (
-          <FieldsConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      case "columnByConfig": {
-        return (
-          <ColumnByConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      case "groupByConfig": {
-        return (
-          <GroupByConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      case "sortByConfig": {
-        return (
-          <SortByConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      case "fieldSumConfig": {
-        return (
-          <FieldSumConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      case "sliceByConfig": {
-        return (
-          <SliceByConfigMenu
-            isOpen
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      default: {
-        throw new Error(mode satisfies never);
-      }
+  const isOpen = mode !== "close";
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setMode("main");
+    } else {
+      setMode("close");
     }
-  }, [isTooltipDisabled, mode, trigger]);
+  };
 
-  return <AnimatePresence mode="wait">{content}</AnimatePresence>;
+  const handlekeEscapeKeydown = () => {
+    if (mode === "main") {
+      setMode("close");
+    } else {
+      setMode("main");
+    }
+  };
+
+  return (
+    <DropdownProvider isOpen={isOpen} onOpenChange={handleOpenChange}>
+      <Tooltip label="View options">
+        <DropdownTrigger>
+          <button
+            className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
+            onClick={() => setMode("main")}
+          >
+            <ChevronDownIcon size={16} />
+          </button>
+        </DropdownTrigger>
+      </Tooltip>
+      <DropdownMultiContent
+        mode={mode}
+        contents={contents}
+        onEscapeKeydown={handlekeEscapeKeydown}
+      />
+    </DropdownProvider>
+  );
 };
 
 const ViewOptionMenu: React.FC<{
-  trigger: ReactNode;
-  isOpen: boolean;
   onChangeMode: (mode: ViewOptionMenuMode) => void;
-}> = ({ trigger, isOpen, onChangeMode }) => {
+}> = ({ onChangeMode }) => {
   return (
-    <RadixDropdown.Root
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          onChangeMode("close");
-        }
-      }}
-    >
-      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
-      {isOpen && (
-        <RadixDropdown.Portal forceMount>
-          <DropdownMenuContent align="start" width={320}>
-            <MenuItemGroup group="configuration">
-              <ViewConfigMenuItem
-                icon={TextIcon}
-                title="Fields"
-                value="Title, Assignees, Status, Foo, Bar"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("fieldsConfig");
-                }}
-              />
-              <ViewConfigMenuItem
-                icon={Columns2Icon}
-                title="Column by:"
-                value="Status"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("columnByConfig");
-                }}
-              />
-              <ViewConfigMenuItem
-                icon={Rows2Icon}
-                title="Group by"
-                value="none"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("groupByConfig");
-                }}
-              />
-              <ViewConfigMenuItem
-                icon={MoveVerticalIcon}
-                title="Sort by"
-                value="manual"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("sortByConfig");
-                }}
-              />
-              <ViewConfigMenuItem
-                icon={LayersIcon}
-                title="Field sum"
-                value="Count"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("fieldSumConfig");
-                }}
-              />
-              <ViewConfigMenuItem
-                icon={TableRowsSplitIcon}
-                title="Slice by"
-                value="Status"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onChangeMode("sliceByConfig");
-                }}
-              />
-            </MenuItemGroup>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <MenuItem icon={LineChartIcon} title="Generate chart" />
-            </MenuItemList>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <MenuItem icon={PenIcon} title="Rename view" />
-              <MenuItem
-                icon={GalleryHorizontalEndIcon}
-                title="Save changes to new view"
-              />
-              <MenuItem icon={TrashIcon} title="Delete view" red />
-            </MenuItemList>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <MenuItem icon={UploadIcon} title="Export view data" />
-            </MenuItemList>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <div className="grid h-8 grid-cols-2 gap-2">
-                <button className="grow rounded-md text-neutral-300 transition-colors hover:bg-white/15">
-                  Discard
-                </button>
-                <button className="grow rounded-md border border-green-500 text-green-500 transition-colors hover:bg-green-500/15">
-                  Save
-                </button>
-              </div>
-            </MenuItemList>
-          </DropdownMenuContent>
-        </RadixDropdown.Portal>
-      )}
-    </RadixDropdown.Root>
+    <FloatingCard width={320}>
+      <DropdownItemGroup group="configuration">
+        <ViewConfigMenuItem
+          icon={TextIcon}
+          title="Fields"
+          value="Title, Assignees, Status, Foo, Bar"
+          onClick={() => {
+            onChangeMode("fieldsConfig");
+          }}
+        />
+        <ViewConfigMenuItem
+          icon={Columns2Icon}
+          title="Column by:"
+          value="Status"
+          onClick={() => {
+            onChangeMode("columnByConfig");
+          }}
+        />
+        <ViewConfigMenuItem
+          icon={Rows2Icon}
+          title="Group by"
+          value="none"
+          onClick={() => {
+            onChangeMode("groupByConfig");
+          }}
+        />
+        <ViewConfigMenuItem
+          icon={MoveVerticalIcon}
+          title="Sort by"
+          value="manual"
+          onClick={() => {
+            onChangeMode("sortByConfig");
+          }}
+        />
+        <ViewConfigMenuItem
+          icon={LayersIcon}
+          title="Field sum"
+          value="Count"
+          onClick={() => {
+            onChangeMode("fieldSumConfig");
+          }}
+        />
+        <ViewConfigMenuItem
+          icon={TableRowsSplitIcon}
+          title="Slice by"
+          value="Status"
+          onClick={() => {
+            onChangeMode("sliceByConfig");
+          }}
+        />
+      </DropdownItemGroup>
+      <DropdownDivider />
+      <DropdownItemList>
+        <DropdownItem icon={LineChartIcon} title="Generate chart" />
+      </DropdownItemList>
+      <DropdownDivider />
+      <DropdownItemList>
+        <DropdownItem icon={PenIcon} title="Rename view" />
+        <DropdownItem
+          icon={GalleryHorizontalEndIcon}
+          title="Save changes to new view"
+        />
+        <DropdownItem icon={TrashIcon} title="Delete view" red />
+      </DropdownItemList>
+      <DropdownDivider />
+      <DropdownItemList>
+        <DropdownItem icon={UploadIcon} title="Export view data" />
+      </DropdownItemList>
+      <DropdownDivider />
+      <DropdownItemList>
+        <div className="grid h-8 grid-cols-2 gap-2">
+          <button className="grow rounded-md text-neutral-300 transition-colors hover:bg-white/15">
+            Discard
+          </button>
+          <button className="grow rounded-md border border-green-500 text-green-500 transition-colors hover:bg-green-500/15">
+            Save
+          </button>
+        </div>
+      </DropdownItemList>
+    </FloatingCard>
   );
 };
 
 const FieldsConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function FieldsConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function FieldsConfigMenu({ onBack }, ref) {
   return (
     <SelectionMenu
       ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
       header={
         <button className="mx-2 flex h-8 items-center gap-2 rounded-md px-2 transition-colors hover:bg-white/15">
           <PlusIcon size={16} />
           <div className="text-sm">New field</div>
         </button>
       }
-      onClose={onClose}
       onBack={onBack}
       placeholder="Fields..."
     >
@@ -558,21 +470,11 @@ const FieldsConfigMenu = React.forwardRef<
 const ColumnByConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function ColumnByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function ColumnByConfigMenu({ onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Column by..."
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Column by...">
       <Command.Item asChild key="status">
         <ConfigMenuItem
           icon={ChevronDownSquareIcon}
@@ -587,21 +489,11 @@ const ColumnByConfigMenu = React.forwardRef<
 const GroupByConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function GroupByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function GroupByConfigMenu({ onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Group by..."
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Group by...">
       <Command.Item asChild key="assignees">
         <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
       </Command.Item>
@@ -636,21 +528,11 @@ const GroupByConfigMenu = React.forwardRef<
 const SortByConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function SortByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function SortByConfigMenu({ onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Sort by..."
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Sort by...">
       <Command.Item asChild key="title">
         <ConfigMenuItem icon={ListIcon} title="Title" isSelected={false} />
       </Command.Item>
@@ -701,21 +583,11 @@ const SortByConfigMenu = React.forwardRef<
 const FieldSumConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function FieldSumConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function FieldSumConfigMenu({ onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Field sum..."
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Field sum...">
       <Command.Item asChild key="count">
         <ConfigMenuItem title="Count" isSelected={true} />
       </Command.Item>
@@ -726,21 +598,11 @@ const FieldSumConfigMenu = React.forwardRef<
 const SliceByConfigMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function SliceByConfigMenu({ trigger, isOpen, onClose, onBack }, ref) {
+>(function SliceByConfigMenu({ onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Slice by..."
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Slice by...">
       <Command.Item asChild key="assignees">
         <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
       </Command.Item>
@@ -791,83 +653,37 @@ const ConfigMenuItem = React.forwardRef<
   );
 });
 
-const ViewConfigMenuItem = React.forwardRef<
-  HTMLDivElement,
-  {
-    icon: LucideIcon;
-    title: string;
-    value: string;
-    disabled?: boolean;
-    onSelect?: (e: Event) => void;
-  }
->(function ViewConfigMenuItem(
-  { icon: Icon, title, value, disabled, onSelect, ...props },
-  ref,
-) {
-  return (
-    <RadixDropdown.Item
-      {...props}
-      ref={ref}
-      onSelect={onSelect}
-      disabled={disabled}
-      className={clsx(
-        "flex h-8 w-full cursor-pointer items-center justify-between gap-4 rounded-md px-2 text-neutral-100 transition-colors hover:bg-white/15 focus-visible:bg-white/15 focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      )}
-    >
-      <div className="flex items-center gap-2 text-neutral-400">
-        <Icon size={16} />
-        <div className="text-sm">{title}:</div>
-      </div>
-      <div className="flex min-w-0 items-center gap-1">
-        <div className="truncate text-nowrap text-sm">{value}</div>
-        <ChevronRightIcon size={16} className="text-neutral-400" />
-      </div>
-    </RadixDropdown.Item>
-  );
-});
-
 const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
-
-  const handleOpenChange = (open: boolean) => {
-    setIsTooltipDisabled(true);
-    setIsOpen(open);
-  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip disabled={isTooltipDisabled} label="View more options">
-        <RadixDropdown.Trigger
-          onBlur={() => setIsTooltipDisabled(false)}
-          asChild
-        >
-          {children}
-        </RadixDropdown.Trigger>
+    <DropdownProvider
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      placement="bottom-end"
+    >
+      <Tooltip label="View more options">
+        <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
-      <AnimatePresence>
-        {isOpen && (
-          <RadixDropdown.Portal forceMount>
-            <DropdownMenuContent align="end">
-              <MenuItemList>
-                <MenuItem icon={WorkflowIcon} title="Workflows" />
-                <MenuItem icon={ArchiveIcon} title="Archived items" />
-                <MenuItem icon={SettingsIcon} title="Settings" />
-                <MenuItem icon={CopyIcon} title="Make a copy" />
-              </MenuItemList>
-              <DropdownMenuDivider />
-              <MenuItemGroup group="GitHub Projects">
-                <MenuItem icon={RocketIcon} title="What's new" />
-                <MenuItem icon={MessageSquareIcon} title="Give feedback" />
-                <MenuItem icon={BookOpenIcon} title="GitHub Docs" />
-              </MenuItemGroup>
-            </DropdownMenuContent>
-          </RadixDropdown.Portal>
-        )}
-      </AnimatePresence>
-    </RadixDropdown.Root>
+      <DropdownContent>
+        <FloatingCard>
+          <DropdownItemList>
+            <DropdownItem icon={WorkflowIcon} title="Workflows" />
+            <DropdownItem icon={ArchiveIcon} title="Archived items" />
+            <DropdownItem icon={SettingsIcon} title="Settings" />
+            <DropdownItem icon={CopyIcon} title="Make a copy" />
+          </DropdownItemList>
+          <DropdownDivider />
+          <DropdownItemGroup group="GitHub Projects">
+            <DropdownItem icon={RocketIcon} title="What's new" />
+            <DropdownItem icon={MessageSquareIcon} title="Give feedback" />
+            <DropdownItem icon={BookOpenIcon} title="GitHub Docs" />
+          </DropdownItemGroup>
+        </FloatingCard>
+      </DropdownContent>
+    </DropdownProvider>
   );
 };
 
@@ -875,46 +691,31 @@ const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
-
-  const handleOpenChange = (open: boolean) => {
-    setIsTooltipDisabled(true);
-    setIsOpen(open);
-  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip disabled={isTooltipDisabled} label="Create new...">
-        <RadixDropdown.Trigger
-          asChild
-          onBlur={() => setIsTooltipDisabled(false)}
-        >
-          {children}
-        </RadixDropdown.Trigger>
+    <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Tooltip label="Create new...">
+        <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
-      <AnimatePresence>
-        {isOpen && (
-          <RadixDropdown.Portal forceMount>
-            <DropdownMenuContent align="end">
-              <MenuItemList>
-                <MenuItem icon={BookMarkedIcon} title="New repository" />
-                <MenuItem icon={BookDownIcon} title="Import repository" />
-              </MenuItemList>
-              <DropdownMenuDivider />
-              <MenuItemList>
-                <MenuItem icon={ComputerIcon} title="New codespace" />
-                <MenuItem icon={CodeIcon} title="New gist" />
-              </MenuItemList>
-              <DropdownMenuDivider />
-              <MenuItemList>
-                <MenuItem icon={BuildingIcon} title="New organization" />
-                <MenuItem icon={KanbanSquareIcon} title="New project" />
-              </MenuItemList>
-            </DropdownMenuContent>
-          </RadixDropdown.Portal>
-        )}
-      </AnimatePresence>
-    </RadixDropdown.Root>
+      <DropdownContent>
+        <FloatingCard>
+          <DropdownItemList>
+            <DropdownItem icon={BookMarkedIcon} title="New repository" />
+            <DropdownItem icon={BookDownIcon} title="Import repository" />
+          </DropdownItemList>
+          <DropdownDivider />
+          <DropdownItemList>
+            <DropdownItem icon={ComputerIcon} title="New codespace" />
+            <DropdownItem icon={CodeIcon} title="New gist" />
+          </DropdownItemList>
+          <DropdownDivider />
+          <DropdownItemList>
+            <DropdownItem icon={BuildingIcon} title="New organization" />
+            <DropdownItem icon={KanbanSquareIcon} title="New project" />
+          </DropdownItemList>
+        </FloatingCard>
+      </DropdownContent>
+    </DropdownProvider>
   );
 };
 
@@ -924,25 +725,21 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-      <RadixDropdown.Trigger asChild>{children}</RadixDropdown.Trigger>
-      <AnimatePresence>
-        {isOpen && (
-          <RadixDropdown.Portal forceMount>
-            <DropdownMenuContent align="start">
-              <MenuItemGroup group="Slice by">
-                <MenuItem icon={UsersIcon} title="Assigness" />
-                <MenuItem icon={ChevronDownSquareIcon} title="Status" />
-                <MenuItem icon={TagIcon} title="Labels" />
-                <MenuItem icon={BookMarkedIcon} title="Repository" />
-                <MenuItem icon={MilestoneIcon} title="Milestone" />
-                <MenuItem icon={XIcon} title="No slicing" />
-              </MenuItemGroup>
-            </DropdownMenuContent>
-          </RadixDropdown.Portal>
-        )}
-      </AnimatePresence>
-    </RadixDropdown.Root>
+    <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
+      <DropdownTrigger>{children}</DropdownTrigger>
+      <DropdownContent>
+        <FloatingCard>
+          <DropdownItemGroup group="Slice by">
+            <DropdownItem icon={UsersIcon} title="Assigness" />
+            <DropdownItem icon={ChevronDownSquareIcon} title="Status" />
+            <DropdownItem icon={TagIcon} title="Labels" />
+            <DropdownItem icon={BookMarkedIcon} title="Repository" />
+            <DropdownItem icon={MilestoneIcon} title="Milestone" />
+            <DropdownItem icon={XIcon} title="No slicing" />
+          </DropdownItemGroup>
+        </FloatingCard>
+      </DropdownContent>
+    </DropdownProvider>
   );
 };
 
@@ -951,273 +748,176 @@ const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
-
-  const handleOpenChange = (open: boolean) => {
-    setIsTooltipDisabled(true);
-    setIsOpen(open);
-  };
 
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip
-        disabled={isTooltipDisabled}
-        label={`Actions for column: ${kanban.status}`}
-      >
-        <RadixDropdown.Trigger
-          asChild
-          onBlur={() => setIsTooltipDisabled(false)}
-        >
-          {children}
-        </RadixDropdown.Trigger>
+    <DropdownProvider
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      placement="bottom-end"
+    >
+      <Tooltip label={`Actions for column: ${kanban.status}`}>
+        <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
-      <AnimatePresence>
-        {isOpen && (
-          <RadixDropdown.Portal forceMount>
-            <DropdownMenuContent>
-              <MenuItemGroup group="Items">
-                <MenuItem icon={ArchiveIcon} title="Archive all" />
-                <MenuItem icon={TrashIcon} title="Delete all" red />
-              </MenuItemGroup>
-              <DropdownMenuDivider />
-              <MenuItemGroup group="Column">
-                <MenuItem icon={Settings2Icon} title="Set limit" />
-                <MenuItem icon={PenIcon} title="Edit details" />
-                <MenuItem icon={EyeOffIcon} title="Hide from view" />
-                <MenuItem icon={TrashIcon} title="Delete" red />
-              </MenuItemGroup>
-            </DropdownMenuContent>
-          </RadixDropdown.Portal>
-        )}
-      </AnimatePresence>
-    </RadixDropdown.Root>
+      <DropdownContent>
+        <FloatingCard>
+          <DropdownItemGroup group="Items">
+            <DropdownItem icon={ArchiveIcon} title="Archive all" />
+            <DropdownItem icon={TrashIcon} title="Delete all" red />
+          </DropdownItemGroup>
+          <DropdownDivider />
+          <DropdownItemGroup group="Column">
+            <DropdownItem icon={Settings2Icon} title="Set limit" />
+            <DropdownItem icon={PenIcon} title="Edit details" />
+            <DropdownItem icon={EyeOffIcon} title="Hide from view" />
+            <DropdownItem icon={TrashIcon} title="Delete" red />
+          </DropdownItemGroup>
+        </FloatingCard>
+      </DropdownContent>
+    </DropdownProvider>
   );
 };
 
 type KanbanItemMenuMode = "close" | "main" | "moveToColumn";
 const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   const [mode, setMode] = useState<KanbanItemMenuMode>("close");
-  const [tooltipDisabled, setTooltipDisabled] = useState(false);
 
-  const changeMode = (mode: KanbanItemMenuMode) => {
-    if (mode === "close") {
-      // triggerを使いまわしているため、Menuをcloseしてもtriggerにfocusが当たらないので手動でfocusを当てる
-      window.setTimeout(() => {
-        triggerRef.current?.focus();
-      }, 250);
+  const contents = useMemo(() => {
+    return {
+      close: null,
+      main: (
+        <KanbanItemMenu
+          onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
+        />
+      ),
+      moveToColumn: (
+        <MoveToColumnMenu kanban={kanban} onBack={() => setMode("main")} />
+      ),
+    };
+  }, [kanban]);
 
-      // menuを閉じてフォーカスがあたったときのtooltipを抑制する。
-      // triggerをblurしたときに解除する
-      setTooltipDisabled(true);
+  const isOpen = mode !== "close";
+  const handleOpenChang = (open: boolean) => {
+    if (open) {
+      setMode("main");
+    } else {
+      setMode("close");
     }
-
-    setMode(mode);
   };
 
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const trigger = useMemo(() => {
-    return (
-      <button
-        ref={triggerRef}
-        onBlur={() => setTooltipDisabled(false)}
-        onClick={() => changeMode("main")}
-        key="trigger"
-        className={clsx(
-          "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus:bg-white/15 focus:opacity-100 focus-visible:bg-white/15 focus-visible:opacity-100",
-          mode != "close"
-            ? "bg-white/15 opacity-100"
-            : "opacity-0 group-hover:opacity-100",
-        )}
-      >
-        <MoreHorizontalIcon size={18} />
-      </button>
-    );
-  }, [mode]);
-
-  const content = useMemo(() => {
-    switch (mode) {
-      case "close": {
-        return (
-          <Tooltip disabled={tooltipDisabled} label={`Actions for task`}>
-            {trigger}
-          </Tooltip>
-        );
-      }
-      case "main": {
-        return (
-          <KanbanItemMenu
-            isOpen={true}
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onOpenMoveToColumnMenu={() => changeMode("moveToColumn")}
-          />
-        );
-      }
-      case "moveToColumn": {
-        return (
-          <MoveToColumnMenu
-            kanban={kanban}
-            isOpen={true}
-            trigger={trigger}
-            onClose={() => changeMode("close")}
-            onBack={() => changeMode("main")}
-          />
-        );
-      }
-      default: {
-        throw new Error(mode satisfies never);
-      }
+  const handleEscapeKeydown = () => {
+    if (mode === "moveToColumn") {
+      setMode("main");
+    } else {
+      setMode("close");
     }
-  }, [kanban, mode, tooltipDisabled, trigger]);
+  };
 
-  return <AnimatePresence mode="wait">{content}</AnimatePresence>;
+  return (
+    <DropdownProvider isOpen={isOpen} onOpenChange={handleOpenChang}>
+      <Tooltip label={`Actions for task`}>
+        <DropdownTrigger>
+          <button
+            key="trigger"
+            className={clsx(
+              "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus:bg-white/15 focus:opacity-100 focus-visible:bg-white/15 focus-visible:opacity-100",
+              mode != "close"
+                ? "bg-white/15 opacity-100"
+                : "opacity-0 group-hover:opacity-100",
+            )}
+          >
+            <MoreHorizontalIcon size={18} />
+          </button>
+        </DropdownTrigger>
+      </Tooltip>
+      <DropdownMultiContent
+        mode={mode}
+        contents={contents}
+        onEscapeKeydown={handleEscapeKeydown}
+      ></DropdownMultiContent>
+    </DropdownProvider>
+  );
 };
 
 const KanbanItemMenu = React.forwardRef<
   HTMLDivElement,
   {
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onOpenMoveToColumnMenu: () => void;
   }
->(function KanbanItemMenu(
-  { trigger, isOpen, onClose, onOpenMoveToColumnMenu },
-  ref,
-) {
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      onClose();
-    }
-  };
-
+>(function KanbanItemMenu({ onOpenMoveToColumnMenu }, ref) {
   return (
-    <RadixDropdown.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
-      {isOpen && (
-        <RadixDropdown.Portal forceMount>
-          <DropdownMenuContent
-            align="start"
-            ref={ref}
-            onCloseAutoFocus={(e) => e.preventDefault()}
-          >
-            <MenuItemList>
-              <MenuItem icon={CircleDotIcon} title="Convert to issue" />
-              <MenuItem icon={CopyIcon} title="Copy link in project" />
-            </MenuItemList>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <MenuItem icon={ArrowUpToLine} title="Move to top" />
-              <MenuItem icon={ArrowDownToLineIcon} title="Move to top" />
-              <MenuItem
-                icon={MoveHorizontalIcon}
-                leftIcon={ChevronRightIcon}
-                title="Move to column"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  onOpenMoveToColumnMenu();
-                }}
-              />
-            </MenuItemList>
-            <DropdownMenuDivider />
-            <MenuItemList>
-              <MenuItem icon={ArchiveIcon} title="Archive" />
-              <MenuItem icon={TrashIcon} title="Delete from project" red />
-            </MenuItemList>
-          </DropdownMenuContent>
-        </RadixDropdown.Portal>
-      )}
-    </RadixDropdown.Root>
+    <FloatingCard ref={ref}>
+      <DropdownItemList>
+        <DropdownItem icon={CircleDotIcon} title="Convert to issue" />
+        <DropdownItem icon={CopyIcon} title="Copy link in project" />
+      </DropdownItemList>
+      <DropdownDivider />
+      <DropdownItemList>
+        <DropdownItem icon={ArrowUpToLine} title="Move to top" />
+        <DropdownItem icon={ArrowDownToLineIcon} title="Move to top" />
+        <DropdownItem
+          icon={MoveHorizontalIcon}
+          leftIcon={ChevronRightIcon}
+          title="Move to column"
+          onClick={onOpenMoveToColumnMenu}
+        />
+      </DropdownItemList>
+      <DropdownDivider />
+      <DropdownItemList>
+        <DropdownItem icon={ArchiveIcon} title="Archive" />
+        <DropdownItem icon={TrashIcon} title="Delete from project" red />
+      </DropdownItemList>
+    </FloatingCard>
   );
 });
 
 const SelectionMenu = React.forwardRef<
   HTMLDivElement,
   {
-    isOpen: boolean;
     width?: number;
-    trigger: ReactNode;
     header?: ReactNode;
-    onClose: () => void;
     onBack?: () => void;
     children: ReactNode;
     placeholder?: string;
-    onCloseAutoFocus?: PopoverContentProps["onCloseAutoFocus"];
   }
 >(function SelectCommandMenu(
-  {
-    isOpen,
-    width = 250,
-    trigger,
-    header,
-    onClose,
-    onBack,
-    children,
-    placeholder,
-    onCloseAutoFocus,
-  },
+  { width = 250, header, onBack, children, placeholder },
   ref,
 ) {
   return (
-    <Popover open={isOpen} modal>
-      <PopoverAnchor asChild>{trigger}</PopoverAnchor>
-      {isOpen && (
-        <PopoverPortal forceMount>
-          <PopoverContent
-            ref={ref}
-            asChild
-            align="start"
-            side="bottom"
-            sideOffset={4}
-            onCloseAutoFocus={onCloseAutoFocus}
-            onEscapeKeyDown={(e) => {
-              e.preventDefault();
-              if (onBack) {
-                onBack();
-              } else {
-                onClose();
-              }
-            }}
-            onPointerDownOutside={onClose}
-          >
-            <Command>
-              <FloatingCard width={width}>
-                <div className="flex h-8 w-full items-center px-2">
-                  {onBack && (
-                    <button
-                      className=" grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
-                      onClick={onBack}
-                    >
-                      <ChevronLeftIcon size={18} className="mr-[2px]" />
-                    </button>
-                  )}
-                  <Command.Input
-                    className="mx-2 block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
-                    placeholder={placeholder}
-                    autoFocus
-                  />
-                </div>
-                <DropdownMenuDivider />
-                {header && (
-                  <>
-                    {header}
-                    <DropdownMenuDivider />
-                  </>
-                )}
-                <Command.List asChild>
-                  <MenuItemList>
-                    <Command.Empty className="grid h-20 place-items-center text-sm text-neutral-400">
-                      No results found.
-                    </Command.Empty>
-                    {children}
-                  </MenuItemList>
-                </Command.List>
-              </FloatingCard>
-            </Command>
-          </PopoverContent>
-        </PopoverPortal>
-      )}
-    </Popover>
+    <Command ref={ref}>
+      <FloatingCard width={width}>
+        <div className="flex h-8 w-full items-center px-2">
+          {onBack && (
+            <button
+              className=" grid size-6 shrink-0 place-items-center rounded-md bg-neutral-700 transition-colors hover:bg-neutral-600"
+              onClick={onBack}
+            >
+              <ChevronLeftIcon size={18} className="mr-[2px]" />
+            </button>
+          )}
+          <Command.Input
+            className="mx-2 block h-full w-full bg-transparent text-sm placeholder:text-neutral-400 focus-within:outline-none"
+            placeholder={placeholder}
+            autoFocus
+          />
+        </div>
+        <DropdownDivider />
+        {header && (
+          <>
+            {header}
+            <DropdownDivider />
+          </>
+        )}
+        <Command.List asChild>
+          <DropdownItemList>
+            <Command.Empty className="grid h-20 place-items-center text-sm text-neutral-400">
+              No results found.
+            </Command.Empty>
+            {children}
+          </DropdownItemList>
+        </Command.List>
+      </FloatingCard>
+    </Command>
   );
 });
 
@@ -1225,22 +925,11 @@ const MoveToColumnMenu = React.forwardRef<
   HTMLDivElement,
   {
     kanban: Kanban;
-    trigger: ReactNode;
-    isOpen: boolean;
-    onClose: () => void;
     onBack: () => void;
   }
->(function MoveToColumnMenu({ kanban, trigger, isOpen, onClose, onBack }, ref) {
+>(function MoveToColumnMenu({ kanban, onBack }, ref) {
   return (
-    <SelectionMenu
-      ref={ref}
-      isOpen={isOpen}
-      trigger={trigger}
-      onClose={onClose}
-      onBack={onBack}
-      placeholder="Column..."
-      onCloseAutoFocus={(e) => e.preventDefault()}
-    >
+    <SelectionMenu ref={ref} onBack={onBack} placeholder="Column...">
       {kanbans.map((k) => {
         return (
           <Command.Item asChild key={k.status}>
@@ -1271,111 +960,6 @@ const MoveToColumnItem = React.forwardRef<
         <div className="text-xs text-neutral-400">{kanban.description}</div>
       </div>
     </button>
-  );
-});
-
-const DropdownMenuDivider: React.FC = () => {
-  return <div className="h-[1px] w-full bg-neutral-700" />;
-};
-
-const DropdownMenuContent = React.forwardRef<
-  HTMLDivElement,
-  {
-    children: ReactNode;
-    align?: "center" | "end" | "start";
-    onEscapeKeydown?: MenuContentProps["onEscapeKeyDown"];
-    onCloseAutoFocus?: MenuContentProps["onCloseAutoFocus"];
-    width?: number;
-  }
->(function DropdownMenuContent(
-  { children, align = "end", width, ...props },
-  ref,
-) {
-  return (
-    <RadixDropdown.Content
-      ref={ref}
-      {...props}
-      loop
-      asChild
-      side="bottom"
-      align={align}
-      sideOffset={4}
-    >
-      <FloatingCard width={width}>{children}</FloatingCard>
-    </RadixDropdown.Content>
-  );
-});
-
-const FloatingCard = forwardRef<
-  HTMLDivElement,
-  { children: ReactNode; width?: number }
->(function Card({ children, width = 200, ...props }, ref) {
-  return (
-    <motion.div
-      {...props}
-      ref={ref}
-      className="flex flex-col gap-2 rounded-lg border border-neutral-700 bg-neutral-800 py-2 text-neutral-200 shadow-2xl"
-      initial={{ y: -5, opacity: 0, width }}
-      animate={{ y: 0, opacity: 1, width }}
-      exit={{ y: -5, opacity: 0, width, transition: { duration: 0.1 } }}
-    >
-      {children}
-    </motion.div>
-  );
-});
-
-const MenuItemGroup: React.FC<{ group: string; children: ReactNode }> = ({
-  group,
-  children,
-}) => {
-  return (
-    <div className="flex flex-col">
-      <div className="px-4 pb-1 pt-2 text-xs text-neutral-400">{group}</div>
-      <MenuItemList>{children}</MenuItemList>
-    </div>
-  );
-};
-
-const MenuItemList: React.FC<{ children: ReactNode }> = ({ children }) => {
-  return <div className="px-2">{children}</div>;
-};
-
-const MenuItem = React.forwardRef<
-  HTMLDivElement,
-  {
-    icon: LucideIcon;
-    title: string;
-    red?: boolean;
-    disabled?: boolean;
-    onSelect?: (e: Event) => void;
-    leftIcon?: LucideIcon;
-  }
->(function MenuItem(
-  { icon: Icon, title, red, disabled, onSelect, leftIcon: LeftIcon, ...props },
-  ref,
-) {
-  return (
-    <RadixDropdown.Item
-      {...props}
-      ref={ref}
-      onSelect={onSelect}
-      disabled={disabled}
-      className={clsx(
-        "flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        red
-          ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
-          : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <Icon
-          size={16}
-          className={clsx("text-neutral-400", red && "text-red-500")}
-        />
-        <div className="text-sm">{title}</div>
-      </div>
-      {LeftIcon && <LeftIcon size={16} className="text-neutral-400" />}
-    </RadixDropdown.Item>
   );
 });
 
@@ -1619,7 +1203,9 @@ const Tooltip: React.FC<{
   return (
     <RadixTooltip.Provider>
       <RadixTooltip.Root>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Trigger asChild>
+          <div>{children}</div>
+        </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
           {!disabled && (
             <RadixTooltip.Content
