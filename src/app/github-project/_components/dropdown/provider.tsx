@@ -19,6 +19,15 @@ import {
   useState,
 } from "react";
 
+/**
+ * https://github.com/radix-ui/primitives/issues/2545
+ * radix-uiのdropdown-menuは、マウスを使用してMenuを閉じたときにもtriggerにfocus-visibleを付与してしまう。
+ * onCloseAutoFocusを使用すると閉じたときにフォーカスを与えないようにもできるのだが、キーボードで操作しているときには
+ * フォーカスを当てたい。
+ *
+ * floating-uiを使用するとそのような問題は起こらなさそうだったので、これを使って自作する
+ */
+
 type DropdownContext = {
   isOpen: boolean;
   activeIndex: number | null;
