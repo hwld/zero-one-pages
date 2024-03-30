@@ -1226,7 +1226,7 @@ const DropdownMenuContent = React.forwardRef<
   );
 });
 
-export const FloatingCard = forwardRef<
+const FloatingCard = forwardRef<
   HTMLDivElement,
   { children: ReactNode; width?: number }
 >(function Card({ children, width = 200, ...props }, ref) {
