@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ReactNode, forwardRef } from "react";
 
 type Props = { children: ReactNode; width?: number };
-export const FloatingCard = forwardRef<HTMLDivElement, Props>(function Card(
+export const DropdownCard = forwardRef<HTMLDivElement, Props>(function Card(
   { children, width = 200, ...props },
   ref,
 ) {

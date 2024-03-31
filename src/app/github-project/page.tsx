@@ -1,38 +1,30 @@
 "use client";
-import * as RadixTooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import { Command } from "cmdk";
 import {
   ArchiveIcon,
   ArrowDownToLineIcon,
   ArrowUpToLine,
-  BookDownIcon,
   BookMarkedIcon,
   BookOpenIcon,
-  BuildingIcon,
   CheckIcon,
-  ChevronDown,
   ChevronDownIcon,
   ChevronDownSquareIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleDashedIcon,
   CircleDotIcon,
-  CodeIcon,
   Columns2Icon,
-  ComputerIcon,
   CopyIcon,
   EyeOffIcon,
   GalleryHorizontalEndIcon,
   GitPullRequestIcon,
-  InboxIcon,
   KanbanSquareIcon,
   LayersIcon,
   LineChartIcon,
   ListFilterIcon,
   ListIcon,
   LucideIcon,
-  MenuIcon,
   MessageSquareIcon,
   MilestoneIcon,
   MoreHorizontalIcon,
@@ -43,12 +35,10 @@ import {
   PlusIcon,
   RocketIcon,
   Rows2Icon,
-  SearchIcon,
   Settings2Icon,
   SettingsIcon,
   TableRowsSplitIcon,
   TagIcon,
-  TerminalIcon,
   TextIcon,
   TrashIcon,
   UploadIcon,
@@ -56,7 +46,7 @@ import {
   WorkflowIcon,
   XIcon,
 } from "lucide-react";
-import React, { ComponentPropsWithoutRef, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ReactNode } from "react";
 import { DropdownProvider } from "./_components/dropdown/provider";
 import { DropdownTrigger } from "./_components/dropdown/trigger";
@@ -70,8 +60,10 @@ import {
   DropdownItemList,
   ViewConfigMenuItem,
 } from "./_components/dropdown/item";
-import { DropdownDivider } from "./_components/dropdown/divider";
-import { FloatingCard } from "./_components/floating-card";
+import { Divider } from "./_components/divider";
+import { DropdownCard } from "./_components/dropdown/card";
+import { Tooltip } from "./_components/tooltip";
+import { AppHeader } from "./_components/app-header/app-header";
 
 type Kanban = {
   color: StatusIconColor;
@@ -118,7 +110,7 @@ const GitHubProjectPage: React.FC = () => {
       className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden bg-neutral-900 text-neutral-100"
       style={{ colorScheme: "dark" }}
     >
-      <Header />
+      <AppHeader />
       <div className="flex items-center justify-between px-8">
         <div className="text-lg font-bold">zero-one-ui</div>
         <div className="flex items-center gap-2">
@@ -322,7 +314,7 @@ const ViewOptionMenu: React.FC<{
   onChangeMode: (mode: ViewOptionMenuMode) => void;
 }> = ({ onChangeMode }) => {
   return (
-    <FloatingCard width={320}>
+    <DropdownCard width={320}>
       <DropdownItemGroup group="configuration">
         <ViewConfigMenuItem
           icon={TextIcon}
@@ -373,11 +365,11 @@ const ViewOptionMenu: React.FC<{
           }}
         />
       </DropdownItemGroup>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <DropdownItem icon={LineChartIcon} title="Generate chart" />
       </DropdownItemList>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <DropdownItem icon={PenIcon} title="Rename view" />
         <DropdownItem
@@ -386,11 +378,11 @@ const ViewOptionMenu: React.FC<{
         />
         <DropdownItem icon={TrashIcon} title="Delete view" red />
       </DropdownItemList>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <DropdownItem icon={UploadIcon} title="Export view data" />
       </DropdownItemList>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <div className="grid h-8 grid-cols-2 gap-2">
           <button className="grow rounded-md text-neutral-300 transition-colors hover:bg-white/15">
@@ -401,7 +393,7 @@ const ViewOptionMenu: React.FC<{
           </button>
         </div>
       </DropdownItemList>
-    </FloatingCard>
+    </DropdownCard>
   );
 };
 
@@ -668,52 +660,20 @@ const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
         <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
       <DropdownContent>
-        <FloatingCard>
+        <DropdownCard>
           <DropdownItemList>
             <DropdownItem icon={WorkflowIcon} title="Workflows" />
             <DropdownItem icon={ArchiveIcon} title="Archived items" />
             <DropdownItem icon={SettingsIcon} title="Settings" />
             <DropdownItem icon={CopyIcon} title="Make a copy" />
           </DropdownItemList>
-          <DropdownDivider />
+          <Divider />
           <DropdownItemGroup group="GitHub Projects">
             <DropdownItem icon={RocketIcon} title="What's new" />
             <DropdownItem icon={MessageSquareIcon} title="Give feedback" />
             <DropdownItem icon={BookOpenIcon} title="GitHub Docs" />
           </DropdownItemGroup>
-        </FloatingCard>
-      </DropdownContent>
-    </DropdownProvider>
-  );
-};
-
-const CreateNewMenuTrigger: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Tooltip label="Create new...">
-        <DropdownTrigger>{children}</DropdownTrigger>
-      </Tooltip>
-      <DropdownContent>
-        <FloatingCard>
-          <DropdownItemList>
-            <DropdownItem icon={BookMarkedIcon} title="New repository" />
-            <DropdownItem icon={BookDownIcon} title="Import repository" />
-          </DropdownItemList>
-          <DropdownDivider />
-          <DropdownItemList>
-            <DropdownItem icon={ComputerIcon} title="New codespace" />
-            <DropdownItem icon={CodeIcon} title="New gist" />
-          </DropdownItemList>
-          <DropdownDivider />
-          <DropdownItemList>
-            <DropdownItem icon={BuildingIcon} title="New organization" />
-            <DropdownItem icon={KanbanSquareIcon} title="New project" />
-          </DropdownItemList>
-        </FloatingCard>
+        </DropdownCard>
       </DropdownContent>
     </DropdownProvider>
   );
@@ -728,7 +688,7 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
     <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
       <DropdownTrigger>{children}</DropdownTrigger>
       <DropdownContent>
-        <FloatingCard>
+        <DropdownCard>
           <DropdownItemGroup group="Slice by">
             <DropdownItem icon={UsersIcon} title="Assigness" />
             <DropdownItem icon={ChevronDownSquareIcon} title="Status" />
@@ -737,7 +697,7 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
             <DropdownItem icon={MilestoneIcon} title="Milestone" />
             <DropdownItem icon={XIcon} title="No slicing" />
           </DropdownItemGroup>
-        </FloatingCard>
+        </DropdownCard>
       </DropdownContent>
     </DropdownProvider>
   );
@@ -759,19 +719,19 @@ const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
         <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
       <DropdownContent>
-        <FloatingCard>
+        <DropdownCard>
           <DropdownItemGroup group="Items">
             <DropdownItem icon={ArchiveIcon} title="Archive all" />
             <DropdownItem icon={TrashIcon} title="Delete all" red />
           </DropdownItemGroup>
-          <DropdownDivider />
+          <Divider />
           <DropdownItemGroup group="Column">
             <DropdownItem icon={Settings2Icon} title="Set limit" />
             <DropdownItem icon={PenIcon} title="Edit details" />
             <DropdownItem icon={EyeOffIcon} title="Hide from view" />
             <DropdownItem icon={TrashIcon} title="Delete" red />
           </DropdownItemGroup>
-        </FloatingCard>
+        </DropdownCard>
       </DropdownContent>
     </DropdownProvider>
   );
@@ -845,12 +805,12 @@ const KanbanItemMenu = React.forwardRef<
   }
 >(function KanbanItemMenu({ onOpenMoveToColumnMenu }, ref) {
   return (
-    <FloatingCard ref={ref}>
+    <DropdownCard ref={ref}>
       <DropdownItemList>
         <DropdownItem icon={CircleDotIcon} title="Convert to issue" />
         <DropdownItem icon={CopyIcon} title="Copy link in project" />
       </DropdownItemList>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <DropdownItem icon={ArrowUpToLine} title="Move to top" />
         <DropdownItem icon={ArrowDownToLineIcon} title="Move to top" />
@@ -861,12 +821,12 @@ const KanbanItemMenu = React.forwardRef<
           onClick={onOpenMoveToColumnMenu}
         />
       </DropdownItemList>
-      <DropdownDivider />
+      <Divider />
       <DropdownItemList>
         <DropdownItem icon={ArchiveIcon} title="Archive" />
         <DropdownItem icon={TrashIcon} title="Delete from project" red />
       </DropdownItemList>
-    </FloatingCard>
+    </DropdownCard>
   );
 });
 
@@ -885,7 +845,7 @@ const SelectionMenu = React.forwardRef<
 ) {
   return (
     <Command ref={ref}>
-      <FloatingCard width={width}>
+      <DropdownCard width={width}>
         <div className="flex h-8 w-full items-center px-2">
           {onBack && (
             <button
@@ -901,11 +861,11 @@ const SelectionMenu = React.forwardRef<
             autoFocus
           />
         </div>
-        <DropdownDivider />
+        <Divider />
         {header && (
           <>
             {header}
-            <DropdownDivider />
+            <Divider />
           </>
         )}
         <Command.List asChild>
@@ -916,7 +876,7 @@ const SelectionMenu = React.forwardRef<
             {children}
           </DropdownItemList>
         </Command.List>
-      </FloatingCard>
+      </DropdownCard>
     </Command>
   );
 });
@@ -1102,121 +1062,3 @@ const ButtonGroupItem = React.forwardRef<
     </button>
   );
 });
-
-const Header: React.FC = () => {
-  return (
-    <div className="flex items-center justify-between gap-2 border-b border-neutral-600 px-4">
-      <div className="flex items-center gap-4">
-        <HeaderButton icon={MenuIcon} />
-        <div className="size-8 shrink-0 rounded-full bg-neutral-300" />
-        <div className="flex items-center">
-          <BreadCrumbItem>hwld</BreadCrumbItem>
-          <BreadCrumbSeparator />
-          <BreadCrumbItem>projects</BreadCrumbItem>
-          <BreadCrumbSeparator />
-          <BreadCrumbItem active>zero-one-ui</BreadCrumbItem>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <button className="flex h-8 w-[350px] cursor-pointer items-center justify-between rounded-md border border-neutral-600 px-2 text-neutral-400">
-          <div className="flex items-center gap-2">
-            <SearchIcon size={16} />
-            <div className="text-sm">
-              Type
-              <kbd className="mx-1 rounded border border-neutral-400 px-[3px]">
-                /
-              </kbd>
-              to search
-            </div>
-          </div>
-          <div className="flex h-full items-center gap-2">
-            <div className="h-2/3 w-[1px] bg-neutral-600" />
-            <TerminalIcon size={16} />
-          </div>
-        </button>
-        <div className="h-5 w-[1px] bg-neutral-600" />
-        <CreateNewMenuTrigger>
-          <HeaderButton icon={PlusIcon} rightIcon={ChevronDown} />
-        </CreateNewMenuTrigger>
-        <Tooltip label="Issues">
-          <HeaderButton icon={CircleDotIcon} />
-        </Tooltip>
-        <Tooltip label="Pull requests">
-          <HeaderButton icon={GitPullRequestIcon} />
-        </Tooltip>
-        <Tooltip label="You have no unread notifications">
-          <HeaderButton icon={InboxIcon} />
-        </Tooltip>
-        <div className="size-8 rounded-full bg-neutral-300" />
-      </div>
-    </div>
-  );
-};
-
-const BreadCrumbSeparator: React.FC = () => {
-  return <span className="text-sm text-neutral-400">/</span>;
-};
-
-const BreadCrumbItem: React.FC<{ children: ReactNode; active?: boolean }> = ({
-  children,
-  active = false,
-}) => {
-  return (
-    <button
-      className={clsx(
-        "flex h-6 cursor-pointer items-center text-nowrap rounded-md px-1 text-sm transition-colors hover:bg-white/15",
-        active && "font-bold",
-      )}
-    >
-      {children}
-    </button>
-  );
-};
-
-const HeaderButton = React.forwardRef<
-  HTMLButtonElement,
-  {
-    icon: LucideIcon;
-    rightIcon?: LucideIcon;
-  } & ComponentPropsWithoutRef<"button">
->(function HeaderButton({ icon: Icon, rightIcon: RightIcon, ...props }, ref) {
-  return (
-    <button
-      {...props}
-      ref={ref}
-      className={clsx(
-        "flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1 rounded-md border border-neutral-600 text-neutral-400 transition-colors hover:bg-white/10",
-        RightIcon ? "px-2" : "w-8",
-      )}
-    >
-      <Icon size={18} />
-      {RightIcon && <RightIcon size={18} />}
-    </button>
-  );
-});
-
-const Tooltip: React.FC<{
-  children: ReactNode;
-  label: string;
-  disabled?: boolean;
-}> = ({ children, label, disabled }) => {
-  return (
-    <RadixTooltip.Provider>
-      <RadixTooltip.Root>
-        <RadixTooltip.Trigger asChild>
-          <div>{children}</div>
-        </RadixTooltip.Trigger>
-        <RadixTooltip.Portal>
-          {!disabled && (
-            <RadixTooltip.Content
-              className="flex h-6 items-center rounded bg-neutral-700 px-2 text-xs text-neutral-300"
-              sideOffset={8}
-            >
-              {label}
-            </RadixTooltip.Content>
-          )}
-        </RadixTooltip.Portal>
-      </RadixTooltip.Root>
-    </RadixTooltip.Provider>
-  );
-};
