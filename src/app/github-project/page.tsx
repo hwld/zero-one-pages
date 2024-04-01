@@ -64,47 +64,19 @@ import { Divider } from "./_components/divider";
 import { DropdownCard } from "./_components/dropdown/card";
 import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
-
-type Kanban = {
-  color: StatusIconColor;
-  status: "Todo" | "In Progress" | "Done" | "Archive" | "On Hold";
-  count: number;
-  description: string;
-};
-const kanbans: Kanban[] = [
-  {
-    color: "green",
-    status: "Todo",
-    count: 10,
-    description: "This item hasn't been started",
-  },
-  {
-    color: "orange",
-    status: "In Progress",
-    count: 5,
-    description: "This is actively being worked on",
-  },
-  {
-    color: "red",
-    status: "On Hold",
-    count: 3,
-    description: "This item is on hold",
-  },
-  {
-    color: "purple",
-    status: "Done",
-    count: 0,
-    description: "This has been completed",
-  },
-  {
-    color: "gray",
-    status: "Archive",
-    count: 3,
-    description: "This item has been archived",
-  },
-];
+import { useView } from "./_queries/useView";
+import { useCreateTask } from "./_queries/useCreateTask";
+import {
+  View,
+  ViewColumn as ViewColumnData,
+  ViewTask,
+} from "./_mocks/view/api";
+import { TaskStatus } from "./_mocks/task-status/store";
+import { useDeleteTask } from "./_queries/useDeleteTask";
 
 const GitHubProjectPage: React.FC = () => {
+  const { data: view } = useView("1");
+
   return (
     <div
       className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden bg-neutral-900 text-neutral-100"
@@ -138,8 +110,8 @@ const GitHubProjectPage: React.FC = () => {
           <Tab icon={PlusIcon}>New view</Tab>
         </div>
         <div className="flex w-[100dvw] bg-neutral-800">
-          <SlicerPanel />
-          <MainPanel />
+          <SlicerPanel columns={view?.columns ?? []} />
+          {view && <MainPanel view={view} />}
         </div>
       </div>
     </div>
@@ -147,7 +119,7 @@ const GitHubProjectPage: React.FC = () => {
 };
 export default GitHubProjectPage;
 
-const MainPanel: React.FC = () => {
+const MainPanel: React.FC<{ view: View }> = ({ view }) => {
   return (
     <div className="flex min-w-0 grow flex-col">
       <div className="flex items-center gap-4 p-4">
@@ -164,8 +136,14 @@ const MainPanel: React.FC = () => {
         </div>
       </div>
       <div className="flex grow gap-4 overflow-x-scroll px-4 py-2">
-        {kanbans.map((kanban, i) => {
-          return <Kanban key={i} kanban={kanban} />;
+        {view?.columns.map((column) => {
+          return (
+            <ViewColumn
+              key={column.statusId}
+              column={column}
+              allColumns={view.columns}
+            />
+          );
         })}
       </div>
     </div>
@@ -194,35 +172,47 @@ const Button: React.FC<{
   );
 };
 
-const Kanban: React.FC<{
-  kanban: Kanban;
-}> = ({ kanban }) => {
+const ViewColumn: React.FC<{
+  allColumns: ViewColumnData[];
+  column: ViewColumnData;
+}> = ({ allColumns, column }) => {
+  const createTaskMutation = useCreateTask();
+
+  const handleCreateTask = () => {
+    createTaskMutation.mutate({ title: "task", statusId: column.statusId });
+  };
+
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
         <div className="flex items-center gap-2">
-          <StatusIcon color={kanban.color} />
-          <div className="font-bold">{kanban.status}</div>
-          <CountBadge count={kanban.count} />
+          <StatusIcon color={column.status.color} />
+          <div className="font-bold">{column.status.name}</div>
+          <CountBadge count={column.tasks.length} />
         </div>
         <div className="flex items-center">
-          <KanbanMenuTrigger kanban={kanban}>
+          <ViewColumnMenuTrigger status={column.status}>
             <button className="grid size-6 place-items-center rounded-md text-neutral-400 transition-colors hover:bg-white/15">
               <MoreHorizontalIcon size={20} />
             </button>
-          </KanbanMenuTrigger>
+          </ViewColumnMenuTrigger>
         </div>
       </div>
       <div className="px-4 pb-2 text-sm text-neutral-400">
-        {kanban.description}
+        {column.status.description}
       </div>
       <div className="flex grow flex-col gap-2 overflow-auto scroll-auto p-2">
-        {[...new Array(kanban.count)].map((_, i) => {
-          return <KanbanItem key={i} kanban={kanban} />;
+        {column.tasks.map((task) => {
+          return (
+            <ViewTaskCard key={task.id} task={task} columns={allColumns} />
+          );
         })}
       </div>
       <div className="grid place-items-center p-2">
-        <button className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-white/15">
+        <button
+          className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-white/15"
+          onClick={handleCreateTask}
+        >
           <PlusIcon size={16} />
           <span className="text-sm">Add Item</span>
         </button>
@@ -231,17 +221,20 @@ const Kanban: React.FC<{
   );
 };
 
-const KanbanItem: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
+const ViewTaskCard: React.FC<{ task: ViewTask; columns: ViewColumnData[] }> = ({
+  task,
+  columns,
+}) => {
   return (
     <div className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1 text-neutral-400">
           <CircleDashedIcon size={16} strokeWidth={3} />
           <div className="text-xs">Draft</div>
-          <KanbanItemMenuTrigger kanban={kanban} />
+          <ViewTaskMenuTrigger columns={columns} task={task} />
         </div>
       </div>
-      <div className="text-sm">task title</div>
+      <div className="text-sm">{task.title}</div>
     </div>
   );
 };
@@ -703,10 +696,10 @@ const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
-  kanban,
-  children,
-}) => {
+const ViewColumnMenuTrigger: React.FC<{
+  status: TaskStatus;
+  children: ReactNode;
+}> = ({ status, children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -715,7 +708,7 @@ const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
       onOpenChange={setIsOpen}
       placement="bottom-end"
     >
-      <Tooltip label={`Actions for column: ${kanban.status}`}>
+      <Tooltip label={`Actions for column: ${status.name}`}>
         <DropdownTrigger>{children}</DropdownTrigger>
       </Tooltip>
       <DropdownContent>
@@ -737,23 +730,31 @@ const KanbanMenuTrigger: React.FC<{ kanban: Kanban; children: ReactNode }> = ({
   );
 };
 
-type KanbanItemMenuMode = "close" | "main" | "moveToColumn";
-const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
-  const [mode, setMode] = useState<KanbanItemMenuMode>("close");
+type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
+const ViewTaskMenuTrigger: React.FC<{
+  columns: ViewColumnData[];
+  task: ViewTask;
+}> = ({ task, columns }) => {
+  const [mode, setMode] = useState<ViewTaskMenuMode>("close");
 
   const contents = useMemo(() => {
     return {
       close: null,
       main: (
-        <KanbanItemMenu
+        <ViewTaskCardMenu
+          task={task}
           onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
         />
       ),
       moveToColumn: (
-        <MoveToColumnMenu kanban={kanban} onBack={() => setMode("main")} />
+        <MoveToColumnMenu
+          columns={columns}
+          status={task.status}
+          onBack={() => setMode("main")}
+        />
       ),
     };
-  }, [kanban]);
+  }, [columns, task]);
 
   const isOpen = mode !== "close";
   const handleOpenChang = (open: boolean) => {
@@ -798,12 +799,19 @@ const KanbanItemMenuTrigger: React.FC<{ kanban: Kanban }> = ({ kanban }) => {
   );
 };
 
-const KanbanItemMenu = React.forwardRef<
+const ViewTaskCardMenu = React.forwardRef<
   HTMLDivElement,
   {
+    task: ViewTask;
     onOpenMoveToColumnMenu: () => void;
   }
->(function KanbanItemMenu({ onOpenMoveToColumnMenu }, ref) {
+>(function ViewTaskCardMenu({ task, onOpenMoveToColumnMenu }, ref) {
+  const deleteTaskMutation = useDeleteTask();
+
+  const handleDeleteTask = () => {
+    deleteTaskMutation.mutate(task.id);
+  };
+
   return (
     <DropdownCard ref={ref}>
       <DropdownItemList>
@@ -824,7 +832,13 @@ const KanbanItemMenu = React.forwardRef<
       <Divider />
       <DropdownItemList>
         <DropdownItem icon={ArchiveIcon} title="Archive" />
-        <DropdownItem icon={TrashIcon} title="Delete from project" red />
+        {/* TODO: confirm dialog */}
+        <DropdownItem
+          icon={TrashIcon}
+          title="Delete from project"
+          red
+          onClick={handleDeleteTask}
+        />
       </DropdownItemList>
     </DropdownCard>
   );
@@ -884,16 +898,20 @@ const SelectionMenu = React.forwardRef<
 const MoveToColumnMenu = React.forwardRef<
   HTMLDivElement,
   {
-    kanban: Kanban;
+    columns: ViewColumnData[];
+    status: TaskStatus;
     onBack: () => void;
   }
->(function MoveToColumnMenu({ kanban, onBack }, ref) {
+>(function MoveToColumnMenu({ columns, status, onBack }, ref) {
   return (
     <SelectionMenu ref={ref} onBack={onBack} placeholder="Column...">
-      {kanbans.map((k) => {
+      {columns.map((column) => {
         return (
-          <Command.Item asChild key={k.status}>
-            <MoveToColumnItem kanban={k} active={k.status === kanban.status} />
+          <Command.Item asChild key={column.statusId}>
+            <MoveToColumnItem
+              status={column.status}
+              active={column.status.name === status.name}
+            />
           </Command.Item>
         );
       })}
@@ -903,27 +921,27 @@ const MoveToColumnMenu = React.forwardRef<
 
 const MoveToColumnItem = React.forwardRef<
   HTMLButtonElement,
-  { kanban: Kanban; active?: boolean }
->(function MoveToColumnItem({ kanban, active = false, ...props }, ref) {
+  { status: TaskStatus; active?: boolean }
+>(function MoveToColumnItem({ status, active = false, ...props }, ref) {
   return (
     <button
       {...props}
       ref={ref}
       className="flex min-h-12 w-full items-start gap-2 rounded-md px-2 py-[6px] transition-colors hover:bg-white/10 data-[selected=true]:bg-white/10"
     >
-      <StatusIcon color={kanban.color} />
+      <StatusIcon color={status.color} />
       <div className="flex w-full flex-col items-start gap-[2px]">
         <div className="flex w-full items-start justify-between gap-1 text-sm">
-          {kanban.status}
+          {status.name}
           {active && <CheckIcon size={20} />}
         </div>
-        <div className="text-xs text-neutral-400">{kanban.description}</div>
+        <div className="text-xs text-neutral-400">{status.description}</div>
       </div>
     </button>
   );
 });
 
-const SlicerPanel: React.FC = () => {
+const SlicerPanel: React.FC<{ columns: ViewColumnData[] }> = ({ columns }) => {
   return (
     <div className="flex w-[350px] shrink-0 flex-col gap-2 overflow-auto border-r border-neutral-600 p-4">
       <SliceByMenuTrigger>
@@ -933,10 +951,9 @@ const SlicerPanel: React.FC = () => {
         </button>
       </SliceByMenuTrigger>
       <ul className="w-full [&>li:last-child]:border-b-0">
-        {kanbans.map((kanban, i) => {
-          return <SlicerListItem key={i} {...kanban} label={kanban.status} />;
+        {columns.map((column) => {
+          return <SlicerListItem key={column.statusId} column={column} />;
         })}
-        <SlicerListItem label="No status" count={100} />
       </ul>
     </div>
   );
@@ -944,11 +961,8 @@ const SlicerPanel: React.FC = () => {
 
 const SlicerListItem: React.FC<{
   active?: boolean;
-  color?: StatusIconColor;
-  label: string;
-  description?: string;
-  count: number;
-}> = ({ active = false, color = "transparent", label, description, count }) => {
+  column: ViewColumnData;
+}> = ({ active = false, column }) => {
   return (
     <li
       className={clsx(
@@ -960,19 +974,21 @@ const SlicerListItem: React.FC<{
       <button
         className={clsx(
           "flex w-full items-start justify-between rounded-md px-2 py-2 transition-colors hover:bg-white/10",
-          description ? "h-14" : "",
+          column.status.description ? "h-14" : "",
         )}
       >
         <div className="flex items-start gap-2">
-          <StatusIcon color={color} />
+          <StatusIcon color={column.status.color} />
           <div className="flex flex-col items-start">
-            <div className="text-sm">{label}</div>
-            {description && (
-              <div className="text-xs text-neutral-400">{description}</div>
+            <div className="text-sm">{column.status.name}</div>
+            {column.status.description && (
+              <div className="text-xs text-neutral-400">
+                {column.status.description}
+              </div>
             )}
           </div>
         </div>
-        <CountBadge count={count} />
+        <CountBadge count={column.tasks.length} />
       </button>
     </li>
   );
