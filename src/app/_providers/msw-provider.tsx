@@ -9,6 +9,7 @@ import {
 } from "react";
 import { setupWorker } from "msw/browser";
 import { todo1Handlers } from "@/app/todo-1/_mocks/api";
+import { githubProjcetApiHandler } from "../github-project/_mocks/api";
 
 type MswState = { isMockserverUp: boolean };
 const MswContext = createContext<MswState | undefined>(undefined);
@@ -29,7 +30,11 @@ export const MswProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   useEffect(() => {
-    const handlers = [...todo1Handlers, ...todo2Handlers];
+    const handlers = [
+      ...todo1Handlers,
+      ...todo2Handlers,
+      ...githubProjcetApiHandler,
+    ];
     const worker = setupWorker(...handlers);
 
     const start = async () => {
