@@ -13,6 +13,9 @@ export const QueryProvider: React.FC<{ children: ReactNode }> = ({
             onSettled: async () => {
               await queryClient.invalidateQueries();
             },
+            onError: (e) => {
+              console.error(e);
+            },
           },
         },
       }),

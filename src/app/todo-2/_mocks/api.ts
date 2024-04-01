@@ -3,6 +3,7 @@ import { HttpResponse, http } from "msw";
 import { paginate } from "../_lib/utils";
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./task-store";
+import { fetcher } from "@/lib/fetcher";
 
 export const sortOrderSchema = z.union([z.literal("asc"), z.literal("desc")]);
 export type SortOrder = z.infer<typeof sortOrderSchema>;
@@ -106,7 +107,7 @@ export const Todo2API = {
 export const fetchPaginatedTasks = async (
   input: PaginatedTasksInput,
 ): Promise<PaginatedTasksEntry> => {
-  const res = await fetch(Todo2API.getTasks(input));
+  const res = await fetcher.get(Todo2API.getTasks(input));
   const json = await res.json();
   const tasks = paginatedTasksEntrySchema.parse(json);
 
@@ -114,7 +115,7 @@ export const fetchPaginatedTasks = async (
 };
 
 export const fetchTask = async (id: string): Promise<Task | undefined> => {
-  const res = await fetch(Todo2API.task(id));
+  const res = await fetcher.get(Todo2API.task(id));
   const json = await res.json();
   const task = taskSchema.optional().parse(json);
 
@@ -122,10 +123,7 @@ export const fetchTask = async (id: string): Promise<Task | undefined> => {
 };
 
 export const createTask = async (input: CreateTaskInput): Promise<Task> => {
-  const res = await fetch(Todo2API.createTask(), {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  const res = await fetcher.post(Todo2API.createTask(), { body: input });
   const json = await res.json();
   const task = taskSchema.parse(json);
 
@@ -135,10 +133,7 @@ export const createTask = async (input: CreateTaskInput): Promise<Task> => {
 export const updateTask = async (
   input: UpdateTaskInput & { id: string },
 ): Promise<Task> => {
-  const res = await fetch(Todo2API.task(input.id), {
-    method: "PUT",
-    body: JSON.stringify(input),
-  });
+  const res = await fetcher.put(Todo2API.task(input.id), { body: input });
   const json = await res.json();
   const task = taskSchema.parse(json);
 
@@ -148,20 +143,13 @@ export const updateTask = async (
 export const updateTaskStatuses = async (
   input: UpdateTaskStatusesInput,
 ): Promise<void> => {
-  await fetch(Todo2API.updateTaskStatuses(), {
-    method: "PATCH",
-    body: JSON.stringify(input),
-  });
+  await fetcher.patch(Todo2API.updateTaskStatuses(), { body: input });
 
   return;
 };
 
 export const deleteTasks = async (ids: string[]): Promise<void> => {
-  await fetch(Todo2API.deleteTasks(), {
-    method: "DELETE",
-    body: JSON.stringify(ids),
-  });
-
+  await fetcher.delete(Todo2API.deleteTasks(), { body: ids });
   return;
 };
 

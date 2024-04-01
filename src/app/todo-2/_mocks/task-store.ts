@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CreateTaskInput, UpdateTaskInput } from "./api";
 import { initialTasks } from "./data";
+import { HttpResponse } from "msw";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -18,7 +19,7 @@ class TaskStore {
 
   public getAll() {
     if (this.isErrorSimulated) {
-      throw new Error("simulated error");
+      throw new HttpResponse(null, { status: 500 });
     }
     return this.allTasks;
   }

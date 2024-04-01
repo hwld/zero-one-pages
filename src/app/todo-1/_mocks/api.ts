@@ -1,6 +1,7 @@
 import { HttpResponse, http } from "msw";
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./task-store";
+import { fetcher } from "@/lib/fetcher";
 
 export const createTaskInputSchema = z.object({
   title: z
@@ -29,7 +30,7 @@ export const Todo1API = {
 };
 
 export const fetchTasks = async (): Promise<Task[]> => {
-  const res = await fetch(Todo1API.tasks());
+  const res = await fetcher.get(Todo1API.tasks());
   const json = await res.json();
   const tasks = z.array(taskSchema).parse(json);
 
@@ -37,7 +38,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const fetchTask = async (id: string): Promise<Task | undefined> => {
-  const res = await fetch(Todo1API.task(id));
+  const res = await fetcher.get(Todo1API.task(id));
   const json = await res.json();
   const task = taskSchema.optional().parse(json);
 
@@ -45,10 +46,7 @@ export const fetchTask = async (id: string): Promise<Task | undefined> => {
 };
 
 export const createTask = async (input: CreateTaskInput): Promise<Task> => {
-  const res = await fetch(Todo1API.tasks(), {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  const res = await fetcher.post(Todo1API.tasks(), { body: input });
   const json = await res.json();
   const task = taskSchema.parse(json);
 
@@ -59,10 +57,7 @@ export const updateTask = async ({
   id,
   ...input
 }: UpdateTaskInput & { id: string }): Promise<Task | undefined> => {
-  const res = await fetch(Todo1API.task(id), {
-    method: "PUT",
-    body: JSON.stringify(input),
-  });
+  const res = await fetcher.put(Todo1API.task(id), { body: input });
   const json = await res.json();
   const task = taskSchema.optional().parse(json);
 
@@ -70,10 +65,7 @@ export const updateTask = async ({
 };
 
 export const deleteTask = async (id: string) => {
-  await fetch(Todo1API.task(id), {
-    method: "DELETE",
-  });
-
+  await fetcher.delete(Todo1API.task(id));
   return;
 };
 
