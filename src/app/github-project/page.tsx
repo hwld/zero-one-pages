@@ -131,6 +131,23 @@ const MainPanel: React.FC<{ view: View }> = ({ view }) => {
     statusId: "",
   });
 
+  const moveTaskMutation = useMoveTask();
+  const handleMoveToColumn = (input: { taskId: string; statusId: string }) => {
+    const column = view.columns.find((c) => c.statusId === input.statusId);
+    if (!column) {
+      throw new Error("存在しないstatusIdが指定されました");
+    }
+
+    const bottomTask = column.tasks.at(-1);
+    const bottomOrder = bottomTask ? bottomTask.order + 0.5 : 1;
+    moveTaskMutation.mutate({
+      viewId: VIEW_ID,
+      taskId: input.taskId,
+      statusId: input.statusId,
+      newOrder: bottomOrder,
+    });
+  };
+
   return (
     <div className="relative flex min-w-0 grow flex-col">
       <div className="flex items-center gap-4 p-4">
@@ -153,6 +170,7 @@ const MainPanel: React.FC<{ view: View }> = ({ view }) => {
               key={column.statusId}
               column={column}
               allColumns={view.columns}
+              onMoveToColumn={handleMoveToColumn}
               onClickAddItem={() =>
                 setCreateTaskBarState({
                   isOpen: true,
@@ -200,8 +218,8 @@ const ViewColumn: React.FC<{
   allColumns: ViewColumnData[];
   column: ViewColumnData;
   onClickAddItem: () => void;
-}> = ({ allColumns, column, onClickAddItem }) => {
-  const sortedTasks = [...column.tasks].sort((a, b) => a.order - b.order);
+  onMoveToColumn: (input: { taskId: string; statusId: string }) => void;
+}> = ({ allColumns, column, onClickAddItem, onMoveToColumn }) => {
   const [acceptDrop, setAcceptDrop] = useState(false);
 
   const moveTaskMutation = useMoveTask();
@@ -210,7 +228,7 @@ const ViewColumn: React.FC<{
     moveTaskMutation.mutate({ viewId: VIEW_ID, ...data });
   };
   const handleMoveTaskTop = (input: { taskId: string; statusId: string }) => {
-    const topItem = sortedTasks.at(0);
+    const topItem = column.tasks.at(0);
 
     moveTaskMutation.mutate({
       viewId: VIEW_ID,
@@ -224,7 +242,7 @@ const ViewColumn: React.FC<{
     taskId: string;
     statusId: string;
   }) => {
-    const bottomItem = sortedTasks.at(-1);
+    const bottomItem = column.tasks.at(-1);
 
     moveTaskMutation.mutate({
       viewId: VIEW_ID,
@@ -296,7 +314,7 @@ const ViewColumn: React.FC<{
             />
           )}
           <AnimatePresence mode="popLayout">
-            {sortedTasks.map((task, i) => {
+            {column.tasks.map((task, i) => {
               const isTop = i === 0;
               const isBottom = i === column.tasks.length - 1;
 
@@ -314,6 +332,7 @@ const ViewColumn: React.FC<{
                     onMove={handleMoveTask}
                     onMoveTop={isTop ? undefined : handleMoveTaskTop}
                     onMoveBottom={isBottom ? undefined : handleMoveTaskBottom}
+                    onMoveToColumn={onMoveToColumn}
                     previousOrder={
                       column.tasks[i - 1] ? column.tasks[i - 1].order : 0
                     }
@@ -358,6 +377,7 @@ const ViewTaskCard: React.FC<{
   nextOrder: number;
   acceptBottomDrop?: boolean;
   onMove: (input: MoveTaskInput) => void;
+  onMoveToColumn: (input: { taskId: string; statusId: string }) => void;
   onMoveTop:
     | ((input: { taskId: string; statusId: string }) => void)
     | undefined;
@@ -371,12 +391,17 @@ const ViewTaskCard: React.FC<{
   nextOrder,
   acceptBottomDrop = false,
   onMove,
+  onMoveToColumn,
   onMoveTop,
   onMoveBottom,
 }) => {
   const [acceptDrop, setAcceptDrop] = useState<"none" | "top" | "bottom">(
     "none",
   );
+
+  const handleMoveToColumn = (statusId: string) => {
+    onMoveToColumn({ taskId: task.id, statusId });
+  };
 
   const handleMoveTop = onMoveTop
     ? () => {
@@ -454,6 +479,7 @@ const ViewTaskCard: React.FC<{
             <ViewTaskMenuTrigger
               columns={columns}
               task={task}
+              onMoveToColumn={handleMoveToColumn}
               onMoveTop={handleMoveTop}
               onMoveBottom={handleMoveBottom}
             />
@@ -960,9 +986,10 @@ type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
 const ViewTaskMenuTrigger: React.FC<{
   columns: ViewColumnData[];
   task: ViewTask;
+  onMoveToColumn: (statusId: string) => void;
   onMoveTop: (() => void) | undefined;
   onMoveBottom: (() => void) | undefined;
-}> = ({ task, columns, onMoveTop, onMoveBottom }) => {
+}> = ({ task, columns, onMoveTop, onMoveBottom, onMoveToColumn }) => {
   const [mode, setMode] = useState<ViewTaskMenuMode>("close");
 
   const contents = useMemo(() => {
@@ -995,10 +1022,12 @@ const ViewTaskMenuTrigger: React.FC<{
           columns={columns}
           status={task.status}
           onBack={() => setMode("main")}
+          onClose={() => setMode("close")}
+          onMoveToColumn={onMoveToColumn}
         />
       ),
     };
-  }, [columns, onMoveBottom, onMoveTop, task]);
+  }, [columns, onMoveBottom, onMoveToColumn, onMoveTop, task]);
 
   const isOpen = mode !== "close";
   const handleOpenChang = (open: boolean) => {
@@ -1158,13 +1187,25 @@ const MoveToColumnMenu = React.forwardRef<
     columns: ViewColumnData[];
     status: TaskStatus;
     onBack: () => void;
+    onClose: () => void;
+    onMoveToColumn: (statusId: string) => void;
   }
->(function MoveToColumnMenu({ columns, status, onBack }, ref) {
+>(function MoveToColumnMenu(
+  { columns, status, onBack, onClose: onClose, onMoveToColumn },
+  ref,
+) {
   return (
     <SelectionMenu ref={ref} onBack={onBack} placeholder="Column...">
       {columns.map((column) => {
         return (
-          <Command.Item asChild key={column.statusId}>
+          <Command.Item
+            asChild
+            key={column.statusId}
+            onSelect={() => {
+              onMoveToColumn(column.status.id);
+              onClose();
+            }}
+          >
             <MoveToColumnItem
               status={column.status}
               active={column.status.name === status.name}
