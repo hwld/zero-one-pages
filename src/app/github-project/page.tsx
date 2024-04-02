@@ -73,9 +73,14 @@ import {
 import { TaskStatus } from "./_mocks/task-status/store";
 import { useDeleteTask } from "./_queries/useDeleteTask";
 import { CreateTaskBar } from "./_components/create-task-bar";
+import { z } from "zod";
+import { useMoveTask } from "./_queries/useMoveTask";
+import { AnimatePresence, motion } from "framer-motion";
+
+const VIEW_ID = "1";
 
 const GitHubProjectPage: React.FC = () => {
-  const { data: view } = useView("1");
+  const { data: view } = useView(VIEW_ID);
 
   return (
     <div
@@ -195,6 +200,9 @@ const ViewColumn: React.FC<{
   column: ViewColumnData;
   onClickAddItem: () => void;
 }> = ({ allColumns, column, onClickAddItem }) => {
+  const moveTaskMutation = useMoveTask();
+  const [acceptDrop, setAcceptDrop] = useState(false);
+
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
@@ -214,12 +222,80 @@ const ViewColumn: React.FC<{
       <div className="px-4 pb-2 text-sm text-neutral-400">
         {column.status.description}
       </div>
-      <div className="flex grow flex-col gap-2 overflow-auto scroll-auto p-2">
-        {column.tasks.map((task) => {
-          return (
-            <ViewTaskCard key={task.id} task={task} columns={allColumns} />
-          );
-        })}
+      <div
+        className={clsx(
+          "relative flex grow flex-col overflow-auto scroll-auto p-2",
+        )}
+      >
+        <div
+          className="h-full w-full"
+          onDragOver={(e) => {
+            if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+              e.preventDefault();
+              e.stopPropagation();
+              setAcceptDrop(true);
+            }
+          }}
+          onDragLeave={() => {
+            setAcceptDrop(false);
+          }}
+          onDrop={(e) => {
+            if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+              e.preventDefault();
+              e.stopPropagation();
+              const data = JSON.parse(e.dataTransfer.getData(DRAG_TYPE.task));
+              const taskId = z.string().parse(data.taskId);
+
+              moveTaskMutation.mutate({
+                taskId,
+                statusId: column.statusId,
+                viewId: VIEW_ID,
+                newOrder: column.tasks.length
+                  ? column.tasks[column.tasks.length - 1].order + 1
+                  : 1,
+              });
+
+              setAcceptDrop(false);
+            }
+          }}
+        >
+          {column.tasks.length === 0 && acceptDrop && (
+            <div
+              className={clsx(droppableClass, "before:left-2 before:right-2")}
+            />
+          )}
+          <AnimatePresence mode="popLayout">
+            {[...column.tasks]
+              .sort((a, b) => a.order - b.order)
+              .map((task, i) => {
+                return (
+                  <motion.div
+                    key={task.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <ViewTaskCard
+                      task={task}
+                      columns={allColumns}
+                      previousOrder={
+                        column.tasks[i - 1] ? column.tasks[i - 1].order : 0
+                      }
+                      nextOrder={
+                        column.tasks[i + 1]
+                          ? column.tasks[i + 1].order
+                          : task.order + 1
+                      }
+                      acceptBottomDrop={
+                        i === column.tasks.length - 1 && acceptDrop
+                      }
+                    />
+                  </motion.div>
+                );
+              })}
+          </AnimatePresence>
+        </div>
       </div>
       <div className="grid place-items-center p-2">
         <button
@@ -234,20 +310,100 @@ const ViewColumn: React.FC<{
   );
 };
 
-const ViewTaskCard: React.FC<{ task: ViewTask; columns: ViewColumnData[] }> = ({
+const DRAG_TYPE = {
+  task: "application/task",
+  column: "application/column",
+};
+
+const droppableClass =
+  "before:absolute before:h-[4px] before:rounded-full before:bg-blue-500 before:content-['']";
+
+const ViewTaskCard: React.FC<{
+  task: ViewTask;
+  columns: ViewColumnData[];
+  previousOrder: number;
+  nextOrder: number;
+  acceptBottomDrop?: boolean;
+}> = ({
   task,
   columns,
+  previousOrder,
+  nextOrder,
+  acceptBottomDrop = false,
 }) => {
+  const [acceptDrop, setAcceptDrop] = useState<"none" | "top" | "bottom">(
+    "none",
+  );
+
+  const moveTaskMutation = useMoveTask();
+
   return (
-    <div className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 text-neutral-400">
-          <CircleDashedIcon size={16} strokeWidth={3} />
-          <div className="text-xs">Draft</div>
-          <ViewTaskMenuTrigger columns={columns} task={task} />
+    <div
+      className={clsx(
+        "relative py-[3px] before:w-full before:opacity-0",
+        droppableClass,
+        {
+          "before:bottom-[calc(100%-2px)] before:opacity-100":
+            acceptDrop === "top",
+        },
+        {
+          "before:top-[calc(100%-2px)] before:opacity-100":
+            acceptDrop === "bottom" || acceptBottomDrop,
+        },
+      )}
+      onDragOver={(e) => {
+        if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const midpoint = (rect.top + rect.bottom) / 2;
+          setAcceptDrop(e.clientY <= midpoint ? "top" : "bottom");
+        }
+      }}
+      onDragLeave={() => {
+        setAcceptDrop("none");
+      }}
+      onDrop={(e) => {
+        if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+          e.stopPropagation();
+
+          const data = JSON.parse(e.dataTransfer.getData(DRAG_TYPE.task));
+          const taskId = z.string().parse(data.taskId);
+
+          const droppedOrder = acceptDrop === "top" ? previousOrder : nextOrder;
+          const newOrder = (droppedOrder + task.order) / 2;
+
+          moveTaskMutation.mutate({
+            viewId: VIEW_ID,
+            taskId,
+            statusId: task.status.id,
+            newOrder,
+          });
+
+          setAcceptDrop("none");
+        }
+      }}
+    >
+      <div
+        className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600"
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData(
+            DRAG_TYPE.task,
+            JSON.stringify({ taskId: task.id }),
+          );
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-neutral-400">
+            <CircleDashedIcon size={16} strokeWidth={3} />
+            <div className="text-xs">Draft</div>
+            <ViewTaskMenuTrigger columns={columns} task={task} />
+          </div>
         </div>
+        <div className="text-sm">{task.title}</div>
       </div>
-      <div className="text-sm">{task.title}</div>
     </div>
   );
 };
