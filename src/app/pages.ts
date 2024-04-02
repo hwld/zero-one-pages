@@ -9,7 +9,7 @@ import {
   TablePropertiesIcon,
 } from "lucide-react";
 
-type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART" | "WIP";
+type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART" | "WIP" | "PRIME";
 export type PageLink =
   | "/"
   | "/todo-1"
@@ -49,7 +49,7 @@ export const pages: Page[] = [
     icon: CircleEllipsisIcon,
     href: "/dynamic-menu",
     title: "変形するメニュー",
-    description: "youtubeの設定メニューを見て作りたくなった。\n🥱🥱🥱😀😀😀",
+    description: "youtubeの設定メニューを見て作りたくなった。\n",
     tags: ["PC", "MOBILE", "PART"],
   },
   {
@@ -80,7 +80,8 @@ export const pages: Page[] = [
     icon: KanbanSquareIcon,
     href: "/github-project",
     title: "GitHub Project",
-    description: "GitHubのProjectsのレイアウトを作ってみた。",
-    tags: ["PC", "LAYOUT", "WIP"],
+    description:
+      "GitHubのProjectsのレイアウトを作ってみた。初めてライブラリを使わないでDnDを実装した。",
+    tags: ["PC", "LAYOUT", "WIP", "PRIME"],
   },
 ];

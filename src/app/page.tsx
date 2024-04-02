@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { Page, pages } from "./pages";
 import { ReactNode } from "react";
+import { SparklesIcon } from "lucide-react";
 
 export default function Home() {
   return (
@@ -31,15 +32,21 @@ export default function Home() {
 
 type Props = { page: Page; number: number };
 const PageCard: React.FC<Props> = (props) => {
+  const isPrime = props.page.tags.includes("PRIME");
+
   return (
     <Link
       href={props.page.href}
-      className={
-        "group flex flex-col gap-2 rounded-lg   border border-zinc-700 bg-zinc-800 px-4 pb-2 pt-4 text-zinc-200 transition-colors hover:bg-zinc-700"
-      }
+      className={clsx(
+        "group flex flex-col gap-2 rounded-lg  border bg-zinc-800 px-4 pb-2 pt-4 text-zinc-200 transition-colors hover:bg-zinc-700",
+        isPrime ? "border-violet-400" : "border-zinc-700",
+      )}
     >
       <div className="flex items-center gap-1">
         <p className="text-zinc-400">{props.number}.</p>
+        {isPrime && (
+          <SparklesIcon className="fill-violet-400 text-violet-400" size={18} />
+        )}
         <p>{props.page.title}</p>
       </div>
       <div className="grow whitespace-pre-wrap text-sm text-zinc-400">
