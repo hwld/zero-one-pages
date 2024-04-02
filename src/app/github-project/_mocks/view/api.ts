@@ -31,6 +31,20 @@ export const fetchView = async (id: string): Promise<View> => {
   return view;
 };
 
+export const moveTaskInputSchema = z.object({
+  taskId: z.string(),
+  statusId: z.string(),
+  newOrder: z.coerce.number(),
+});
+export type MoveTaskInput = z.infer<typeof moveTaskInputSchema>;
+
+export const moveTask = async ({
+  viewId,
+  ...body
+}: MoveTaskInput & { viewId: string }): Promise<undefined> => {
+  await fetcher.post(GitHubProjectAPI.moveTask(viewId), { body });
+};
+
 export const viewApiHandler = [
   http.get(GitHubProjectAPI.view(), ({ params }) => {
     const viewId = z.string().parse(params.id);
@@ -76,5 +90,27 @@ export const viewApiHandler = [
     };
 
     return HttpResponse.json(view);
+  }),
+
+  http.post(GitHubProjectAPI.moveTask(), async ({ params, request }) => {
+    const viewId = z.string().parse(params.id);
+    const input = moveTaskInputSchema.parse(await request.json());
+
+    const task = taskStore.get(input.taskId);
+    if (!task) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    if (task.status.id !== input.statusId) {
+      taskStore.update({ ...task, statusId: input.statusId });
+    }
+
+    viewConfigStore.moveTask({
+      viewId,
+      taskId: input.taskId,
+      newOrder: input.newOrder,
+    });
+
+    return HttpResponse.json({});
   }),
 ];

@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  TaskStatus,
-  taskStatusSchema,
-  taskStatusStore,
-} from "../task-status/store";
+import { taskStatusSchema, taskStatusStore } from "../task-status/store";
 import { viewConfigStore } from "../view/view-config-store";
 
 export const taskSchema = z.object({
@@ -25,6 +21,10 @@ class TaskStore {
     return this.tasks.find((t) => t.id === id);
   }
 
+  public getByStatusId(statusId: string): Task[] {
+    return this.tasks.filter((t) => t.status.id === statusId);
+  }
+
   public add(input: { title: string; statusId: string }): Task {
     const status = taskStatusStore.get(input.statusId);
     if (!status) {
@@ -38,15 +38,28 @@ class TaskStore {
     };
     this.tasks = [...this.tasks, newTask];
 
-    viewConfigStore.addTaskToAllConfigs(newTask.id);
+    viewConfigStore.addTaskToAllConfigs({
+      taskId: newTask.id,
+      statusId: newTask.status.id,
+    });
 
     return newTask;
   }
 
-  public update(input: { id: string; title: string; status: TaskStatus }) {
+  public update(input: { id: string; title: string; statusId: string }) {
+    const status = taskStatusStore.get(input.statusId);
+
+    if (!status) {
+      throw new Error("statusが存在しません");
+    }
+
     this.tasks = this.tasks.map((t) => {
       if (t.id === input.id) {
-        return { ...t, title: input.title, status: input.status };
+        return {
+          ...t,
+          title: input.title,
+          status: status,
+        };
       }
       return t;
     });

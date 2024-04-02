@@ -5,12 +5,12 @@ import { taskStore } from "../task/store";
 
 export const viewColumnConfigSchema = z.object({
   statusId: z.string(),
-  order: z.number(),
+  order: z.coerce.number(),
 });
 
 export const viewTaskConfigSchema = z.object({
   taskId: z.string(),
-  order: z.number(),
+  order: z.coerce.number(),
 });
 
 export const viewConfigSchema = z.object({
@@ -59,6 +59,23 @@ class ViewConfigStore {
     this.viewConfigs = [...this.viewConfigs, newView];
   }
 
+  public moveTask(input: { viewId: string; taskId: string; newOrder: number }) {
+    this.viewConfigs = this.viewConfigs.map((viewConfig) => {
+      if (viewConfig.id === input.viewId) {
+        return {
+          ...viewConfig,
+          taskConfigs: viewConfig.taskConfigs.map((taskConfig) => {
+            if (taskConfig.taskId === input.taskId) {
+              return { ...taskConfig, order: input.newOrder };
+            }
+            return taskConfig;
+          }),
+        };
+      }
+      return viewConfig;
+    });
+  }
+
   public addColumnToAllConfigs(statusId: string) {
     this.viewConfigs = this.viewConfigs.map((config): ViewConfig => {
       const newOrder =
@@ -72,15 +89,24 @@ class ViewConfigStore {
     });
   }
 
-  public addTaskToAllConfigs(taskId: string) {
+  public addTaskToAllConfigs(input: { taskId: string; statusId: string }) {
     this.viewConfigs = this.viewConfigs.map((config): ViewConfig => {
+      const taskIdsWithSameStatus = taskStore
+        .getByStatusId(input.statusId)
+        .map((t) => t.id);
+
+      const tasks = config.taskConfigs.filter((t) =>
+        taskIdsWithSameStatus.includes(t.taskId),
+      );
       const newOrder =
-        config.taskConfigs.length === 0
-          ? 1
-          : Math.max(...config.taskConfigs.map((t) => t.order)) + 1;
+        tasks.length === 0 ? 1 : Math.max(...tasks.map((t) => t.order)) + 1;
+
       return {
         ...config,
-        taskConfigs: [...config.taskConfigs, { taskId, order: newOrder }],
+        taskConfigs: [
+          ...config.taskConfigs,
+          { taskId: input.taskId, order: newOrder },
+        ],
       };
     });
   }
