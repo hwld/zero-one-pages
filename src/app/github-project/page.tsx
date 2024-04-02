@@ -65,7 +65,6 @@ import { DropdownCard } from "./_components/dropdown/card";
 import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
 import { useView } from "./_queries/useView";
-import { useCreateTask } from "./_queries/useCreateTask";
 import {
   View,
   ViewColumn as ViewColumnData,
@@ -73,6 +72,7 @@ import {
 } from "./_mocks/view/api";
 import { TaskStatus } from "./_mocks/task-status/store";
 import { useDeleteTask } from "./_queries/useDeleteTask";
+import { CreateTaskBar } from "./_components/create-task-bar";
 
 const GitHubProjectPage: React.FC = () => {
   const { data: view } = useView("1");
@@ -120,8 +120,13 @@ const GitHubProjectPage: React.FC = () => {
 export default GitHubProjectPage;
 
 const MainPanel: React.FC<{ view: View }> = ({ view }) => {
+  const [createTaskBarState, setCreateTaskBarState] = useState({
+    isOpen: false,
+    statusId: "",
+  });
+
   return (
-    <div className="flex min-w-0 grow flex-col">
+    <div className="relative flex min-w-0 grow flex-col">
       <div className="flex items-center gap-4 p-4">
         <div className="flex h-8 grow items-center rounded-md border border-neutral-600 bg-transparent pl-2 focus-within:border-blue-500">
           <ListFilterIcon size={16} className="text-neutral-400" />
@@ -142,10 +147,23 @@ const MainPanel: React.FC<{ view: View }> = ({ view }) => {
               key={column.statusId}
               column={column}
               allColumns={view.columns}
+              onClickAddItem={() =>
+                setCreateTaskBarState({
+                  isOpen: true,
+                  statusId: column.statusId,
+                })
+              }
             />
           );
         })}
       </div>
+      <CreateTaskBar
+        isOpen={createTaskBarState.isOpen}
+        statusId={createTaskBarState.statusId}
+        onOpenChange={(open) => {
+          setCreateTaskBarState((s) => ({ ...s, isOpen: open }));
+        }}
+      />
     </div>
   );
 };
@@ -175,13 +193,8 @@ const Button: React.FC<{
 const ViewColumn: React.FC<{
   allColumns: ViewColumnData[];
   column: ViewColumnData;
-}> = ({ allColumns, column }) => {
-  const createTaskMutation = useCreateTask();
-
-  const handleCreateTask = () => {
-    createTaskMutation.mutate({ title: "task", statusId: column.statusId });
-  };
-
+  onClickAddItem: () => void;
+}> = ({ allColumns, column, onClickAddItem }) => {
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
@@ -211,7 +224,7 @@ const ViewColumn: React.FC<{
       <div className="grid place-items-center p-2">
         <button
           className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-white/15"
-          onClick={handleCreateTask}
+          onClick={onClickAddItem}
         >
           <PlusIcon size={16} />
           <span className="text-sm">Add Item</span>

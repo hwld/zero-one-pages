@@ -7,12 +7,12 @@ import { GitHubProjectAPI } from "../api-routes";
 export const createTaskInputSchema = z.object({
   title: z
     .string()
-    .min(0, "タイトルの入力は必須です")
+    .min(1, "タイトルの入力は必須です")
     .max(256, "256文字以内で入力してください"),
   statusId: z.string(),
 });
-
 export type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
+
 export const createTask = async (input: CreateTaskInput): Promise<Task> => {
   const res = await fetcher.post(GitHubProjectAPI.tasks(), { body: input });
   const json = await res.json();
