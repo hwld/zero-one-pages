@@ -66,6 +66,7 @@ import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
 import { useView } from "./_queries/useView";
 import {
+  MoveTaskInput,
   View,
   ViewColumn as ViewColumnData,
   ViewTask,
@@ -200,8 +201,38 @@ const ViewColumn: React.FC<{
   column: ViewColumnData;
   onClickAddItem: () => void;
 }> = ({ allColumns, column, onClickAddItem }) => {
-  const moveTaskMutation = useMoveTask();
+  const sortedTasks = [...column.tasks].sort((a, b) => a.order - b.order);
   const [acceptDrop, setAcceptDrop] = useState(false);
+
+  const moveTaskMutation = useMoveTask();
+
+  const handleMoveTask = (data: MoveTaskInput) => {
+    moveTaskMutation.mutate({ viewId: VIEW_ID, ...data });
+  };
+  const handleMoveTaskTop = (input: { taskId: string; statusId: string }) => {
+    const topItem = sortedTasks.at(0);
+
+    moveTaskMutation.mutate({
+      viewId: VIEW_ID,
+      taskId: input.taskId,
+      statusId: input.statusId,
+      newOrder: topItem ? topItem.order / 2 : 1,
+    });
+  };
+
+  const handleMoveTaskBottom = (input: {
+    taskId: string;
+    statusId: string;
+  }) => {
+    const bottomItem = sortedTasks.at(-1);
+
+    moveTaskMutation.mutate({
+      viewId: VIEW_ID,
+      taskId: input.taskId,
+      statusId: input.statusId,
+      newOrder: bottomItem ? bottomItem.order + 0.5 : 1,
+    });
+  };
 
   return (
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
@@ -265,35 +296,37 @@ const ViewColumn: React.FC<{
             />
           )}
           <AnimatePresence mode="popLayout">
-            {[...column.tasks]
-              .sort((a, b) => a.order - b.order)
-              .map((task, i) => {
-                return (
-                  <motion.div
-                    key={task.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <ViewTaskCard
-                      task={task}
-                      columns={allColumns}
-                      previousOrder={
-                        column.tasks[i - 1] ? column.tasks[i - 1].order : 0
-                      }
-                      nextOrder={
-                        column.tasks[i + 1]
-                          ? column.tasks[i + 1].order
-                          : task.order + 1
-                      }
-                      acceptBottomDrop={
-                        i === column.tasks.length - 1 && acceptDrop
-                      }
-                    />
-                  </motion.div>
-                );
-              })}
+            {sortedTasks.map((task, i) => {
+              const isTop = i === 0;
+              const isBottom = i === column.tasks.length - 1;
+
+              return (
+                <motion.div
+                  key={task.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <ViewTaskCard
+                    task={task}
+                    columns={allColumns}
+                    onMove={handleMoveTask}
+                    onMoveTop={isTop ? undefined : handleMoveTaskTop}
+                    onMoveBottom={isBottom ? undefined : handleMoveTaskBottom}
+                    previousOrder={
+                      column.tasks[i - 1] ? column.tasks[i - 1].order : 0
+                    }
+                    nextOrder={
+                      column.tasks[i + 1]
+                        ? column.tasks[i + 1].order
+                        : task.order + 1
+                    }
+                    acceptBottomDrop={isBottom && acceptDrop}
+                  />
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </div>
@@ -324,18 +357,38 @@ const ViewTaskCard: React.FC<{
   previousOrder: number;
   nextOrder: number;
   acceptBottomDrop?: boolean;
+  onMove: (input: MoveTaskInput) => void;
+  onMoveTop:
+    | ((input: { taskId: string; statusId: string }) => void)
+    | undefined;
+  onMoveBottom:
+    | ((input: { taskId: string; statusId: string }) => void)
+    | undefined;
 }> = ({
   task,
   columns,
   previousOrder,
   nextOrder,
   acceptBottomDrop = false,
+  onMove,
+  onMoveTop,
+  onMoveBottom,
 }) => {
   const [acceptDrop, setAcceptDrop] = useState<"none" | "top" | "bottom">(
     "none",
   );
 
-  const moveTaskMutation = useMoveTask();
+  const handleMoveTop = onMoveTop
+    ? () => {
+        onMoveTop?.({ taskId: task.id, statusId: task.status.id });
+      }
+    : undefined;
+
+  const handleMoveBottom = onMoveBottom
+    ? () => {
+        onMoveBottom?.({ taskId: task.id, statusId: task.status.id });
+      }
+    : undefined;
 
   return (
     <div
@@ -373,8 +426,7 @@ const ViewTaskCard: React.FC<{
           const droppedOrder = acceptDrop === "top" ? previousOrder : nextOrder;
           const newOrder = (droppedOrder + task.order) / 2;
 
-          moveTaskMutation.mutate({
-            viewId: VIEW_ID,
+          onMove({
             taskId,
             statusId: task.status.id,
             newOrder,
@@ -399,7 +451,12 @@ const ViewTaskCard: React.FC<{
           <div className="flex items-center gap-1 text-neutral-400">
             <CircleDashedIcon size={16} strokeWidth={3} />
             <div className="text-xs">Draft</div>
-            <ViewTaskMenuTrigger columns={columns} task={task} />
+            <ViewTaskMenuTrigger
+              columns={columns}
+              task={task}
+              onMoveTop={handleMoveTop}
+              onMoveBottom={handleMoveBottom}
+            />
           </div>
         </div>
         <div className="text-sm">{task.title}</div>
@@ -903,16 +960,34 @@ type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
 const ViewTaskMenuTrigger: React.FC<{
   columns: ViewColumnData[];
   task: ViewTask;
-}> = ({ task, columns }) => {
+  onMoveTop: (() => void) | undefined;
+  onMoveBottom: (() => void) | undefined;
+}> = ({ task, columns, onMoveTop, onMoveBottom }) => {
   const [mode, setMode] = useState<ViewTaskMenuMode>("close");
 
   const contents = useMemo(() => {
+    const handleMoveTop = onMoveTop
+      ? () => {
+          onMoveTop();
+          setMode("close");
+        }
+      : undefined;
+
+    const handleMoveBottom = onMoveBottom
+      ? () => {
+          onMoveBottom();
+          setMode("close");
+        }
+      : undefined;
+
     return {
       close: null,
       main: (
         <ViewTaskCardMenu
           task={task}
           onOpenMoveToColumnMenu={() => setMode("moveToColumn")}
+          onMoveTop={handleMoveTop}
+          onMoveBottom={handleMoveBottom}
         />
       ),
       moveToColumn: (
@@ -923,7 +998,7 @@ const ViewTaskMenuTrigger: React.FC<{
         />
       ),
     };
-  }, [columns, task]);
+  }, [columns, onMoveBottom, onMoveTop, task]);
 
   const isOpen = mode !== "close";
   const handleOpenChang = (open: boolean) => {
@@ -944,21 +1019,19 @@ const ViewTaskMenuTrigger: React.FC<{
 
   return (
     <DropdownProvider isOpen={isOpen} onOpenChange={handleOpenChang}>
-      <Tooltip label={`Actions for task`}>
-        <DropdownTrigger>
-          <button
-            key="trigger"
-            className={clsx(
-              "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus:bg-white/15 focus:opacity-100 focus-visible:bg-white/15 focus-visible:opacity-100",
-              mode != "close"
-                ? "bg-white/15 opacity-100"
-                : "opacity-0 group-hover:opacity-100",
-            )}
-          >
-            <MoreHorizontalIcon size={18} />
-          </button>
-        </DropdownTrigger>
-      </Tooltip>
+      <DropdownTrigger>
+        <button
+          key="trigger"
+          className={clsx(
+            "grid size-5 place-items-center rounded transition-all hover:bg-white/15 focus:bg-white/15 focus:opacity-100 focus-visible:bg-white/15 focus-visible:opacity-100",
+            mode != "close"
+              ? "bg-white/15 opacity-100"
+              : "opacity-0 group-hover:opacity-100",
+          )}
+        >
+          <MoreHorizontalIcon size={18} />
+        </button>
+      </DropdownTrigger>
       <DropdownMultiContent
         mode={mode}
         contents={contents}
@@ -973,8 +1046,13 @@ const ViewTaskCardMenu = React.forwardRef<
   {
     task: ViewTask;
     onOpenMoveToColumnMenu: () => void;
+    onMoveTop: (() => void) | undefined;
+    onMoveBottom: (() => void) | undefined;
   }
->(function ViewTaskCardMenu({ task, onOpenMoveToColumnMenu }, ref) {
+>(function ViewTaskCardMenu(
+  { task, onOpenMoveToColumnMenu, onMoveTop, onMoveBottom },
+  ref,
+) {
   const deleteTaskMutation = useDeleteTask();
 
   const handleDeleteTask = () => {
@@ -989,8 +1067,18 @@ const ViewTaskCardMenu = React.forwardRef<
       </DropdownItemList>
       <Divider />
       <DropdownItemList>
-        <DropdownItem icon={ArrowUpToLine} title="Move to top" />
-        <DropdownItem icon={ArrowDownToLineIcon} title="Move to top" />
+        <DropdownItem
+          icon={ArrowUpToLine}
+          title="Move to top"
+          disabled={onMoveTop === undefined}
+          onClick={onMoveTop}
+        />
+        <DropdownItem
+          icon={ArrowDownToLineIcon}
+          title="Move to bottom"
+          disabled={onMoveBottom === undefined}
+          onClick={onMoveBottom}
+        />
         <DropdownItem
           icon={MoveHorizontalIcon}
           leftIcon={ChevronRightIcon}

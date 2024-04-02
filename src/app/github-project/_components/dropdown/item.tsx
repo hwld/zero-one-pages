@@ -47,7 +47,7 @@ export const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(
         ref={mergedRef}
         tabIndex={isActive ? 0 : -1}
         className={clsx(
-          "flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 transition-colors focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+          "flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
           red
             ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
             : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
