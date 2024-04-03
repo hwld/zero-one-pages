@@ -10,7 +10,7 @@ import {
   ArchiveIcon,
   TrashIcon,
 } from "lucide-react";
-import { useDeleteTask } from "../../_queries/useDeleteTask";
+import { useDeleteTask } from "../../_queries/use-delete-task";
 import { Divider } from "../divider";
 import { DropdownCard } from "../dropdown/card";
 import { DropdownItemList, DropdownItem } from "../dropdown/item";

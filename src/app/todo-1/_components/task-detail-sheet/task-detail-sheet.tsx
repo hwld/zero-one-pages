@@ -4,7 +4,7 @@ import { ActivityIcon, TextIcon, XIcon } from "lucide-react";
 import { TaskStatusBadge } from "../task-status-badge";
 import { TaskDescriptionForm } from "./task-description-form";
 import { Task } from "../../_mocks/task-store";
-import { useUpdateTask } from "../../_queries/useUpdateTask";
+import { useUpdateTask } from "../../_queries/use-update-task";
 
 export const TaskDetailSheet: React.FC<{
   task: Task;

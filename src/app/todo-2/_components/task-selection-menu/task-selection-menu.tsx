@@ -10,8 +10,8 @@ import {
   useHover,
   useInteractions,
 } from "@floating-ui/react";
-import { useUpdateTaskStatuses } from "../../_queries/useUpdateTaskStatuses";
-import { useDeleteTasks } from "../../_queries/useDeleteTasks";
+import { useUpdateTaskStatuses } from "../../_queries/use-update-task-statuses";
+import { useDeleteTasks } from "../../_queries/use-delete-tasks";
 
 export const TaskSelectionMenu: React.FC = () => {
   const { selectedTaskIds } = useTasksData();

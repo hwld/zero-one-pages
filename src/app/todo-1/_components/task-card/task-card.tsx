@@ -11,8 +11,8 @@ import { EditableTaskTitle } from "../editable-task-title";
 import { TaskCardButton } from "./task-card-button";
 import { ConfirmTaskDeleteDialog } from "../confirm-task-delete-dialog";
 import { Task } from "../../_mocks/task-store";
-import { useUpdateTask } from "../../_queries/useUpdateTask";
-import { useDeleteTask } from "../../_queries/useDeleteTask";
+import { useUpdateTask } from "../../_queries/use-update-task";
+import { useDeleteTask } from "../../_queries/use-delete-task";
 import { TaskCardLink } from "./task-card-link";
 import { Card } from "../card";
 

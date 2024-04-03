@@ -10,7 +10,7 @@ import { TaskCard } from "./_components/task-card/task-card";
 import { TaskForm } from "./_components/task-form";
 import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
-import { useTasks } from "./_queries/useTasks";
+import { useTasks } from "./_queries/use-tasks";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする

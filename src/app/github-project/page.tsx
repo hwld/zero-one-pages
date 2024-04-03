@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
-import { useView } from "./_queries/useView";
+import { useView } from "./_queries/use-view";
 import { ButtonGroupItem } from "./_components/button-group-item";
 import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { ViewTab } from "./_components/view-tab";

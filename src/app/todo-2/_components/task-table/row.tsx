@@ -8,8 +8,8 @@ import { Tooltip } from "../tooltip";
 import { format } from "../../_lib/utils";
 import { TaskTableCheckbox } from "./checkbox";
 import Link from "next/link";
-import { useUpdateTask } from "../../_queries/useUpdateTask";
-import { useDeleteTasks } from "../../_queries/useDeleteTasks";
+import { useUpdateTask } from "../../_queries/use-update-task";
+import { useDeleteTasks } from "../../_queries/use-delete-tasks";
 import { Task } from "../../_mocks/task-store";
 
 export const TaskTableRow: React.FC<{

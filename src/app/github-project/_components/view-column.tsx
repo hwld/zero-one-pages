@@ -7,7 +7,7 @@ import {
   MoveTaskInput,
   ViewColumn as ViewColumnData,
 } from "../_mocks/view/api";
-import { useMoveTask } from "../_queries/useMoveTask";
+import { useMoveTask } from "../_queries/use-move-task";
 import { CountBadge } from "./count-badge";
 import { TaskStatusIcon } from "./task-status-icon";
 import { ViewColumnMenuTrigger } from "./view-column-menu-trigger";

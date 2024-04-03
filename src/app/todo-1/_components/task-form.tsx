@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircleIcon, CommandIcon } from "lucide-react";
 import { FocusEventHandler, forwardRef } from "react";
 import { useForm } from "react-hook-form";
-import { useAddTask } from "../_queries/useAddTask";
+import { useAddTask } from "../_queries/use-add-task";
 import { CreateTaskInput, createTaskInputSchema } from "../_mocks/api";
 
 export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(

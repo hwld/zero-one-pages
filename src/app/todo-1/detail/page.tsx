@@ -4,8 +4,8 @@ import * as RadixDialog from "@radix-ui/react-dialog";
 import { ActivityIcon, TextIcon, XIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
-import { useTask } from "../_queries/useTask";
-import { useUpdateTask } from "../_queries/useUpdateTask";
+import { useTask } from "../_queries/use-task";
+import { useUpdateTask } from "../_queries/use-update-task";
 import { TaskStatusBadge } from "../_components/task-status-badge";
 import { TaskDescriptionForm } from "../_components/task-detail-sheet/task-description-form";
 

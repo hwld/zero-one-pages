@@ -9,7 +9,7 @@ import { TaskSearch } from "./_components/task-search";
 import { TaskSelectionMenu } from "./_components/task-selection-menu/task-selection-menu";
 import { Card } from "./_components/card";
 import { useTasksData } from "./_contexts/tasks-provider";
-import { usePaginatedTasks } from "./_queries/usePaginatedTasks";
+import { usePaginatedTasks } from "./_queries/use-paginated-tasks";
 import { useMemo } from "react";
 import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
 import { ErrorTaskTable } from "./_components/task-table/error-task-table";

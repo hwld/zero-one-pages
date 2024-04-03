@@ -2,7 +2,7 @@ import { IconPencil } from "@tabler/icons-react";
 import { Card } from "./card";
 import { useId, useState } from "react";
 import { TaskEditForm } from "./task-form/task-edit-form";
-import { useUpdateTask } from "../_queries/useUpdateTask";
+import { useUpdateTask } from "../_queries/use-update-task";
 import { Button } from "./button";
 import { Task } from "../_mocks/task-store";
 import { CreateTaskInput } from "../_mocks/api";

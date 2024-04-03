@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { createTaskInputSchema } from "../_mocks/task/api";
-import { useCreateTask } from "../_queries/useCreateTask";
+import { useCreateTask } from "../_queries/use-create-task";
 import { z } from "zod";
 
 const createTaskFormSchema = createTaskInputSchema.pick({ title: true });

@@ -13,8 +13,8 @@ import { z } from "zod";
 import Link from "next/link";
 import { TaskStatusBadge } from "../_components/task-status-badge";
 import { TaskDetailContentCard } from "../_components/task-detail-content-card";
-import { useTask } from "../_queries/useTask";
-import { useUpdateTask } from "../_queries/useUpdateTask";
+import { useTask } from "../_queries/use-task";
+import { useUpdateTask } from "../_queries/use-update-task";
 
 const TaskDetailPage: NextPage = () => {
   const updateTaskMutation = useUpdateTask();

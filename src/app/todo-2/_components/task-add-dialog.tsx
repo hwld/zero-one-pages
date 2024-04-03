@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XIcon } from "lucide-react";
 import { TaskCreateForm } from "./task-form/task-create-form";
 import { useState } from "react";
-import { useAddTask } from "../_queries/useAddTask";
+import { useAddTask } from "../_queries/use-add-task";
 import { Button } from "./button";
 import { CreateTaskInput } from "../_mocks/api";
 

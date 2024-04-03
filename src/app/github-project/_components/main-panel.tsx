@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View } from "../_mocks/view/api";
-import { useMoveTask } from "../_queries/useMoveTask";
+import { useMoveTask } from "../_queries/use-move-task";
 import { Button } from "./button";
 import { CreateTaskBar } from "./create-task-bar";
 import { ListFilterIcon } from "lucide-react";
