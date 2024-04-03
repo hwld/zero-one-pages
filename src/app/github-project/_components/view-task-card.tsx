@@ -3,8 +3,9 @@ import { CircleDashedIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { ViewTask, MoveTaskInput, ViewColumn } from "../_mocks/view/api";
-import { droppableClass, DRAG_TYPE } from "../consts";
+import { DRAG_TYPE } from "../consts";
 import { ViewTaskMenuTrigger } from "./view-task-menu/trigger";
+import { DropPreviewLine } from "./drop-preview-line";
 
 type Props = {
   task: ViewTask;
@@ -55,18 +56,7 @@ export const ViewTaskCard: React.FC<Props> = ({
 
   return (
     <div
-      className={clsx(
-        "relative py-[3px] before:w-full before:opacity-0",
-        droppableClass,
-        {
-          "before:bottom-[calc(100%-2px)] before:opacity-100":
-            acceptDrop === "top",
-        },
-        {
-          "before:top-[calc(100%-2px)] before:opacity-100":
-            acceptDrop === "bottom" || acceptBottomDrop,
-        },
-      )}
+      className={"relative py-[3px] before:w-full before:opacity-0"}
       onDragOver={(e) => {
         if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
           e.preventDefault();
@@ -99,6 +89,13 @@ export const ViewTaskCard: React.FC<Props> = ({
         }
       }}
     >
+      <DropPreviewLine
+        className={clsx("w-full opacity-0", {
+          "bottom-[calc(100%-2px)] opacity-100": acceptDrop === "top",
+          "top-[calc(100%-2px)] opacity-100":
+            acceptDrop === "bottom" || acceptBottomDrop,
+        })}
+      />
       <div
         className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600"
         draggable

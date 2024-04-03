@@ -12,7 +12,8 @@ import { CountBadge } from "./count-badge";
 import { TaskStatusIcon } from "./task-status-icon";
 import { ViewColumnMenuTrigger } from "./view-column-menu-trigger";
 import { ViewTaskCard } from "./view-task-card";
-import { DRAG_TYPE, VIEW_ID, droppableClass } from "../consts";
+import { DRAG_TYPE, VIEW_ID } from "../consts";
+import { DropPreviewLine } from "./drop-preview-line";
 
 type Props = {
   allColumns: ViewColumnData[];
@@ -116,9 +117,7 @@ export const ViewColumn: React.FC<Props> = ({
           }}
         >
           {column.tasks.length === 0 && acceptDrop && (
-            <div
-              className={clsx(droppableClass, "before:left-2 before:right-2")}
-            />
+            <DropPreviewLine className="left-2 right-2" />
           )}
           <AnimatePresence mode="popLayout">
             {column.tasks.map((task, i) => {
