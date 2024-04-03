@@ -7,7 +7,7 @@ import {
 import { taskSchema, taskStore } from "../task/store";
 import { taskStatusSchema, taskStatusStore } from "../task-status/store";
 import { fetcher } from "@/lib/fetcher";
-import { HttpResponse, http } from "msw";
+import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 
 const viewTaskSchema = viewTaskConfigSchema.merge(taskSchema);
@@ -46,7 +46,8 @@ export const moveTask = async ({
 };
 
 export const viewApiHandler = [
-  http.get(GitHubProjectAPI.view(), ({ params }) => {
+  http.get(GitHubProjectAPI.view(), async ({ params }) => {
+    await delay();
     const viewId = z.string().parse(params.id);
 
     const viewConfig = viewConfigStore.get(viewId);

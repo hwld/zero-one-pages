@@ -8,17 +8,12 @@ import {
 import React from "react";
 import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
-import { useView } from "./_queries/use-view";
 import { ButtonGroupItem } from "./_components/button-group-item";
 import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { ViewTab } from "./_components/view-tab";
-import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
-import { MainPanel } from "./_components/main-panel";
-import { VIEW_ID } from "./consts";
+import { ViewPage } from "./view-page";
 
 const GitHubProjectPage: React.FC = () => {
-  const { data: view } = useView(VIEW_ID);
-
   return (
     <div
       className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden bg-neutral-900 text-neutral-100"
@@ -51,8 +46,7 @@ const GitHubProjectPage: React.FC = () => {
           <ViewTab icon={PlusIcon}>New view</ViewTab>
         </div>
         <div className="flex w-[100dvw] bg-neutral-800">
-          <SlicerPanel columns={view?.columns ?? []} />
-          {view && <MainPanel view={view} />}
+          <ViewPage />
         </div>
       </div>
     </div>
