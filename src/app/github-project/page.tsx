@@ -5,46 +5,22 @@ import {
   ArchiveIcon,
   ArrowDownToLineIcon,
   ArrowUpToLine,
-  BookMarkedIcon,
-  BookOpenIcon,
   CheckIcon,
-  ChevronDownIcon,
-  ChevronDownSquareIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleDashedIcon,
   CircleDotIcon,
-  Columns2Icon,
   CopyIcon,
   EyeOffIcon,
-  GalleryHorizontalEndIcon,
-  GitPullRequestIcon,
-  KanbanSquareIcon,
-  LayersIcon,
   LineChartIcon,
   ListFilterIcon,
-  ListIcon,
-  LucideIcon,
-  MessageSquareIcon,
-  MilestoneIcon,
   MoreHorizontalIcon,
   MoveHorizontalIcon,
-  MoveVerticalIcon,
   PanelRightOpenIcon,
   PenIcon,
   PlusIcon,
-  RocketIcon,
-  Rows2Icon,
   Settings2Icon,
-  SettingsIcon,
-  TableRowsSplitIcon,
-  TagIcon,
-  TextIcon,
   TrashIcon,
-  UploadIcon,
-  UsersIcon,
-  WorkflowIcon,
-  XIcon,
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { ReactNode } from "react";
@@ -58,7 +34,6 @@ import {
   DropdownItem,
   DropdownItemGroup,
   DropdownItemList,
-  ViewConfigMenuItem,
 } from "./_components/dropdown/item";
 import { Divider } from "./_components/divider";
 import { DropdownCard } from "./_components/dropdown/card";
@@ -77,6 +52,12 @@ import { CreateTaskBar } from "./_components/create-task-bar";
 import { z } from "zod";
 import { useMoveTask } from "./_queries/useMoveTask";
 import { AnimatePresence, motion } from "framer-motion";
+import { ButtonGroupItem } from "./_components/button-group-item";
+import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
+import { ViewTab } from "./_components/view-tab";
+import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
+import { TaskStatusIcon } from "./_components/task-status-icon";
+import { CountBadge } from "./_components/count-badge";
 
 const VIEW_ID = "1";
 
@@ -102,7 +83,6 @@ const GitHubProjectPage: React.FC = () => {
             <Tooltip label="Project details">
               <ButtonGroupItem icon={PanelRightOpenIcon} />
             </Tooltip>
-
             <ProjectMenuTrigger>
               <ButtonGroupItem position="right" icon={MoreHorizontalIcon} />
             </ProjectMenuTrigger>
@@ -111,9 +91,9 @@ const GitHubProjectPage: React.FC = () => {
       </div>
       <div className="grid grid-rows-[min-content_minmax(0,1fr)]">
         <div className="flex gap-1 border-b border-neutral-600 px-8">
-          <Tab active>Kanban1</Tab>
-          <Tab>Kanban2</Tab>
-          <Tab icon={PlusIcon}>New view</Tab>
+          <ViewTab active>Kanban1</ViewTab>
+          <ViewTab>Kanban2</ViewTab>
+          <ViewTab icon={PlusIcon}>New view</ViewTab>
         </div>
         <div className="flex w-[100dvw] bg-neutral-800">
           <SlicerPanel columns={view?.columns ?? []} />
@@ -256,7 +236,7 @@ const ViewColumn: React.FC<{
     <div className="flex h-full w-[350px] shrink-0 flex-col rounded-lg border border-neutral-700 bg-neutral-900">
       <div className="flex items-center justify-between px-4 pb-2 pt-4">
         <div className="flex items-center gap-2">
-          <StatusIcon color={column.status.color} />
+          <TaskStatusIcon color={column.status.color} />
           <div className="font-bold">{column.status.name}</div>
           <CountBadge count={column.tasks.length} />
         </div>
@@ -488,463 +468,6 @@ const ViewTaskCard: React.FC<{
         <div className="text-sm">{task.title}</div>
       </div>
     </div>
-  );
-};
-
-type ViewOptionMenuMode =
-  | "close"
-  | "main"
-  | "fieldsConfig"
-  | "columnByConfig"
-  | "groupByConfig"
-  | "sortByConfig"
-  | "fieldSumConfig"
-  | "sliceByConfig";
-
-const ViewOptionMenuTrigger: React.FC = () => {
-  const [mode, setMode] = useState<ViewOptionMenuMode>("close");
-
-  const contents = useMemo((): Record<ViewOptionMenuMode, ReactNode> => {
-    return {
-      close: null,
-      main: <ViewOptionMenu onChangeMode={setMode} />,
-      fieldsConfig: <FieldsConfigMenu onBack={() => setMode("main")} />,
-      columnByConfig: <ColumnByConfigMenu onBack={() => setMode("main")} />,
-      groupByConfig: <GroupByConfigMenu onBack={() => setMode("main")} />,
-      sortByConfig: <SortByConfigMenu onBack={() => setMode("main")} />,
-      fieldSumConfig: <FieldSumConfigMenu onBack={() => setMode("main")} />,
-      sliceByConfig: <SliceByConfigMenu onBack={() => setMode("main")} />,
-    };
-  }, []);
-
-  const isOpen = mode !== "close";
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setMode("main");
-    } else {
-      setMode("close");
-    }
-  };
-
-  const handlekeEscapeKeydown = () => {
-    if (mode === "main") {
-      setMode("close");
-    } else {
-      setMode("main");
-    }
-  };
-
-  return (
-    <DropdownProvider isOpen={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip label="View options">
-        <DropdownTrigger>
-          <button
-            className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
-            onClick={() => setMode("main")}
-          >
-            <ChevronDownIcon size={16} />
-          </button>
-        </DropdownTrigger>
-      </Tooltip>
-      <DropdownMultiContent
-        mode={mode}
-        contents={contents}
-        onEscapeKeydown={handlekeEscapeKeydown}
-      />
-    </DropdownProvider>
-  );
-};
-
-const ViewOptionMenu: React.FC<{
-  onChangeMode: (mode: ViewOptionMenuMode) => void;
-}> = ({ onChangeMode }) => {
-  return (
-    <DropdownCard width={320}>
-      <DropdownItemGroup group="configuration">
-        <ViewConfigMenuItem
-          icon={TextIcon}
-          title="Fields"
-          value="Title, Assignees, Status, Foo, Bar"
-          onClick={() => {
-            onChangeMode("fieldsConfig");
-          }}
-        />
-        <ViewConfigMenuItem
-          icon={Columns2Icon}
-          title="Column by:"
-          value="Status"
-          onClick={() => {
-            onChangeMode("columnByConfig");
-          }}
-        />
-        <ViewConfigMenuItem
-          icon={Rows2Icon}
-          title="Group by"
-          value="none"
-          onClick={() => {
-            onChangeMode("groupByConfig");
-          }}
-        />
-        <ViewConfigMenuItem
-          icon={MoveVerticalIcon}
-          title="Sort by"
-          value="manual"
-          onClick={() => {
-            onChangeMode("sortByConfig");
-          }}
-        />
-        <ViewConfigMenuItem
-          icon={LayersIcon}
-          title="Field sum"
-          value="Count"
-          onClick={() => {
-            onChangeMode("fieldSumConfig");
-          }}
-        />
-        <ViewConfigMenuItem
-          icon={TableRowsSplitIcon}
-          title="Slice by"
-          value="Status"
-          onClick={() => {
-            onChangeMode("sliceByConfig");
-          }}
-        />
-      </DropdownItemGroup>
-      <Divider />
-      <DropdownItemList>
-        <DropdownItem icon={LineChartIcon} title="Generate chart" />
-      </DropdownItemList>
-      <Divider />
-      <DropdownItemList>
-        <DropdownItem icon={PenIcon} title="Rename view" />
-        <DropdownItem
-          icon={GalleryHorizontalEndIcon}
-          title="Save changes to new view"
-        />
-        <DropdownItem icon={TrashIcon} title="Delete view" red />
-      </DropdownItemList>
-      <Divider />
-      <DropdownItemList>
-        <DropdownItem icon={UploadIcon} title="Export view data" />
-      </DropdownItemList>
-      <Divider />
-      <DropdownItemList>
-        <div className="grid h-8 grid-cols-2 gap-2">
-          <button className="grow rounded-md text-neutral-300 transition-colors hover:bg-white/15">
-            Discard
-          </button>
-          <button className="grow rounded-md border border-green-500 text-green-500 transition-colors hover:bg-green-500/15">
-            Save
-          </button>
-        </div>
-      </DropdownItemList>
-    </DropdownCard>
-  );
-};
-
-const FieldsConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function FieldsConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu
-      ref={ref}
-      header={
-        <button className="mx-2 flex h-8 items-center gap-2 rounded-md px-2 transition-colors hover:bg-white/15">
-          <PlusIcon size={16} />
-          <div className="text-sm">New field</div>
-        </button>
-      }
-      onBack={onBack}
-      placeholder="Fields..."
-    >
-      <Command.Item asChild key="title">
-        <ConfigMenuItem icon={ListIcon} title="Title" isSelected={true} />
-      </Command.Item>
-      <Command.Item asChild key="assignees">
-        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={true} />
-      </Command.Item>
-      <Command.Item asChild key="status">
-        <ConfigMenuItem
-          icon={ChevronDownSquareIcon}
-          title="Status"
-          isSelected={true}
-        />
-      </Command.Item>
-      <Command.Item asChild key="labels">
-        <ConfigMenuItem icon={TagIcon} title="Labels" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="linked pull requests">
-        <ConfigMenuItem
-          icon={GitPullRequestIcon}
-          title="Linked pull requests"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="reviewers">
-        <ConfigMenuItem icon={UsersIcon} title="Reviewers" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="repository">
-        <ConfigMenuItem
-          icon={BookMarkedIcon}
-          title="repository"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="milestone">
-        <ConfigMenuItem
-          icon={MilestoneIcon}
-          title="Milestone"
-          isSelected={false}
-        />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const ColumnByConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function ColumnByConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu ref={ref} onBack={onBack} placeholder="Column by...">
-      <Command.Item asChild key="status">
-        <ConfigMenuItem
-          icon={ChevronDownSquareIcon}
-          title="Status"
-          isSelected={true}
-        />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const GroupByConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function GroupByConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu ref={ref} onBack={onBack} placeholder="Group by...">
-      <Command.Item asChild key="assignees">
-        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="status">
-        <ConfigMenuItem
-          icon={ChevronDownSquareIcon}
-          title="Status"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="repository">
-        <ConfigMenuItem
-          icon={BookMarkedIcon}
-          title="repository"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="milestone">
-        <ConfigMenuItem
-          icon={MilestoneIcon}
-          title="Milestone"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="no grouping">
-        <ConfigMenuItem icon={XIcon} title="No grouping" isSelected={true} />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const SortByConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function SortByConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu ref={ref} onBack={onBack} placeholder="Sort by...">
-      <Command.Item asChild key="title">
-        <ConfigMenuItem icon={ListIcon} title="Title" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="assignees">
-        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="status">
-        <ConfigMenuItem
-          icon={ChevronDownSquareIcon}
-          title="Status"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="labels">
-        <ConfigMenuItem icon={TagIcon} title="Labels" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="linked pull requests">
-        <ConfigMenuItem
-          icon={GitPullRequestIcon}
-          title="Linked pull requests"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="reviewers">
-        <ConfigMenuItem icon={UsersIcon} title="Reviewers" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="repository">
-        <ConfigMenuItem
-          icon={BookMarkedIcon}
-          title="repository"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="milestone">
-        <ConfigMenuItem
-          icon={MilestoneIcon}
-          title="Milestone"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="no sorting">
-        <ConfigMenuItem icon={XIcon} title="No sorting" isSelected={true} />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const FieldSumConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function FieldSumConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu ref={ref} onBack={onBack} placeholder="Field sum...">
-      <Command.Item asChild key="count">
-        <ConfigMenuItem title="Count" isSelected={true} />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const SliceByConfigMenu = React.forwardRef<
-  HTMLDivElement,
-  {
-    onBack: () => void;
-  }
->(function SliceByConfigMenu({ onBack }, ref) {
-  return (
-    <SelectionMenu ref={ref} onBack={onBack} placeholder="Slice by...">
-      <Command.Item asChild key="assignees">
-        <ConfigMenuItem icon={UsersIcon} title="Assignees" isSelected={false} />
-      </Command.Item>
-      <Command.Item asChild key="status">
-        <ConfigMenuItem
-          icon={ChevronDownSquareIcon}
-          title="Status"
-          isSelected={true}
-        />
-      </Command.Item>
-      <Command.Item asChild key="repository">
-        <ConfigMenuItem
-          icon={BookMarkedIcon}
-          title="repository"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="milestone">
-        <ConfigMenuItem
-          icon={MilestoneIcon}
-          title="Milestone"
-          isSelected={false}
-        />
-      </Command.Item>
-      <Command.Item asChild key="no grouping">
-        <ConfigMenuItem icon={XIcon} title="No slicing" isSelected={false} />
-      </Command.Item>
-    </SelectionMenu>
-  );
-});
-
-const ConfigMenuItem = React.forwardRef<
-  HTMLButtonElement,
-  { icon?: LucideIcon; title: string; isSelected: boolean }
->(function ConfigMenuItem({ icon: Icon, title, isSelected, ...props }, ref) {
-  return (
-    <button
-      {...props}
-      ref={ref}
-      className="flex min-h-8 w-full items-center justify-between rounded-md px-2 transition-colors hover:bg-white/15 data-[selected=true]:bg-white/15"
-    >
-      <div className="flex items-center gap-2">
-        {Icon && <Icon size={16} className="text-neutral-400" />}
-        <div className="text-sm">{title}</div>
-      </div>
-      {isSelected && <CheckIcon size={20} />}
-    </button>
-  );
-});
-
-const ProjectMenuTrigger: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <DropdownProvider
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
-      placement="bottom-end"
-    >
-      <Tooltip label="View more options">
-        <DropdownTrigger>{children}</DropdownTrigger>
-      </Tooltip>
-      <DropdownContent>
-        <DropdownCard>
-          <DropdownItemList>
-            <DropdownItem icon={WorkflowIcon} title="Workflows" />
-            <DropdownItem icon={ArchiveIcon} title="Archived items" />
-            <DropdownItem icon={SettingsIcon} title="Settings" />
-            <DropdownItem icon={CopyIcon} title="Make a copy" />
-          </DropdownItemList>
-          <Divider />
-          <DropdownItemGroup group="GitHub Projects">
-            <DropdownItem icon={RocketIcon} title="What's new" />
-            <DropdownItem icon={MessageSquareIcon} title="Give feedback" />
-            <DropdownItem icon={BookOpenIcon} title="GitHub Docs" />
-          </DropdownItemGroup>
-        </DropdownCard>
-      </DropdownContent>
-    </DropdownProvider>
-  );
-};
-
-const SliceByMenuTrigger: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
-      <DropdownTrigger>{children}</DropdownTrigger>
-      <DropdownContent>
-        <DropdownCard>
-          <DropdownItemGroup group="Slice by">
-            <DropdownItem icon={UsersIcon} title="Assigness" />
-            <DropdownItem icon={ChevronDownSquareIcon} title="Status" />
-            <DropdownItem icon={TagIcon} title="Labels" />
-            <DropdownItem icon={BookMarkedIcon} title="Repository" />
-            <DropdownItem icon={MilestoneIcon} title="Milestone" />
-            <DropdownItem icon={XIcon} title="No slicing" />
-          </DropdownItemGroup>
-        </DropdownCard>
-      </DropdownContent>
-    </DropdownProvider>
   );
 };
 
@@ -1227,7 +750,7 @@ const MoveToColumnItem = React.forwardRef<
       ref={ref}
       className="flex min-h-12 w-full items-start gap-2 rounded-md px-2 py-[6px] transition-colors hover:bg-white/10 data-[selected=true]:bg-white/10"
     >
-      <StatusIcon color={status.color} />
+      <TaskStatusIcon color={status.color} />
       <div className="flex w-full flex-col items-start gap-[2px]">
         <div className="flex w-full items-start justify-between gap-1 text-sm">
           {status.name}
@@ -1235,144 +758,6 @@ const MoveToColumnItem = React.forwardRef<
         </div>
         <div className="text-xs text-neutral-400">{status.description}</div>
       </div>
-    </button>
-  );
-});
-
-const SlicerPanel: React.FC<{ columns: ViewColumnData[] }> = ({ columns }) => {
-  return (
-    <div className="flex w-[350px] shrink-0 flex-col gap-2 overflow-auto border-r border-neutral-600 p-4">
-      <SliceByMenuTrigger>
-        <button className="flex h-8 w-fit items-center gap-1 rounded-md px-2 text-sm hover:bg-white/10">
-          <span>Status</span>
-          <ChevronDownIcon size={16} />
-        </button>
-      </SliceByMenuTrigger>
-      <ul className="w-full [&>li:last-child]:border-b-0">
-        {columns.map((column) => {
-          return <SlicerListItem key={column.statusId} column={column} />;
-        })}
-      </ul>
-    </div>
-  );
-};
-
-const SlicerListItem: React.FC<{
-  active?: boolean;
-  column: ViewColumnData;
-}> = ({ active = false, column }) => {
-  return (
-    <li
-      className={clsx(
-        "relative w-full border-b border-neutral-700",
-        active &&
-          "before:absolute before:-left-3 before:bottom-2 before:top-2 before:w-1 before:rounded-full before:bg-blue-500 before:content-['']",
-      )}
-    >
-      <button
-        className={clsx(
-          "flex w-full items-start justify-between rounded-md px-2 py-2 transition-colors hover:bg-white/10",
-          column.status.description ? "h-14" : "",
-        )}
-      >
-        <div className="flex items-start gap-2">
-          <StatusIcon color={column.status.color} />
-          <div className="flex flex-col items-start">
-            <div className="text-sm">{column.status.name}</div>
-            {column.status.description && (
-              <div className="text-xs text-neutral-400">
-                {column.status.description}
-              </div>
-            )}
-          </div>
-        </div>
-        <CountBadge count={column.tasks.length} />
-      </button>
-    </li>
-  );
-};
-
-type StatusIconColor =
-  | "green"
-  | "orange"
-  | "red"
-  | "purple"
-  | "gray"
-  | "transparent";
-const StatusIcon: React.FC<{ color: StatusIconColor }> = ({ color }) => {
-  const iconClass = {
-    green: "bg-green-600/20 border-green-600",
-    orange: "bg-orange-600/20 border-orange-600",
-    red: "bg-red-600/20 border-red-600",
-    purple: "bg-purple-600/20 border-purple-600",
-    gray: "bg-neutral-500/20 border-neutral-500",
-    transparent: "bg-transparent border-transparent",
-  };
-
-  return (
-    <div
-      className={clsx(
-        "size-4 shrink-0 rounded-full border-2",
-        iconClass[color],
-      )}
-    />
-  );
-};
-
-const CountBadge: React.FC<{ count: number }> = ({ count }) => {
-  return (
-    <div className="grid min-w-6 place-items-center rounded-full bg-white/10 p-1 text-xs text-neutral-400">
-      {count}
-    </div>
-  );
-};
-
-const Tab: React.FC<{
-  active?: boolean;
-  children: ReactNode;
-  icon?: LucideIcon;
-}> = ({ children, icon: Icon = KanbanSquareIcon, active = false }) => {
-  const Wrapper = active ? "div" : "button";
-
-  return (
-    <Wrapper
-      className={clsx(
-        "-mb-[1px] flex items-center gap-2 border-neutral-600 px-4 py-2",
-        active
-          ? "rounded-t-md border-x border-t bg-neutral-800 text-neutral-100"
-          : "rounded-md text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100",
-      )}
-    >
-      <Icon size={20} />
-      <div className="text-sm">{children}</div>
-      {active && <ViewOptionMenuTrigger />}
-    </Wrapper>
-  );
-};
-
-const ButtonGroupItem = React.forwardRef<
-  HTMLButtonElement,
-  {
-    icon: LucideIcon;
-    position?: "left" | "center" | "right";
-  }
->(function ButtonGroupItem({ icon: Icon, position = "center", ...props }, ref) {
-  const positionClass = {
-    left: "border-x rounded-l-md",
-    center: "",
-    right: "border-x rounded-r-md",
-  };
-
-  return (
-    <button
-      {...props}
-      ref={ref}
-      className={clsx(
-        "flex h-8 w-9 items-center justify-center border-y border-neutral-700 bg-neutral-800 text-neutral-300 transition-colors hover:bg-neutral-600",
-        positionClass[position],
-      )}
-    >
-      <Icon size={20} />
     </button>
   );
 });
