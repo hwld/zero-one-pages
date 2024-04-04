@@ -114,10 +114,10 @@ export const fetchPaginatedTasks = async (
   return tasks;
 };
 
-export const fetchTask = async (id: string): Promise<Task | undefined> => {
+export const fetchTask = async (id: string): Promise<Task | null> => {
   const res = await fetcher.get(Todo2API.task(id));
   const json = await res.json();
-  const task = taskSchema.optional().parse(json);
+  const task = taskSchema.nullable().parse(json);
 
   return task;
 };
@@ -236,7 +236,7 @@ export const todo2Handlers = [
   http.get(Todo2API.task(), ({ params }) => {
     const id = z.string().parse(params.id);
     const task = taskStore.get(id);
-    return HttpResponse.json(task);
+    return HttpResponse.json(task ?? null);
   }),
   http.post(Todo2API.createTask(), async ({ request }) => {
     const input = createTaskInputSchema.parse(await request.json());
