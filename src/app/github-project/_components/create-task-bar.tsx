@@ -1,11 +1,12 @@
 import { useDismiss, useFloating, useInteractions } from "@floating-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { createTaskInputSchema } from "../_mocks/task/api";
 import { useCreateTask } from "../_queries/use-create-task";
 import { z } from "zod";
+import clsx from "clsx";
 
 const createTaskFormSchema = createTaskInputSchema.pick({ title: true });
 type CreateTaskFrom = z.infer<typeof createTaskFormSchema>;
@@ -32,6 +33,9 @@ export const CreateTaskBar: React.FC<Props> = ({
 
   const createTaskMutation = useCreateTask();
   const handleCreateTask = (input: CreateTaskFrom) => {
+    if (createTaskMutation.isPending) {
+      return;
+    }
     createTaskMutation.mutate(
       { ...input, statusId },
       {
@@ -77,10 +81,24 @@ export const CreateTaskBar: React.FC<Props> = ({
                 onSubmit={handleSubmit(handleCreateTask)}
               >
                 <input
+                  aria-disabled={createTaskMutation.isPending}
                   autoFocus
-                  className="h-full w-full bg-transparent px-4 text-sm placeholder:text-neutral-400 focus-visible:outline-none"
+                  className={clsx(
+                    "h-full w-full bg-transparent px-4 text-sm placeholder:text-neutral-400 focus-visible:outline-none",
+                    createTaskMutation.isPending && "text-neutral-400",
+                  )}
                   placeholder="Start typing to create a draft"
                   {...register("title")}
+                />
+                <Loader2Icon
+                  strokeWidth={3}
+                  size={25}
+                  className={clsx(
+                    "absolute bottom-0 left-4 top-0 my-auto rounded-full",
+                    createTaskMutation.isPending
+                      ? "animate-spin opacity-100"
+                      : "opacity-0",
+                  )}
                 />
                 <AnimatePresence>
                   {errors.title && (

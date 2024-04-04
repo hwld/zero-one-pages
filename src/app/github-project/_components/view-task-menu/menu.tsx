@@ -69,6 +69,7 @@ export const ViewTaskCardMenu = forwardRef<HTMLDivElement, Props>(
             title="Delete from project"
             red
             onClick={handleDeleteTask}
+            disabled={deleteTaskMutation.isPending}
           />
         </DropdownItemList>
       </DropdownCard>

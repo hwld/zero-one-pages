@@ -94,6 +94,8 @@ export const viewApiHandler = [
   }),
 
   http.post(GitHubProjectAPI.moveTask(), async ({ params, request }) => {
+    await delay();
+
     const viewId = z.string().parse(params.id);
     const input = moveTaskInputSchema.parse(await request.json());
 

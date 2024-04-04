@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./store";
 import { fetcher } from "@/lib/fetcher";
-import { HttpResponse, http } from "msw";
+import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 
 export const createTaskInputSchema = z.object({
@@ -27,13 +27,15 @@ export const deleteTask = async (id: string) => {
 
 export const taskApiHandler = [
   http.post(GitHubProjectAPI.tasks(), async ({ request }) => {
+    await delay();
     const input = createTaskInputSchema.parse(await request.json());
     const createdTask = taskStore.add(input);
 
     return HttpResponse.json(createdTask);
   }),
 
-  http.delete(GitHubProjectAPI.task(), ({ params }) => {
+  http.delete(GitHubProjectAPI.task(), async ({ params }) => {
+    await delay();
     const id = z.string().parse(params?.id);
     taskStore.remove(id);
 
