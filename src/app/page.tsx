@@ -16,9 +16,10 @@ export default function Home() {
         <h1 className="text-3xl font-bold">Zero one ui</h1>
         <p className="text-center text-sm text-zinc-400">
           ReactでいろんなUIを作ります
+          <br />`<kbd className="text-zinc-300">/</kbd>
+          `キーでページの移動やページ毎のコマンドを
           <br />
-          <span className="text-zinc-300">`/`</span>
-          キーでどこからでも好きなページに移動できます
+          実行するためのメニューを開くことができます
         </p>
       </div>
       <div className="mt-[80px] grid max-w-[950px] grid-cols-1 gap-5 p-5 md:grid-cols-2 lg:grid-cols-3">

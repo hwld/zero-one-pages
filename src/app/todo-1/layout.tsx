@@ -56,7 +56,7 @@ const Layout: React.FC<Props> = ({ children }) => {
             </h1>
             <div className="flex flex-col gap-1">
               {tasks.length === 0 && <EmptyTask />}
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence mode="popLayout" initial={false}>
                 {tasks.map((task) => {
                   return (
                     <motion.div

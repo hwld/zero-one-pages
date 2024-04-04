@@ -119,7 +119,7 @@ export const ViewColumn: React.FC<Props> = ({
           {column.tasks.length === 0 && acceptDrop && (
             <DropPreviewLine className="left-2 right-2" />
           )}
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence mode="popLayout" initial={false}>
             {column.tasks.map((task, i) => {
               const isTop = i === 0;
               const isBottom = i === column.tasks.length - 1;

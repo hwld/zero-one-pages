@@ -8,10 +8,7 @@ export const LoadingTaskTable: React.FC = () => {
         <tr>
           <td colSpan={taskTableCols} className="h-[150px]">
             <div className="grid w-full place-items-center">
-              <IconLoader2
-                size={100}
-                className="animate-spin text-white/30 duration-75"
-              />
+              <IconLoader2 size={100} className="animate-spin text-white/30" />
             </div>
           </td>
         </tr>

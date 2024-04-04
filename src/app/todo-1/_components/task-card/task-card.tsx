@@ -31,7 +31,7 @@ export const TaskCard: React.FC<{
       <div className="just flex w-full items-center justify-between gap-1">
         <div className="flex w-full items-center gap-2">
           <div className="relative flex h-[25px] w-[25px] shrink-0 cursor-pointer items-center justify-center">
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {task.done && (
                 <motion.div
                   className="absolute inset-0 rounded-full bg-neutral-900"
