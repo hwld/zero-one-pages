@@ -163,7 +163,7 @@ export const GlobalCommand: React.FC = () => {
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
                 style={{ colorScheme: "dark" }}
               >
-                <Command className="flex h-full flex-col">
+                <Command className="flex h-full flex-col" loop>
                   <div className="flex flex-col gap-2 px-4 pt-4">
                     <div className="flex h-5 w-fit items-center rounded bg-white/10 px-2 text-xs text-neutral-400">
                       {currentPage}

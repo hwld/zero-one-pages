@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGlobalCommandConfig } from "../_providers/global-command-provider";
 import {
   BoxSelectIcon,
@@ -19,19 +19,15 @@ export const useTodo2HomeCommands = () => {
         newCommands: [
           {
             icon: isErrorMode ? TriangleIcon : TriangleAlertIcon,
-            label: isErrorMode
-              ? "タスク取得エラーを止める"
-              : "タスク取得エラーを発生させる",
+            label: `タスク取得エラーを${isErrorMode ? "止める" : "発生させる"}`,
             action: async () => {
-              // TODO:
-              // tsakStoreはグローバルなので、このhookを使っているコンポーネントがアンマウントされると
-              // 状態が食い違う
               setIsErrorMode((s) => !s);
               if (isErrorMode) {
-                taskStore.stopSimulateError();
+                taskStore.removeErrorSimulationScope("getAll");
               } else {
-                taskStore.simulateError();
+                taskStore.addErrorSimulationScope("getAll");
               }
+
               client.refetchQueries();
             },
           },
@@ -55,4 +51,45 @@ export const useTodo2HomeCommands = () => {
       };
     }, [client, isErrorMode]),
   );
+
+  useEffect(() => {
+    taskStore.stopErrorSimulation();
+    return () => {
+      taskStore.stopErrorSimulation();
+    };
+  }, []);
+};
+
+export const useTodo2DetailCommands = () => {
+  const client = useQueryClient();
+  const [isErrorMode, setIsErrorMode] = useState(false);
+  useGlobalCommandConfig(
+    useMemo(() => {
+      return {
+        newCommands: [
+          {
+            icon: isErrorMode ? TriangleIcon : TriangleAlertIcon,
+            label: `タスク取得エラーを${isErrorMode ? "止める" : "発生させる"}`,
+            action: async () => {
+              setIsErrorMode((s) => !s);
+              if (isErrorMode) {
+                taskStore.removeErrorSimulationScope("get");
+              } else {
+                taskStore.addErrorSimulationScope("get");
+              }
+
+              client.refetchQueries();
+            },
+          },
+        ],
+      };
+    }, [client, isErrorMode]),
+  );
+
+  useEffect(() => {
+    taskStore.stopErrorSimulation();
+    return () => {
+      taskStore.stopErrorSimulation();
+    };
+  }, []);
 };

@@ -5,10 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 import Link from "next/link";
 import { TaskDetailContent } from "./detail-content";
+import { useTodo2DetailCommands } from "../commands";
 
 const TaskDetailPage: NextPage = () => {
   const searchParams = useSearchParams();
   const id = z.string().parse(searchParams.get("id"));
+
+  useTodo2DetailCommands();
 
   return (
     <>

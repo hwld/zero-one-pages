@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { CreateTaskInput, UpdateTaskInput } from "./api";
 import { initialTasks } from "./data";
-import { HttpResponse } from "msw";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -13,18 +12,24 @@ export const taskSchema = z.object({
 });
 export type Task = z.infer<typeof taskSchema>;
 
+export type TaskStoreErrorSimulationScope = "getAll" | "get";
 class TaskStore {
   private allTasks: Task[] = initialTasks;
-  private isErrorSimulated: boolean = false;
+  private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();
+
+  private throwErrorForMode(mode: TaskStoreErrorSimulationScope) {
+    if (this.errorSimulationScopes.has(mode)) {
+      throw new Error("simulated error");
+    }
+  }
 
   public getAll() {
-    if (this.isErrorSimulated) {
-      throw new HttpResponse(null, { status: 500 });
-    }
+    this.throwErrorForMode("getAll");
     return this.allTasks;
   }
 
   public get(id: string) {
+    this.throwErrorForMode("get");
     return this.allTasks.find((t) => t.id === id);
   }
 
@@ -90,12 +95,16 @@ class TaskStore {
     this.allTasks = initialTasks;
   }
 
-  public simulateError() {
-    this.isErrorSimulated = true;
+  public addErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {
+    this.errorSimulationScopes.add(scope);
   }
 
-  public stopSimulateError() {
-    this.isErrorSimulated = false;
+  public removeErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {
+    this.errorSimulationScopes.delete(scope);
+  }
+
+  public stopErrorSimulation() {
+    this.errorSimulationScopes.clear();
   }
 }
 
