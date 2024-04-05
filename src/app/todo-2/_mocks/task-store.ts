@@ -17,19 +17,19 @@ class TaskStore {
   private allTasks: Task[] = initialTasks;
   private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();
 
-  private throwErrorForMode(mode: TaskStoreErrorSimulationScope) {
-    if (this.errorSimulationScopes.has(mode)) {
+  private throwErrorForScope(scope: TaskStoreErrorSimulationScope) {
+    if (this.errorSimulationScopes.has(scope)) {
       throw new Error("simulated error");
     }
   }
 
   public getAll() {
-    this.throwErrorForMode("getAll");
+    this.throwErrorForScope("getAll");
     return this.allTasks;
   }
 
   public get(id: string) {
-    this.throwErrorForMode("get");
+    this.throwErrorForScope("get");
     return this.allTasks.find((t) => t.id === id);
   }
 

@@ -10,10 +10,19 @@ export const taskSchema = z.object({
 
 export type Task = z.infer<typeof taskSchema>;
 
+export type TaskStoreErrorSimulationScope = "getAll" | "mutation";
 class TaskStore {
   private tasks: Task[] = [];
+  private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();
+
+  private throwErrorForScope(scope: TaskStoreErrorSimulationScope) {
+    if (this.errorSimulationScopes.has(scope)) {
+      throw new Error("simulated error");
+    }
+  }
 
   public getAll(): Task[] {
+    this.throwErrorForScope("getAll");
     return this.tasks;
   }
 
@@ -26,6 +35,8 @@ class TaskStore {
   }
 
   public add(input: { title: string; statusId: string }): Task {
+    this.throwErrorForScope("mutation");
+
     const status = taskStatusStore.get(input.statusId);
     if (!status) {
       throw new Error("Statusが存在しません");
@@ -47,6 +58,8 @@ class TaskStore {
   }
 
   public update(input: { id: string; title: string; statusId: string }) {
+    this.throwErrorForScope("mutation");
+
     const status = taskStatusStore.get(input.statusId);
 
     if (!status) {
@@ -66,9 +79,23 @@ class TaskStore {
   }
 
   public remove(id: string) {
+    this.throwErrorForScope("mutation");
+
     this.tasks = this.tasks.filter((t) => t.id !== id);
 
     viewConfigStore.removeTaskFromAllConfigs(id);
+  }
+
+  public addErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {
+    this.errorSimulationScopes.add(scope);
+  }
+
+  public removeErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {
+    this.errorSimulationScopes.delete(scope);
+  }
+
+  public stopErrorSimulation() {
+    this.errorSimulationScopes.clear();
   }
 }
 

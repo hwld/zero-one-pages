@@ -13,8 +13,11 @@ import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { ViewTab } from "./_components/view-tab";
 import { ViewPage } from "./view-page";
 import { Toaster } from "./_components/toast/toaster";
+import { useGitHubProjectCommands } from "./commands";
 
 const GitHubProjectPage: React.FC = () => {
+  useGitHubProjectCommands();
+
   return (
     <>
       <div

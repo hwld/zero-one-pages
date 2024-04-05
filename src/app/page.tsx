@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Page, pages } from "./pages";
 import { ReactNode } from "react";
 import { SparklesIcon } from "lucide-react";
+import { IoLogoGithub } from "react-icons/io";
 
 export default function Home() {
   return (
@@ -13,7 +14,19 @@ export default function Home() {
       style={{ colorScheme: "dark" }}
     >
       <div className="flex w-[500px] max-w-full flex-col gap-2 px-5 text-center text-zinc-200">
-        <h1 className="text-3xl font-bold">Zero one ui</h1>
+        <div className="flex items-center justify-center gap-2">
+          <h1 className="text-3xl font-bold">Zero one ui</h1>
+          <a
+            href="https://github.com/hwld/zero-one-ui"
+            target="_blank"
+            className="grid size-[30px] place-items-center rounded  transition-colors hover:bg-white/15"
+          >
+            <IoLogoGithub
+              className="fill-neutral-200"
+              style={{ fontSize: "23" }}
+            />
+          </a>
+        </div>
         <p className="text-center text-sm text-zinc-400">
           ReactでいろんなUIを作ります
           <br />`<kbd className="text-zinc-300">/</kbd>
