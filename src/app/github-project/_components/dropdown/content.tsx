@@ -1,6 +1,10 @@
 import { useDropdown } from "./provider";
 import { ReactNode, useEffect } from "react";
-import { AnimatePresence, AnimatePresenceProps } from "framer-motion";
+import {
+  AnimatePresence,
+  AnimatePresenceProps,
+  useIsPresent,
+} from "framer-motion";
 import {
   FloatingFocusManager,
   FloatingOverlay,
@@ -20,12 +24,13 @@ export const DropdownContent: React.FC<DropdownContentProps> = ({
   onEscapeKeydown,
   animationMode,
 }) => {
+  const isPresent = useIsPresent();
   const { isOpen, refs, getFloatingProps, floatingStyles, context } =
     useDropdown();
 
   return (
     <AnimatePresence mode={animationMode}>
-      {isOpen && (
+      {isOpen && isPresent && (
         <FloatingPortal>
           <FloatingOverlay>
             <FloatingFocusManager context={context}>
