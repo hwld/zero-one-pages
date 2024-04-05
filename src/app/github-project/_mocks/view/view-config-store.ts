@@ -76,6 +76,24 @@ class ViewConfigStore {
     });
   }
 
+  public moveColumn(input: {
+    viewId: string;
+    statusId: string;
+    newOrder: number;
+  }) {
+    this.viewConfigs = this.viewConfigs.map((viewConfig) => {
+      return {
+        ...viewConfig,
+        columnConfigs: viewConfig.columnConfigs.map((columnConfig) => {
+          if (columnConfig.statusId === input.statusId) {
+            return { ...columnConfig, order: input.newOrder };
+          }
+          return columnConfig;
+        }),
+      };
+    });
+  }
+
   public addColumnToAllConfigs(statusId: string) {
     this.viewConfigs = this.viewConfigs.map((config): ViewConfig => {
       const newOrder =

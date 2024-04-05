@@ -6,6 +6,7 @@ import { CreateTaskBar } from "./create-task-bar";
 import { ListFilterIcon } from "lucide-react";
 import { VIEW_ID } from "../consts";
 import { ViewColumn } from "./view-column";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Props = { view: View };
 export const MainPanel: React.FC<Props> = ({ view }) => {
@@ -46,23 +47,35 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
           <Button color="primary">Save</Button>
         </div>
       </div>
-      <div className="flex grow gap-4 overflow-x-scroll px-4 py-2">
-        {view?.columns.map((column) => {
-          return (
-            <ViewColumn
-              key={column.statusId}
-              column={column}
-              allColumns={view.columns}
-              onMoveToColumn={handleMoveToColumn}
-              onClickAddItem={() =>
-                setCreateTaskBarState({
-                  isOpen: true,
-                  statusId: column.statusId,
-                })
-              }
-            />
-          );
-        })}
+      <div className="flex grow overflow-x-scroll px-4 py-2">
+        <AnimatePresence>
+          {view?.columns.map((column, i) => {
+            return (
+              <motion.div key={column.statusId} className="h-full" layout>
+                <ViewColumn
+                  key={column.statusId}
+                  column={column}
+                  allColumns={view.columns}
+                  onMoveToColumn={handleMoveToColumn}
+                  onClickAddItem={() =>
+                    setCreateTaskBarState({
+                      isOpen: true,
+                      statusId: column.statusId,
+                    })
+                  }
+                  previousOrder={
+                    view.columns[i - 1] ? view.columns[i - 1].order : 0
+                  }
+                  nextOrder={
+                    view.columns[i + 1]
+                      ? view.columns[i + 1].order
+                      : column.order + 1
+                  }
+                />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
       <CreateTaskBar
         isOpen={createTaskBarState.isOpen}

@@ -97,9 +97,12 @@ export const ViewTaskCard: React.FC<Props> = ({
         })}
       />
       <div
-        className="group flex cursor-pointer flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600"
+        className={
+          "group flex cursor-grab flex-col gap-1 rounded-md border border-neutral-700 bg-neutral-800 p-2 transition-colors hover:border-neutral-600"
+        }
         draggable
         onDragStart={(e) => {
+          e.stopPropagation();
           e.dataTransfer.effectAllowed = "move";
           e.dataTransfer.setData(
             DRAG_TYPE.task,

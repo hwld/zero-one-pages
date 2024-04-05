@@ -45,6 +45,21 @@ export const moveTask = async ({
   await fetcher.post(GitHubProjectAPI.moveTask(viewId), { body });
 };
 
+export const moveColumnInputSchema = z.object({
+  statusId: z.string(),
+  newOrder: z.coerce.number(),
+});
+export type MoveColumnInput = z.infer<typeof moveColumnInputSchema>;
+
+export const moveColumn = async ({
+  viewId,
+  ...body
+}: MoveColumnInput & {
+  viewId: string;
+}) => {
+  await fetcher.post(GitHubProjectAPI.moveColumn(viewId), { body });
+};
+
 export const viewApiHandler = [
   http.get(GitHubProjectAPI.view(), async ({ params }) => {
     await delay();
@@ -111,6 +126,21 @@ export const viewApiHandler = [
     viewConfigStore.moveTask({
       viewId,
       taskId: input.taskId,
+      newOrder: input.newOrder,
+    });
+
+    return HttpResponse.json({});
+  }),
+
+  http.post(GitHubProjectAPI.moveColumn(), async ({ params, request }) => {
+    await delay();
+
+    const viewId = z.string().parse(params.id);
+    const input = moveColumnInputSchema.parse(await request.json());
+
+    viewConfigStore.moveColumn({
+      viewId,
+      statusId: input.statusId,
       newOrder: input.newOrder,
     });
 
