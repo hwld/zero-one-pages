@@ -15,11 +15,13 @@ type Props = {
   viewId: string;
   allColumns: ViewColumnData[];
   column: ViewColumnData;
-  onClickAddItem: () => void;
+  onClickAddItem: (statusId: string) => void;
   onMoveToColumn: (input: { taskId: string; statusId: string }) => void;
   previousOrder: number;
   nextOrder: number;
   acceptBottomDrop?: boolean;
+  onSetScrollBottomRef: (statusId: string, element: HTMLDivElement) => void;
+  addingColumnId: string | null;
 };
 
 export const ViewColumn: React.FC<Props> = ({
@@ -31,6 +33,8 @@ export const ViewColumn: React.FC<Props> = ({
   previousOrder,
   nextOrder,
   acceptBottomDrop = false,
+  onSetScrollBottomRef,
+  addingColumnId,
 }) => {
   const [acceptDrop, setAcceptDrop] = useState<"none" | "left" | "right">(
     "none",
@@ -74,6 +78,14 @@ export const ViewColumn: React.FC<Props> = ({
     );
   };
 
+  const handleSetScrollBottomRef = (e: HTMLDivElement) => {
+    onSetScrollBottomRef(column.statusId, e);
+  };
+
+  const handleClickAddItem = () => {
+    onClickAddItem(column.statusId);
+  };
+
   return (
     <div
       className="relative h-full px-[3px]"
@@ -115,16 +127,18 @@ export const ViewColumn: React.FC<Props> = ({
           {column.status.description}
         </div>
         <ViewTaskCardList
+          isAddingTask={addingColumnId === column.statusId}
           viewId={viewId}
           allColumns={allColumns}
           onMoveToColumn={onMoveToColumn}
           tasks={column.tasks}
           statusId={column.statusId}
+          onSetScrollBottomRef={handleSetScrollBottomRef}
         />
         <div className="grid place-items-center p-2">
           <button
             className="flex w-full items-center gap-1 rounded-md px-4 py-2 text-neutral-300 transition-colors hover:bg-white/15"
-            onClick={onClickAddItem}
+            onClick={handleClickAddItem}
           >
             <PlusIcon size={16} />
             <span className="text-sm">Add Item</span>

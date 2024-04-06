@@ -15,11 +15,13 @@ type Props = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   statusId: string;
+  onAfterCreate?: (statusId: string) => void;
 };
 export const CreateTaskBar: React.FC<Props> = ({
   isOpen,
   onOpenChange,
   statusId,
+  onAfterCreate,
 }) => {
   const {
     register,
@@ -41,6 +43,7 @@ export const CreateTaskBar: React.FC<Props> = ({
       {
         onSuccess: () => {
           reset();
+          onAfterCreate?.(statusId);
         },
       },
     );
@@ -64,7 +67,7 @@ export const CreateTaskBar: React.FC<Props> = ({
       {isOpen && (
         <div
           ref={refs.setFloating}
-          className="absolute bottom-8 left-0 right-0 h-12 p-2"
+          className="absolute bottom-6 left-0 right-0 h-12 p-2"
           {...getFloatingProps()}
         >
           <motion.div
@@ -84,10 +87,11 @@ export const CreateTaskBar: React.FC<Props> = ({
                   aria-disabled={createTaskMutation.isPending}
                   autoFocus
                   className={clsx(
-                    "h-full w-full bg-transparent px-4 text-sm placeholder:text-neutral-400 focus-visible:outline-none",
+                    "h-full w-full bg-transparent px-4 text-sm text-neutral-100 placeholder:text-neutral-400 focus-visible:outline-none",
                     createTaskMutation.isPending && "text-neutral-400",
                   )}
                   placeholder="Start typing to create a draft"
+                  readOnly={createTaskMutation.isPending}
                   {...register("title")}
                 />
                 <Loader2Icon

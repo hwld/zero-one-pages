@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "../_mocks/view/api";
 import { useMoveTask } from "../_queries/use-move-task";
 import { Button } from "./button";
@@ -9,6 +9,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 type Props = { view: View };
 export const MainPanel: React.FC<Props> = ({ view }) => {
+  const [addingColumnId, setAddingColumnId] = useState<string | null>(null);
+
+  const scrollColumnBottomRefMap = useRef(new Map<string, HTMLDivElement>());
+  const handleSetScrollColumnBottomRef = (id: string, div: HTMLDivElement) => {
+    scrollColumnBottomRefMap.current.set(id, div);
+  };
+
   const [createTaskBarState, setCreateTaskBarState] = useState({
     isOpen: false,
     statusId: "",
@@ -29,6 +36,34 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
       statusId: input.statusId,
       newOrder: bottomOrder,
     });
+  };
+
+  const handleClickAddItem = (statusId: string) => {
+    const ref = scrollColumnBottomRefMap.current.get(statusId);
+    if (ref) {
+      ref.scrollIntoView({ block: "end", inline: "center" });
+    }
+    setAddingColumnId(statusId);
+    setCreateTaskBarState({
+      isOpen: true,
+      statusId,
+    });
+  };
+
+  const handleCreateTaskBarOpenChange = (open: boolean) => {
+    if (!open) {
+      setAddingColumnId(null);
+    }
+    setCreateTaskBarState((s) => ({ ...s, isOpen: open }));
+  };
+
+  const handleAfterCreateTask = (statusId: string) => {
+    const ref = scrollColumnBottomRefMap.current.get(statusId);
+    if (ref) {
+      window.setTimeout(() => {
+        ref.scrollIntoView({ block: "end", inline: "center" });
+      }, 0);
+    }
   };
 
   return (
@@ -52,17 +87,13 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
             return (
               <motion.div key={column.statusId} className="h-full" layout>
                 <ViewColumn
+                  addingColumnId={addingColumnId}
                   viewId={view.id}
                   key={column.statusId}
                   column={column}
                   allColumns={view.columns}
                   onMoveToColumn={handleMoveToColumn}
-                  onClickAddItem={() =>
-                    setCreateTaskBarState({
-                      isOpen: true,
-                      statusId: column.statusId,
-                    })
-                  }
+                  onClickAddItem={handleClickAddItem}
                   previousOrder={
                     view.columns[i - 1] ? view.columns[i - 1].order : 0
                   }
@@ -71,6 +102,7 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
                       ? view.columns[i + 1].order
                       : column.order + 1
                   }
+                  onSetScrollBottomRef={handleSetScrollColumnBottomRef}
                 />
               </motion.div>
             );
@@ -80,9 +112,8 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
       <CreateTaskBar
         isOpen={createTaskBarState.isOpen}
         statusId={createTaskBarState.statusId}
-        onOpenChange={(open) => {
-          setCreateTaskBarState((s) => ({ ...s, isOpen: open }));
-        }}
+        onOpenChange={handleCreateTaskBarOpenChange}
+        onAfterCreate={handleAfterCreateTask}
       />
     </div>
   );

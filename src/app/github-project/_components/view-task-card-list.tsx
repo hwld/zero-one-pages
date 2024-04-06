@@ -13,7 +13,9 @@ type Props = {
   tasks: ViewTask[];
   statusId: string;
   allColumns: ViewColumn[];
+  isAddingTask?: boolean;
   onMoveToColumn: (input: { taskId: string; statusId: string }) => void;
+  onSetScrollBottomRef: (element: HTMLDivElement) => void;
 };
 
 export const ViewTaskCardList: React.FC<Props> = ({
@@ -21,7 +23,9 @@ export const ViewTaskCardList: React.FC<Props> = ({
   tasks,
   statusId,
   allColumns,
+  isAddingTask = false,
   onMoveToColumn,
+  onSetScrollBottomRef,
 }) => {
   const [acceptDrop, setAcceptDrop] = useState(false);
 
@@ -54,43 +58,50 @@ export const ViewTaskCardList: React.FC<Props> = ({
     });
   };
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+      e.preventDefault();
+      e.stopPropagation();
+      setAcceptDrop(true);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setAcceptDrop(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
+      e.preventDefault();
+      e.stopPropagation();
+      const data = JSON.parse(e.dataTransfer.getData(DRAG_TYPE.task));
+      const taskId = z.string().parse(data.taskId);
+
+      moveTaskMutation.mutate({
+        taskId,
+        statusId: statusId,
+        viewId,
+        newOrder: tasks.length ? tasks[tasks.length - 1].order + 1 : 1,
+      });
+
+      setAcceptDrop(false);
+    }
+  };
+
+  const showDropPreview = acceptDrop || isAddingTask;
   return (
     <div
       className={clsx(
-        "relative flex grow flex-col overflow-auto scroll-auto p-2",
+        "relative flex grow scroll-p-2 flex-col overflow-auto scroll-auto p-2",
       )}
     >
       <div
         className="h-full w-full"
-        onDragOver={(e) => {
-          if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
-            e.preventDefault();
-            e.stopPropagation();
-            setAcceptDrop(true);
-          }
-        }}
-        onDragLeave={() => {
-          setAcceptDrop(false);
-        }}
-        onDrop={(e) => {
-          if (e.dataTransfer.types.includes(DRAG_TYPE.task)) {
-            e.preventDefault();
-            e.stopPropagation();
-            const data = JSON.parse(e.dataTransfer.getData(DRAG_TYPE.task));
-            const taskId = z.string().parse(data.taskId);
-
-            moveTaskMutation.mutate({
-              taskId,
-              statusId: statusId,
-              viewId,
-              newOrder: tasks.length ? tasks[tasks.length - 1].order + 1 : 1,
-            });
-
-            setAcceptDrop(false);
-          }
-        }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
-        {tasks.length === 0 && acceptDrop && (
+        {tasks.length === 0 && showDropPreview && (
           <DropPreviewLine className="inset-x-2 w-auto" />
         )}
         <AnimatePresence mode="popLayout" initial={false}>
@@ -115,12 +126,14 @@ export const ViewTaskCardList: React.FC<Props> = ({
                   onMoveToColumn={onMoveToColumn}
                   previousOrder={tasks[i - 1] ? tasks[i - 1].order : 0}
                   nextOrder={tasks[i + 1] ? tasks[i + 1].order : task.order + 1}
-                  acceptBottomDrop={isBottom && acceptDrop}
+                  acceptBottomDrop={isBottom && showDropPreview}
                 />
               </motion.div>
             );
           })}
         </AnimatePresence>
+        <div ref={onSetScrollBottomRef} className="h-1" />
+        <div />
       </div>
     </div>
   );
