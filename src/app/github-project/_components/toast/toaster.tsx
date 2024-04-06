@@ -13,7 +13,7 @@ export function Toaster() {
           <Toast key={id} title={title} description={description} {...props} />
         );
       })}
-      <ToastViewport />
+      <ToastViewport style={{ colorScheme: "dark" }} />
     </ToastProvider>
   );
 }

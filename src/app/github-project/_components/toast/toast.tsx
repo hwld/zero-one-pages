@@ -49,7 +49,7 @@ const Toast = React.forwardRef<
       onSwipeCancel={(e) => e.preventDefault()}
       ref={ref}
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:slide-in-from-left-10 data-[state=closed]:slide-out-to-left-full group pointer-events-auto relative flex min-h-16 w-full items-stretch justify-between space-x-2 overflow-hidden rounded-md bg-neutral-600 text-neutral-100 shadow-lg transition-all ease-out data-[state=close]:opacity-0",
+        "group pointer-events-auto relative flex min-h-16 w-full items-stretch justify-between space-x-2 overflow-hidden rounded-md bg-neutral-600 text-neutral-100 shadow-lg transition-all ease-out data-[state=close]:opacity-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left-full data-[state=open]:slide-in-from-left-10",
         className,
       )}
       {...props}
