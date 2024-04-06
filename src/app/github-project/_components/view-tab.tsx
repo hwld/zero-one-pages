@@ -19,7 +19,7 @@ const ViewTabContent: React.FC<ViewTabProps> = ({
   return (
     <div
       className={clsx(
-        "flex w-full items-center gap-3 rounded-md border-[2px] border-transparent px-4 py-[6px] outline-1 transition-colors group-focus-visible:border-blue-300",
+        "flex w-full items-center gap-3 rounded-md border-[2px] border-transparent px-2 py-[6px] outline-1 transition-colors group-focus-visible:border-blue-300",
         interactive
           ? "text-neutral-400 group-hover:bg-white/10 group-hover:text-neutral-100"
           : "text-neutral-100",

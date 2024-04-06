@@ -31,7 +31,7 @@ export const ViewTabsPage: React.FC = () => {
   const viewId = useSearchParams().get("viewId") ?? firstViewId;
   const { data: view, status: viewStatus } = useView(viewId);
 
-  if (viewSummariesStatus === "error" || viewStatus === "error" || !viewId) {
+  if (viewSummariesStatus === "error" || viewStatus === "error") {
     return (
       <PageLayout
         content={
