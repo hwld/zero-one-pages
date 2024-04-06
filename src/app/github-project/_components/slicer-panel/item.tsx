@@ -12,7 +12,7 @@ export const SlicerListItem: React.FC<Props> = ({ active = false, column }) => {
   return (
     <li
       className={clsx(
-        "relative w-full border-b border-neutral-700",
+        "relative w-full border-b border-neutral-600",
         active &&
           "before:absolute before:-left-3 before:bottom-2 before:top-2 before:w-1 before:rounded-full before:bg-blue-500 before:content-['']",
       )}

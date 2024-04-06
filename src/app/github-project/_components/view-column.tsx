@@ -104,7 +104,7 @@ export const ViewColumn: React.FC<Props> = ({
       )}
       <div
         className={clsx(
-          "flex h-full w-[350px] shrink-0 cursor-grab flex-col rounded-lg border border-neutral-700 bg-neutral-900",
+          "flex h-full w-[350px] shrink-0 cursor-grab flex-col rounded-lg border border-neutral-600 bg-neutral-900",
         )}
         draggable
         onDragStart={handleDragStart}

@@ -20,7 +20,7 @@ export const ButtonGroupItem = forwardRef<HTMLButtonElement, Props>(
         {...props}
         ref={ref}
         className={clsx(
-          "flex h-8 w-9 items-center justify-center border-y border-neutral-700 bg-neutral-800 text-neutral-300 transition-colors hover:bg-neutral-600",
+          "flex h-8 w-9 items-center justify-center border-y border-neutral-600 bg-neutral-800 text-neutral-300 transition-colors hover:bg-neutral-600",
           positionClass[position],
         )}
       >

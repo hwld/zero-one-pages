@@ -60,7 +60,7 @@ export const ViewOptionMenuTrigger: React.FC = () => {
       <Tooltip label="View options">
         <DropdownTrigger>
           <button
-            className="flex size-5 items-center justify-center rounded-md border border-neutral-700 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
+            className="flex size-5 items-center justify-center rounded-md border border-neutral-600 bg-neutral-800 text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200"
             onClick={() => setMode("main")}
           >
             <ChevronDownIcon size={16} />
