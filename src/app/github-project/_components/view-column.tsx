@@ -6,12 +6,13 @@ import { ViewColumn as ViewColumnData } from "../_mocks/view/api";
 import { CountBadge } from "./count-badge";
 import { TaskStatusIcon } from "./task-status-icon";
 import { ViewColumnMenuTrigger } from "./view-column-menu-trigger";
-import { DRAG_TYPE, VIEW_ID } from "../consts";
+import { DRAG_TYPE } from "../consts";
 import { DropPreviewLine } from "./drop-preview-line";
 import { useMoveColumn } from "../_queries/use-move-column";
 import { ViewTaskCardList } from "./view-task-card-list";
 
 type Props = {
+  viewId: string;
   allColumns: ViewColumnData[];
   column: ViewColumnData;
   onClickAddItem: () => void;
@@ -22,6 +23,7 @@ type Props = {
 };
 
 export const ViewColumn: React.FC<Props> = ({
+  viewId,
   allColumns,
   column,
   onClickAddItem,
@@ -59,7 +61,7 @@ export const ViewColumn: React.FC<Props> = ({
       const droppedOrder = acceptDrop === "left" ? previousOrder : nextOrder;
       const newOrder = (droppedOrder + column.order) / 2;
 
-      moveColumnMutation.mutate({ viewId: VIEW_ID, statusId, newOrder });
+      moveColumnMutation.mutate({ viewId, statusId, newOrder });
     }
     setAcceptDrop("none");
   };
@@ -113,6 +115,7 @@ export const ViewColumn: React.FC<Props> = ({
           {column.status.description}
         </div>
         <ViewTaskCardList
+          viewId={viewId}
           allColumns={allColumns}
           onMoveToColumn={onMoveToColumn}
           tasks={column.tasks}

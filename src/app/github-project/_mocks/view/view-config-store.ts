@@ -15,6 +15,7 @@ export const viewTaskConfigSchema = z.object({
 
 export const viewConfigSchema = z.object({
   id: z.string(),
+  name: z.string(),
   columnConfigs: z.array(viewColumnConfigSchema),
   taskConfigs: z.array(viewTaskConfigSchema),
 });
@@ -24,15 +25,18 @@ export type ViewTaskConfig = z.infer<typeof viewTaskConfigSchema>;
 export type ViewConfig = z.infer<typeof viewConfigSchema>;
 
 class ViewConfigStore {
-  private viewConfigs: ViewConfig[] = [
-    {
-      id: "1",
-      columnConfigs: initialStatuses.map((status, i) => {
-        return { id: status.id, statusId: status.id, order: i + 1 };
-      }),
+  private viewConfigs: ViewConfig[] = [...new Array(3)].map((_, i) => {
+    const columnConfigs = initialStatuses.map((status, i) => {
+      return { id: status.id, statusId: status.id, order: i + 1 };
+    });
+
+    return {
+      id: `${i + 1}`,
+      name: `View${i + 1}`,
+      columnConfigs,
       taskConfigs: [],
-    },
-  ];
+    };
+  });
 
   public getAll(): ViewConfig[] {
     return this.viewConfigs;
@@ -42,12 +46,13 @@ class ViewConfigStore {
     return this.viewConfigs.find((vc) => vc.id === id);
   }
 
-  public add() {
+  public add(name: string) {
     const allStatus = taskStatusStore.getAll();
     const allTasks = taskStore.getAll();
 
     const newView: ViewConfig = {
       id: crypto.randomUUID(),
+      name,
       columnConfigs: allStatus.map((s, i): ViewColumnConfig => {
         return { statusId: s.id, order: i + 1 };
       }),
@@ -82,6 +87,10 @@ class ViewConfigStore {
     newOrder: number;
   }) {
     this.viewConfigs = this.viewConfigs.map((viewConfig) => {
+      if (viewConfig.id !== input.viewId) {
+        return viewConfig;
+      }
+
       return {
         ...viewConfig,
         columnConfigs: viewConfig.columnConfigs.map((columnConfig) => {

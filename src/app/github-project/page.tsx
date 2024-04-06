@@ -3,16 +3,14 @@ import {
   LineChartIcon,
   MoreHorizontalIcon,
   PanelRightOpenIcon,
-  PlusIcon,
 } from "lucide-react";
-import React from "react";
+import React, { Suspense } from "react";
 import { Tooltip } from "./_components/tooltip";
 import { AppHeader } from "./_components/app-header/app-header";
 import { ButtonGroupItem } from "./_components/button-group-item";
 import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
-import { ViewTab } from "./_components/view-tab";
-import { ViewPage } from "./view-page";
 import { Toaster } from "./_components/toast/toaster";
+import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
 
 const GitHubProjectPage: React.FC = () => {
@@ -44,16 +42,9 @@ const GitHubProjectPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-rows-[min-content_minmax(0,1fr)]">
-          <div className="flex gap-1 border-b border-neutral-600 px-8">
-            <ViewTab active>Kanban1</ViewTab>
-            <ViewTab>Kanban2</ViewTab>
-            <ViewTab icon={PlusIcon}>New view</ViewTab>
-          </div>
-          <div className="flex w-[100dvw] bg-neutral-800">
-            <ViewPage />
-          </div>
-        </div>
+        <Suspense>
+          <ViewTabsPage />
+        </Suspense>
       </div>
       <Toaster />
     </>

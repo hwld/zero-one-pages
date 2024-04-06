@@ -4,7 +4,6 @@ import { useMoveTask } from "../_queries/use-move-task";
 import { Button } from "./button";
 import { CreateTaskBar } from "./create-task-bar";
 import { ListFilterIcon } from "lucide-react";
-import { VIEW_ID } from "../consts";
 import { ViewColumn } from "./view-column";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -25,7 +24,7 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
     const bottomTask = column.tasks.at(-1);
     const bottomOrder = bottomTask ? bottomTask.order + 0.5 : 1;
     moveTaskMutation.mutate({
-      viewId: VIEW_ID,
+      viewId: view.id,
       taskId: input.taskId,
       statusId: input.statusId,
       newOrder: bottomOrder,
@@ -48,11 +47,12 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
         </div>
       </div>
       <div className="flex grow overflow-x-scroll px-4 py-2">
-        <AnimatePresence>
-          {view?.columns.map((column, i) => {
+        <AnimatePresence initial={false}>
+          {view.columns.map((column, i) => {
             return (
               <motion.div key={column.statusId} className="h-full" layout>
                 <ViewColumn
+                  viewId={view.id}
                   key={column.statusId}
                   column={column}
                   allColumns={view.columns}

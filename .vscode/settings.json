@@ -8,6 +8,12 @@
     "className",
     "classNames",
     "ngClass",
-    ".*ClassMap"
+    ".*ClassMap",
   ],
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "clsx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
+  ]
 }

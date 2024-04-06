@@ -2,13 +2,14 @@ import clsx from "clsx";
 import { DropPreviewLine } from "./drop-preview-line";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
-import { DRAG_TYPE, VIEW_ID } from "../consts";
+import { DRAG_TYPE } from "../consts";
 import { ViewTaskCard } from "./view-task-card";
 import { useState } from "react";
 import { MoveTaskInput, ViewColumn, ViewTask } from "../_mocks/view/api";
 import { useMoveTask } from "../_queries/use-move-task";
 
 type Props = {
+  viewId: string;
   tasks: ViewTask[];
   statusId: string;
   allColumns: ViewColumn[];
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export const ViewTaskCardList: React.FC<Props> = ({
+  viewId,
   tasks,
   statusId,
   allColumns,
@@ -26,12 +28,12 @@ export const ViewTaskCardList: React.FC<Props> = ({
   const moveTaskMutation = useMoveTask();
 
   const handleMoveTask = (data: MoveTaskInput) => {
-    moveTaskMutation.mutate({ viewId: VIEW_ID, ...data });
+    moveTaskMutation.mutate({ viewId, ...data });
   };
   const handleMoveTaskTop = (input: { taskId: string; statusId: string }) => {
     const topItem = tasks.at(0);
     moveTaskMutation.mutate({
-      viewId: VIEW_ID,
+      viewId,
       taskId: input.taskId,
       statusId: input.statusId,
       newOrder: topItem ? topItem.order / 2 : 1,
@@ -45,7 +47,7 @@ export const ViewTaskCardList: React.FC<Props> = ({
     const bottomItem = tasks.at(-1);
 
     moveTaskMutation.mutate({
-      viewId: VIEW_ID,
+      viewId,
       taskId: input.taskId,
       statusId: input.statusId,
       newOrder: bottomItem ? bottomItem.order + 0.5 : 1,
@@ -80,7 +82,7 @@ export const ViewTaskCardList: React.FC<Props> = ({
             moveTaskMutation.mutate({
               taskId,
               statusId: statusId,
-              viewId: VIEW_ID,
+              viewId,
               newOrder: tasks.length ? tasks[tasks.length - 1].order + 1 : 1,
             });
 

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   viewColumnConfigSchema,
+  viewConfigSchema,
   viewConfigStore,
   viewTaskConfigSchema,
 } from "./view-config-store";
@@ -14,12 +15,15 @@ const viewTaskSchema = viewTaskConfigSchema.merge(taskSchema);
 const viewColumnSchema = viewColumnConfigSchema.merge(
   z.object({ tasks: z.array(viewTaskSchema), status: taskStatusSchema }),
 );
-const viewSchema = z.object({
-  id: z.string(),
-  columns: z.array(viewColumnSchema),
-});
+const viewSummarySchema = viewConfigSchema.pick({ id: true, name: true });
+const viewSchema = viewSummarySchema.merge(
+  z.object({
+    columns: z.array(viewColumnSchema),
+  }),
+);
 
 export type View = z.infer<typeof viewSchema>;
+export type ViewSummary = Pick<View, "id" | "name">;
 export type ViewColumn = z.infer<typeof viewColumnSchema>;
 export type ViewTask = z.infer<typeof viewTaskSchema>;
 
@@ -29,6 +33,14 @@ export const fetchView = async (id: string): Promise<View> => {
   const view = viewSchema.parse(json);
 
   return view;
+};
+
+export const fetchViewSummaries = async (): Promise<ViewSummary[]> => {
+  const res = await fetcher.get(GitHubProjectAPI.views());
+  const json = await res.json();
+  const viewSummaries = z.array(viewSummarySchema).parse(json);
+
+  return viewSummaries;
 };
 
 export const moveTaskInputSchema = z.object({
@@ -61,6 +73,18 @@ export const moveColumn = async ({
 };
 
 export const viewApiHandler = [
+  http.get(GitHubProjectAPI.views(), async () => {
+    await delay();
+
+    const summaries: ViewSummary[] = viewConfigStore
+      .getAll()
+      .map((config): ViewSummary => {
+        return { id: config.id, name: config.name };
+      });
+
+    return HttpResponse.json(summaries);
+  }),
+
   http.get(GitHubProjectAPI.view(), async ({ params }) => {
     await delay();
     const viewId = z.string().parse(params.id);
@@ -102,6 +126,7 @@ export const viewApiHandler = [
 
     const view: View = {
       id: viewConfig.id,
+      name: viewConfig.name,
       columns: sortedColumns,
     };
 
