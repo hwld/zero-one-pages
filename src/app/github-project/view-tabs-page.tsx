@@ -29,18 +29,6 @@ export const ViewTabsPage: React.FC = () => {
   const viewId = useSearchParams().get("viewId") ?? firstViewId;
   const { data: view, status: viewStatus } = useView(viewId);
 
-  if (viewSummariesStatus === "pending" || viewStatus === "pending") {
-    return (
-      <PageLayout
-        content={
-          <div className="grid h-full w-full place-content-center place-items-center gap-2 text-neutral-400">
-            <CatIcon size={50} className="animate-bounce" />
-            <div className="text-sm">One moment please...</div>
-          </div>
-        }
-      />
-    );
-  }
   if (viewSummariesStatus === "error" || viewStatus === "error" || !viewId) {
     return (
       <PageLayout
@@ -66,26 +54,35 @@ export const ViewTabsPage: React.FC = () => {
   return (
     <PageLayout
       tabs={
-        <>
-          {viewSummaries.map((summary) => {
-            return (
-              <ViewTabLink
-                href={`/github-project?viewId=${summary.id}`}
-                key={summary.id}
-                active={viewId === summary.id}
-              >
-                {summary.name}
-              </ViewTabLink>
-            );
-          })}
-          <ViewTabButton icon={PlusIcon}>New view</ViewTabButton>
-        </>
+        viewSummariesStatus === "pending" ? undefined : (
+          <>
+            {viewSummaries.map((summary) => {
+              return (
+                <ViewTabLink
+                  href={`/github-project?viewId=${summary.id}`}
+                  key={summary.id}
+                  active={viewId === summary.id}
+                >
+                  {summary.name}
+                </ViewTabLink>
+              );
+            })}
+            <ViewTabButton icon={PlusIcon}>New view</ViewTabButton>
+          </>
+        )
       }
       content={
-        <React.Fragment key={view.id}>
-          <SlicerPanel columns={view.columns} />
-          <MainPanel view={view} />
-        </React.Fragment>
+        viewStatus === "pending" ? (
+          <div className="grid h-full w-full place-content-center place-items-center gap-2 text-neutral-400">
+            <CatIcon size={50} className="animate-bounce" />
+            <div className="text-sm">One moment please...</div>
+          </div>
+        ) : (
+          <React.Fragment key={view.id}>
+            <SlicerPanel columns={view.columns} />
+            <MainPanel view={view} />
+          </React.Fragment>
+        )
       }
     />
   );
