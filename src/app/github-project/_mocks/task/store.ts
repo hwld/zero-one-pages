@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { taskStatusSchema, taskStatusStore } from "../task-status/store";
 import { viewConfigStore } from "../view/view-config-store";
+import { initialTasks } from "./data";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -12,7 +13,7 @@ export type Task = z.infer<typeof taskSchema>;
 
 export type TaskStoreErrorSimulationScope = "getAll" | "mutation";
 class TaskStore {
-  private tasks: Task[] = [];
+  private tasks: Task[] = initialTasks;
   private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();
 
   private throwErrorForScope(scope: TaskStoreErrorSimulationScope) {

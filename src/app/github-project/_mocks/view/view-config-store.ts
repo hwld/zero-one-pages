@@ -2,6 +2,7 @@ import { z } from "zod";
 import { taskStatusStore } from "../task-status/store";
 import { initialStatuses } from "../task-status/data";
 import { taskStore } from "../task/store";
+import { initialTasks } from "../task/data";
 
 export const viewColumnConfigSchema = z.object({
   statusId: z.string(),
@@ -26,15 +27,18 @@ export type ViewConfig = z.infer<typeof viewConfigSchema>;
 
 class ViewConfigStore {
   private viewConfigs: ViewConfig[] = [...new Array(3)].map((_, i) => {
-    const columnConfigs = initialStatuses.map((status, i) => {
-      return { id: status.id, statusId: status.id, order: i + 1 };
+    const columnConfigs = initialStatuses.map((status, i): ViewColumnConfig => {
+      return { statusId: status.id, order: i + 1 };
+    });
+    const taskConfigs = initialTasks.map((task, i): ViewTaskConfig => {
+      return { taskId: task.id, order: i + 1 };
     });
 
     return {
       id: `${i + 1}`,
       name: `View${i + 1}`,
       columnConfigs,
-      taskConfigs: [],
+      taskConfigs,
     };
   });
 
