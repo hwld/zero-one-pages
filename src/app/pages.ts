@@ -5,6 +5,7 @@ import {
   LayoutListIcon,
   LucideIcon,
   MessageSquareMoreIcon,
+  PlayCircleIcon,
   RectangleEllipsisIcon,
   TablePropertiesIcon,
 } from "lucide-react";
@@ -18,7 +19,8 @@ export type PageLink =
   | "/chat"
   | "/dynamic-island"
   | "/continuty-transition"
-  | "/github-project";
+  | "/github-project"
+  | "/audio-player";
 
 export type Page = {
   icon: LucideIcon;
@@ -83,5 +85,12 @@ export const pages: Page[] = [
     description:
       "GitHubのProjectsのレイアウトを作ってみた。初めてライブラリを使わないでDnDを実装した。",
     tags: ["PC", "LAYOUT", "WIP", "PRIME"],
+  },
+  {
+    icon: PlayCircleIcon,
+    href: "/audio-player",
+    title: "Audio Player",
+    description: "オーディオプレイヤーUI",
+    tags: ["WIP", "MOBILE", "PART"],
   },
 ];
