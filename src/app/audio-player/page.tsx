@@ -105,7 +105,15 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteMusic = (id: string) => {
-    setMusics((ms) => ms.filter((m) => m.id !== id));
+    setMusics((ms) => {
+      const target = ms.find((m) => m.id === id);
+      if (!target) {
+        return ms;
+      }
+
+      URL.revokeObjectURL(target.url);
+      return ms.filter((m) => m.id !== id);
+    });
   };
 
   return (
