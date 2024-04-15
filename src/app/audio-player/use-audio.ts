@@ -7,8 +7,13 @@ import {
   useState,
 } from "react";
 
-type UseAudioParams = { initialVolume?: number };
+type UseAudioParams = {
+  src: string;
+  initialVolume?: number;
+};
+
 export const useAudio = ({
+  src,
   initialVolume: _initialVolume = 1,
 }: UseAudioParams) => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -119,6 +124,7 @@ export const useAudio = ({
 
   const onDurationChange = useCallback(
     (e: SyntheticEvent<HTMLAudioElement>) => {
+      console.log(e.currentTarget.duration);
       changeDuration(e.currentTarget.duration);
     },
     [changeDuration],
@@ -134,6 +140,15 @@ export const useAudio = ({
     }
     audioRef.current.volume = initialVolume;
   }, [initialVolume]);
+
+  // audio要素にsrcを直接渡すとdurationなどの初期化がうまくいかないため、
+  // refを使ってsrcを設定する
+  useEffect(() => {
+    if (!audioRef.current) {
+      return;
+    }
+    audioRef.current.src = src;
+  }, [src]);
 
   const state = useMemo(() => {
     return { playing, currentTime, duration, volume, isSeeking };

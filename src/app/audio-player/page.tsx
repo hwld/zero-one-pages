@@ -29,14 +29,16 @@ const Page: React.FC = () => {
     },
   ]);
 
-  const [currentMusicId, setCurrentMusicId] = useState<string>(musics[0].id);
-  const currentMusicUrl = useMemo((): string | undefined => {
+  const [currentMusicId, setCurrentMusicId] = useState<string | undefined>(
+    musics[0].id,
+  );
+  const currentMusic = useMemo(() => {
     const music = musics.find((m) => m.id === currentMusicId);
     if (!music) {
       return undefined;
     }
 
-    return music.url;
+    return music;
   }, [currentMusicId, musics]);
 
   const prevMusic = useMemo((): Music | undefined => {
@@ -92,12 +94,16 @@ const Page: React.FC = () => {
       style={{ colorScheme: "dark" }}
     >
       <div className="grid grid-cols-[400px_400px] grid-rows-[500px] gap-4">
-        <CardAudioPlayer
-          src={currentMusicUrl}
-          hasPrev={!!prevMusic}
-          hasNext={!!nextMusic}
-          onMusicChange={handleMusicChange}
-        />
+        {currentMusic ? (
+          <CardAudioPlayer
+            currentMusic={currentMusic}
+            hasPrev={!!prevMusic}
+            hasNext={!!nextMusic}
+            onMusicChange={handleMusicChange}
+          />
+        ) : (
+          <Card />
+        )}
         <div className="flex h-min max-h-full flex-col">
           <Card>
             <div className="flex min-h-0 grow flex-col gap-4">

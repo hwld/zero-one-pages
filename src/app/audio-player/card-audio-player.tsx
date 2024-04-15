@@ -16,32 +16,26 @@ import { Card } from "./card";
 import { SubButton } from "./sub-button";
 import { useAudio } from "./use-audio";
 import { Slider } from "./slider";
-import { useEffect, useState } from "react";
+import { Music } from "./page";
 
 export type MusicNavigationDirection = "first" | "prev" | "next" | "last";
 
 type Props = {
-  src?: string;
+  currentMusic: Music;
   hasPrev: boolean;
   hasNext: boolean;
   onMusicChange: (dir: MusicNavigationDirection) => void;
 };
 export const CardAudioPlayer: React.FC<Props> = ({
-  src: _src,
+  currentMusic,
   hasPrev,
   hasNext,
   onMusicChange,
 }) => {
-  const [src, setSrc] = useState<string | undefined>(undefined);
   const { audioRef, state, controls, handlers } = useAudio({
     initialVolume: 0.1,
+    src: currentMusic.url,
   });
-
-  // srcを直接渡すと、事前に音声を読み込んでしまうので様々なハンドラが呼ばれなくなるためレンダリング後にsrcを設定する。
-  // preload属性を使用して再生されたときに読み込むことも考えたが、再生する前にシークバーを動かすとエラーになってしまう
-  useEffect(() => {
-    setSrc(_src);
-  }, [_src]);
 
   const handleMusicChange = (dir: MusicNavigationDirection) => {
     onMusicChange(dir);
@@ -53,8 +47,8 @@ export const CardAudioPlayer: React.FC<Props> = ({
   return (
     <Card>
       <div className="flex h-full flex-col gap-8">
-        <div className="min-h-[230px] w-full rounded-lg bg-neutral-300" />
-        <audio ref={audioRef} src={src} {...handlers} />
+        <div className="min-h-[230px] w-full rounded-lg bg-neutral-300"></div>
+        <audio ref={audioRef} {...handlers}></audio>
         <div className="flex grow flex-col items-center justify-between gap-2">
           <div className="flex w-full flex-col gap-4">
             <div className="flex w-full items-center justify-center gap-1">

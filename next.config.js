@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+  images: { unoptimized: true },
 
   // これを指定することで、`/todo-2.html`ではなく`/todo-2/index.html`のようなファイルが生成され、
   // firebase hostingで`/todo-2`にアクセスすると`/todo-2/index.html`が返ってくるようになる。
