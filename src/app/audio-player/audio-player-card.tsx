@@ -14,28 +14,26 @@ import {
 } from "react-icons/tb";
 import { Card } from "./card";
 import { SubButton } from "./sub-button";
-import { useAudio } from "./use-audio";
 import { Slider } from "./slider";
+import { useAudioContext } from "./audio/audio-provider";
 import { Music } from "./page";
+import Image from "next/image";
 
 export type MusicNavigationDirection = "first" | "prev" | "next" | "last";
 
 type Props = {
-  currentMusic: Music;
+  currentMusic: Music | undefined;
   hasPrev: boolean;
   hasNext: boolean;
   onMusicChange: (dir: MusicNavigationDirection) => void;
 };
-export const CardAudioPlayer: React.FC<Props> = ({
+export const AudioPlayerCard: React.FC<Props> = ({
   currentMusic,
   hasPrev,
   hasNext,
   onMusicChange,
 }) => {
-  const { audioRef, state, controls, handlers } = useAudio({
-    initialVolume: 0.1,
-    src: currentMusic.url,
-  });
+  const { audioRef, state, controls, handlers } = useAudioContext();
 
   const handleMusicChange = (dir: MusicNavigationDirection) => {
     onMusicChange(dir);
@@ -47,7 +45,17 @@ export const CardAudioPlayer: React.FC<Props> = ({
   return (
     <Card>
       <div className="flex h-full flex-col gap-8">
-        <div className="min-h-[230px] w-full rounded-lg bg-neutral-300"></div>
+        <div className="relative min-h-[230px] w-full overflow-hidden rounded-lg bg-neutral-300 text-neutral-900">
+          <Image
+            className="object-cover"
+            src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${currentMusic?.fileName}`}
+            alt="thumbnail"
+            fill
+          />
+          <div className="absolute bottom-2 right-2 max-w-[60%] items-center truncate rounded-full border border-neutral-300 bg-neutral-100 px-2 text-sm shadow">
+            {currentMusic?.fileName}
+          </div>
+        </div>
         <audio ref={audioRef} {...handlers}></audio>
         <div className="flex grow flex-col items-center justify-between gap-2">
           <div className="flex w-full flex-col gap-4">

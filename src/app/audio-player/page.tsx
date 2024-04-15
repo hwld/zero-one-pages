@@ -1,10 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
-import { TbMusicPlus } from "react-icons/tb";
-import { Card } from "./card";
-import { MusicFile } from "./music-file";
-import { CardAudioPlayer, MusicNavigationDirection } from "./card-audio-player";
+import { AudioPlayerCard, MusicNavigationDirection } from "./audio-player-card";
 import { Music } from "lucide-react";
+import { AudioProvider } from "./audio/audio-provider";
+import { MusicListCard } from "./music-list-card";
 
 export type Music = {
   fileName: string;
@@ -17,13 +16,13 @@ const Page: React.FC = () => {
   const [musics, setMusics] = useState<Music[]>([
     {
       id: crypto.randomUUID(),
-      fileName: "sample1",
+      fileName: "sample-music-1",
       url: "/audio-player/sample1.mp3",
       sample: true,
     },
     {
       id: crypto.randomUUID(),
-      fileName: "sample2",
+      fileName: "sample-music-2",
       url: "/audio-player/sample2.mp3",
       sample: true,
     },
@@ -88,83 +87,36 @@ const Page: React.FC = () => {
     }
   };
 
+  const handleAddMusics = (musics: Music[]) => {
+    setMusics((ms) => [...ms, ...musics]);
+  };
+
+  const handleDeleteMusic = (id: string) => {
+    setMusics((ms) => ms.filter((m) => m.id !== id));
+  };
+
   return (
-    <div
-      className="grid h-[100dvh] w-full place-items-center bg-neutral-900 text-neutral-100"
-      style={{ colorScheme: "dark" }}
-    >
-      <div className="grid grid-cols-[400px_400px] grid-rows-[500px] gap-4">
-        {currentMusic ? (
-          <CardAudioPlayer
+    <AudioProvider src={currentMusic?.url}>
+      <div
+        className="grid h-[100dvh] w-full place-items-center bg-neutral-900 text-neutral-100"
+        style={{ colorScheme: "dark" }}
+      >
+        <div className="grid grid-cols-[400px_400px] grid-rows-[500px] gap-4">
+          <AudioPlayerCard
             currentMusic={currentMusic}
             hasPrev={!!prevMusic}
             hasNext={!!nextMusic}
             onMusicChange={handleMusicChange}
           />
-        ) : (
-          <Card />
-        )}
-        <div className="flex h-min max-h-full flex-col">
-          <Card>
-            <div className="flex min-h-0 grow flex-col gap-4">
-              <div
-                className="grid h-[230px] w-full shrink-0 place-items-center rounded-lg border-2 border-dashed border-neutral-500 bg-white/5"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const fileCount = e.dataTransfer.files.length;
-                  let musics = [...new Array(fileCount)]
-                    .map((_, i) => e.dataTransfer.files[i])
-                    .filter((f) => f.type.startsWith("audio/"))
-                    .map((f): Music => {
-                      return {
-                        fileName: f.name,
-                        url: URL.createObjectURL(f),
-                        id: crypto.randomUUID(),
-                      };
-                    });
-                  setMusics((ms) => [...ms, ...musics]);
-                }}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <TbMusicPlus className="size-[40px]" />
-                  <div className="text-center text-sm">
-                    ここに音声をドラッグ&ドロップしてください
-                  </div>
-                  <div className="text-center text-xs text-neutral-400">
-                    音声はサーバーにアップロードされることはありません。
-                    <br />
-                    画面を更新するとリセットされます。
-                  </div>
-                </div>
-              </div>
-
-              {musics.length > 0 && (
-                <div className="flex grow flex-col gap-2 overflow-hidden">
-                  <div className="px-2 text-neutral-400">music files</div>
-                  <div className="flex grow flex-col gap-4 overflow-auto rounded-lg px-2">
-                    {musics.map((m) => {
-                      const handleDelete = (id: string) => {
-                        setMusics((ms) => ms.filter((m) => m.id !== id));
-                      };
-
-                      return (
-                        <MusicFile
-                          key={m.id}
-                          id={m.id}
-                          fileName={m.fileName}
-                          onDelete={m.sample ? undefined : handleDelete}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </Card>
+          <MusicListCard
+            musics={musics}
+            currentMusicId={currentMusicId}
+            onAddMusics={handleAddMusics}
+            onDeleteMusic={handleDeleteMusic}
+          />
         </div>
       </div>
-    </div>
+    </AudioProvider>
   );
 };
 
