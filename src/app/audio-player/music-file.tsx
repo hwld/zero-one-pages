@@ -2,6 +2,7 @@
 import { TbMusic, TbX } from "react-icons/tb";
 import { MusicWavesIndicator } from "./music-waves-indicator";
 import { useEffect, useRef } from "react";
+import clsx from "clsx";
 
 export const MusicFile: React.FC<{
   id: string;
@@ -29,14 +30,30 @@ export const MusicFile: React.FC<{
   return (
     <div ref={ref} className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        <div className="grid size-8 shrink-0 place-items-center overflow-hidden rounded border border-neutral-600 bg-neutral-700 text-neutral-100">
-          {isCurrentMusic ? (
-            <MusicWavesIndicator playing={isPlaying} />
+        <div
+          className={clsx(
+            "grid size-8 shrink-0 place-items-center overflow-hidden rounded border border-neutral-600 bg-neutral-800 text-neutral-100",
+          )}
+        >
+          {isCurrentMusic && isPlaying ? (
+            <MusicWavesIndicator />
           ) : (
-            <TbMusic className="text-[16px]" />
+            <TbMusic
+              className={clsx(
+                "text-[16px]",
+                isCurrentMusic ? "text-sky-400" : "text-neutral-100",
+              )}
+            />
           )}
         </div>
-        <div className="break-all text-sm">{fileName}</div>
+        <div
+          className={clsx(
+            "break-all text-sm",
+            isCurrentMusic ? "text-sky-400" : "text-neutral-100",
+          )}
+        >
+          {fileName}
+        </div>
       </div>
       {onDelete && (
         <button

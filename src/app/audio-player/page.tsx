@@ -81,6 +81,10 @@ const Page: React.FC = () => {
         setCurrentMusicId(last.id);
         break;
       }
+      case "none": {
+        setCurrentMusicId(undefined);
+        break;
+      }
       default: {
         throw new Error(dir satisfies never);
       }
@@ -110,9 +114,12 @@ const Page: React.FC = () => {
           />
           <MusicListCard
             musics={musics}
+            prevMusicId={prevMusic?.id}
+            nextMusicId={prevMusic?.id}
             currentMusicId={currentMusicId}
             onAddMusics={handleAddMusics}
             onDeleteMusic={handleDeleteMusic}
+            onMusicChange={handleMusicChange}
           />
         </div>
       </div>

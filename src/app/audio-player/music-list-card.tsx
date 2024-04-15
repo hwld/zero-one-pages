@@ -3,20 +3,41 @@ import { Card } from "./card";
 import { MusicFile } from "./music-file";
 import { Music } from "./page";
 import { useAudioContext } from "./audio/audio-provider";
+import { MusicNavigationDirection } from "./audio-player-card";
 
 type Props = {
   musics: Music[];
+  prevMusicId: string | undefined;
+  nextMusicId: string | undefined;
   currentMusicId: string | undefined;
   onAddMusics: (musics: Music[]) => void;
   onDeleteMusic: (id: string) => void;
+  onMusicChange: (dir: MusicNavigationDirection) => void;
 };
 export const MusicListCard: React.FC<Props> = ({
   musics,
+  prevMusicId,
+  nextMusicId,
   currentMusicId,
   onAddMusics,
   onDeleteMusic,
+  onMusicChange,
 }) => {
-  const { state } = useAudioContext();
+  const { state, controls } = useAudioContext();
+
+  const handleDeleteMusic = (id: string) => {
+    if (id === currentMusicId) {
+      if (prevMusicId) {
+        onMusicChange("prev");
+      } else if (nextMusicId) {
+        onMusicChange("next");
+      } else {
+        onMusicChange("none");
+      }
+      controls.changePlaying(false);
+    }
+    onDeleteMusic(id);
+  };
 
   return (
     <div className="flex h-min max-h-full flex-col">
@@ -70,7 +91,7 @@ export const MusicListCard: React.FC<Props> = ({
                       key={m.id}
                       id={m.id}
                       fileName={m.fileName}
-                      onDelete={m.sample ? undefined : onDeleteMusic}
+                      onDelete={m.sample ? undefined : handleDeleteMusic}
                       isCurrentMusic={isCurrent}
                       isPlaying={isCurrent && state.playing}
                     />

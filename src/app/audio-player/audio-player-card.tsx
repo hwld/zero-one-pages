@@ -20,7 +20,12 @@ import { useAudioContext } from "./audio/audio-provider";
 import { Music } from "./page";
 import Image from "next/image";
 
-export type MusicNavigationDirection = "first" | "prev" | "next" | "last";
+export type MusicNavigationDirection =
+  | "first"
+  | "prev"
+  | "next"
+  | "last"
+  | "none";
 
 type Props = {
   currentMusic: Music | undefined;
@@ -46,7 +51,7 @@ export const AudioPlayerCard: React.FC<Props> = ({
   return (
     <Card>
       <div className="flex h-full flex-col gap-8">
-        <div className="relative min-h-[230px] w-full overflow-hidden rounded-lg bg-neutral-300 text-neutral-900">
+        <div className="bg-neutl-300 relative min-h-[230px] w-full overflow-hidden rounded-lg text-neutral-900">
           <Image
             className="object-cover"
             src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${currentMusic?.fileName}`}
@@ -59,7 +64,7 @@ export const AudioPlayerCard: React.FC<Props> = ({
         </div>
         <audio ref={audioRef} {...handlers}></audio>
         <div className="flex grow flex-col items-center justify-between gap-2">
-          <div className="flex w-full flex-col gap-4">
+          <div className="flex w-full flex-col gap-2">
             <div className="flex w-full items-center justify-center gap-1">
               <SubButton
                 disabled={!hasPrev || !state.isReady}
@@ -83,7 +88,7 @@ export const AudioPlayerCard: React.FC<Props> = ({
               </SubButton>
               <button
                 disabled={!state.isReady}
-                className="grid size-12 shrink-0 place-items-center rounded-full bg-neutral-100 text-[25px] text-neutral-900 transition-colors hover:bg-neutral-300 disabled:opacity-50"
+                className="grid size-12 shrink-0 place-items-center rounded-full bg-sky-500 text-[25px] text-neutral-900 transition-colors hover:bg-sky-600 disabled:opacity-50"
                 onClick={() => {
                   controls.changePlaying(!state.playing);
                 }}

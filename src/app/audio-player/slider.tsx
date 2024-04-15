@@ -38,9 +38,9 @@ export const Slider: React.FC<Props> = ({
       onValueCommit={onValueCommit}
     >
       <SliderTrack className="relative h-[4px] w-full rounded-full bg-white/15">
-        <SliderRange className="absolute h-full rounded-full bg-neutral-100" />
+        <SliderRange className="absolute h-full rounded-full bg-neutral-100 transition-colors group-hover:bg-sky-500" />
       </SliderTrack>
-      <SliderThumb className="block size-4 rounded-full bg-neutral-100 opacity-0 transition-[opacity_colors_shadow] hover:bg-neutral-300 focus:shadow-[0_0_0_5px] focus:shadow-white/30 focus:outline-none group-hover:opacity-100" />
+      <SliderThumb className="block size-4 rounded-full bg-neutral-100 opacity-0 transition-[opacity_colors_shadow] hover:bg-neutral-300 focus:opacity-100 focus:shadow-[0_0_0_5px] focus:shadow-white/30 focus:outline-none group-hover:opacity-100" />
     </SliderPrimitive>
   );
 };
