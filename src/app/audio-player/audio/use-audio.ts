@@ -25,6 +25,7 @@ export const useAudio = ({
   const [initialVolume] = useState(_initialVolume);
   const [volume, setVolume] = useState(initialVolume);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const withReadyCheck = useCallback(
     (callback: () => void) => {
@@ -123,6 +124,15 @@ export const useAudio = ({
     setVolume(volume);
   }, []);
 
+  const changeMute = useCallback((muted: boolean) => {
+    if (!audioRef.current) {
+      return;
+    }
+
+    audioRef.current.muted = muted;
+    setIsMuted(muted);
+  }, []);
+
   const onPlay = useCallback(() => {
     setPlaying(true);
   }, []);
@@ -176,8 +186,16 @@ export const useAudio = ({
   }, [src]);
 
   const state = useMemo(() => {
-    return { playing, currentTime, duration, volume, isSeeking, isReady };
-  }, [currentTime, duration, isReady, isSeeking, playing, volume]);
+    return {
+      playing,
+      currentTime,
+      duration,
+      volume,
+      isSeeking,
+      isReady,
+      isMuted,
+    };
+  }, [currentTime, duration, isMuted, isReady, isSeeking, playing, volume]);
 
   const controls = useMemo(() => {
     return {
@@ -187,10 +205,12 @@ export const useAudio = ({
       seekEnd,
       changePlaying,
       changeVolume,
+      changeMute,
     };
   }, [
     changeCurrentTime,
     changeDuration,
+    changeMute,
     changePlaying,
     changeVolume,
     seek,

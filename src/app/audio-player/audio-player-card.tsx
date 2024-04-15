@@ -11,6 +11,7 @@ import {
   TbRewindBackward10,
   TbRewindForward10,
   TbVolume,
+  TbVolumeOff,
 } from "react-icons/tb";
 import { Card } from "./card";
 import { SubButton } from "./sub-button";
@@ -134,16 +135,25 @@ export const AudioPlayerCard: React.FC<Props> = ({
           </div>
           <div className="flex w-full justify-between gap-2">
             <div className="flex items-center">
-              <SubButton>
-                <TbVolume />
+              <SubButton
+                onClick={() => {
+                  controls.changeMute(!state.isMuted);
+                }}
+              >
+                {state.volume === 0 || state.isMuted ? (
+                  <TbVolumeOff />
+                ) : (
+                  <TbVolume />
+                )}
               </SubButton>
               <div className="w-[120px]">
                 <Slider
                   max={1}
                   min={0}
                   step={0.01}
-                  value={state.volume}
+                  value={state.isMuted ? 0 : state.volume}
                   onValueChange={(value) => {
+                    controls.changeMute(false);
                     controls.changeVolume(value);
                   }}
                 />
