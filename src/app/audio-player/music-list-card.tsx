@@ -3,7 +3,7 @@ import { Card } from "./card";
 import { MusicFile } from "./music-file";
 import { Music } from "./page";
 import { useAudioContext } from "./audio/audio-provider";
-import { MusicNavigationDirection } from "./audio-player-card";
+import { MusicChangeParam } from "./audio-player-card";
 
 type Props = {
   musics: Music[];
@@ -12,7 +12,7 @@ type Props = {
   currentMusicId: string | undefined;
   onAddMusics: (musics: Music[]) => void;
   onDeleteMusic: (id: string) => void;
-  onMusicChange: (dir: MusicNavigationDirection) => void;
+  onMusicChange: (params: MusicChangeParam) => void;
 };
 export const MusicListCard: React.FC<Props> = ({
   musics,
@@ -28,15 +28,20 @@ export const MusicListCard: React.FC<Props> = ({
   const handleDeleteMusic = (id: string) => {
     if (id === currentMusicId) {
       if (prevMusicId) {
-        onMusicChange("prev");
+        onMusicChange({ type: "prev" });
       } else if (nextMusicId) {
-        onMusicChange("next");
+        onMusicChange({ type: "next" });
       } else {
-        onMusicChange("none");
+        onMusicChange({ type: "unset" });
       }
       controls.changePlaying(false);
     }
     onDeleteMusic(id);
+  };
+
+  const handlePlay = (id: string) => {
+    onMusicChange({ type: "byId", id });
+    controls.changePlaying(true);
   };
 
   return (
@@ -83,7 +88,7 @@ export const MusicListCard: React.FC<Props> = ({
                   {musics.length}
                 </div>
               </div>
-              <div className="flex grow flex-col gap-4 overflow-auto rounded-lg px-2">
+              <div className="flex grow flex-col gap-2 overflow-auto rounded-lg px-2">
                 {musics.map((m) => {
                   const isCurrent = currentMusicId === m.id;
                   return (
@@ -91,9 +96,15 @@ export const MusicListCard: React.FC<Props> = ({
                       key={m.id}
                       id={m.id}
                       fileName={m.fileName}
-                      onDelete={m.sample ? undefined : handleDeleteMusic}
                       isCurrentMusic={isCurrent}
                       isPlaying={isCurrent && state.playing}
+                      onDelete={m.sample ? undefined : handleDeleteMusic}
+                      onPlay={handlePlay}
+                      onPause={() => {
+                        if (isCurrent) {
+                          controls.changePlaying(false);
+                        }
+                      }}
                     />
                   );
                 })}

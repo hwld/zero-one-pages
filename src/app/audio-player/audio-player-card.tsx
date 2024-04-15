@@ -20,18 +20,19 @@ import { useAudioContext } from "./audio/audio-provider";
 import { Music } from "./page";
 import Image from "next/image";
 
-export type MusicNavigationDirection =
-  | "first"
-  | "prev"
-  | "next"
-  | "last"
-  | "none";
+export type MusicChangeParam =
+  | { type: "first" }
+  | { type: "prev" }
+  | { type: "next" }
+  | { type: "last" }
+  | { type: "unset" }
+  | { type: "byId"; id: string };
 
 type Props = {
   currentMusic: Music | undefined;
   hasPrev: boolean;
   hasNext: boolean;
-  onMusicChange: (dir: MusicNavigationDirection) => void;
+  onMusicChange: (param: MusicChangeParam) => void;
 };
 export const AudioPlayerCard: React.FC<Props> = ({
   currentMusic,
@@ -41,11 +42,9 @@ export const AudioPlayerCard: React.FC<Props> = ({
 }) => {
   const { audioRef, state, controls, handlers } = useAudioContext();
 
-  const handleMusicChange = (dir: MusicNavigationDirection) => {
-    onMusicChange(dir);
-    window.setTimeout(() => {
-      controls.changePlaying(true);
-    }, 0);
+  const handleMusicChange = (param: MusicChangeParam) => {
+    onMusicChange(param);
+    controls.changePlaying(true);
   };
 
   return (
@@ -68,13 +67,13 @@ export const AudioPlayerCard: React.FC<Props> = ({
             <div className="flex w-full items-center justify-center gap-1">
               <SubButton
                 disabled={!hasPrev || !state.isReady}
-                onClick={() => handleMusicChange("first")}
+                onClick={() => handleMusicChange({ type: "first" })}
               >
                 <TbPlayerTrackPrevFilled />
               </SubButton>
               <SubButton
                 disabled={!hasPrev || !state.isReady}
-                onClick={() => handleMusicChange("prev")}
+                onClick={() => handleMusicChange({ type: "prev" })}
               >
                 <TbPlayerSkipBackFilled />
               </SubButton>
@@ -109,13 +108,13 @@ export const AudioPlayerCard: React.FC<Props> = ({
               </SubButton>
               <SubButton
                 disabled={!hasNext || !state.isReady}
-                onClick={() => handleMusicChange("next")}
+                onClick={() => handleMusicChange({ type: "next" })}
               >
                 <TbPlayerSkipForwardFilled />
               </SubButton>
               <SubButton
                 disabled={!hasNext || !state.isReady}
-                onClick={() => handleMusicChange("last")}
+                onClick={() => handleMusicChange({ type: "last" })}
               >
                 <TbPlayerTrackNextFilled />
               </SubButton>

@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { AudioPlayerCard, MusicNavigationDirection } from "./audio-player-card";
+import { AudioPlayerCard, MusicChangeParam } from "./audio-player-card";
 import { Music } from "lucide-react";
 import { AudioProvider } from "./audio/audio-provider";
 import { MusicListCard } from "./music-list-card";
@@ -50,8 +50,8 @@ const Page: React.FC = () => {
     return musics[index + 1];
   }, [currentMusicId, musics]);
 
-  const handleMusicChange = (dir: MusicNavigationDirection) => {
-    switch (dir) {
+  const handleMusicChange = (param: MusicChangeParam) => {
+    switch (param.type) {
       case "first": {
         if (!musics[0]) {
           throw new Error("エピソードが存在しない");
@@ -81,12 +81,21 @@ const Page: React.FC = () => {
         setCurrentMusicId(last.id);
         break;
       }
-      case "none": {
+      case "unset": {
         setCurrentMusicId(undefined);
         break;
       }
+      case "byId": {
+        const id = musics.find((m) => m.id === param.id)?.id;
+        if (!id) {
+          throw new Error("エピソードが存在しない");
+        }
+
+        setCurrentMusicId(id);
+        break;
+      }
       default: {
-        throw new Error(dir satisfies never);
+        throw new Error(param satisfies never);
       }
     }
   };

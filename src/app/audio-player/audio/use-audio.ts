@@ -43,11 +43,18 @@ export const useAudio = ({
           return;
         }
 
-        if (playing) {
-          audioRef.current.play();
-        } else {
-          audioRef.current.pause();
-        }
+        window.setTimeout(() => {
+          if (!audioRef.current) {
+            throw new Error("audioが存在しない");
+          }
+
+          if (playing) {
+            audioRef.current.play();
+          } else {
+            audioRef.current.pause();
+          }
+        }, 0);
+
         setPlaying(playing);
       });
     },
