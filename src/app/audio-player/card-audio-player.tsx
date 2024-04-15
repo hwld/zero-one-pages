@@ -53,18 +53,19 @@ export const CardAudioPlayer: React.FC<Props> = ({
           <div className="flex w-full flex-col gap-4">
             <div className="flex w-full items-center justify-center gap-1">
               <SubButton
-                disabled={!hasPrev}
+                disabled={!hasPrev || !state.isReady}
                 onClick={() => handleMusicChange("first")}
               >
                 <TbPlayerTrackPrevFilled />
               </SubButton>
               <SubButton
-                disabled={!hasPrev}
+                disabled={!hasPrev || !state.isReady}
                 onClick={() => handleMusicChange("prev")}
               >
                 <TbPlayerSkipBackFilled />
               </SubButton>
               <SubButton
+                disabled={!state.isReady}
                 onClick={() => {
                   controls.changeCurrentTime(state.currentTime - 10);
                 }}
@@ -72,7 +73,8 @@ export const CardAudioPlayer: React.FC<Props> = ({
                 <TbRewindBackward10 />
               </SubButton>
               <button
-                className="grid size-12 shrink-0 place-items-center rounded-full bg-neutral-100 text-[25px] text-neutral-900 transition-colors hover:bg-neutral-300"
+                disabled={!state.isReady}
+                className="grid size-12 shrink-0 place-items-center rounded-full bg-neutral-100 text-[25px] text-neutral-900 transition-colors hover:bg-neutral-300 disabled:opacity-50"
                 onClick={() => {
                   controls.changePlaying(!state.playing);
                 }}
@@ -84,6 +86,7 @@ export const CardAudioPlayer: React.FC<Props> = ({
                 )}
               </button>
               <SubButton
+                disabled={!state.isReady}
                 onClick={() => {
                   controls.changeCurrentTime(state.currentTime + 10);
                 }}
@@ -91,13 +94,13 @@ export const CardAudioPlayer: React.FC<Props> = ({
                 <TbRewindForward10 />
               </SubButton>
               <SubButton
-                disabled={!hasNext}
+                disabled={!hasNext || !state.isReady}
                 onClick={() => handleMusicChange("next")}
               >
                 <TbPlayerSkipForwardFilled />
               </SubButton>
               <SubButton
-                disabled={!hasNext}
+                disabled={!hasNext || !state.isReady}
                 onClick={() => handleMusicChange("last")}
               >
                 <TbPlayerTrackNextFilled />

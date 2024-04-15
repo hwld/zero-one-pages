@@ -1,4 +1,5 @@
 import {
+  ComponentPropsWithoutRef,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -17,6 +18,7 @@ export const useAudio = ({
   initialVolume: _initialVolume = 1,
 }: UseAudioParams) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isReady, setIsReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -24,66 +26,86 @@ export const useAudio = ({
   const [volume, setVolume] = useState(initialVolume);
   const [isSeeking, setIsSeeking] = useState(false);
 
-  const changePlaying = useCallback((playing: boolean) => {
-    if (!audioRef.current) {
-      return;
-    }
+  const withReadyCheck = useCallback(
+    (callback: () => void) => {
+      if (isReady) {
+        callback();
+      }
+    },
+    [isReady],
+  );
 
-    if (playing) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-    setPlaying(playing);
-  }, []);
+  const changePlaying = useCallback(
+    (playing: boolean) => {
+      withReadyCheck(() => {
+        if (!audioRef.current) {
+          return;
+        }
+
+        if (playing) {
+          audioRef.current.play();
+        } else {
+          audioRef.current.pause();
+        }
+        setPlaying(playing);
+      });
+    },
+    [withReadyCheck],
+  );
 
   const changeCurrentTime = useCallback(
     (currentTime: number) => {
-      if (!audioRef.current) {
-        return;
-      }
+      withReadyCheck(() => {
+        if (!audioRef.current) {
+          return;
+        }
 
-      let valid = currentTime;
-      if (currentTime < 0) {
-        valid = 0;
-      }
-      if (currentTime > duration) {
-        valid = duration;
-      }
+        let valid = currentTime;
+        if (currentTime < 0) {
+          valid = 0;
+        }
+        if (currentTime > duration) {
+          valid = duration;
+        }
 
-      audioRef.current.currentTime = valid;
-      setCurrentTime(valid);
+        audioRef.current.currentTime = valid;
+        setCurrentTime(valid);
+      });
     },
-    [duration],
+    [duration, withReadyCheck],
   );
 
   const seek = useCallback(
     (currentTime: number) => {
+      withReadyCheck(() => {
+        if (!audioRef.current) {
+          return;
+        }
+
+        setIsSeeking(true);
+
+        audioRef.current.pause();
+        changeCurrentTime(currentTime);
+      });
+    },
+    [changeCurrentTime, withReadyCheck],
+  );
+
+  const seekEnd = useCallback(() => {
+    withReadyCheck(() => {
       if (!audioRef.current) {
         return;
       }
 
-      setIsSeeking(true);
+      setIsSeeking(false);
 
-      audioRef.current.pause();
-      changeCurrentTime(currentTime);
-    },
-    [changeCurrentTime],
-  );
-
-  const seekEnd = useCallback(() => {
-    if (!audioRef.current) {
-      return;
-    }
-
-    setIsSeeking(false);
-
-    window.setTimeout(() => {
-      if (audioRef.current?.paused) {
-        audioRef.current.play();
-      }
-    }, 0);
-  }, []);
+      window.setTimeout(() => {
+        if (audioRef.current?.paused) {
+          audioRef.current.play();
+        }
+      }, 0);
+    });
+  }, [withReadyCheck]);
 
   const changeDuration = useCallback((duration: number) => {
     if (!audioRef.current) {
@@ -124,7 +146,6 @@ export const useAudio = ({
 
   const onDurationChange = useCallback(
     (e: SyntheticEvent<HTMLAudioElement>) => {
-      console.log(e.currentTarget.duration);
       changeDuration(e.currentTarget.duration);
     },
     [changeDuration],
@@ -132,6 +153,10 @@ export const useAudio = ({
 
   const onEnded = useCallback(() => {
     setPlaying(false);
+  }, []);
+
+  const onCanPlay = useCallback(() => {
+    setIsReady(true);
   }, []);
 
   useEffect(() => {
@@ -151,8 +176,8 @@ export const useAudio = ({
   }, [src]);
 
   const state = useMemo(() => {
-    return { playing, currentTime, duration, volume, isSeeking };
-  }, [currentTime, duration, isSeeking, playing, volume]);
+    return { playing, currentTime, duration, volume, isSeeking, isReady };
+  }, [currentTime, duration, isReady, isSeeking, playing, volume]);
 
   const controls = useMemo(() => {
     return {
@@ -172,15 +197,16 @@ export const useAudio = ({
     seekEnd,
   ]);
 
-  const handlers = useMemo(() => {
+  const handlers = useMemo((): ComponentPropsWithoutRef<"audio"> => {
     return {
       onPlay,
       onPause,
       onTimeUpdate,
       onDurationChange,
       onEnded,
+      onCanPlay,
     };
-  }, [onDurationChange, onEnded, onPause, onPlay, onTimeUpdate]);
+  }, [onCanPlay, onDurationChange, onEnded, onPause, onPlay, onTimeUpdate]);
 
   return { audioRef, state, controls, handlers };
 };
