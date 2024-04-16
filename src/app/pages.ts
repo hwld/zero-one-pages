@@ -84,13 +84,13 @@ export const pages: Page[] = [
     title: "GitHub Project",
     description:
       "GitHubのProjectsのレイアウトを作ってみた。初めてライブラリを使わないでDnDを実装した。",
-    tags: ["PC", "LAYOUT", "WIP", "PRIME"],
+    tags: ["PC", "LAYOUT", "PRIME"],
   },
   {
     icon: PlayCircleIcon,
     href: "/audio-player",
     title: "Audio Player",
     description: "オーディオプレイヤーUI",
-    tags: ["WIP", "MOBILE", "PART"],
+    tags: ["PC", "PART"],
   },
 ];

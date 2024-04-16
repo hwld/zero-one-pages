@@ -43,13 +43,13 @@ export const useAudio = ({
           return;
         }
 
-        window.setTimeout(() => {
+        window.setTimeout(async () => {
           if (!audioRef.current) {
             throw new Error("audioが存在しない");
           }
 
           if (playing) {
-            audioRef.current.play();
+            await audioRef.current.play();
           } else {
             audioRef.current.pause();
           }
@@ -83,6 +83,7 @@ export const useAudio = ({
     [duration, withReadyCheck],
   );
 
+  const seekStartPlaying = useRef<boolean | undefined>(undefined);
   const seek = useCallback(
     (currentTime: number) => {
       withReadyCheck(() => {
@@ -90,6 +91,9 @@ export const useAudio = ({
           return;
         }
 
+        if (seekStartPlaying.current === undefined) {
+          seekStartPlaying.current = !audioRef.current.paused;
+        }
         setIsSeeking(true);
 
         audioRef.current.pause();
@@ -108,9 +112,10 @@ export const useAudio = ({
       setIsSeeking(false);
 
       window.setTimeout(() => {
-        if (audioRef.current?.paused) {
+        if (audioRef.current && seekStartPlaying.current) {
           audioRef.current.play();
         }
+        seekStartPlaying.current = undefined;
       }, 0);
     });
   }, [withReadyCheck]);
