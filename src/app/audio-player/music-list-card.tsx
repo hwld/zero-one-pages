@@ -4,6 +4,7 @@ import { MusicFile } from "./music-file";
 import { Music } from "./page";
 import { useAudioContext } from "./audio/audio-provider";
 import { MusicChangeParam } from "./audio-player-card";
+import { ChangeEvent, DragEvent, useRef } from "react";
 
 type Props = {
   musics: Music[];
@@ -44,6 +45,40 @@ export const MusicListCard: React.FC<Props> = ({
     controls.changePlaying(true);
   };
 
+  const addMusicFiles = (files: FileList) => {
+    let musics = Array.from(files)
+      .filter((f) => f.type.startsWith("audio/"))
+      .map((f): Music => {
+        return {
+          fileName: f.name,
+          url: URL.createObjectURL(f),
+          id: crypto.randomUUID(),
+        };
+      });
+    onAddMusics(musics);
+  };
+
+  const handleMusicFilesDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    addMusicFiles(e.dataTransfer.files);
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleMusicFilesClick = () => {
+    if (!fileInputRef.current) {
+      return;
+    }
+
+    fileInputRef.current.click();
+  };
+
+  const handleMusicFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      addMusicFiles(e.target.files);
+    }
+    e.target.value = "";
+  };
+
   return (
     <div className="flex h-min max-h-full flex-col">
       <Card>
@@ -51,32 +86,34 @@ export const MusicListCard: React.FC<Props> = ({
           <div
             className="grid h-[230px] w-full shrink-0 place-items-center rounded-lg border-2 border-dashed border-neutral-500 bg-white/5"
             onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              const fileCount = e.dataTransfer.files.length;
-              let musics = [...new Array(fileCount)]
-                .map((_, i) => e.dataTransfer.files[i])
-                .filter((f) => f.type.startsWith("audio/"))
-                .map((f): Music => {
-                  return {
-                    fileName: f.name,
-                    url: URL.createObjectURL(f),
-                    id: crypto.randomUUID(),
-                  };
-                });
-              onAddMusics(musics);
-            }}
+            onDrop={handleMusicFilesDrop}
           >
-            <div className="flex flex-col items-center gap-2">
-              <TbMusicPlus className="size-[40px]" />
-              <div className="text-center text-sm">
-                ここに音声をドラッグ&ドロップしてください
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex flex-col items-center gap-2">
+                <TbMusicPlus className="size-[40px]" />
+                <div className="text-center text-sm">
+                  ここに音声をドラッグ&ドロップしてください
+                </div>
+                <div className="text-center text-xs text-neutral-400">
+                  音声はサーバーにアップロードされることはありません。
+                  <br />
+                  画面を更新するとリセットされます。
+                </div>
               </div>
-              <div className="text-center text-xs text-neutral-400">
-                音声はサーバーにアップロードされることはありません。
-                <br />
-                画面を更新するとリセットされます。
-              </div>
+              <button
+                className="h-7 rounded-full bg-neutral-100 px-3 text-xs text-neutral-700 transition-colors hover:bg-neutral-300"
+                onClick={handleMusicFilesClick}
+              >
+                ファイルを選択する
+              </button>
+              <input
+                ref={fileInputRef}
+                multiple
+                accept="audio/*"
+                className="hidden"
+                type="file"
+                onChange={handleMusicFileSelect}
+              />
             </div>
           </div>
 

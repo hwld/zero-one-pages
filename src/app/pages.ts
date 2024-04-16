@@ -90,7 +90,8 @@ export const pages: Page[] = [
     icon: PlayCircleIcon,
     href: "/audio-player",
     title: "Audio Player",
-    description: "オーディオプレイヤーUI",
+    description:
+      "ブラウザ上で音楽を再生できるオーディオプレイヤーを作ってみた。",
     tags: ["PC", "PART"],
   },
 ];
