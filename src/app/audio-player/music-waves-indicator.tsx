@@ -1,19 +1,30 @@
 import { motion } from "framer-motion";
+import { TbVolumeOff } from "react-icons/tb";
 
-const delays = [0.1, 0.4, 0.2, 0.3];
-export const MusicWavesIndicator: React.FC = () => {
+const delays = [0.1, 0.3, 0.2, 0.4];
+
+type Props = { volume: number; isMuted: boolean };
+
+export const MusicWavesIndicator: React.FC<Props> = ({ volume, isMuted }) => {
+  const y1 = `${100}%`;
+  const y2 = `${90 * (1 - volume)}%`;
+
+  if (isMuted || volume === 0) {
+    return <TbVolumeOff className="text-sky-400" />;
+  }
+
   return (
     <div className="grid h-[17px] w-[15px] grid-cols-4 items-end justify-between gap-[1px] overflow-hidden bg-transparent">
       {[...new Array(4)].map((_, i) => {
         return (
           <motion.div
             key={i}
-            initial={{ y: "70%" }}
+            initial={{ y: y1 }}
             animate={{
-              y: ["70%", "20%", "70%"],
+              y: [y1, y2, y1],
               transition: { repeat: Infinity, delay: delays[i] },
             }}
-            className="h-full rounded-b-none rounded-t-md bg-sky-400 py-[2px]"
+            className="h-full bg-sky-400 py-[2px]"
           />
         );
       })}

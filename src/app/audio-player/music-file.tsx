@@ -10,7 +10,7 @@ import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { IconType } from "react-icons/lib";
 
-export const MusicFile: React.FC<{
+type Props = {
   id: string;
   fileName: string;
   onDelete?: (id: string) => void;
@@ -18,7 +18,11 @@ export const MusicFile: React.FC<{
   isPlaying: boolean;
   onPlay: (id: string) => void;
   onPause: () => void;
-}> = ({
+  volume: number;
+  isMuted: boolean;
+};
+
+export const MusicFile: React.FC<Props> = ({
   id,
   fileName,
   onDelete,
@@ -26,6 +30,8 @@ export const MusicFile: React.FC<{
   isPlaying,
   onPlay,
   onPause,
+  volume,
+  isMuted,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -52,7 +58,7 @@ export const MusicFile: React.FC<{
       <div className="flex items-center gap-2">
         {isCurrentMusic && isPlaying ? (
           <MusicFileButton hoverIcon={TbPlayerPauseFilled} onClick={onPause}>
-            <MusicWavesIndicator />
+            <MusicWavesIndicator volume={volume} isMuted={isMuted} />
           </MusicFileButton>
         ) : (
           <MusicFileButton hoverIcon={TbPlayerPlayFilled} onClick={handlePlay}>

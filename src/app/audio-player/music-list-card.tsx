@@ -135,6 +135,8 @@ export const MusicListCard: React.FC<Props> = ({
                       fileName={m.fileName}
                       isCurrentMusic={isCurrent}
                       isPlaying={isCurrent && state.playing}
+                      volume={state.volume}
+                      isMuted={state.isMuted}
                       onDelete={m.sample ? undefined : handleDeleteMusic}
                       onPlay={handlePlay}
                       onPause={() => {
