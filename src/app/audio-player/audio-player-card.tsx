@@ -48,16 +48,16 @@ export const AudioPlayerCard: React.FC<Props> = ({
   };
 
   return (
-    <Card>
+    <Card className="rounded-none border-0 lg:rounded-lg lg:border">
       <div className="flex h-full flex-col gap-8">
-        <div className="bg-neutl-300 relative min-h-[230px] w-full overflow-hidden rounded-lg text-neutral-900">
+        <div className="bg-neutl-300 relative min-h-[100px]  w-full overflow-hidden rounded-lg text-neutral-900 lg:min-h-[230px]">
           <Image
             className="object-cover"
             src={`https://api.dicebear.com/8.x/thumbs/svg?seed=${currentMusic?.fileName}`}
             alt="thumbnail"
             fill
           />
-          <div className="absolute bottom-2 right-2 max-w-[60%] items-center truncate rounded-full border border-neutral-300 bg-neutral-100 px-2 text-sm shadow">
+          <div className="absolute bottom-2 right-2 max-w-[60%] items-center truncate rounded border border-neutral-300 bg-neutral-300 px-2 text-sm shadow">
             {currentMusic?.fileName}
           </div>
         </div>

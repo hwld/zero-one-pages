@@ -80,16 +80,16 @@ export const MusicListCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex h-min max-h-full flex-col">
+    <div className="flex h-full max-h-full flex-col p-4 lg:h-min lg:p-0">
       <Card>
         <div className="flex min-h-0 grow flex-col gap-4">
           <div
-            className="grid h-[230px] w-full shrink-0 place-items-center rounded-lg border-2 border-dashed border-neutral-500 bg-white/5"
+            className="grid h-[100px] w-full shrink-0 place-items-center rounded-lg border-2 border-dashed border-neutral-500 bg-white/5 lg:h-[230px]"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleMusicFilesDrop}
           >
             <div className="flex flex-col items-center gap-6">
-              <div className="flex flex-col items-center gap-2">
+              <div className="hidden flex-col items-center gap-2 lg:flex">
                 <TbMusicPlus className="size-[40px]" />
                 <div className="text-center text-sm">
                   ここに音声をドラッグ&ドロップしてください
@@ -121,7 +121,7 @@ export const MusicListCard: React.FC<Props> = ({
             <div className="flex grow flex-col gap-2 overflow-hidden">
               <div className="flex items-center gap-2 px-2 text-neutral-400">
                 music files
-                <div className="grid size-6 shrink-0 place-items-center rounded-full bg-white/30 text-xs text-neutral-100">
+                <div className="grid size-6 shrink-0 place-items-center rounded-full bg-neutral-600 text-xs font-bold text-neutral-100">
                   {musics.length}
                 </div>
               </div>

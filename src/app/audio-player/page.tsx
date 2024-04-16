@@ -122,22 +122,26 @@ const Page: React.FC = () => {
         className="grid h-[100dvh] w-full place-items-center bg-neutral-900 text-neutral-100"
         style={{ colorScheme: "dark" }}
       >
-        <div className="grid grid-cols-[400px_400px] grid-rows-[500px] gap-4">
-          <AudioPlayerCard
-            currentMusic={currentMusic}
-            hasPrev={!!prevMusic}
-            hasNext={!!nextMusic}
-            onMusicChange={handleMusicChange}
-          />
-          <MusicListCard
-            musics={musics}
-            prevMusicId={prevMusic?.id}
-            nextMusicId={prevMusic?.id}
-            currentMusicId={currentMusicId}
-            onAddMusics={handleAddMusics}
-            onDeleteMusic={handleDeleteMusic}
-            onMusicChange={handleMusicChange}
-          />
+        <div className="grid h-full min-h-0 w-full grid-cols-[1fr] grid-rows-[1fr_300px] place-content-center gap-4 lg:grid-cols-[400px_400px] lg:grid-rows-[500px]">
+          <div className="order-2 h-full min-h-0 w-full lg:order-1">
+            <AudioPlayerCard
+              currentMusic={currentMusic}
+              hasPrev={!!prevMusic}
+              hasNext={!!nextMusic}
+              onMusicChange={handleMusicChange}
+            />
+          </div>
+          <div className="order-1 h-full min-h-0 w-full lg:order-2">
+            <MusicListCard
+              musics={musics}
+              prevMusicId={prevMusic?.id}
+              nextMusicId={prevMusic?.id}
+              currentMusicId={currentMusicId}
+              onAddMusics={handleAddMusics}
+              onDeleteMusic={handleDeleteMusic}
+              onMusicChange={handleMusicChange}
+            />
+          </div>
         </div>
       </div>
     </AudioProvider>

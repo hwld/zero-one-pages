@@ -92,6 +92,6 @@ export const pages: Page[] = [
     title: "Audio Player",
     description:
       "ブラウザ上で音楽を再生できるオーディオプレイヤーを作ってみた。",
-    tags: ["PC", "PART"],
+    tags: ["PC", "MOBILE", "PART"],
   },
 ];

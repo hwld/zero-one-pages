@@ -101,7 +101,7 @@ const MusicFileButton: React.FC<
     <button
       {...props}
       className={
-        "group relative grid size-8 shrink-0 place-items-center overflow-hidden rounded border border-neutral-600 bg-neutral-800 text-neutral-100"
+        "group relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-neutral-600 bg-neutral-800 text-neutral-100"
       }
     >
       {children}
