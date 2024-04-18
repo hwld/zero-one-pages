@@ -12,7 +12,11 @@ export const AddTaskButton: React.FC = () => {
 
   useEffect(() => {
     const openAddDialog = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "k") {
+      const cmdK = e.metaKey && e.key === "k";
+      const ctrlK = e.ctrlKey && e.key === "k";
+      if (cmdK || ctrlK) {
+        e.stopPropagation();
+        e.preventDefault();
         setIsAddDialogOpen(true);
       }
     };

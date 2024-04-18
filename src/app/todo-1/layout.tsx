@@ -30,7 +30,11 @@ const Layout: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "k") {
+      const cmdK = e.metaKey && e.key === "k";
+      const ctrlK = e.ctrlKey && e.key === "k";
+      if (cmdK || ctrlK) {
+        e.stopPropagation();
+        e.preventDefault();
         focusInput();
       }
     };
