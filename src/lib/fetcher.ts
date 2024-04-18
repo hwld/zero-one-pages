@@ -36,7 +36,7 @@ class Fetcher {
   }
 
   public put(...args: Args): Promise<Response> {
-    return this.fetch("POST", ...args);
+    return this.fetch("PUT", ...args);
   }
 
   public patch(...args: Args): Promise<Response> {
