@@ -25,11 +25,11 @@ const Page: React.FC = () => {
   });
 
   const onOpenMenu = () => {
-    router.push(`${pathname}?isOpen=true`, { scroll: false });
+    router.replace(`${pathname}?isOpen=true`, { scroll: false });
   };
 
   const onCloseMenu = () => {
-    router.push(`${pathname}`, { scroll: false });
+    router.replace(`${pathname}`, { scroll: false });
   };
 
   return (
