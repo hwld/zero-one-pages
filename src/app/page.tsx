@@ -10,6 +10,8 @@ export default function Home() {
     <div
       className={clsx(
         "flex h-[100dvh] flex-col items-center overflow-auto bg-zinc-900 pb-6 pt-[200px]",
+        // chromeでキーボードを操作しているとなぜかfocus-visibleがあたることがあるので
+        "focus-visible:outline-none",
       )}
       style={{ colorScheme: "dark" }}
     >

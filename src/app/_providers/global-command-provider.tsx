@@ -129,7 +129,13 @@ export const GlobalCommand: React.FC = () => {
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key === "/" && event.target === document.body) {
+      if (
+        event.key === "/" &&
+        !(
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement
+        )
+      ) {
         setIsOpen(true);
         event.preventDefault();
         event.stopPropagation();
