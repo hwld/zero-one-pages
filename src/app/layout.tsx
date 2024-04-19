@@ -3,6 +3,7 @@ import "./globals.css";
 import { GlobalCommand } from "./_providers/global-command-provider";
 import { Providers } from "./_providers/providers";
 import { Inter } from "next/font/google";
+import clsx from "clsx";
 
 export const metadata: Metadata = {
   title: "Zero one ui",
@@ -18,7 +19,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={inter.className}>
+      {/* page毎にbodyのbg-colorを設定できるようにする */}
+      <body className={clsx(inter.className, "bg-[var(--body-bg)]")}>
         <Providers>
           {children}
           <GlobalCommand />

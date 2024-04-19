@@ -12,6 +12,7 @@ import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { Toaster } from "./_components/toast/toaster";
 import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
+import "./style.css";
 
 const GitHubProjectPage: React.FC = () => {
   useGitHubProjectCommands();

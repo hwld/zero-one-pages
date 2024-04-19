@@ -4,6 +4,7 @@ import { Page, pages } from "./pages";
 import { ReactNode } from "react";
 import { SparklesIcon } from "lucide-react";
 import { IoLogoGithub } from "react-icons/io";
+import "./home.css";
 
 export default function Home() {
   return (

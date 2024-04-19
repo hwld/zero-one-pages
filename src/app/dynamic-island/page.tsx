@@ -2,6 +2,7 @@
 
 import { NextPage } from "next";
 import { AppControl } from "./_components/app-control/app-control";
+import "./style.css";
 
 const Page: NextPage = () => {
   return (

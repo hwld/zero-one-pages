@@ -4,6 +4,7 @@ import { AudioPlayerCard, MusicChangeParam } from "./audio-player-card";
 import { Music } from "lucide-react";
 import { AudioProvider } from "./audio/audio-provider";
 import { MusicListCard } from "./music-list-card";
+import "./style.css";
 
 export type Music = {
   fileName: string;

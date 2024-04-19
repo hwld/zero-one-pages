@@ -11,6 +11,7 @@ import { TaskForm } from "./_components/task-form";
 import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
 import { useTasks } from "./_queries/use-tasks";
+import "./style.css";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする

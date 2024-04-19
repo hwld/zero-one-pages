@@ -2,6 +2,7 @@
 
 import { NextPage } from "next";
 import { Menu } from "./_components/menu/menu";
+import "./style.css";
 
 const Page: NextPage = () => {
   return (
