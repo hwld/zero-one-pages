@@ -1,7 +1,7 @@
-import { format as tempoFormat } from "@formkit/tempo";
+import { format as dateFormat } from "date-fns";
 
 export const format = (date: Date) => {
-  return tempoFormat(date, "YYYY/MM/DD hh:mm:ss", "ja");
+  return dateFormat(date, "yyyy/MM/dd hh:mm:ss");
 };
 
 export const paginate = <T>(

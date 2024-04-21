@@ -1,69 +1,152 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import {
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  endOfWeek,
+  isEqual,
+  lastDayOfMonth,
+  startOfWeek,
+} from "date-fns";
 
-type DragRange = { start: number | undefined; end: number | undefined };
+const getCalendarDates = ({
+  year,
+  month: _month,
+}: {
+  year: number;
+  month: number;
+}): Date[][] => {
+  const month = _month - 1;
+  const firstDay = new Date(year, month, 1);
+  const lastDay = lastDayOfMonth(new Date(year, month));
 
-const inDragRange = (value: number, range: DragRange) => {
-  if (range.start === undefined && range.end === undefined) {
+  // 7日ごとに日付をまとめる
+  const calendarWeekStarts = eachWeekOfInterval({
+    start: startOfWeek(firstDay),
+    end: endOfWeek(lastDay),
+  });
+  const calendar = calendarWeekStarts.map((weekStart) => {
+    return eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart) });
+  });
+
+  return calendar;
+};
+
+type DragDateRange = { startDate: Date | undefined; endDate: Date | undefined };
+
+const inDragDateRange = (value: Date, range: DragDateRange) => {
+  if (range.startDate === undefined && range.endDate === undefined) {
     return false;
   }
 
-  if (range.start === undefined) {
-    return value === range.end;
+  // どっちかがundefinedであれば同じ日付か比較する
+  if (range.startDate === undefined && range.endDate !== undefined) {
+    return isEqual(value, range.endDate);
   }
 
-  if (range.end === undefined) {
-    return value === range.start;
+  if (range.startDate !== undefined && range.endDate === undefined) {
+    return isEqual(value, range.startDate);
   }
 
-  const min = Math.min(range.start, range.end);
-  const max = Math.max(range.start, range.end);
-  return value >= min && value <= max;
+  if (range.startDate === undefined || range.endDate === undefined) {
+    throw new Error("");
+  }
+
+  const startDateTime = range.startDate.getTime();
+  const endDateTime = range.endDate.getTime();
+  const valueTime = value.getTime();
+
+  const min = Math.min(startDateTime, endDateTime);
+  const max = Math.max(startDateTime, endDateTime);
+  return valueTime >= min && valueTime <= max;
 };
 
-export const MonthlyCalendar: React.FC = () => {
-  const days = new Date(2024, 4, 0).getDate();
-  const weeks = Math.ceil(days / 7);
+type Event = { title: string; start: Date; end: Date };
 
-  const [dragState, setDragState] = useState<DragRange>({
-    start: undefined,
-    end: undefined,
+export const MonthlyCalendar: React.FC = () => {
+  const year = 2024;
+  const month = 4;
+  const calendar = useMemo(() => {
+    return getCalendarDates({ year, month });
+  }, []);
+
+  const [events, setEvents] = useState<Event[]>([
+    {
+      title: "task",
+      start: new Date(year, month, 1),
+      end: new Date(year, month, 7),
+    },
+  ]);
+
+  const [dragState, setDragState] = useState<DragDateRange>({
+    startDate: undefined,
+    endDate: undefined,
   });
 
   const isDragging = useRef(false);
   return (
     <div className="[&>div:last-child]:border-b">
-      {[...new Array(weeks)].map((_, i) => {
+      {calendar.map((week, i) => {
         return (
           <div
             key={i}
-            className="grid auto-rows-[170px] grid-cols-7 [&>div:last-child]:border-r"
+            className="relative grid select-none auto-rows-[180px] grid-cols-7 [&>div:last-child]:border-r"
           >
-            {[...new Array(7)].map((_, j) => {
-              const day = i * 7 + 1 + j;
+            <div className="pointer-events-none absolute bottom-0 left-0 top-6 grid w-full auto-rows-[20px] grid-cols-7 gap-1 p-2">
+              {/* <div className="col-span-3 col-start-3 bg-blue-500" /> */}
+            </div>
+            {week.map((date) => {
+              const day = date.getDate();
 
               return (
                 <div
                   key={day}
                   className={clsx(
                     "select-none border-l border-t text-xs text-neutral-700",
-                    inDragRange(day, dragState) ? "bg-blue-500/20" : "",
+                    inDragDateRange(date, dragState) ? "bg-blue-500/20" : "",
                   )}
-                  onMouseOver={(e) => {
+                  onMouseOver={() => {
                     if (isDragging.current) {
-                      setDragState((s) => ({ ...s, end: day }));
+                      setDragState((s) => ({ ...s, endDate: date }));
                     }
-                    console.log(e.buttons);
                   }}
                   onMouseDown={() => {
-                    setDragState({ start: day, end: undefined });
+                    setDragState({ startDate: date, endDate: undefined });
                     isDragging.current = true;
                   }}
                   onMouseUp={() => {
+                    if (
+                      dragState.startDate === undefined &&
+                      dragState.endDate
+                    ) {
+                      return;
+                    }
+                    if (dragState.startDate === undefined) {
+                      return;
+                    }
+
+                    const minDateTime = Math.min(
+                      dragState.startDate.getTime(),
+                      dragState.endDate?.getTime() ?? Number.MAX_VALUE,
+                    );
+                    const maxDateTime = Math.max(
+                      dragState.startDate.getTime(),
+                      dragState.endDate?.getTime() ?? Number.MIN_VALUE,
+                    );
+
+                    setEvents((ss) => [
+                      ...ss,
+                      {
+                        title: "task",
+                        start: new Date(minDateTime),
+                        end: new Date(maxDateTime),
+                      },
+                    ]);
+                    setDragState({ startDate: undefined, endDate: undefined });
                     isDragging.current = false;
                   }}
                 >
-                  <div className="p-2">{day > days ? "" : day}</div>
+                  <div className="p-2">{day}</div>
                   <div></div>
                 </div>
               );
@@ -74,6 +157,3 @@ export const MonthlyCalendar: React.FC = () => {
     </div>
   );
 };
-
-// 1 ~ 7
-// 8 ~ 14
