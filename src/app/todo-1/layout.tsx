@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ReactNode, Suspense, useEffect, useRef } from "react";
+import { ReactNode, Suspense, useEffect, useMemo, useRef } from "react";
 import { SideBar } from "./_components/side-bar/side-bar";
 import { HomeIcon } from "lucide-react";
 import { EmptyTask } from "./_components/empty-task";
@@ -12,6 +12,8 @@ import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
 import { useTasks } from "./_queries/use-tasks";
 import "./style.css";
+import { ErrorTasks } from "./_components/error-tasks";
+import { LoadingTasks } from "./_components/loading-tasks";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする
@@ -19,7 +21,7 @@ import "./style.css";
 type Props = { children: ReactNode };
 const Layout: React.FC<Props> = ({ children }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { data: tasks = [] } = useTasks();
+  const { data: tasks = [], status: tasksStatus } = useTasks();
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -46,6 +48,46 @@ const Layout: React.FC<Props> = ({ children }) => {
     };
   }, []);
 
+  const content = useMemo(() => {
+    if (tasksStatus === "error") {
+      return (
+        <div className="absolute w-full">
+          <ErrorTasks />
+        </div>
+      );
+    }
+
+    if (tasksStatus === "pending") {
+      return (
+        <div className="absolute w-full">
+          <LoadingTasks />
+        </div>
+      );
+    }
+
+    if (tasks.length === 0) {
+      return (
+        <div className="absolute w-full">
+          <EmptyTask />
+        </div>
+      );
+    }
+
+    return tasks.map((task) => {
+      return (
+        <motion.div
+          key={task.id}
+          layout
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+        >
+          <TaskCard key={task.id} task={task} />
+        </motion.div>
+      );
+    });
+  }, [tasks, tasksStatus]);
+
   return (
     <div className={clsx("flex h-[100dvh] bg-neutral-100 text-neutral-700")}>
       <SideBar />
@@ -54,27 +96,14 @@ const Layout: React.FC<Props> = ({ children }) => {
         style={{ backgroundImage: "url(/1-bg.svg)", backgroundSize: "200px" }}
       >
         <div className="h-full w-full max-w-3xl shrink-0 ">
-          <div className="flex flex-col gap-4 pb-24">
+          <div className="relative flex flex-col gap-4 pb-24">
             <h1 className="flex items-center gap-2 font-bold text-neutral-700">
               <HomeIcon strokeWidth={3} size={20} />
               <div className="pt-[3px]">今日のタスク</div>
             </h1>
             <div className="flex flex-col gap-1">
-              {tasks.length === 0 && <EmptyTask />}
               <AnimatePresence mode="popLayout" initial={false}>
-                {tasks.map((task) => {
-                  return (
-                    <motion.div
-                      key={task.id}
-                      layout
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <TaskCard key={task.id} task={task} />
-                    </motion.div>
-                  );
-                })}
+                {content}
               </AnimatePresence>
             </div>
           </div>
