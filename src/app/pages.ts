@@ -1,4 +1,5 @@
 import {
+  CalendarIcon,
   CircleEllipsisIcon,
   FullscreenIcon,
   KanbanSquareIcon,
@@ -20,7 +21,8 @@ export type PageLink =
   | "/dynamic-island"
   | "/continuty-transition"
   | "/github-project"
-  | "/audio-player";
+  | "/audio-player"
+  | "/calendar";
 
 export type Page = {
   icon: LucideIcon;
@@ -93,5 +95,12 @@ export const pages: Page[] = [
     description:
       "ブラウザ上で音楽を再生できるオーディオプレイヤーを作ってみた。",
     tags: ["PC", "MOBILE", "PART"],
+  },
+  {
+    icon: CalendarIcon,
+    href: "/calendar",
+    title: "Calendar",
+    description: "予定を書き込めるカレンダー",
+    tags: ["PC", "PART", "WIP"],
   },
 ];
