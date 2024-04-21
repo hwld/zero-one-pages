@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import { useMemo, useRef, useState } from "react";
 import {
+  AreIntervalsOverlappingOptions,
+  Interval,
+  areIntervalsOverlapping,
   eachDayOfInterval,
   eachWeekOfInterval,
   endOfWeek,
@@ -32,6 +35,20 @@ const getCalendarDates = ({
   return calendar;
 };
 
+const getOverlappingDates = (
+  a: Interval,
+  b: Interval,
+  options?: AreIntervalsOverlappingOptions,
+) => {
+  if (areIntervalsOverlapping(a, b, options)) {
+    const start = a.start > b.start ? a.start : b.start;
+    const end = a.end < b.end ? a.end : b.end;
+    return eachDayOfInterval({ start, end });
+  } else {
+    return [];
+  }
+};
+
 type DragDateRange = { startDate: Date | undefined; endDate: Date | undefined };
 
 const inDragDateRange = (value: Date, range: DragDateRange) => {
@@ -61,7 +78,7 @@ const inDragDateRange = (value: Date, range: DragDateRange) => {
   return valueTime >= min && valueTime <= max;
 };
 
-type Event = { title: string; start: Date; end: Date };
+type Event = { id: string; title: string; start: Date; end: Date };
 
 export const MonthlyCalendar: React.FC = () => {
   const year = 2024;
@@ -70,13 +87,7 @@ export const MonthlyCalendar: React.FC = () => {
     return getCalendarDates({ year, month });
   }, []);
 
-  const [events, setEvents] = useState<Event[]>([
-    {
-      title: "task",
-      start: new Date(year, month, 1),
-      end: new Date(year, month, 7),
-    },
-  ]);
+  const [events, setEvents] = useState<Event[]>([]);
 
   const [dragState, setDragState] = useState<DragDateRange>({
     startDate: undefined,
@@ -92,7 +103,38 @@ export const MonthlyCalendar: React.FC = () => {
             key={i}
             className="relative grid select-none auto-rows-[180px] grid-cols-7 [&>div:last-child]:border-r"
           >
-            <div className="pointer-events-none absolute bottom-0 left-0 top-6 grid w-full auto-rows-[20px] grid-cols-7 gap-1 p-2">
+            <div className="pointer-events-none absolute bottom-0 left-0 top-6 grid w-full auto-rows-[20px] grid-cols-7 gap-1 py-2">
+              {events
+                .filter((event) => {
+                  return areIntervalsOverlapping(
+                    { start: week[0], end: week[week.length - 1] },
+                    { start: event.start, end: event.end },
+                    { inclusive: true },
+                  );
+                })
+                .map((e) => {
+                  const dates = getOverlappingDates(
+                    { start: week[0], end: week[week.length - 1] },
+                    { start: e.start, end: e.end },
+                    { inclusive: true },
+                  );
+                  const firstWeek = dates[0].getDay();
+                  const lastWeek = dates[dates.length - 1].getDay();
+                  return (
+                    <div
+                      key={e.id}
+                      className="col-start-[var(--col-start)] col-end-[var(--col-end)] flex items-center rounded bg-blue-500 px-1 text-sm text-neutral-100"
+                      style={{
+                        ["--col-start" as string]: firstWeek + 1,
+                        ["--col-end" as string]: `span ${
+                          lastWeek - firstWeek + 1
+                        }`,
+                      }}
+                    >
+                      {e.title}
+                    </div>
+                  );
+                })}
               {/* <div className="col-span-3 col-start-3 bg-blue-500" /> */}
             </div>
             {week.map((date) => {
@@ -137,7 +179,8 @@ export const MonthlyCalendar: React.FC = () => {
                     setEvents((ss) => [
                       ...ss,
                       {
-                        title: "task",
+                        id: crypto.randomUUID(),
+                        title: "event",
                         start: new Date(minDateTime),
                         end: new Date(maxDateTime),
                       },
