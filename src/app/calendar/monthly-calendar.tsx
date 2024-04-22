@@ -4,6 +4,7 @@ import {
   AreIntervalsOverlappingOptions,
   Interval,
   areIntervalsOverlapping,
+  differenceInCalendarDays,
   eachDayOfInterval,
   eachWeekOfInterval,
   endOfWeek,
@@ -106,21 +107,45 @@ export const MonthlyCalendar: React.FC = () => {
     // read moreを表示するため、-1する
     const rowLimit = Math.floor(eventSpaceHeight / EVENT_ROW_SIZE) - 1;
     setRowLimit(rowLimit);
+
+    // TODO: サイズが変わるたびに計測し直す
   }, []);
 
   const isDragging = useRef(false);
   return (
     <div className="[&>div:last-child]:border-b">
       {calendar.map((week, i) => {
-        const weekEvents = events.filter((event) => {
-          const overlapping = areIntervalsOverlapping(
-            { start: week[0], end: week[week.length - 1] },
-            { start: event.start, end: event.end },
-            { inclusive: true },
-          );
+        const weekEvents = events
+          .filter((event) => {
+            const overlapping = areIntervalsOverlapping(
+              { start: week[0], end: week[week.length - 1] },
+              { start: event.start, end: event.end },
+              { inclusive: true },
+            );
 
-          return overlapping;
-        });
+            return overlapping;
+          })
+          .sort((event1, event2) => {
+            const startTime1 = event1.start.getTime();
+            const startTime2 = event2.start.getTime();
+            if (startTime1 < startTime2) {
+              return -1;
+            }
+            if (startTime2 > startTime1) {
+              return 1;
+            }
+
+            const range1 = differenceInCalendarDays(event1.end, event1.start);
+            const range2 = differenceInCalendarDays(event2.end, event2.start);
+            if (range1 > range2) {
+              return -1;
+            }
+            if (range2 > range1) {
+              return 1;
+            }
+
+            return 0;
+          });
 
         const weekEventsWithTop: (Event & { top: number })[] = [];
         for (let i = 0; i < weekEvents.length; i++) {
@@ -276,7 +301,7 @@ export const MonthlyCalendar: React.FC = () => {
                       ...ss,
                       {
                         id: crypto.randomUUID(),
-                        title: "event",
+                        title: `event ${ss.length + 1}`,
                         start: eventStart,
                         end: eventEnd,
                       },
