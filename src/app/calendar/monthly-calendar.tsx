@@ -9,6 +9,7 @@ import {
   eachWeekOfInterval,
   endOfWeek,
   isEqual,
+  isWithinInterval,
   lastDayOfMonth,
   startOfWeek,
 } from "date-fns";
@@ -161,15 +162,30 @@ export const MonthlyCalendar: React.FC = () => {
             },
           );
 
-          // 重複しているイベントの最大のtopを取得する
-          const maxTop = prevOverlappingEvents.reduce((maxTop, event) => {
-            if (event.top > maxTop) {
-              return event.top;
-            }
-            return maxTop;
-          }, -1);
+          // 使用されているtopを取得する
+          const dates = eachDayOfInterval(event);
+          const invalidTops = dates.flatMap((date) => {
+            return prevOverlappingEvents
+              .map((prevEvent) => {
+                if (isWithinInterval(date, prevEvent)) {
+                  return prevEvent.top;
+                }
+                return undefined;
+              })
+              .filter((top): top is number => top !== undefined);
+          });
+          const invalidTopSet = new Set(invalidTops);
 
-          weekEventsWithTop.push({ ...event, top: maxTop + 1 });
+          // topを求める
+          let top = 0;
+          for (let i = 0; i < Number.MAX_VALUE; i++) {
+            if (!invalidTopSet.has(i)) {
+              top = i;
+              break;
+            }
+          }
+
+          weekEventsWithTop.push({ ...event, top });
         }
 
         const overLimitCountByWeekDay = weekEventsWithTop
