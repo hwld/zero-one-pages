@@ -79,6 +79,7 @@ const inDragDateRange = (value: Date, range: DragDateRange) => {
 };
 
 type Event = { id: string; title: string; start: Date; end: Date };
+type CalendarEvent = Event & { top: number };
 
 export const MonthlyCalendar: React.FC = () => {
   const year = 2024;
@@ -87,7 +88,7 @@ export const MonthlyCalendar: React.FC = () => {
     return getCalendarDates({ year, month });
   }, []);
 
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   const [dragState, setDragState] = useState<DragDateRange>({
     startDate: undefined,
@@ -103,7 +104,7 @@ export const MonthlyCalendar: React.FC = () => {
             key={i}
             className="relative grid select-none auto-rows-[180px] grid-cols-7 [&>div:last-child]:border-r"
           >
-            <div className="pointer-events-none absolute bottom-0 left-0 top-6 grid w-full auto-rows-[20px] grid-cols-7 gap-1 py-2">
+            <div className="gap-1- pointer-events-none absolute bottom-0 left-0 top-6 my-2 w-full">
               {events
                 .filter((event) => {
                   return areIntervalsOverlapping(
@@ -120,22 +121,25 @@ export const MonthlyCalendar: React.FC = () => {
                   );
                   const firstWeek = dates[0].getDay();
                   const lastWeek = dates[dates.length - 1].getDay();
+
                   return (
                     <div
                       key={e.id}
-                      className="col-start-[var(--col-start)] col-end-[var(--col-end)] flex items-center rounded bg-blue-500 px-1 text-sm text-neutral-100"
+                      className="absolute flex items-center rounded bg-blue-500 px-1 text-sm text-neutral-100"
                       style={{
-                        ["--col-start" as string]: firstWeek + 1,
-                        ["--col-end" as string]: `span ${
+                        ["--height" as string]: "20px",
+                        height: "var(--height)",
+                        width: `calc(100% / 7  * ${
                           lastWeek - firstWeek + 1
-                        }`,
+                        } - 10px)`,
+                        top: `calc((var(--height) + 2px) * ${e.top})`,
+                        left: `calc(100% / 7 * ${firstWeek})`,
                       }}
                     >
                       {e.title}
                     </div>
                   );
                 })}
-              {/* <div className="col-span-3 col-start-3 bg-blue-500" /> */}
             </div>
             {week.map((date) => {
               const day = date.getDate();
@@ -167,22 +171,45 @@ export const MonthlyCalendar: React.FC = () => {
                       return;
                     }
 
-                    const minDateTime = Math.min(
-                      dragState.startDate.getTime(),
-                      dragState.endDate?.getTime() ?? Number.MAX_VALUE,
+                    const eventStart = new Date(
+                      Math.min(
+                        dragState.startDate.getTime(),
+                        dragState.endDate?.getTime() ?? Number.MAX_VALUE,
+                      ),
                     );
-                    const maxDateTime = Math.max(
-                      dragState.startDate.getTime(),
-                      dragState.endDate?.getTime() ?? Number.MIN_VALUE,
+                    const eventEnd = new Date(
+                      Math.max(
+                        dragState.startDate.getTime(),
+                        dragState.endDate?.getTime() ?? Number.MIN_VALUE,
+                      ),
                     );
+
+                    let maxTop = -1;
+                    const overlappingEvents = events.filter((e) => {
+                      return areIntervalsOverlapping(
+                        {
+                          start: eventStart,
+                          end: eventEnd,
+                        },
+                        { start: e.start, end: e.end },
+                        { inclusive: true },
+                      );
+                    });
+
+                    for (let e of overlappingEvents) {
+                      if (e.top > maxTop) {
+                        maxTop = e.top;
+                      }
+                    }
 
                     setEvents((ss) => [
                       ...ss,
                       {
+                        top: maxTop + 1,
                         id: crypto.randomUUID(),
                         title: "event",
-                        start: new Date(minDateTime),
-                        end: new Date(maxDateTime),
+                        start: eventStart,
+                        end: eventEnd,
                       },
                     ]);
                     setDragState({ startDate: undefined, endDate: undefined });
