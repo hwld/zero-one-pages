@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AreIntervalsOverlappingOptions,
   Interval,
@@ -11,6 +11,7 @@ import {
   lastDayOfMonth,
   startOfWeek,
 } from "date-fns";
+import { EVENT_ROW_SIZE } from "./consts";
 
 const getCalendarDates = ({
   year,
@@ -79,7 +80,6 @@ const inDragDateRange = (value: Date, range: DragDateRange) => {
 };
 
 type Event = { id: string; title: string; start: Date; end: Date };
-type CalendarEvent = Event & { top: number };
 
 export const MonthlyCalendar: React.FC = () => {
   const year = 2024;
@@ -88,58 +88,102 @@ export const MonthlyCalendar: React.FC = () => {
     return getCalendarDates({ year, month });
   }, []);
 
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
 
   const [dragState, setDragState] = useState<DragDateRange>({
     startDate: undefined,
     endDate: undefined,
   });
 
+  const firstEventSpaceRef = useRef<HTMLDivElement>(null);
+  const [rowLimit, setRowLimit] = useState(0);
+  useEffect(() => {
+    if (!firstEventSpaceRef.current) {
+      return;
+    }
+    const eventSpaceHeight =
+      firstEventSpaceRef.current.getBoundingClientRect().height;
+    // read moreを表示するため、-1する
+    const rowLimit = Math.floor(eventSpaceHeight / EVENT_ROW_SIZE) - 1;
+    setRowLimit(rowLimit);
+  }, []);
+
   const isDragging = useRef(false);
   return (
     <div className="[&>div:last-child]:border-b">
       {calendar.map((week, i) => {
+        const weekEvents = events.filter((event) => {
+          const overlapping = areIntervalsOverlapping(
+            { start: week[0], end: week[week.length - 1] },
+            { start: event.start, end: event.end },
+            { inclusive: true },
+          );
+
+          return overlapping;
+        });
+
+        const weekEventsWithTop: (Event & { top: number })[] = [];
+        for (let i = 0; i < weekEvents.length; i++) {
+          const event = weekEvents[i];
+
+          // イベントよりも前に存在している重複したイベントを取得する
+          const prevOverlappingEvents = weekEventsWithTop.filter(
+            (prevEvent, index) => {
+              const overlapping = areIntervalsOverlapping(event, prevEvent, {
+                inclusive: true,
+              });
+              return overlapping && index < i;
+            },
+          );
+
+          // 重複しているイベントの最大のtopを取得する
+          const maxTop = prevOverlappingEvents.reduce((maxTop, event) => {
+            if (event.top > maxTop) {
+              return event.top;
+            }
+            return maxTop;
+          }, -1);
+
+          weekEventsWithTop.push({ ...event, top: maxTop + 1 });
+        }
+
         return (
           <div
             key={i}
             className="relative grid select-none auto-rows-[180px] grid-cols-7 [&>div:last-child]:border-r"
           >
-            <div className="gap-1- pointer-events-none absolute bottom-0 left-0 top-6 my-2 w-full">
-              {events
-                .filter((event) => {
-                  return areIntervalsOverlapping(
-                    { start: week[0], end: week[week.length - 1] },
-                    { start: event.start, end: event.end },
-                    { inclusive: true },
-                  );
-                })
-                .map((e) => {
-                  const dates = getOverlappingDates(
-                    { start: week[0], end: week[week.length - 1] },
-                    { start: e.start, end: e.end },
-                    { inclusive: true },
-                  );
-                  const firstWeek = dates[0].getDay();
-                  const lastWeek = dates[dates.length - 1].getDay();
+            <div
+              ref={i === 0 ? firstEventSpaceRef : undefined}
+              className="gap-1- pointer-events-none absolute bottom-0 left-0 top-6 mt-2 w-full"
+            >
+              {weekEventsWithTop.map((event) => {
+                const dates = getOverlappingDates(
+                  { start: week[0], end: week[week.length - 1] },
+                  { start: event.start, end: event.end },
+                  { inclusive: true },
+                );
+                const startWeek = dates[0].getDay();
+                const endWeek = dates[dates.length - 1].getDay();
 
-                  return (
-                    <div
-                      key={e.id}
-                      className="absolute flex items-center rounded bg-blue-500 px-1 text-sm text-neutral-100"
-                      style={{
-                        ["--height" as string]: "20px",
-                        height: "var(--height)",
-                        width: `calc(100% / 7  * ${
-                          lastWeek - firstWeek + 1
-                        } - 10px)`,
-                        top: `calc((var(--height) + 2px) * ${e.top})`,
-                        left: `calc(100% / 7 * ${firstWeek})`,
-                      }}
-                    >
-                      {e.title}
+                return (
+                  <div
+                    key={event.id}
+                    className="absolute pb-[1px] text-sm text-neutral-100"
+                    style={{
+                      height: `${EVENT_ROW_SIZE}px`,
+                      width: `calc(100% / 7  * ${
+                        endWeek - startWeek + 1
+                      } - 10px)`,
+                      top: `calc(${EVENT_ROW_SIZE}px * ${event.top})`,
+                      left: `calc(100% / 7 * ${startWeek})`,
+                    }}
+                  >
+                    <div className="flex h-full w-full items-center rounded bg-neutral-700 px-1">
+                      {event.title}
                     </div>
-                  );
-                })}
+                  </div>
+                );
+              })}
             </div>
             {week.map((date) => {
               const day = date.getDate();
@@ -184,28 +228,9 @@ export const MonthlyCalendar: React.FC = () => {
                       ),
                     );
 
-                    let maxTop = -1;
-                    const overlappingEvents = events.filter((e) => {
-                      return areIntervalsOverlapping(
-                        {
-                          start: eventStart,
-                          end: eventEnd,
-                        },
-                        { start: e.start, end: e.end },
-                        { inclusive: true },
-                      );
-                    });
-
-                    for (let e of overlappingEvents) {
-                      if (e.top > maxTop) {
-                        maxTop = e.top;
-                      }
-                    }
-
                     setEvents((ss) => [
                       ...ss,
                       {
-                        top: maxTop + 1,
                         id: crypto.randomUUID(),
                         title: "event",
                         start: eventStart,
