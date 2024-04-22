@@ -99,22 +99,30 @@ export const MonthlyCalendar: React.FC = () => {
 
   const firstEventSpaceRef = useRef<HTMLDivElement>(null);
   const [rowLimit, setRowLimit] = useState(0);
-  useEffect(() => {
-    if (!firstEventSpaceRef.current) {
-      return;
-    }
-    const eventSpaceHeight =
-      firstEventSpaceRef.current.getBoundingClientRect().height;
-    // read moreを表示するため、-1する
-    const rowLimit = Math.floor(eventSpaceHeight / EVENT_ROW_SIZE) - 1;
-    setRowLimit(rowLimit);
 
-    // TODO: サイズが変わるたびに計測し直す
+  useEffect(() => {
+    const eventSpace = firstEventSpaceRef.current;
+    const measure = () => {
+      if (!eventSpace) {
+        return;
+      }
+      const eventSpaceHeight = eventSpace.getBoundingClientRect().height;
+      // read moreを表示するため、-1する
+      const rowLimit = Math.floor(eventSpaceHeight / EVENT_ROW_SIZE) - 1;
+      setRowLimit(rowLimit);
+    };
+
+    measure();
+
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("reset", measure);
+    };
   }, []);
 
   const isDragging = useRef(false);
   return (
-    <div className="[&>div:last-child]:border-b">
+    <div className="grid h-full w-full flex-col [&>div:last-child]:border-b">
       {calendar.map((week, i) => {
         const weekEvents = events
           .filter((event) => {
@@ -208,11 +216,11 @@ export const MonthlyCalendar: React.FC = () => {
         return (
           <div
             key={i}
-            className="relative grid select-none auto-rows-[170px] grid-cols-7 [&>div:last-child]:border-r"
+            className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7 [&>div:last-child]:border-r"
           >
             <div
               ref={i === 0 ? firstEventSpaceRef : undefined}
-              className="gap-1- pointer-events-none absolute bottom-0 left-0 top-6 mt-2 w-full"
+              className="pointer-events-none absolute bottom-0 left-0 top-6 mt-2 w-full gap-1"
             >
               {weekEventsWithTop
                 .filter((event) => event.top < rowLimit)
@@ -327,7 +335,6 @@ export const MonthlyCalendar: React.FC = () => {
                   }}
                 >
                   <div className="p-2">{day}</div>
-                  <div></div>
                 </div>
               );
             })}

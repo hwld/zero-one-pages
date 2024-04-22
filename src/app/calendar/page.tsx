@@ -3,8 +3,10 @@ import { MonthlyCalendar } from "./monthly-calendar";
 
 const Page = () => {
   return (
-    <div className="h-[100dvh] bg-neutral-100 p-4">
-      <MonthlyCalendar />
+    <div className="grid min-h-[100dvh] min-w-[100dvw] place-items-center bg-neutral-100">
+      <div className="h-[90%] w-[90%]">
+        <MonthlyCalendar />
+      </div>
     </div>
   );
 };
