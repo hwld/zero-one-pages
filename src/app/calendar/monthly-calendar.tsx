@@ -147,39 +147,83 @@ export const MonthlyCalendar: React.FC = () => {
           weekEventsWithTop.push({ ...event, top: maxTop + 1 });
         }
 
+        const overLimitCountByWeekDay = weekEventsWithTop
+          .filter((event) => event.top >= rowLimit)
+          .flatMap((event) => {
+            return eachDayOfInterval(event);
+          })
+          .reduce((map, date) => {
+            const weekDay = date.getDay();
+            const overLimitEventCount = map.get(weekDay);
+
+            if (overLimitEventCount !== undefined) {
+              map.set(weekDay, overLimitEventCount + 1);
+            } else {
+              map.set(weekDay, 1);
+            }
+            return map;
+          }, new Map<number, number>());
+
         return (
           <div
             key={i}
-            className="relative grid select-none auto-rows-[180px] grid-cols-7 [&>div:last-child]:border-r"
+            className="relative grid select-none auto-rows-[170px] grid-cols-7 [&>div:last-child]:border-r"
           >
             <div
               ref={i === 0 ? firstEventSpaceRef : undefined}
               className="gap-1- pointer-events-none absolute bottom-0 left-0 top-6 mt-2 w-full"
             >
-              {weekEventsWithTop.map((event) => {
-                const dates = getOverlappingDates(
-                  { start: week[0], end: week[week.length - 1] },
-                  { start: event.start, end: event.end },
-                  { inclusive: true },
-                );
-                const startWeek = dates[0].getDay();
-                const endWeek = dates[dates.length - 1].getDay();
+              {weekEventsWithTop
+                .filter((event) => event.top < rowLimit)
+                .map((event) => {
+                  const dates = getOverlappingDates(
+                    { start: week[0], end: week[week.length - 1] },
+                    { start: event.start, end: event.end },
+                    { inclusive: true },
+                  );
+                  const startWeekDay = dates[0].getDay();
+                  const endWeekDay = dates[dates.length - 1].getDay();
+
+                  return (
+                    <div
+                      key={event.id}
+                      className="absolute pb-[1px] text-sm text-neutral-100"
+                      style={{
+                        height: `${EVENT_ROW_SIZE}px`,
+                        width: `calc(100% / 7  * ${
+                          endWeekDay - startWeekDay + 1
+                        } - 10px)`,
+                        top: `calc(${EVENT_ROW_SIZE}px * ${event.top})`,
+                        left: `calc(100% / 7 * ${startWeekDay})`,
+                      }}
+                    >
+                      <div className="flex h-full w-full items-center rounded bg-neutral-700 px-1">
+                        {event.title}
+                      </div>
+                    </div>
+                  );
+                })}
+              {week.map((date) => {
+                const weekDay = date.getDay();
+                const count = overLimitCountByWeekDay.get(weekDay);
+
+                if (!count) {
+                  return null;
+                }
 
                 return (
                   <div
-                    key={event.id}
-                    className="absolute pb-[1px] text-sm text-neutral-100"
+                    key={weekDay}
+                    className="absolute"
                     style={{
                       height: `${EVENT_ROW_SIZE}px`,
-                      width: `calc(100% / 7  * ${
-                        endWeek - startWeek + 1
-                      } - 10px)`,
-                      top: `calc(${EVENT_ROW_SIZE}px * ${event.top})`,
-                      left: `calc(100% / 7 * ${startWeek})`,
+                      width: `calc(100% / 7 - 10px)`,
+                      top: `calc(${EVENT_ROW_SIZE}px * ${rowLimit})`,
+                      left: `calc(100% / 7 * ${weekDay})`,
                     }}
                   >
-                    <div className="flex h-full w-full items-center rounded bg-neutral-700 px-1">
-                      {event.title}
+                    <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700">
+                      他<span className="mx-1">{count}</span>件
                     </div>
                   </div>
                 );
