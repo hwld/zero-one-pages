@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EVENT_ROW_SIZE } from "../consts";
+import { EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../consts";
 import {
   DragDateRange,
   getCalendarDates,
@@ -10,13 +10,14 @@ import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
 
-export const MonthlyCalendar: React.FC = () => {
-  const year = 2024;
-  const month = 4;
+type Props = { yearMonth: Date };
 
+export const MonthlyCalendar: React.FC<Props> = ({ yearMonth }) => {
   const calendar = useMemo(() => {
+    const year = yearMonth.getFullYear();
+    const month = yearMonth.getMonth() + 1;
     return getCalendarDates({ year, month });
-  }, []);
+  }, [yearMonth]);
 
   const [events, setEvents] = useState<Event[]>([]);
 
@@ -49,48 +50,61 @@ export const MonthlyCalendar: React.FC = () => {
     return () => {
       window.removeEventListener("reset", measure);
     };
-  }, []);
+  }, [yearMonth]);
 
   return (
-    <div className="grid h-full w-full flex-col [&>div:last-child]:border-b">
-      {calendar.map((week, i) => {
-        const weekEvents = getWeekEvents({ week, events });
+    <div className="grid h-full w-full grid-rows-[min-content,1fr] gap-2">
+      <div className="grid w-full grid-cols-7">
+        {WEEK_DAY_LABELS.map((weekDay) => {
+          return (
+            <div className="text-center text-xs" key={weekDay}>
+              {weekDay}
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid">
+        {calendar.map((week, i) => {
+          const weekEvents = getWeekEvents({ week, events });
 
-        const filteredWeekEvents = weekEvents.filter(
-          (event) => event.top < eventLimit,
-        );
-        const exceededEventCountMap = getExceededEventCountByDayOfWeek({
-          weekEvents,
-          limit: eventLimit,
-        });
+          const filteredWeekEvents = weekEvents.filter(
+            (event) => event.top < eventLimit,
+          );
+          const exceededEventCountMap = getExceededEventCountByDayOfWeek({
+            weekEvents,
+            limit: eventLimit,
+          });
 
-        return (
-          <div
-            key={`${week[0]}`}
-            className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7 [&>div:last-child]:border-r"
-          >
-            {week.map((date) => {
-              return (
-                <CalendarDate
-                  key={date.getTime()}
-                  date={date}
-                  dragDateRange={dragDateRange}
-                  onDragDateRangeChange={setDragDateRange}
-                  onCreateEvent={handleCreateEvent}
-                />
-              );
-            })}
-            <WeekEventRow
-              ref={i === 0 ? firstWeekEventRowRef : undefined}
-              isDraggingDate={!!dragDateRange}
-              week={week}
-              weekEvents={filteredWeekEvents}
-              eventLimit={eventLimit}
-              exceededEventCountMap={exceededEventCountMap}
-            />
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={`${week[0]}`}
+              className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7"
+            >
+              {week.map((date) => {
+                return (
+                  <CalendarDate
+                    calendarYearMonth={yearMonth}
+                    key={date.getTime()}
+                    date={date}
+                    isLastWeek={calendar.length - 1 === i}
+                    dragDateRange={dragDateRange}
+                    onDragDateRangeChange={setDragDateRange}
+                    onCreateEvent={handleCreateEvent}
+                  />
+                );
+              })}
+              <WeekEventRow
+                ref={i === 0 ? firstWeekEventRowRef : undefined}
+                isDraggingDate={!!dragDateRange}
+                week={week}
+                weekEvents={filteredWeekEvents}
+                eventLimit={eventLimit}
+                exceededEventCountMap={exceededEventCountMap}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
