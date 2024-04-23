@@ -1,5 +1,5 @@
 "use client";
-import { MonthlyCalendar } from "./monthly-calendar";
+import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
 
 const Page = () => {
   return (
