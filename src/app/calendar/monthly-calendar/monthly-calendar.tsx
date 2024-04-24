@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../consts";
 import {
   DragDateRange,
@@ -9,15 +16,32 @@ import {
 import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
+import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { addMonths, subMonths } from "date-fns";
 
-type Props = { yearMonth: Date };
+type Props = {};
 
-export const MonthlyCalendar: React.FC<Props> = ({ yearMonth }) => {
-  const calendar = useMemo(() => {
-    const year = yearMonth.getFullYear();
-    const month = yearMonth.getMonth() + 1;
-    return getCalendarDates({ year, month });
+export const MonthlyCalendar: React.FC<Props> = ({}) => {
+  const [yearMonth, setYearMonth] = useState(new Date());
+
+  const year = useMemo(() => {
+    return yearMonth.getFullYear();
   }, [yearMonth]);
+
+  const month = useMemo(() => {
+    return yearMonth.getMonth() + 1;
+  }, [yearMonth]);
+
+  const handleGoPrevMonth = () => {
+    setYearMonth(subMonths(yearMonth, 1));
+  };
+  const handleGoNextMonth = () => {
+    setYearMonth(addMonths(yearMonth, 1));
+  };
+
+  const calendar = useMemo(() => {
+    return getCalendarDates({ year, month });
+  }, [month, year]);
 
   const [events, setEvents] = useState<Event[]>([]);
 
@@ -53,7 +77,22 @@ export const MonthlyCalendar: React.FC<Props> = ({ yearMonth }) => {
   }, [yearMonth]);
 
   return (
-    <div className="grid h-full w-full grid-rows-[min-content,1fr] gap-2">
+    <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
+      <div className="flex items-center gap-2">
+        <MonthNavigationButton onClick={handleGoPrevMonth}>
+          <TbChevronLeft />
+        </MonthNavigationButton>
+        <div className="flex select-none items-center">
+          <div className="mx-1 text-lg tabular-nums">{year}</div>年
+          <div className="mx-1 w-6 text-center text-lg tabular-nums">
+            {month}
+          </div>
+          月
+        </div>
+        <MonthNavigationButton onClick={handleGoNextMonth}>
+          <TbChevronRight />
+        </MonthNavigationButton>
+      </div>
       <div className="grid w-full grid-cols-7">
         {WEEK_DAY_LABELS.map((weekDay) => {
           return (
@@ -106,5 +145,18 @@ export const MonthlyCalendar: React.FC<Props> = ({ yearMonth }) => {
         })}
       </div>
     </div>
+  );
+};
+
+const MonthNavigationButton: React.FC<
+  { children: ReactNode } & ComponentPropsWithoutRef<"button">
+> = ({ children, ...props }) => {
+  return (
+    <button
+      {...props}
+      className="grid size-6 place-items-center rounded text-lg transition-colors hover:bg-neutral-500/20"
+    >
+      {children}
+    </button>
   );
 };
