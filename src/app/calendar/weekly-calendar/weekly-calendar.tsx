@@ -17,7 +17,7 @@ import { NewEvent } from "./new-event";
 
 export const minutes15Height = 12;
 
-export type DragState = { dragStartY: number; dragStart: Date; dragEnd: Date };
+export type DragState = { dragStart: Date; dragEnd: Date };
 
 export const WeeklyCalendar: React.FC = () => {
   const [date] = useState(new Date());
@@ -33,9 +33,31 @@ export const WeeklyCalendar: React.FC = () => {
 
   const [dragState, setDragState] = useState<DragState | undefined>(undefined);
 
+  const mouseRef = useRef<{ y: number; scrollTop: number } | undefined>(
+    undefined,
+  );
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (!dragState || !mouseRef.current) {
+      return;
+    }
+
+    const delta = e.currentTarget.scrollTop - mouseRef.current.scrollTop;
+    const y = mouseRef.current.y + delta;
+    const minutes = Math.ceil(y / minutes15Height) * 15;
+    const dragEnd = addMinutes(startOfDay(dragState.dragStart), minutes);
+
+    setDragState({ ...dragState, dragEnd });
+  };
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const firstDateColumnRef = useRef<HTMLDivElement>(null);
   return (
-    <div className="grid grid-cols-7 overflow-auto bg-neutral-100">
+    <div
+      ref={containerRef}
+      className="grid grid-cols-7 overflow-auto bg-neutral-100"
+      onScroll={handleScroll}
+    >
       {week.map((date, i) => {
         const hours = eachHourOfInterval({
           start: startOfDay(date),
@@ -47,8 +69,9 @@ export const WeeklyCalendar: React.FC = () => {
             key={`${date}`}
             className="relative border-r border-neutral-300"
             style={{ height: minutes15Height * 4 * 24 }}
+            draggable={false}
             onMouseDown={(e) => {
-              if (!firstDateColumnRef.current) {
+              if (!firstDateColumnRef.current || !containerRef.current) {
                 return;
               }
               const columnY =
@@ -60,23 +83,39 @@ export const WeeklyCalendar: React.FC = () => {
                 Math.floor(y / minutes15Height) * 15,
               );
 
+              mouseRef.current = {
+                y,
+                scrollTop: containerRef.current.scrollTop,
+              };
               setDragState({
-                dragStartY: e.clientY,
                 dragStart: start,
                 dragEnd: addMinutes(start, 15),
               });
             }}
-            onScroll={(e) => console.log(e)}
             onMouseMove={(e) => {
-              if (!dragState) {
+              if (
+                !dragState ||
+                !firstDateColumnRef.current ||
+                !containerRef.current
+              ) {
                 return;
               }
 
-              const span = e.clientY - dragState.dragStartY;
-              const minutes = Math.ceil(span / minutes15Height) * 15;
+              const columnY =
+                firstDateColumnRef.current.getBoundingClientRect().y;
+              const y = e.clientY - columnY;
+              const minutes = Math.ceil(y / minutes15Height) * 15;
 
-              const dragEnd = addMinutes(dragState.dragStart, minutes);
-              setDragState({ ...dragState, dragEnd: dragEnd });
+              const dragEnd = addMinutes(
+                startOfDay(dragState.dragStart),
+                minutes,
+              );
+
+              mouseRef.current = {
+                y,
+                scrollTop: containerRef.current.scrollTop,
+              };
+              setDragState({ ...dragState, dragEnd });
             }}
             onMouseUp={() => {
               if (!dragState) {
@@ -103,6 +142,7 @@ export const WeeklyCalendar: React.FC = () => {
                 },
               ]);
               setDragState(undefined);
+              mouseRef.current = undefined;
             }}
           >
             {hours.map((hour, i) => {
