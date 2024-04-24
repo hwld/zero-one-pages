@@ -1,17 +1,17 @@
-import { differenceInMinutes, max, min } from "date-fns";
-import { DragState, minutes15Height } from "./weekly-calendar";
+import { max, min } from "date-fns";
+import { DragState } from "./weekly-calendar";
+import { getDateFromY, getHeightFromDate, getTopFromDate } from "./utils";
 
 type Props = { data: DragState };
 export const NewEvent: React.FC<Props> = ({ data }) => {
-  const start = min([data.dragStart, data.dragEnd]);
-  const end = max([data.dragStart, data.dragEnd]);
+  const startDate = getDateFromY(data.targetDate, data.dragStartY);
+  const endDate = getDateFromY(data.targetDate, data.dragEndY);
 
-  const top =
-    Math.floor((start.getHours() * 60 + start.getMinutes()) / 15) *
-    minutes15Height;
+  const start = min([startDate, endDate]);
+  const end = max([startDate, endDate]);
 
-  const height =
-    Math.ceil(differenceInMinutes(end, start) / 15) * minutes15Height;
+  const top = getTopFromDate(start);
+  const height = getHeightFromDate({ start, end });
 
   return (
     <div

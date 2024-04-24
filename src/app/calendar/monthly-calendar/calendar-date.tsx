@@ -6,7 +6,7 @@ import {
   max,
   min,
 } from "date-fns";
-import { DragDateRange, inDragDateRange } from "../utils";
+import { DragDateRange, inDragDateRange } from "./utils";
 import { Event } from "../type";
 import clsx from "clsx";
 import { MouseEvent } from "react";

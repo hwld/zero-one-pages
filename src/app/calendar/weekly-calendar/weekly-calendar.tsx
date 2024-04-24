@@ -1,6 +1,4 @@
 import {
-  addMinutes,
-  differenceInMinutes,
   eachDayOfInterval,
   eachHourOfInterval,
   endOfDay,
@@ -14,10 +12,14 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { Event } from "../type";
 import { NewEvent } from "./new-event";
+import { MINUTES_15_HEIGHT, getDateFromY } from "./utils";
+import { DateEventColumn } from "./date-event-column";
 
-export const minutes15Height = 12;
-
-export type DragState = { dragStart: Date; dragEnd: Date };
+export type DragState = {
+  targetDate: Date;
+  dragStartY: number;
+  dragEndY: number;
+};
 
 export const WeeklyCalendar: React.FC = () => {
   const [date] = useState(new Date());
@@ -44,10 +46,8 @@ export const WeeklyCalendar: React.FC = () => {
 
     const delta = e.currentTarget.scrollTop - mouseRef.current.scrollTop;
     const y = mouseRef.current.y + delta;
-    const minutes = Math.ceil(y / minutes15Height) * 15;
-    const dragEnd = addMinutes(startOfDay(dragState.dragStart), minutes);
 
-    setDragState({ ...dragState, dragEnd });
+    setDragState({ ...dragState, dragEndY: y });
   };
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,12 +63,13 @@ export const WeeklyCalendar: React.FC = () => {
           start: startOfDay(date),
           end: endOfDay(date),
         });
+
         return (
           <div
             ref={i === 0 ? firstDateColumnRef : undefined}
             key={`${date}`}
             className="relative border-r border-neutral-300"
-            style={{ height: minutes15Height * 4 * 24 }}
+            style={{ height: MINUTES_15_HEIGHT * 4 * 24 }}
             draggable={false}
             onMouseDown={(e) => {
               if (!firstDateColumnRef.current || !containerRef.current) {
@@ -78,18 +79,14 @@ export const WeeklyCalendar: React.FC = () => {
                 firstDateColumnRef.current.getBoundingClientRect().y;
               const y = e.clientY - columnY;
 
-              const start = addMinutes(
-                date,
-                Math.floor(y / minutes15Height) * 15,
-              );
-
               mouseRef.current = {
                 y,
                 scrollTop: containerRef.current.scrollTop,
               };
               setDragState({
-                dragStart: start,
-                dragEnd: addMinutes(start, 15),
+                targetDate: startOfDay(date),
+                dragStartY: y,
+                dragEndY: y + MINUTES_15_HEIGHT,
               });
             }}
             onMouseMove={(e) => {
@@ -104,33 +101,35 @@ export const WeeklyCalendar: React.FC = () => {
               const columnY =
                 firstDateColumnRef.current.getBoundingClientRect().y;
               const y = e.clientY - columnY;
-              const minutes = Math.ceil(y / minutes15Height) * 15;
-
-              const dragEnd = addMinutes(
-                startOfDay(dragState.dragStart),
-                minutes,
-              );
 
               mouseRef.current = {
                 y,
                 scrollTop: containerRef.current.scrollTop,
               };
-              setDragState({ ...dragState, dragEnd });
+              setDragState({ ...dragState, dragEndY: y });
             }}
             onMouseUp={() => {
               if (!dragState) {
                 return;
               }
 
-              if (
-                dragState.dragStart.getTime() === dragState.dragEnd.getTime()
-              ) {
+              const startDate = getDateFromY(
+                dragState.targetDate,
+                dragState.dragStartY,
+              );
+
+              const endDate = getDateFromY(
+                dragState.targetDate,
+                dragState.dragEndY,
+              );
+
+              if (startDate.getTime() === endDate.getTime()) {
                 setDragState(undefined);
                 return;
               }
 
-              const minDate = min([dragState.dragStart, dragState.dragEnd]);
-              const maxDate = max([dragState.dragStart, dragState.dragEnd]);
+              const minDate = min([startDate, endDate]);
+              const maxDate = max([startDate, endDate]);
 
               setEvents((e) => [
                 ...e,
@@ -150,37 +149,14 @@ export const WeeklyCalendar: React.FC = () => {
                 <div
                   key={`${hour}`}
                   className="absolute h-[1px] w-full bg-neutral-300"
-                  style={{ top: minutes15Height * 4 * i }}
+                  style={{ top: MINUTES_15_HEIGHT * 4 * i }}
                 />
               );
             })}
-            {dragState && isSameDay(date, dragState.dragStart) && (
+            {dragState && isSameDay(date, dragState.targetDate) && (
               <NewEvent data={dragState} />
             )}
-            {events.map((event) => {
-              if (!isSameDay(date, event.start)) {
-                return null;
-              }
-
-              const top =
-                Math.floor(
-                  (event.start.getHours() * 60 + event.start.getMinutes()) / 15,
-                ) * minutes15Height;
-
-              const height =
-                Math.ceil(differenceInMinutes(event.end, event.start) / 15) *
-                minutes15Height;
-
-              return (
-                <div
-                  key={event.id}
-                  className="absolute w-full bg-neutral-200"
-                  style={{ top, height }}
-                >
-                  {event.title}
-                </div>
-              );
-            })}
+            <DateEventColumn date={date} events={events} />
           </div>
         );
       })}

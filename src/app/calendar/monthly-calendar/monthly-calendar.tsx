@@ -12,7 +12,7 @@ import {
   getCalendarDates,
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
-} from "../utils";
+} from "./utils";
 import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
