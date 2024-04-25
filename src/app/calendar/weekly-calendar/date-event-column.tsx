@@ -11,7 +11,6 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
       start: event.start,
       end: event.end,
     });
-
     return (
       <button
         key={event.id}
@@ -26,8 +25,13 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
           left:
             event.prevOverlappings === 0
               ? 0
-              : `calc(95%/${event.prevOverlappings + 1})`,
-          width: `calc(95% / ${event.totalOverlappings + 1})`,
+              : `calc(93% / ${event.totalOverlappings + 1} * ${
+                  event.prevOverlappings
+                })`,
+          width:
+            event.totalOverlappings === 0
+              ? "93%"
+              : `calc(93% * ${Math.pow(0.7, event.prevOverlappings + 1)})`,
         }}
       >
         {event.title}

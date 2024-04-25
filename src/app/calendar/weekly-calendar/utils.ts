@@ -51,30 +51,48 @@ export const getDateEvents = ({
   const sortedEvents = events
     .filter((event) => isSameDay(date, event.start))
     .sort((event1, event2) => {
-      return event1.start.getTime() - event2.start.getTime();
+      if (event1.start.getTime() > event2.start.getTime()) {
+        return 1;
+      }
+      if (event1.start.getTime() < event2.start.getTime()) {
+        return -1;
+      }
+      return (
+        differenceInMinutes(event2.end, event2.start) -
+        differenceInMinutes(event1.end, event1.start)
+      );
     });
 
-  const dateEvents: DateEvent[] = [];
+  const dateEvents: (Omit<DateEvent, "totalOverlappings"> & {
+    totalOverlappingsList: number[];
+  })[] = [];
 
   for (let i = 0; i < sortedEvents.length; i++) {
     const event = sortedEvents[i];
-
     const prevEvents = dateEvents.filter((_, index) => index < i);
 
+    const overlappingEvents = [];
     let prevOverlappings = 0;
     for (let prevEvent of prevEvents) {
       if (areIntervalsOverlapping(event, prevEvent)) {
-        prevEvent.totalOverlappings = prevEvent.totalOverlappings + 1;
+        overlappingEvents.push(prevEvent);
         prevOverlappings++;
       }
     }
 
+    overlappingEvents.forEach((e) =>
+      e.totalOverlappingsList.push(prevOverlappings),
+    );
+
     dateEvents.push({
       ...event,
       prevOverlappings,
-      totalOverlappings: prevOverlappings,
+      totalOverlappingsList: [prevOverlappings],
     });
   }
 
-  return dateEvents;
+  return dateEvents.map((event) => ({
+    ...event,
+    totalOverlappings: Math.max(...event.totalOverlappingsList),
+  }));
 };
