@@ -1,14 +1,11 @@
-import { isSameDay } from "date-fns";
 import { Event } from "../type";
-import { getHeightFromDate, getTopFromDate } from "./utils";
+import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
 
 type Props = { date: Date; events: Event[] };
 export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
-  return events.map((event) => {
-    if (!isSameDay(date, event.start)) {
-      return null;
-    }
+  const dateEvents = getDateEvents({ date, events });
 
+  return dateEvents.map((event) => {
     const top = getTopFromDate(event.start);
     const height = getHeightFromDate({
       start: event.start,
@@ -16,13 +13,25 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
     });
 
     return (
-      <div
+      <button
         key={event.id}
-        className="absolute w-[90%] rounded bg-neutral-700"
-        style={{ top, height }}
+        draggable
+        onMouseDown={(e) => {
+          e.stopPropagation();
+        }}
+        className="absolute rounded border border-neutral-500 bg-neutral-700 transition-colors hover:bg-neutral-800"
+        style={{
+          top,
+          height,
+          left:
+            event.prevOverlappings === 0
+              ? 0
+              : `calc(95%/${event.prevOverlappings + 1})`,
+          width: `calc(95% / ${event.totalOverlappings + 1})`,
+        }}
       >
         {event.title}
-      </div>
+      </button>
     );
   });
 };

@@ -4,3 +4,7 @@ export type WeekEvent = Event & {
   startWeekDay: number;
   endWeekDay: number;
 };
+export type DateEvent = Event & {
+  prevOverlappings: number;
+  totalOverlappings: number;
+};

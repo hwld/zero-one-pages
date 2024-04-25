@@ -3,7 +3,10 @@ import {
   startOfDay,
   Interval,
   differenceInMinutes,
+  isSameDay,
+  areIntervalsOverlapping,
 } from "date-fns";
+import { DateEvent, Event } from "../type";
 
 export const MINUTES_15_HEIGHT = 12;
 /**
@@ -36,4 +39,42 @@ export const getHeightFromDate = ({ start, end }: Interval): number => {
     Math.ceil(differenceInMinutes(end, start) / 15) * MINUTES_15_HEIGHT;
 
   return height;
+};
+
+export const getDateEvents = ({
+  date,
+  events,
+}: {
+  date: Date;
+  events: Event[];
+}): DateEvent[] => {
+  const sortedEvents = events
+    .filter((event) => isSameDay(date, event.start))
+    .sort((event1, event2) => {
+      return event1.start.getTime() - event2.start.getTime();
+    });
+
+  const dateEvents: DateEvent[] = [];
+
+  for (let i = 0; i < sortedEvents.length; i++) {
+    const event = sortedEvents[i];
+
+    const prevEvents = dateEvents.filter((_, index) => index < i);
+
+    let prevOverlappings = 0;
+    for (let prevEvent of prevEvents) {
+      if (areIntervalsOverlapping(event, prevEvent)) {
+        prevEvent.totalOverlappings = prevEvent.totalOverlappings + 1;
+        prevOverlappings++;
+      }
+    }
+
+    dateEvents.push({
+      ...event,
+      prevOverlappings,
+      totalOverlappings: prevOverlappings,
+    });
+  }
+
+  return dateEvents;
 };
