@@ -34,6 +34,9 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
         onMouseDown={(e) => {
           e.stopPropagation();
         }}
+        onDragStart={(e) => {
+          e.dataTransfer.effectAllowed = "move";
+        }}
         className="absolute rounded border border-neutral-500 bg-neutral-700 transition-colors hover:bg-neutral-800"
         style={{
           top,

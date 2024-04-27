@@ -120,7 +120,6 @@ export const WeeklyCalendar: React.FC = () => {
                   draggable={false}
                   onMouseDown={(e) => {
                     e.stopPropagation();
-                    e.preventDefault();
 
                     if (!firstDateColumnRef.current || !containerRef.current) {
                       return;
@@ -142,7 +141,6 @@ export const WeeklyCalendar: React.FC = () => {
                   }}
                   onMouseMove={(e) => {
                     e.stopPropagation();
-                    e.preventDefault();
 
                     if (
                       !dragState ||
@@ -164,7 +162,6 @@ export const WeeklyCalendar: React.FC = () => {
                   }}
                   onMouseUp={(e) => {
                     e.stopPropagation();
-                    e.preventDefault();
 
                     if (!dragState) {
                       return;
