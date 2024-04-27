@@ -3,9 +3,6 @@ import {
   eachHourOfInterval,
   endOfDay,
   endOfWeek,
-  isSameDay,
-  max,
-  min,
   startOfDay,
   startOfWeek,
   format,
@@ -14,17 +11,10 @@ import {
 } from "date-fns";
 import { useMemo, useRef, useState } from "react";
 import { Event } from "../type";
-import { NewEvent } from "./new-event";
-import { MINUTES_15_HEIGHT, getDateFromY } from "./utils";
-import { DateEventColumn } from "./date-event-column";
-import { WEEK_DAY_LABELS } from "../consts";
+import { MINUTES_15_HEIGHT } from "./utils";
 import { NavigationButton } from "../navigation-button";
-
-export type DragState = {
-  targetDate: Date;
-  dragStartY: number;
-  dragEndY: number;
-};
+import { DateColumn, DragDateState, MouseHistory } from "./date-column";
+import { WEEK_DAY_LABELS } from "../consts";
 
 export const WeeklyCalendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
@@ -38,32 +28,39 @@ export const WeeklyCalendar: React.FC = () => {
     return eachDayOfInterval({ start, end });
   }, [date]);
 
-  const [dragState, setDragState] = useState<DragState | undefined>(undefined);
-
-  const mouseRef = useRef<{ y: number; scrollTop: number } | undefined>(
+  const [dragState, setDragState] = useState<DragDateState | undefined>(
     undefined,
   );
 
+  /**
+   * マウスイベントが発生したときのyとscrollableのscrollTipを保存する
+   */
+  const mouseHistoryRef = useRef<MouseHistory | undefined>(undefined);
+
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!dragState || !mouseRef.current) {
+    if (!dragState || !mouseHistoryRef.current) {
       return;
     }
 
-    const delta = e.currentTarget.scrollTop - mouseRef.current.scrollTop;
-    const y = mouseRef.current.y + delta;
+    const delta = e.currentTarget.scrollTop - mouseHistoryRef.current.scrollTop;
+    const y = mouseHistoryRef.current.y + delta;
 
     setDragState({ ...dragState, dragEndY: y });
+  };
+
+  const handleCreateEvent = (event: Event) => {
+    setEvents((e) => [...e, event]);
   };
 
   const handleNextWeek = () => {
     setDate(addDays(endOfWeek(date), 1));
   };
+
   const handlePrevWeek = () => {
     setDate(subDays(startOfWeek(date), 1));
   };
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const firstDateColumnRef = useRef<HTMLDivElement>(null);
+  const scrollableRef = useRef<HTMLDivElement>(null);
   return (
     <div className="flex min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -80,7 +77,7 @@ export const WeeklyCalendar: React.FC = () => {
       </div>
       <div
         className="flex w-full gap-2 overflow-auto"
-        ref={containerRef}
+        ref={scrollableRef}
         onScroll={handleScroll}
       >
         <div>
@@ -101,118 +98,34 @@ export const WeeklyCalendar: React.FC = () => {
           })}
         </div>
         <div className="grid w-full grid-cols-7 bg-neutral-100">
-          {week.map((date, i) => {
-            const hours = eachHourOfInterval({
-              start: startOfDay(date),
-              end: endOfDay(date),
-            });
-
+          {/* select-noneをつけてもDnDで日数が選択され、特定の拡張機能が動いてしまうことがあるため、緩和策としてDateColumnの外に出す*/}
+          {/* 参考: 
+                https://issues.chromium.org/issues/40728610) 
+                https://developer.mozilla.org/ja/docs/Web/CSS/user-select#none
+          */}
+          {week.map((date) => {
             return (
-              <div key={`${date}`} className="flex flex-col gap-2">
-                <div className="flex h-5 select-none items-center justify-center gap-1 text-xs">
-                  <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
-                  <div>{date.getDate()}</div>
-                </div>
-                <div
-                  ref={i === 0 ? firstDateColumnRef : undefined}
-                  className="relative border-r border-neutral-300"
-                  style={{ height: MINUTES_15_HEIGHT * 4 * 24 }}
-                  draggable={false}
-                  onMouseDown={(e) => {
-                    e.stopPropagation();
-
-                    if (!firstDateColumnRef.current || !containerRef.current) {
-                      return;
-                    }
-
-                    const columnY =
-                      firstDateColumnRef.current.getBoundingClientRect().y;
-                    const y = e.clientY - columnY;
-
-                    mouseRef.current = {
-                      y,
-                      scrollTop: containerRef.current.scrollTop,
-                    };
-                    setDragState({
-                      targetDate: startOfDay(date),
-                      dragStartY: y,
-                      dragEndY: y + MINUTES_15_HEIGHT,
-                    });
-                  }}
-                  onMouseMove={(e) => {
-                    e.stopPropagation();
-
-                    if (
-                      !dragState ||
-                      !firstDateColumnRef.current ||
-                      !containerRef.current
-                    ) {
-                      return;
-                    }
-
-                    const columnY =
-                      firstDateColumnRef.current.getBoundingClientRect().y;
-                    const y = e.clientY - columnY;
-
-                    mouseRef.current = {
-                      y,
-                      scrollTop: containerRef.current.scrollTop,
-                    };
-                    setDragState({ ...dragState, dragEndY: y });
-                  }}
-                  onMouseUp={(e) => {
-                    e.stopPropagation();
-
-                    if (!dragState) {
-                      return;
-                    }
-
-                    const startDate = getDateFromY(
-                      dragState.targetDate,
-                      dragState.dragStartY,
-                    );
-
-                    const endDate = getDateFromY(
-                      dragState.targetDate,
-                      dragState.dragEndY,
-                    );
-
-                    if (startDate.getTime() === endDate.getTime()) {
-                      setDragState(undefined);
-                      return;
-                    }
-
-                    const minDate = min([startDate, endDate]);
-                    const maxDate = max([startDate, endDate]);
-
-                    setEvents((e) => [
-                      ...e,
-                      {
-                        id: crypto.randomUUID(),
-                        start: minDate,
-                        end: maxDate,
-                        title: "",
-                      },
-                    ]);
-                    setDragState(undefined);
-                    mouseRef.current = undefined;
-                  }}
-                >
-                  {hours.map((hour, i) => {
-                    return (
-                      <div
-                        key={`${hour}`}
-                        className="absolute h-[1px] w-full bg-neutral-300"
-                        style={{ top: MINUTES_15_HEIGHT * 4 * i }}
-                      />
-                    );
-                  })}
-                  {dragState && isSameDay(date, dragState.targetDate) && (
-                    <NewEvent data={dragState} />
-                  )}
-                  <DateEventColumn date={date} events={events} />
-                </div>
+              <div
+                key={`${date}`}
+                className="mb-2 flex h-5 select-none items-center justify-center gap-1 text-xs"
+              >
+                <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
+                <div>{date.getDate()}</div>
               </div>
+            );
+          })}
+          {week.map((date) => {
+            return (
+              <DateColumn
+                date={date}
+                events={events}
+                dragState={dragState}
+                onDragStateChange={setDragState}
+                scrollableRef={scrollableRef}
+                mouseHistoryRef={mouseHistoryRef}
+                onCreateEvent={handleCreateEvent}
+                key={`${date}`}
+              />
             );
           })}
         </div>
