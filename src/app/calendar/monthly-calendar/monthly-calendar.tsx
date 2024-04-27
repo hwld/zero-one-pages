@@ -1,11 +1,4 @@
-import {
-  ComponentPropsWithoutRef,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../consts";
 import {
   DragDateRange,
@@ -16,8 +9,8 @@ import {
 import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
-import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import { addMonths, subMonths } from "date-fns";
+import { NavigationButton } from "../navigation-button";
 
 type Props = {};
 
@@ -79,9 +72,7 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
   return (
     <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
       <div className="flex items-center gap-2">
-        <MonthNavigationButton onClick={handleGoPrevMonth}>
-          <TbChevronLeft />
-        </MonthNavigationButton>
+        <NavigationButton dir="prev" onClick={handleGoPrevMonth} />
         <div className="flex select-none items-center">
           <div className="mx-1 text-lg tabular-nums">{year}</div>年
           <div className="mx-1 w-6 text-center text-lg tabular-nums">
@@ -89,9 +80,7 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
           </div>
           月
         </div>
-        <MonthNavigationButton onClick={handleGoNextMonth}>
-          <TbChevronRight />
-        </MonthNavigationButton>
+        <NavigationButton dir="next" onClick={handleGoNextMonth} />
       </div>
       <div className="grid w-full grid-cols-7">
         {WEEK_DAY_LABELS.map((weekDay) => {
@@ -145,18 +134,5 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
         })}
       </div>
     </div>
-  );
-};
-
-const MonthNavigationButton: React.FC<
-  { children: ReactNode } & ComponentPropsWithoutRef<"button">
-> = ({ children, ...props }) => {
-  return (
-    <button
-      {...props}
-      className="grid size-6 place-items-center rounded text-lg transition-colors hover:bg-neutral-500/20"
-    >
-      {children}
-    </button>
   );
 };
