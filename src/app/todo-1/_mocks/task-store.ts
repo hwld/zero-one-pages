@@ -14,16 +14,27 @@ export type Task = z.infer<typeof taskSchema>;
 
 class TaskStore {
   private tasks: Task[] = initialTasks;
+  private isSimulatingError = false;
+
+  private throwSimulatedError() {
+    if (this.isSimulatingError) {
+      throw new Error("simulated error");
+    }
+  }
 
   public getAll(): Task[] {
+    this.throwSimulatedError();
     return this.tasks;
   }
 
   public get(id: string): Task | undefined {
+    this.throwSimulatedError();
     return this.tasks.find((t) => t.id === id);
   }
 
   public add(input: CreateTaskInput): Task {
+    this.throwSimulatedError();
+
     const now = new Date().toLocaleString();
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -40,6 +51,8 @@ class TaskStore {
   }
 
   public update(input: UpdateTaskInput & { id: string }): Task | undefined {
+    this.throwSimulatedError();
+
     this.tasks = this.tasks.map((t) => {
       if (t.id === input.id) {
         return {
@@ -58,6 +71,8 @@ class TaskStore {
   }
 
   public remove(id: string) {
+    this.throwSimulatedError();
+
     this.tasks = this.tasks.filter((t) => t.id !== id);
   }
 
@@ -67,6 +82,14 @@ class TaskStore {
 
   public reset() {
     this.tasks = initialTasks;
+  }
+
+  public startErrorSimulation() {
+    this.isSimulatingError = true;
+  }
+
+  public stopErrorSimulation() {
+    this.isSimulatingError = false;
   }
 }
 

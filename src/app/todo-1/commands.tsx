@@ -1,16 +1,36 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useGlobalCommandConfig } from "../_providers/global-command-provider";
-import { useMemo } from "react";
-import { BoxSelectIcon, RefreshCcwIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  BoxSelectIcon,
+  RefreshCcwIcon,
+  TriangleAlert,
+  TriangleIcon,
+} from "lucide-react";
 import { taskStore } from "./_mocks/task-store";
 
 export const useTodo1HomeCommands = () => {
   const client = useQueryClient();
+  const [isSimulatingError, setIsSimulatingError] = useState(false);
 
   useGlobalCommandConfig(
     useMemo(() => {
       return {
         newCommands: [
+          {
+            icon: isSimulatingError ? TriangleIcon : TriangleAlert,
+            label: `エラーを${isSimulatingError ? "止める" : "発生させる"}`,
+            action: async () => {
+              setIsSimulatingError((s) => !s);
+              if (isSimulatingError) {
+                taskStore.stopErrorSimulation();
+              } else {
+                taskStore.startErrorSimulation();
+              }
+
+              client.refetchQueries();
+            },
+          },
           {
             icon: BoxSelectIcon,
             label: "タスク一覧を空にする",
@@ -29,6 +49,13 @@ export const useTodo1HomeCommands = () => {
           },
         ],
       };
-    }, [client]),
+    }, [client, isSimulatingError]),
   );
+
+  useEffect(() => {
+    taskStore.stopErrorSimulation();
+    return () => {
+      taskStore.stopErrorSimulation();
+    };
+  }, []);
 };
