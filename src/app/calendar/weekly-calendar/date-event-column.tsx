@@ -38,7 +38,7 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
         onDragStart={(e) => {
           e.dataTransfer.effectAllowed = "move";
         }}
-        className="absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors hover:bg-neutral-800"
+        className="absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors hover:z-10 hover:bg-neutral-800"
         style={{
           top,
           height,

@@ -74,7 +74,10 @@ export const getDateEvents = ({
     const overlappingEvents = [];
     let prevOverlappings = 0;
     for (let prevEvent of prevEvents) {
-      if (areIntervalsOverlapping(event, prevEvent)) {
+      if (
+        areIntervalsOverlapping(event, prevEvent) &&
+        isShortInterval(event.start, prevEvent.start)
+      ) {
         overlappingEvents.push(prevEvent);
         prevOverlappings++;
       }
@@ -95,4 +98,8 @@ export const getDateEvents = ({
     ...event,
     totalOverlappings: Math.max(...event.totalOverlappingsList),
   }));
+};
+
+const isShortInterval = (left: Date, right: Date) => {
+  return Math.abs(differenceInMinutes(left, right)) < 30;
 };
