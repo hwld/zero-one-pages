@@ -9,8 +9,8 @@ import {
   addDays,
   subDays,
 } from "date-fns";
-import { useMemo, useRef, useState } from "react";
-import { DraggingDateEvent, Event } from "../type";
+import { DragEvent, useMemo, useRef, useState } from "react";
+import { DateEvent, DraggingDateEvent, Event } from "../type";
 import { MINUTES_15_HEIGHT } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
@@ -61,6 +61,20 @@ export const WeeklyCalendar: React.FC = () => {
 
   const handlePrevWeek = () => {
     setDate(subDays(startOfWeek(date), 1));
+  };
+
+  const handleEventDragStart = (
+    event: DragEvent<HTMLDivElement>,
+    dateEvent: DateEvent,
+  ) => {
+    const dateEventY = event.currentTarget.getBoundingClientRect().y;
+    setDraggingEvent({
+      ...dateEvent,
+      dragStartY: event.clientY - dateEventY,
+    });
+  };
+  const handleEventDragEnd = () => {
+    setDraggingEvent(undefined);
   };
 
   const scrollableRef = useRef<HTMLDivElement>(null);
@@ -128,7 +142,8 @@ export const WeeklyCalendar: React.FC = () => {
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onCreateEvent={handleCreateEvent}
-                onDraggingEventChange={setDraggingEvent}
+                onEventDragStart={handleEventDragStart}
+                onEventDragEnd={handleEventDragEnd}
                 key={`${date}`}
               />
             );

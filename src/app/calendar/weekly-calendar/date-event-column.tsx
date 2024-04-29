@@ -1,19 +1,26 @@
-import { DateEvent, DraggingDateEvent, Event } from "../type";
+import { DragEvent } from "react";
+import { DateEvent as DateEventData, DraggingDateEvent, Event } from "../type";
 import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
-import { format, getHours } from "date-fns";
+import { DateEventCard } from "./date-event";
+import clsx from "clsx";
 
 export const EVENT_DRAG_TYPE = "application/event";
 
 type Props = {
   date: Date;
   events: Event[];
-  onDragStart: (dateEvent: DraggingDateEvent) => void;
+  draggingEvent: DraggingDateEvent | undefined;
+  onDragStart: (
+    event: DragEvent<HTMLDivElement>,
+    dateEvent: DateEventData,
+  ) => void;
   onDragEnd: () => void;
 };
 
 export const DateEventColumn: React.FC<Props> = ({
   date,
   events,
+  draggingEvent,
   onDragStart,
   onDragEnd,
 }) => {
@@ -42,43 +49,23 @@ export const DateEventColumn: React.FC<Props> = ({
           : lastEventWidth * 1.7;
 
     return (
-      <div
+      <DateEventCard
         key={event.id}
-        draggable
-        onMouseDown={(e) => {
-          e.stopPropagation();
-        }}
+        event={event}
         onDragStart={(e) => {
-          const eventY = e.currentTarget.getBoundingClientRect().y;
-          onDragStart({ ...event, dragStartY: e.clientY - eventY });
+          onDragStart(e, event);
         }}
         onDragEnd={onDragEnd}
-        className="absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors hover:z-10 hover:bg-neutral-800"
         style={{
           top,
           height,
           left: `${left}%`,
           width: `${width}%`,
         }}
-      >
-        <div className="text-xs">{event.title}</div>
-        <div className="text-xs">{formatEventDateSpan(event)}</div>
-      </div>
+        className={clsx(
+          event.id === draggingEvent?.id ? "opacity-50" : "opacity-100",
+        )}
+      />
     );
   });
-};
-
-const isSameAmPm = (date1: Date, date2: Date) => {
-  const h1 = getHours(date1);
-  const h2 = getHours(date2);
-  const isAm1 = h1 >= 0 && h1 < 12;
-  const isAm2 = h2 >= 0 && h2 < 12;
-  return isAm1 === isAm2;
-};
-
-const formatEventDateSpan = (event: DateEvent) => {
-  if (isSameAmPm(event.start, event.end)) {
-    return `${format(event.start, "h:mm")}~${format(event.end, "h:mm a")}`;
-  }
-  return `${format(event.start, "h:mm a")}~${format(event.end, "h:mm a")}`;
 };

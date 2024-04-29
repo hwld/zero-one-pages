@@ -5,6 +5,8 @@ import {
   differenceInMinutes,
   isSameDay,
   areIntervalsOverlapping,
+  format,
+  getHours,
 } from "date-fns";
 import { DateEvent, Event } from "../type";
 
@@ -102,4 +104,19 @@ export const getDateEvents = ({
 
 const isShortInterval = (left: Date, right: Date) => {
   return Math.abs(differenceInMinutes(left, right)) < 30;
+};
+
+export const isSameAmPm = (date1: Date, date2: Date) => {
+  const h1 = getHours(date1);
+  const h2 = getHours(date2);
+  const isAm1 = h1 >= 0 && h1 < 12;
+  const isAm2 = h2 >= 0 && h2 < 12;
+  return isAm1 === isAm2;
+};
+
+export const formatEventDateSpan = (event: DateEvent) => {
+  if (isSameAmPm(event.start, event.end)) {
+    return `${format(event.start, "h:mm")}~${format(event.end, "h:mm a")}`;
+  }
+  return `${format(event.start, "h:mm a")}~${format(event.end, "h:mm a")}`;
 };
