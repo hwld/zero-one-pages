@@ -119,7 +119,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       id: crypto.randomUUID(),
       start: minDate,
       end: maxDate,
-      title: "",
+      title: "event",
     });
     onDragStateChange(undefined);
     mouseHistoryRef.current = undefined;

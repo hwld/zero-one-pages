@@ -8,7 +8,7 @@ import {
 } from "date-fns";
 import { DateEvent, Event } from "../type";
 
-export const MINUTES_15_HEIGHT = 12;
+export const MINUTES_15_HEIGHT = 17;
 /**
  * 年月日とweekly calendar上のy軸から日付を取得する
  */

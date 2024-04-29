@@ -1,6 +1,6 @@
 import { max, min } from "date-fns";
-import { DragDateState } from "./weekly-calendar";
 import { getDateFromY, getHeightFromDate, getTopFromDate } from "./utils";
+import { DragDateState } from "./date-column";
 
 type Props = { data: DragDateState };
 export const NewEvent: React.FC<Props> = ({ data }) => {

@@ -1,5 +1,6 @@
-import { Event } from "../type";
+import { DateEvent, Event } from "../type";
 import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
+import { format, getHours } from "date-fns";
 
 type Props = { date: Date; events: Event[] };
 export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
@@ -28,7 +29,7 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
           : lastEventWidth * 1.7;
 
     return (
-      <button
+      <div
         key={event.id}
         draggable
         onMouseDown={(e) => {
@@ -37,7 +38,7 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
         onDragStart={(e) => {
           e.dataTransfer.effectAllowed = "move";
         }}
-        className="absolute rounded border border-neutral-500 bg-neutral-700 transition-colors hover:bg-neutral-800"
+        className="absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors hover:bg-neutral-800"
         style={{
           top,
           height,
@@ -45,8 +46,24 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
           width: `${width}%`,
         }}
       >
-        {event.title}
-      </button>
+        <div className="text-xs">{event.title}</div>
+        <div className="text-xs">{formatEventDateSpan(event)}</div>
+      </div>
     );
   });
+};
+
+const isSameAmPm = (date1: Date, date2: Date) => {
+  const h1 = getHours(date1);
+  const h2 = getHours(date2);
+  const isAm1 = h1 >= 0 && h1 < 12;
+  const isAm2 = h2 >= 0 && h2 < 12;
+  return isAm1 === isAm2;
+};
+
+const formatEventDateSpan = (event: DateEvent) => {
+  if (isSameAmPm(event.start, event.end)) {
+    return `${format(event.start, "h:mm")}~${format(event.end, "h:mm a")}`;
+  }
+  return `${format(event.start, "h:mm a")}~${format(event.end, "h:mm a")}`;
 };
