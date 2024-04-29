@@ -55,6 +55,17 @@ export const WeeklyCalendar: React.FC = () => {
     setEvents((e) => [...e, event]);
   };
 
+  const handleUpdateEvent = (event: Event) => {
+    setEvents((events) =>
+      events.map((e) => {
+        if (e.id === event.id) {
+          return event;
+        }
+        return e;
+      }),
+    );
+  };
+
   const handleNextWeek = () => {
     setDate(addDays(endOfWeek(date), 1));
   };
@@ -73,7 +84,12 @@ export const WeeklyCalendar: React.FC = () => {
       dragStartY: event.clientY - dateEventY,
     });
   };
+
   const handleEventDragEnd = () => {
+    setDraggingEvent(undefined);
+  };
+
+  const handleEventDrop = () => {
     setDraggingEvent(undefined);
   };
 
@@ -142,8 +158,10 @@ export const WeeklyCalendar: React.FC = () => {
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onCreateEvent={handleCreateEvent}
+                onUpdateEvent={handleUpdateEvent}
                 onEventDragStart={handleEventDragStart}
                 onEventDragEnd={handleEventDragEnd}
+                onEventDrop={handleEventDrop}
                 key={`${date}`}
               />
             );

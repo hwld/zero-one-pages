@@ -42,11 +42,13 @@ type Props = {
     dateEvent: DateEvent,
   ) => void;
   onEventDragEnd: () => void;
+  onEventDrop: () => void;
   dragState: DragDateState | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   onDragStateChange: (state: DragDateState | undefined) => void;
   onCreateEvent: (event: Event) => void;
+  onUpdateEvent: (event: Event) => void;
 };
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
@@ -55,11 +57,13 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     draggingEvent,
     onEventDragEnd,
     onEventDragStart,
+    onEventDrop,
     scrollableRef,
     mouseHistoryRef,
     dragState,
     onDragStateChange,
     onCreateEvent,
+    onUpdateEvent,
   },
   ref,
 ) {
@@ -191,7 +195,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   };
 
   const handleDrop = () => {
+    if (!draggingEvent) {
+      return;
+    }
+
+    onUpdateEvent({
+      ...draggingEvent,
+      start: dropPreviewEventPart?.start ?? draggingEvent.start,
+      end: dropPreviewEventPart?.end ?? draggingEvent.end,
+    });
+
     setIsDragOver(false);
+
+    onEventDrop();
   };
 
   const previewEvent = useMemo((): DateEvent | undefined => {
