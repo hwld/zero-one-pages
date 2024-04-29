@@ -1,9 +1,22 @@
-import { DateEvent, Event } from "../type";
+import { DateEvent, DraggingDateEvent, Event } from "../type";
 import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
 import { format, getHours } from "date-fns";
 
-type Props = { date: Date; events: Event[] };
-export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
+export const EVENT_DRAG_TYPE = "application/event";
+
+type Props = {
+  date: Date;
+  events: Event[];
+  onDragStart: (dateEvent: DraggingDateEvent) => void;
+  onDragEnd: () => void;
+};
+
+export const DateEventColumn: React.FC<Props> = ({
+  date,
+  events,
+  onDragStart,
+  onDragEnd,
+}) => {
   const dateEvents = getDateEvents({ date, events });
 
   return dateEvents.map((event) => {
@@ -36,8 +49,10 @@ export const DateEventColumn: React.FC<Props> = ({ date, events }) => {
           e.stopPropagation();
         }}
         onDragStart={(e) => {
-          e.dataTransfer.effectAllowed = "move";
+          const eventY = e.currentTarget.getBoundingClientRect().y;
+          onDragStart({ ...event, dragStartY: e.clientY - eventY });
         }}
+        onDragEnd={onDragEnd}
         className="absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors hover:z-10 hover:bg-neutral-800"
         style={{
           top,

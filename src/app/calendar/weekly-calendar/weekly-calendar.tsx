@@ -10,7 +10,7 @@ import {
   subDays,
 } from "date-fns";
 import { useMemo, useRef, useState } from "react";
-import { Event } from "../type";
+import { DraggingDateEvent, Event } from "../type";
 import { MINUTES_15_HEIGHT } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
@@ -32,9 +32,12 @@ export const WeeklyCalendar: React.FC = () => {
     undefined,
   );
 
-  /**
-   * マウスイベントが発生したときのyとscrollableのscrollTipを保存する
-   */
+  // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
+  const [draggingEvent, setDraggingEvent] = useState<
+    DraggingDateEvent | undefined
+  >(undefined);
+
+  // マウスイベントが発生したときのyとscrollableのscrollTipを保存する
   const mouseHistoryRef = useRef<MouseHistory | undefined>(undefined);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -119,11 +122,13 @@ export const WeeklyCalendar: React.FC = () => {
               <DateColumn
                 date={date}
                 events={events}
+                draggingEvent={draggingEvent}
                 dragState={dragState}
                 onDragStateChange={setDragState}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onCreateEvent={handleCreateEvent}
+                onDraggingEventChange={setDraggingEvent}
                 key={`${date}`}
               />
             );

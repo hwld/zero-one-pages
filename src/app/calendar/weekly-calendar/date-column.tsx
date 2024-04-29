@@ -8,16 +8,19 @@ import {
 } from "date-fns";
 import { DateEventColumn } from "./date-event-column";
 import { NewEvent } from "./new-event";
-import { MINUTES_15_HEIGHT, getDateFromY } from "./utils";
+import { MINUTES_15_HEIGHT, getDateFromY, getHeightFromDate } from "./utils";
 import {
+  DragEvent,
   MouseEvent,
   MutableRefObject,
   RefObject,
   forwardRef,
   useMemo,
   useRef,
+  useState,
 } from "react";
-import { Event } from "../type";
+import { DraggingDateEvent, Event } from "../type";
+import clsx from "clsx";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -30,6 +33,8 @@ export type DragDateState = {
 type Props = {
   date: Date;
   events: Event[];
+  draggingEvent: DraggingDateEvent | undefined;
+  onDraggingEventChange: (event: DraggingDateEvent | undefined) => void;
   dragState: DragDateState | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
@@ -40,6 +45,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
     date,
     events,
+    draggingEvent,
+    onDraggingEventChange,
     scrollableRef,
     mouseHistoryRef,
     dragState,
@@ -125,6 +132,51 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     mouseHistoryRef.current = undefined;
   };
 
+  const handleEventDragStart = (dateEvent: DraggingDateEvent) => {
+    onDraggingEventChange(dateEvent);
+  };
+
+  const handleEventDragEnd = () => {
+    onDraggingEventChange(undefined);
+  };
+
+  const dropPreviewRef = useRef<HTMLDivElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!draggingEvent || !dropPreviewRef.current || !columnRef.current) {
+      return;
+    }
+
+    setIsDragOver(true);
+    const columnRect = columnRef.current.getBoundingClientRect();
+    console.log(draggingEvent);
+    const previewHeight = getHeightFromDate(draggingEvent);
+
+    let previewTop = e.clientY - columnRect.y - draggingEvent.dragStartY;
+    if (previewTop < 0) {
+      previewTop = 0;
+    }
+    if (previewTop > columnRect.height - previewHeight) {
+      previewTop = columnRect.height - previewHeight;
+    }
+    const gap = previewTop % MINUTES_15_HEIGHT;
+    previewTop = previewTop - gap;
+
+    dropPreviewRef.current.style.height = `${previewHeight}px`;
+    dropPreviewRef.current.style.top = `${previewTop}px`;
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = () => {
+    console.log(draggingEvent);
+    setIsDragOver(false);
+  };
+
   return (
     <div className="flex flex-col gap-2" ref={ref}>
       <div
@@ -135,6 +187,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
         {hours.map((hour, i) => {
           return (
@@ -148,7 +203,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         {dragState && isSameDay(date, dragState.targetDate) && (
           <NewEvent data={dragState} />
         )}
-        <DateEventColumn date={date} events={events} />
+        <DateEventColumn
+          date={date}
+          events={events}
+          onDragStart={handleEventDragStart}
+          onDragEnd={handleEventDragEnd}
+        />
+        <div
+          ref={dropPreviewRef}
+          className={clsx(
+            "absolute left-0 w-full rounded border-2 border-neutral-500",
+            isDragOver ? "block" : "hidden",
+          )}
+        />
       </div>
     </div>
   );
