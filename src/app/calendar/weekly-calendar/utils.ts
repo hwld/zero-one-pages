@@ -11,6 +11,8 @@ import {
 import { DateEvent, Event } from "../type";
 
 export const MINUTES_15_HEIGHT = 17;
+export const EVENT_MIN_MINUTES = 15;
+
 /**
  * 年月日とweekly calendar上のy軸から日付を取得する
  */

@@ -54,7 +54,7 @@ export const WeeklyCalendar: React.FC = () => {
     setEvents((e) => [...e, event]);
   };
 
-  const handleUpdateEvent = (event: Event) => {
+  const handleEventUpdate = (event: Event) => {
     setEvents((events) =>
       events.map((e) => {
         if (e.id === event.id) {
@@ -139,7 +139,7 @@ export const WeeklyCalendar: React.FC = () => {
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onCreateEvent={handleCreateEvent}
-                onUpdateEvent={handleUpdateEvent}
+                onEventUpdate={handleEventUpdate}
                 key={`${date}`}
               />
             );

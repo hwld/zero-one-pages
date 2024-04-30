@@ -23,7 +23,7 @@ import {
 } from "react";
 import { DateEvent, DraggingDateEvent, Event } from "../type";
 import clsx from "clsx";
-import { DateEventCard } from "./date-event";
+import { DateEventCard } from "./date-event-card";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -43,7 +43,7 @@ type Props = {
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   onDragStateChange: (state: DragDateState | undefined) => void;
   onCreateEvent: (event: Event) => void;
-  onUpdateEvent: (event: Event) => void;
+  onEventUpdate: (event: Event) => void;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
@@ -57,7 +57,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     dragState,
     onDragStateChange,
     onCreateEvent,
-    onUpdateEvent,
+    onEventUpdate,
   },
   ref,
 ) {
@@ -215,7 +215,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       return;
     }
 
-    onUpdateEvent({
+    onEventUpdate({
       ...draggingEvent,
       start: dropPreviewEventPart?.start ?? draggingEvent.start,
       end: dropPreviewEventPart?.end ?? draggingEvent.end,
@@ -268,11 +268,13 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           <NewEvent data={dragState} />
         )}
         <DateEventColumn
+          dateColumnRef={columnRef}
           date={date}
           events={events}
           draggingEvent={draggingEvent}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+          onEventUpdate={onEventUpdate}
         />
         <DateEventCard
           ref={dropPreviewRef}

@@ -1,12 +1,18 @@
-import { DragEvent } from "react";
-import { DateEvent as DateEventData, DraggingDateEvent, Event } from "../type";
+import { DragEvent, RefObject } from "react";
+import {
+  DateEvent,
+  DateEvent as DateEventData,
+  DraggingDateEvent,
+  Event,
+} from "../type";
 import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
-import { DateEventCard } from "./date-event";
+import { DateEventCard } from "./date-event-card";
 import clsx from "clsx";
 
 export const EVENT_DRAG_TYPE = "application/event";
 
 type Props = {
+  dateColumnRef: RefObject<HTMLDivElement>;
   date: Date;
   events: Event[];
   draggingEvent: DraggingDateEvent | undefined;
@@ -15,14 +21,17 @@ type Props = {
     dateEvent: DateEventData,
   ) => void;
   onDragEnd: () => void;
+  onEventUpdate: (event: DateEvent) => void;
 };
 
 export const DateEventColumn: React.FC<Props> = ({
+  dateColumnRef,
   date,
   events,
   draggingEvent,
   onDragStart,
   onDragEnd,
+  onEventUpdate,
 }) => {
   const dateEvents = getDateEvents({ date, events });
 
@@ -50,12 +59,14 @@ export const DateEventColumn: React.FC<Props> = ({
 
     return (
       <DateEventCard
+        dateColumnRef={dateColumnRef}
         key={event.id}
         event={event}
         onDragStart={(e) => {
           onDragStart(e, event);
         }}
         onDragEnd={onDragEnd}
+        onEventUpdate={onEventUpdate}
         style={{
           top,
           height,
