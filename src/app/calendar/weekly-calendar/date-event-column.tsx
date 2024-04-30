@@ -7,7 +7,6 @@ import {
 } from "../type";
 import { getDateEvents, getHeightFromDate, getTopFromDate } from "./utils";
 import { DateEventCard } from "./date-event-card";
-import clsx from "clsx";
 
 export const EVENT_DRAG_TYPE = "application/event";
 
@@ -62,9 +61,7 @@ export const DateEventColumn: React.FC<Props> = ({
         dateColumnRef={dateColumnRef}
         key={event.id}
         event={event}
-        onDragStart={(e) => {
-          onDragStart(e, event);
-        }}
+        onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onEventUpdate={onEventUpdate}
         style={{
@@ -73,9 +70,7 @@ export const DateEventColumn: React.FC<Props> = ({
           left: `${left}%`,
           width: `${width}%`,
         }}
-        className={clsx(
-          event.id === draggingEvent?.id ? "opacity-50" : "opacity-100",
-        )}
+        dragging={event.id === draggingEvent?.id}
       />
     );
   });

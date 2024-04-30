@@ -22,8 +22,7 @@ import {
   useState,
 } from "react";
 import { DateEvent, DraggingDateEvent, Event } from "../type";
-import clsx from "clsx";
-import { DateEventCard } from "./date-event-card";
+import { PreviewDateEventCard } from "./date-event-card";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -276,17 +275,12 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           onDragEnd={handleDragEnd}
           onEventUpdate={onEventUpdate}
         />
-        <DateEventCard
+        <PreviewDateEventCard
           ref={dropPreviewRef}
           event={previewEvent}
-          className={clsx(
-            "pointer-events-none z-20 w-full",
-            isDragOver ? "opacity-100" : "opacity-0",
-          )}
-          style={{
-            top: dropPreviewEventPart?.top,
-            height: dropPreviewEventPart?.height,
-          }}
+          visible={isDragOver}
+          top={dropPreviewEventPart?.top}
+          height={dropPreviewEventPart?.height}
         />
       </div>
     </div>
