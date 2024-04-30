@@ -4,13 +4,13 @@ import {
   RefObject,
   forwardRef,
   useEffect,
-  useState,
 } from "react";
 import { DateEvent } from "../type";
 import { formatEventDateSpan, getDateFromY } from "./utils";
 import { cn } from "@/lib/utils";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import clsx from "clsx";
+import { atom, useAtom } from "jotai";
 
 const DateEventCardBase = forwardRef<
   HTMLDivElement,
@@ -65,6 +65,11 @@ export const PreviewDateEventCard = forwardRef<
   );
 });
 
+type ResizeState =
+  | { origin: "eventStart" | "eventEnd"; eventId: string }
+  | undefined;
+const resizeStateAtom = atom<ResizeState>(undefined);
+
 type DateEventCardProps = {
   dateColumnRef?: RefObject<HTMLDivElement>;
   event: DateEvent;
@@ -88,10 +93,9 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
     },
     ref,
   ) {
-    const [resizeOrigin, setResizeOrigin] = useState<
-      "eventStart" | "eventEnd" | undefined
-    >(undefined);
-    const isResizing = resizeOrigin !== undefined;
+    const [globalResizeState, setGlobalResizeState] = useAtom(resizeStateAtom);
+    const isResizing = globalResizeState?.eventId === event.id;
+    const isResizingOtherEvents = globalResizeState && !isResizing;
 
     const handleResizeStartFromEventStart = (
       e: React.MouseEvent<HTMLDivElement>,
@@ -99,7 +103,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       e.stopPropagation();
       e.preventDefault();
 
-      setResizeOrigin("eventEnd");
+      setGlobalResizeState({ eventId: event.id, origin: "eventEnd" });
     };
 
     const handleResizeStartFromEventEnd = (
@@ -108,12 +112,12 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       e.stopPropagation();
       e.preventDefault();
 
-      setResizeOrigin("eventStart");
+      setGlobalResizeState({ eventId: event.id, origin: "eventStart" });
     };
 
     useEffect(() => {
       const handleMouseMove = (e: MouseEvent) => {
-        if (!dateColumnRef?.current || !resizeOrigin) {
+        if (!dateColumnRef?.current || !globalResizeState || !isResizing) {
           return;
         }
 
@@ -123,7 +127,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
         }
         const date = getDateFromY(event.start, y);
 
-        switch (resizeOrigin) {
+        switch (globalResizeState.origin) {
           case "eventStart": {
             if (isSameMinute(event.start, date)) {
               return;
@@ -131,7 +135,10 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
 
             if (isBefore(date, event.start)) {
               onEventUpdate({ ...event, start: date });
-              setResizeOrigin("eventEnd");
+              setGlobalResizeState({
+                ...globalResizeState,
+                origin: "eventEnd",
+              });
             } else {
               onEventUpdate({ ...event, end: date });
             }
@@ -144,21 +151,24 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
 
             if (isAfter(date, event.end)) {
               onEventUpdate({ ...event, end: date });
-              setResizeOrigin("eventStart");
+              setGlobalResizeState({
+                ...globalResizeState,
+                origin: "eventStart",
+              });
             } else {
               onEventUpdate({ ...event, start: date });
             }
             return;
           }
           default: {
-            throw new Error(resizeOrigin satisfies never);
+            throw new Error(globalResizeState.origin satisfies never);
           }
         }
       };
 
       const handleMouseUp = () => {
-        if (resizeOrigin) {
-          setResizeOrigin(undefined);
+        if (globalResizeState) {
+          setGlobalResizeState(undefined);
         }
       };
 
@@ -168,7 +178,14 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       };
-    }, [dateColumnRef, event, onEventUpdate, resizeOrigin]);
+    }, [
+      dateColumnRef,
+      event,
+      onEventUpdate,
+      globalResizeState,
+      setGlobalResizeState,
+      isResizing,
+    ]);
 
     return (
       <DateEventCardBase
@@ -188,7 +205,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
           width: isResizing ? "100%" : style.width,
         }}
         className={clsx(
-          "hover:z-10 hover:bg-neutral-800",
+          !isResizingOtherEvents && "hover:z-10 hover:bg-neutral-800",
           isResizing && "z-20 bg-neutral-800",
           dragging ? "opacity-50" : "opacity-100",
         )}
