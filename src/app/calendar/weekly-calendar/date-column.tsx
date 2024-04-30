@@ -37,12 +37,7 @@ type Props = {
   date: Date;
   events: Event[];
   draggingEvent: DraggingDateEvent | undefined;
-  onEventDragStart: (
-    e: DragEvent<HTMLDivElement>,
-    dateEvent: DateEvent,
-  ) => void;
-  onEventDragEnd: () => void;
-  onEventDrop: () => void;
+  onDraggingEventChange: (event: DraggingDateEvent | undefined) => void;
   dragState: DragDateState | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
@@ -50,14 +45,13 @@ type Props = {
   onCreateEvent: (event: Event) => void;
   onUpdateEvent: (event: Event) => void;
 };
+
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
     date,
     events,
     draggingEvent,
-    onEventDragEnd,
-    onEventDragStart,
-    onEventDrop,
+    onDraggingEventChange,
     scrollableRef,
     mouseHistoryRef,
     dragState,
@@ -147,6 +141,28 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const dropPreviewRef = useRef<HTMLDivElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
+  const handleDragStart = (
+    event: DragEvent<HTMLDivElement>,
+    dateEvent: DateEvent,
+  ) => {
+    if (!dropPreviewRef.current) {
+      return;
+    }
+
+    event.dataTransfer.setDragImage(dropPreviewRef.current, 0, 0);
+    event.dataTransfer.effectAllowed = "move";
+
+    const dateEventY = event.currentTarget.getBoundingClientRect().y;
+    onDraggingEventChange({
+      ...dateEvent,
+      dragStartY: event.clientY - dateEventY,
+    });
+  };
+
+  const handleDragEnd = () => {
+    onDraggingEventChange(undefined);
+  };
+
   const [dropPreviewEventPart, setDropPreviewEventPart] = useState<
     | {
         top: string;
@@ -206,8 +222,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     });
 
     setIsDragOver(false);
-
-    onEventDrop();
+    onDraggingEventChange(undefined);
   };
 
   const previewEvent = useMemo((): DateEvent | undefined => {
@@ -256,15 +271,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           date={date}
           events={events}
           draggingEvent={draggingEvent}
-          onDragStart={(e, dateEvent) => {
-            if (!dropPreviewRef.current) {
-              return;
-            }
-
-            e.dataTransfer.setDragImage(dropPreviewRef.current, 0, 0);
-            onEventDragStart(e, dateEvent);
-          }}
-          onDragEnd={onEventDragEnd}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
         />
         <DateEventCard
           ref={dropPreviewRef}

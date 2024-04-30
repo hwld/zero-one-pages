@@ -9,8 +9,8 @@ import {
   addDays,
   subDays,
 } from "date-fns";
-import { DragEvent, useMemo, useRef, useState } from "react";
-import { DateEvent, DraggingDateEvent, Event } from "../type";
+import { useMemo, useRef, useState } from "react";
+import { DraggingDateEvent, Event } from "../type";
 import { MINUTES_15_HEIGHT } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
@@ -18,7 +18,6 @@ import { WEEK_DAY_LABELS } from "../consts";
 
 export const WeeklyCalendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
-
   const [events, setEvents] = useState<Event[]>([]);
 
   const week = useMemo(() => {
@@ -72,25 +71,6 @@ export const WeeklyCalendar: React.FC = () => {
 
   const handlePrevWeek = () => {
     setDate(subDays(startOfWeek(date), 1));
-  };
-
-  const handleEventDragStart = (
-    event: DragEvent<HTMLDivElement>,
-    dateEvent: DateEvent,
-  ) => {
-    const dateEventY = event.currentTarget.getBoundingClientRect().y;
-    setDraggingEvent({
-      ...dateEvent,
-      dragStartY: event.clientY - dateEventY,
-    });
-  };
-
-  const handleEventDragEnd = () => {
-    setDraggingEvent(undefined);
-  };
-
-  const handleEventDrop = () => {
-    setDraggingEvent(undefined);
   };
 
   const scrollableRef = useRef<HTMLDivElement>(null);
@@ -153,15 +133,13 @@ export const WeeklyCalendar: React.FC = () => {
                 date={date}
                 events={events}
                 draggingEvent={draggingEvent}
+                onDraggingEventChange={setDraggingEvent}
                 dragState={dragState}
                 onDragStateChange={setDragState}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onCreateEvent={handleCreateEvent}
                 onUpdateEvent={handleUpdateEvent}
-                onEventDragStart={handleEventDragStart}
-                onEventDragEnd={handleEventDragEnd}
-                onEventDrop={handleEventDrop}
                 key={`${date}`}
               />
             );
