@@ -11,7 +11,7 @@ import {
 } from "date-fns";
 import { useMemo, useRef, useState } from "react";
 import { DraggingDateEvent, Event } from "../type";
-import { MINUTES_15_HEIGHT } from "./utils";
+import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
 import { WEEK_DAY_LABELS } from "../consts";
@@ -47,7 +47,10 @@ export const WeeklyCalendar: React.FC = () => {
     const delta = e.currentTarget.scrollTop - mouseHistoryRef.current.scrollTop;
     const y = mouseHistoryRef.current.y + delta;
 
-    setDragState({ ...dragState, dragEndY: y });
+    setDragState({
+      ...dragState,
+      endDate: getDateFromY(dragState.targetDate, y),
+    });
   };
 
   const handleCreateEvent = (event: Event) => {
@@ -103,7 +106,7 @@ export const WeeklyCalendar: React.FC = () => {
               <div
                 className="select-none whitespace-nowrap text-xs tabular-nums text-neutral-400"
                 key={i}
-                style={{ height: MINUTES_15_HEIGHT * 4 }}
+                style={{ height: EVENT_MIN_HEIGHT * 4 }}
               >
                 {format(h, "hh:mm a")}
               </div>

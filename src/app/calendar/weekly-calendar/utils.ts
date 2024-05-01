@@ -10,37 +10,44 @@ import {
 } from "date-fns";
 import { DateEvent, Event } from "../type";
 
-export const MINUTES_15_HEIGHT = 17;
+export const EVENT_MIN_HEIGHT = 17;
 export const EVENT_MIN_MINUTES = 15;
 
 /**
  * 年月日とweekly calendar上のy軸から日付を取得する
  */
-export const getDateFromY = (yearMonthDate: Date, y: number): Date => {
+export const getDateFromY = (
+  yearMonthDate: Date,
+  y: number,
+  roundingOption: "floor" | "round" = "round",
+): Date => {
+  const roundingMethod = Math[roundingOption];
+
   const date = addMinutes(
     startOfDay(yearMonthDate),
-    Math.floor(y / MINUTES_15_HEIGHT) * 15,
+    roundingMethod(y / EVENT_MIN_HEIGHT) * EVENT_MIN_MINUTES,
   );
   return date;
 };
+
 /**
  *  日付に対応するweekly calendar上のtopを取得する
  */
-
 export const getTopFromDate = (date: Date): number => {
   const top =
-    Math.floor((date.getHours() * 60 + date.getMinutes()) / 15) *
-    MINUTES_15_HEIGHT;
+    Math.floor((date.getHours() * 60 + date.getMinutes()) / EVENT_MIN_MINUTES) *
+    EVENT_MIN_HEIGHT;
 
   return top;
 };
+
 /**
  * 日付の範囲対応するweekly calendar上のheightを取得する
  */
-
 export const getHeightFromDate = ({ start, end }: Interval): number => {
   const height =
-    Math.ceil(differenceInMinutes(end, start) / 15) * MINUTES_15_HEIGHT;
+    Math.ceil(differenceInMinutes(end, start) / EVENT_MIN_MINUTES) *
+    EVENT_MIN_HEIGHT;
 
   return height;
 };

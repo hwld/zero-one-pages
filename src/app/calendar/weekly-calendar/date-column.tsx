@@ -10,7 +10,12 @@ import {
 } from "date-fns";
 import { DateEventColumn } from "./date-event-column";
 import { NewEvent } from "./new-event";
-import { MINUTES_15_HEIGHT, getDateFromY, getHeightFromDate } from "./utils";
+import {
+  EVENT_MIN_HEIGHT,
+  EVENT_MIN_MINUTES,
+  getDateFromY,
+  getHeightFromDate,
+} from "./utils";
 import {
   DragEvent,
   MouseEvent,
@@ -28,8 +33,8 @@ export type MouseHistory = { y: number; scrollTop: number };
 
 export type DragDateState = {
   targetDate: Date;
-  dragStartY: number;
-  dragEndY: number;
+  startDate: Date;
+  endDate: Date;
 };
 
 type Props = {
@@ -85,10 +90,17 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       y,
       scrollTop: scrollableRef.current.scrollTop,
     };
+
+    const targetDate = startOfDay(date);
+
+    // ドラッグ開始の時点では常にクリックした最小領域が期間として設定されるようにする
+    const startDate = getDateFromY(targetDate, y, "floor");
+    const endDate = addMinutes(startDate, EVENT_MIN_MINUTES);
+
     onDragStateChange({
-      targetDate: startOfDay(date),
-      dragStartY: y,
-      dragEndY: y + MINUTES_15_HEIGHT,
+      targetDate,
+      startDate,
+      endDate,
     });
   };
 
@@ -106,7 +118,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       y,
       scrollTop: scrollableRef.current.scrollTop,
     };
-    onDragStateChange({ ...dragState, dragEndY: y });
+    onDragStateChange({
+      ...dragState,
+      endDate: getDateFromY(dragState.targetDate, y),
+    });
   };
 
   const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
@@ -116,8 +131,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       return;
     }
 
-    const startDate = getDateFromY(dragState.targetDate, dragState.dragStartY);
-    const endDate = getDateFromY(dragState.targetDate, dragState.dragEndY);
+    const startDate = dragState.startDate;
+    const endDate = dragState.endDate;
 
     if (startDate.getTime() === endDate.getTime()) {
       onDragStateChange(undefined);
@@ -188,7 +203,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     if (previewTop > columnRect.height - previewHeight) {
       previewTop = columnRect.height - previewHeight;
     }
-    const gap = previewTop % MINUTES_15_HEIGHT;
+    const gap = previewTop % EVENT_MIN_HEIGHT;
     previewTop = previewTop - gap;
 
     const startDate = getDateFromY(date, previewTop);
@@ -245,7 +260,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       <div
         ref={columnRef}
         className="relative border-r border-neutral-300"
-        style={{ height: MINUTES_15_HEIGHT * 4 * 24 }}
+        style={{ height: EVENT_MIN_HEIGHT * 4 * 24 }}
         draggable={false}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -259,7 +274,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             <div
               key={`${hour}`}
               className="absolute h-[1px] w-full bg-neutral-300"
-              style={{ top: MINUTES_15_HEIGHT * 4 * i }}
+              style={{ top: EVENT_MIN_HEIGHT * 4 * i }}
             />
           );
         })}
