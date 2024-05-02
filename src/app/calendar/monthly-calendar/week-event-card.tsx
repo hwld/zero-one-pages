@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { ComponentPropsWithoutRef } from "react";
 import { WeekEvent } from "../type";
+import { format } from "date-fns";
 
 type WeekEventCardBaseProps = {
   disablePointerEvents: boolean;
@@ -56,7 +57,11 @@ export const WeekEventCard: React.FC<WeekEventCardProps> = ({
       startWeekDay={weekEvent.startWeekDay}
       range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
     >
-      <div className="flex h-full items-center rounded bg-neutral-700 px-1 transition-colors hover:bg-neutral-800">
+      <div className="flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800">
+        {!weekEvent.allDay ? (
+          <span className="mr-1">{format(weekEvent.start, "aa hh:mm")}</span>
+        ) : null}
+
         {weekEvent.title}
       </div>
     </WeekEventCardBase>
