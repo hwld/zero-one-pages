@@ -15,6 +15,7 @@ import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
 import { WEEK_DAY_LABELS } from "../consts";
+import clsx from "clsx";
 
 export const WeeklyCalendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
@@ -77,6 +78,7 @@ export const WeeklyCalendar: React.FC = () => {
   };
 
   const scrollableRef = useRef<HTMLDivElement>(null);
+  const gridColsClass = "grid-cols-[75px,repeat(7,1fr)]";
   return (
     <div className="flex min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -91,45 +93,58 @@ export const WeeklyCalendar: React.FC = () => {
         </div>
         <NavigationButton dir="next" onClick={handleNextWeek} />
       </div>
+
       <div
-        className="flex w-full gap-2 overflow-auto"
+        className="flex w-full flex-col overflow-auto"
         ref={scrollableRef}
         onScroll={handleScroll}
       >
-        <div>
-          <div className="h-5"></div>
-          {eachHourOfInterval({
-            start: startOfDay(date),
-            end: endOfDay(date),
-          }).map((h, i) => {
+        <div
+          className={clsx(
+            "sticky top-0 z-30 grid bg-neutral-100",
+            gridColsClass,
+          )}
+        >
+          <div className="flex select-none flex-col">
+            <div className="h-5" />
+            <div className="flex grow justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
+              終日
+            </div>
+          </div>
+          {week.map((date) => {
             return (
-              <div
-                className="select-none whitespace-nowrap text-xs tabular-nums text-neutral-400"
-                key={i}
-                style={{ height: EVENT_MIN_HEIGHT * 4 }}
-              >
-                {format(h, "hh:mm a")}
+              <div className="flex flex-col" key={`${date}`}>
+                <div className="z-30 flex h-5 select-none items-center justify-center gap-1 pb-2 text-xs">
+                  <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
+                  <div>{date.getDate()}</div>
+                </div>
+                <div className="grow border-y border-r border-neutral-300"></div>
               </div>
             );
           })}
         </div>
-        <div className="grid w-full grid-cols-7 bg-neutral-100">
-          {/* select-noneをつけてもDnDで日数が選択され、特定の拡張機能が動いてしまうことがあるため、緩和策としてDateColumnの外に出す*/}
-          {/* 参考: 
-                https://issues.chromium.org/issues/40728610) 
-                https://developer.mozilla.org/ja/docs/Web/CSS/user-select#none
-          */}
-          {week.map((date) => {
-            return (
-              <div
-                key={`${date}`}
-                className="mb-2 flex h-5 select-none items-center justify-center gap-1 text-xs"
-              >
-                <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
-                <div>{date.getDate()}</div>
-              </div>
-            );
-          })}
+
+        <div className="grid grid-cols-[75px,repeat(7,1fr)]">
+          <div className="mr-2">
+            {eachHourOfInterval({
+              start: startOfDay(date),
+              end: endOfDay(date),
+            }).map((h, i) => {
+              return (
+                <div
+                  className="relative select-none whitespace-nowrap tabular-nums text-neutral-400"
+                  key={i}
+                  style={{
+                    height: EVENT_MIN_HEIGHT * 4,
+                    top: i !== 0 ? "-6px" : undefined,
+                    fontSize: "12px",
+                  }}
+                >
+                  {format(h, "hh:mm a")}
+                </div>
+              );
+            })}
+          </div>
           {week.map((date) => {
             return (
               <DateColumn

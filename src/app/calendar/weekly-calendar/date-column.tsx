@@ -270,6 +270,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         onDrop={handleDrop}
       >
         {hours.map((hour, i) => {
+          if (i === 0) {
+            return null;
+          }
           return (
             <div
               key={`${hour}`}
