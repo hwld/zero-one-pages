@@ -31,8 +31,8 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     undefined,
   );
   useEffect(() => {
-    const createEvent = () => {
-      if (!dragDateRange) {
+    const createEvent = (e: MouseEvent) => {
+      if (!dragDateRange || e.button !== 0) {
         return;
       }
 

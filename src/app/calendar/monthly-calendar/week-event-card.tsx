@@ -24,7 +24,7 @@ const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
     <button
       {...props}
       className={clsx(
-        "absolute pb-[1px] text-sm text-neutral-100",
+        "absolute select-none pb-[1px] text-sm text-neutral-100",
         disablePointerEvents ? "pointer-events-none" : "pointer-events-auto",
       )}
       style={{

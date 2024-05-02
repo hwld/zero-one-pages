@@ -9,7 +9,7 @@ import { DragDateRange } from "../utils";
 import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
-import { addMonths, subMonths } from "date-fns";
+import { addMonths, max, min, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
 
 type Props = { events: Event[]; onCreateEvent: (event: Event) => void };
@@ -64,6 +64,38 @@ export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
     };
   }, [yearMonth]);
 
+  useEffect(() => {
+    const createEvent = (event: MouseEvent) => {
+      if (!dragDateRange || event.button !== 0) {
+        return;
+      }
+
+      const eventStart = min([
+        dragDateRange.dragStartDate,
+        dragDateRange.dragEndDate,
+      ]);
+
+      const eventEnd = max([
+        dragDateRange.dragStartDate,
+        dragDateRange.dragEndDate,
+      ]);
+
+      onCreateEvent({
+        id: crypto.randomUUID(),
+        allDay: true,
+        title: "event",
+        start: eventStart,
+        end: eventEnd,
+      });
+      setDragDateRange(undefined);
+    };
+
+    document.addEventListener("mouseup", createEvent);
+    return () => {
+      document.removeEventListener("mouseup", createEvent);
+    };
+  }, [dragDateRange, onCreateEvent]);
+
   return (
     <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
       <div className="flex items-center gap-2">
@@ -113,7 +145,6 @@ export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
                     isLastWeek={calendar.length - 1 === i}
                     dragDateRange={dragDateRange}
                     onDragDateRangeChange={setDragDateRange}
-                    onCreateEvent={onCreateEvent}
                   />
                 );
               })}

@@ -8,8 +8,10 @@ import {
   format,
   addDays,
   subDays,
+  min,
+  max,
 } from "date-fns";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DraggingDateEvent, Event } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
@@ -74,6 +76,38 @@ export const WeeklyCalendar: React.FC<Props> = ({
     setDate(subDays(startOfWeek(date), 1));
   };
 
+  useEffect(() => {
+    const createEvent = (e: MouseEvent) => {
+      if (!dragState || e.button !== 0) {
+        return;
+      }
+
+      const startDate = dragState.startDate;
+      const endDate = dragState.endDate;
+
+      if (startDate.getTime() !== endDate.getTime()) {
+        const minDate = min([startDate, endDate]);
+        const maxDate = max([startDate, endDate]);
+
+        onCreateEvent({
+          id: crypto.randomUUID(),
+          allDay: false,
+          start: minDate,
+          end: maxDate,
+          title: "event",
+        });
+      }
+
+      setDragState(undefined);
+      mouseHistoryRef.current = undefined;
+    };
+
+    document.addEventListener("mouseup", createEvent);
+    return () => {
+      document.removeEventListener("mouseup", createEvent);
+    };
+  }, [dragState, onCreateEvent]);
+
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
     <div className="flex min-h-0 flex-col gap-2">
@@ -133,7 +167,6 @@ export const WeeklyCalendar: React.FC<Props> = ({
                 onDragStateChange={setDragState}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
-                onCreateEvent={onCreateEvent}
                 onUpdateEvent={onUpdateEvent}
                 key={`${date}`}
               />

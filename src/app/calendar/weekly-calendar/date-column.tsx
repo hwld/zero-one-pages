@@ -4,8 +4,6 @@ import {
   eachHourOfInterval,
   endOfDay,
   isSameDay,
-  max,
-  min,
   startOfDay,
 } from "date-fns";
 import { TimedEventColumn } from "./timed-event-column";
@@ -46,7 +44,6 @@ type Props = {
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   onDragStateChange: (state: DragDateState | undefined) => void;
-  onCreateEvent: (event: Event) => void;
   onUpdateEvent: (event: Event) => void;
 };
 
@@ -60,7 +57,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     mouseHistoryRef,
     dragState,
     onDragStateChange,
-    onCreateEvent,
     onUpdateEvent,
   },
   ref,
@@ -79,7 +75,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    if (!columnRef.current || !scrollableRef.current) {
+    if (!columnRef.current || !scrollableRef.current || e.button !== 0) {
       return;
     }
 
@@ -122,35 +118,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       ...dragState,
       endDate: getDateFromY(dragState.targetDate, y),
     });
-  };
-
-  const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
-    if (!dragState) {
-      return;
-    }
-
-    const startDate = dragState.startDate;
-    const endDate = dragState.endDate;
-
-    if (startDate.getTime() === endDate.getTime()) {
-      onDragStateChange(undefined);
-      return;
-    }
-
-    const minDate = min([startDate, endDate]);
-    const maxDate = max([startDate, endDate]);
-
-    onCreateEvent({
-      id: crypto.randomUUID(),
-      allDay: false,
-      start: minDate,
-      end: maxDate,
-      title: "event",
-    });
-    onDragStateChange(undefined);
-    mouseHistoryRef.current = undefined;
   };
 
   const dropPreviewRef = useRef<HTMLDivElement>(null);
@@ -265,7 +232,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         draggable={false}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}

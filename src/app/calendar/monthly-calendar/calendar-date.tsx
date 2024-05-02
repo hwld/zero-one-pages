@@ -1,13 +1,5 @@
-import {
-  isSameMonth,
-  isSameYear,
-  isSaturday,
-  isWeekend,
-  max,
-  min,
-} from "date-fns";
+import { isSameMonth, isSameYear, isSaturday, isWeekend } from "date-fns";
 import { DragDateRange, isWithinDragDateRange } from "../utils";
-import { Event } from "../type";
 import clsx from "clsx";
 import { MouseEvent } from "react";
 
@@ -17,7 +9,6 @@ type Props = {
   isLastWeek: boolean;
   dragDateRange: DragDateRange | undefined;
   onDragDateRangeChange: (range: DragDateRange | undefined) => void;
-  onCreateEvent: (event: Event) => void;
 };
 
 export const CalendarDate: React.FC<Props> = ({
@@ -26,7 +17,6 @@ export const CalendarDate: React.FC<Props> = ({
   isLastWeek,
   dragDateRange,
   onDragDateRangeChange,
-  onCreateEvent,
 }) => {
   const isDragging = !!dragDateRange;
 
@@ -36,35 +26,10 @@ export const CalendarDate: React.FC<Props> = ({
     }
   };
 
-  const handleMouseOver = () => {
+  const handleMouseEnter = () => {
     if (isDragging) {
       onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
     }
-  };
-
-  const handleMouseUp = (event: MouseEvent) => {
-    if (!isDragging || event.button !== 0) {
-      return;
-    }
-
-    const eventStart = min([
-      dragDateRange.dragStartDate,
-      dragDateRange.dragEndDate,
-    ]);
-
-    const eventEnd = max([
-      dragDateRange.dragStartDate,
-      dragDateRange.dragEndDate,
-    ]);
-
-    onCreateEvent({
-      id: crypto.randomUUID(),
-      allDay: true,
-      title: "event",
-      start: eventStart,
-      end: eventEnd,
-    });
-    onDragDateRangeChange(undefined);
   };
 
   const isSameCalendarYearMonth =
@@ -80,8 +45,7 @@ export const CalendarDate: React.FC<Props> = ({
         isWeekend(date) ? "bg-neutral-200/25" : "",
       )}
       onMouseDown={handleMouseDown}
-      onMouseOver={handleMouseOver}
-      onMouseUp={handleMouseUp}
+      onMouseEnter={handleMouseEnter}
     >
       <div
         className={clsx(
