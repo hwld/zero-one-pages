@@ -12,9 +12,9 @@ import { WeekEventRow } from "./week-event-row";
 import { addMonths, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
 
-type Props = {};
+type Props = { events: Event[]; onCreateEvent: (event: Event) => void };
 
-export const MonthlyCalendar: React.FC<Props> = ({}) => {
+export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
   const [yearMonth, setYearMonth] = useState(new Date());
 
   const year = useMemo(() => {
@@ -36,15 +36,9 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
     return getCalendarDates({ year, month });
   }, [month, year]);
 
-  const [events, setEvents] = useState<Event[]>([]);
-
   const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
     undefined,
   );
-
-  const handleCreateEvent = (event: Event) => {
-    setEvents((ss) => [...ss, event]);
-  };
 
   const firstWeekEventRowRef = useRef<HTMLDivElement>(null);
   const [eventLimit, setEventLimit] = useState(0);
@@ -118,7 +112,7 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
                     isLastWeek={calendar.length - 1 === i}
                     dragDateRange={dragDateRange}
                     onDragDateRangeChange={setDragDateRange}
-                    onCreateEvent={handleCreateEvent}
+                    onCreateEvent={onCreateEvent}
                   />
                 );
               })}

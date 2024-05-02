@@ -47,7 +47,7 @@ type Props = {
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   onDragStateChange: (state: DragDateState | undefined) => void;
   onCreateEvent: (event: Event) => void;
-  onEventUpdate: (event: Event) => void;
+  onUpdateEvent: (event: Event) => void;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
@@ -61,7 +61,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     dragState,
     onDragStateChange,
     onCreateEvent,
-    onEventUpdate,
+    onUpdateEvent,
   },
   ref,
 ) {
@@ -230,7 +230,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       return;
     }
 
-    onEventUpdate({
+    onUpdateEvent({
       ...draggingEvent,
       start: dropPreviewEventPart?.start ?? draggingEvent.start,
       end: dropPreviewEventPart?.end ?? draggingEvent.end,
@@ -292,7 +292,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           draggingEvent={draggingEvent}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
-          onEventUpdate={onEventUpdate}
+          onUpdateEvent={onUpdateEvent}
         />
         <PreviewDateEventCard
           ref={dropPreviewRef}

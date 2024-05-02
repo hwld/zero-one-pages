@@ -20,7 +20,7 @@ type Props = {
     dateEvent: DateEventData,
   ) => void;
   onDragEnd: () => void;
-  onEventUpdate: (event: DateEvent) => void;
+  onUpdateEvent: (event: DateEvent) => void;
 };
 
 export const TimedEventColumn: React.FC<Props> = ({
@@ -30,7 +30,7 @@ export const TimedEventColumn: React.FC<Props> = ({
   draggingEvent,
   onDragStart,
   onDragEnd,
-  onEventUpdate,
+  onUpdateEvent,
 }) => {
   const dateEvents = getDateEvents({ date, events: timedEvents });
 
@@ -63,7 +63,7 @@ export const TimedEventColumn: React.FC<Props> = ({
         event={event}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        onEventUpdate={onEventUpdate}
+        onEventUpdate={onUpdateEvent}
         style={{
           top,
           height,

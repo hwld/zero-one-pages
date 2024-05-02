@@ -3,24 +3,50 @@ import { useMemo, useState } from "react";
 import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
 import "./style.css";
 import { WeeklyCalendar } from "./weekly-calendar/weekly-calendar";
+import { Event } from "./type";
 
 type CalendarType = "month" | "week";
 const Page = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const handleCreateEvent = (event: Event) => {
+    setEvents((e) => [...e, event]);
+  };
+
+  const handleUpdateEvent = (event: Event) => {
+    setEvents((events) =>
+      events.map((e) => {
+        if (e.id === event.id) {
+          return event;
+        }
+        return e;
+      }),
+    );
+  };
+
   const [type, setType] = useState<CalendarType>("week");
 
   const calendar = useMemo(() => {
     switch (type) {
       case "month": {
-        return <MonthlyCalendar />;
+        return (
+          <MonthlyCalendar events={events} onCreateEvent={handleCreateEvent} />
+        );
       }
       case "week": {
-        return <WeeklyCalendar />;
+        return (
+          <WeeklyCalendar
+            events={events}
+            onCreateEvent={handleCreateEvent}
+            onUpdateEvent={handleUpdateEvent}
+          />
+        );
       }
       default: {
         throw new Error(type satisfies never);
       }
     }
-  }, [type]);
+  }, [events, type]);
 
   return (
     <div className="grid h-[100dvh] w-[100dvw] grid-rows-[min-content,1fr] gap-4 overflow-hidden bg-neutral-100 p-4 text-neutral-700">

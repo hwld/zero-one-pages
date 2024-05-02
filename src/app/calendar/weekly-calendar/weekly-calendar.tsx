@@ -18,9 +18,18 @@ import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
-export const WeeklyCalendar: React.FC = () => {
+type Props = {
+  events: Event[];
+  onCreateEvent: (event: Event) => void;
+  onUpdateEvent: (event: Event) => void;
+};
+
+export const WeeklyCalendar: React.FC<Props> = ({
+  events,
+  onCreateEvent,
+  onUpdateEvent,
+}) => {
   const [date, setDate] = useState(new Date());
-  const [events, setEvents] = useState<Event[]>([]);
   const allDayEvents = events.filter((e) => e.allDay);
   const timedEvents = events.filter((e) => !e.allDay);
 
@@ -57,21 +66,6 @@ export const WeeklyCalendar: React.FC = () => {
     });
   };
 
-  const handleCreateEvent = (event: Event) => {
-    setEvents((e) => [...e, event]);
-  };
-
-  const handleEventUpdate = (event: Event) => {
-    setEvents((events) =>
-      events.map((e) => {
-        if (e.id === event.id) {
-          return event;
-        }
-        return e;
-      }),
-    );
-  };
-
   const handleNextWeek = () => {
     setDate(addDays(endOfWeek(date), 1));
   };
@@ -103,7 +97,7 @@ export const WeeklyCalendar: React.FC = () => {
       >
         <WeeklyCalendarDayHeader
           week={week}
-          onCreateEvent={handleCreateEvent}
+          onCreateEvent={onCreateEvent}
           allDayEvents={allDayEvents}
         />
 
@@ -139,8 +133,8 @@ export const WeeklyCalendar: React.FC = () => {
                 onDragStateChange={setDragState}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
-                onCreateEvent={handleCreateEvent}
-                onEventUpdate={handleEventUpdate}
+                onCreateEvent={onCreateEvent}
+                onUpdateEvent={onUpdateEvent}
                 key={`${date}`}
               />
             );

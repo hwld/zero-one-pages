@@ -10,6 +10,7 @@ import {
   areIntervalsOverlapping,
   differenceInCalendarDays,
   isWithinInterval,
+  startOfDay,
 } from "date-fns";
 import { Event, WeekEvent } from "../type";
 
@@ -95,9 +96,13 @@ export const getWeekEvents = ({
 
     // イベントよりも前に存在している重複したイベントを取得する
     const prevOverlappingEvents = weekEvents.filter((prevEvent, index) => {
-      const overlapping = areIntervalsOverlapping(event, prevEvent, {
-        inclusive: true,
-      });
+      const overlapping = areIntervalsOverlapping(
+        { start: startOfDay(event.start), end: startOfDay(event.end) },
+        { start: startOfDay(prevEvent.start), end: startOfDay(prevEvent.end) },
+        {
+          inclusive: true,
+        },
+      );
       return overlapping && index < i;
     });
 
@@ -106,7 +111,12 @@ export const getWeekEvents = ({
     const invalidTops = dates.flatMap((date) => {
       return prevOverlappingEvents
         .map((prevEvent) => {
-          if (isWithinInterval(date, prevEvent)) {
+          if (
+            isWithinInterval(date, {
+              start: startOfDay(prevEvent.start),
+              end: startOfDay(prevEvent.end),
+            })
+          ) {
             return prevEvent.top;
           }
           return undefined;
