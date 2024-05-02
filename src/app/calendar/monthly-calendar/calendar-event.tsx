@@ -1,9 +1,9 @@
 import clsx from "clsx";
-import { EVENT_ROW_SIZE } from "../consts";
 import { ReactNode } from "react";
 
 type Props = {
   isDraggingDate: boolean;
+  height: number;
   range?: number;
   top: number;
   startWeekDay: number;
@@ -12,6 +12,7 @@ type Props = {
 
 export const CalendarEvent: React.FC<Props> = ({
   isDraggingDate,
+  height,
   range = 1,
   top,
   startWeekDay,
@@ -24,9 +25,9 @@ export const CalendarEvent: React.FC<Props> = ({
         isDraggingDate ? "pointer-events-none" : "pointer-events-auto",
       )}
       style={{
-        height: `${EVENT_ROW_SIZE}px`,
+        height: `${height}px`,
         width: `calc(100% / 7  * ${range} - 10px)`,
-        top: `calc(${EVENT_ROW_SIZE}px * ${top})`,
+        top: `calc(${height}px * ${top})`,
         left: `calc(100% / 7 * ${startWeekDay})`,
       }}
     >

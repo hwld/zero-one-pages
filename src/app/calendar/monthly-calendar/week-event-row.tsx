@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { WeekEvent } from "../type";
 import { CalendarEvent } from "./calendar-event";
+import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 
 type Props = {
   week: Date[];
@@ -24,6 +25,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           return (
             <CalendarEvent
               key={event.id}
+              height={MONTHLY_EVENT_ROW_SIZE}
               isDraggingDate={isDraggingDate}
               top={event.top}
               startWeekDay={event.startWeekDay}
@@ -47,6 +49,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           return (
             <CalendarEvent
               key={weekDay}
+              height={MONTHLY_EVENT_ROW_SIZE}
               isDraggingDate={isDraggingDate}
               top={eventLimit}
               startWeekDay={weekDay}

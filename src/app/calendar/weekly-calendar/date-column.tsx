@@ -8,7 +8,7 @@ import {
   min,
   startOfDay,
 } from "date-fns";
-import { DateEventColumn } from "./date-event-column";
+import { TimedEventColumn } from "./timed-event-column";
 import { NewEvent } from "./new-event";
 import {
   EVENT_MIN_HEIGHT,
@@ -39,7 +39,7 @@ export type DragDateState = {
 
 type Props = {
   date: Date;
-  events: Event[];
+  timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
   onDraggingEventChange: (event: DraggingDateEvent | undefined) => void;
   dragState: DragDateState | undefined;
@@ -53,7 +53,7 @@ type Props = {
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
     date,
-    events,
+    timedEvents,
     draggingEvent,
     onDraggingEventChange,
     scrollableRef,
@@ -285,10 +285,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         {dragState && isSameDay(date, dragState.targetDate) && (
           <NewEvent data={dragState} />
         )}
-        <DateEventColumn
+        <TimedEventColumn
           dateColumnRef={columnRef}
           date={date}
-          events={events}
+          timedEvents={timedEvents}
           draggingEvent={draggingEvent}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}

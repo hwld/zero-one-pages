@@ -15,7 +15,7 @@ export const NewEvent: React.FC<Props> = ({ data }) => {
 
   return (
     <div
-      className="absolute z-10 w-full bg-neutral-900/20"
+      className="absolute z-10 w-full bg-neutral-500/15"
       style={{ top, height }}
     />
   );

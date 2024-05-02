@@ -1,3 +1,4 @@
+// TODO:
 import {
   lastDayOfMonth,
   eachWeekOfInterval,
@@ -11,20 +12,6 @@ import {
   isWithinInterval,
 } from "date-fns";
 import { Event, WeekEvent } from "../type";
-
-export type DragDateRange = {
-  dragStartDate: Date;
-  dragEndDate: Date;
-};
-export const inDragDateRange = (value: Date, range: DragDateRange) => {
-  const startDateTime = range.dragStartDate.getTime();
-  const endDateTime = range.dragEndDate.getTime();
-  const valueTime = value.getTime();
-
-  const min = Math.min(startDateTime, endDateTime);
-  const max = Math.max(startDateTime, endDateTime);
-  return valueTime >= min && valueTime <= max;
-};
 
 export const getCalendarDates = ({
   year,
@@ -151,11 +138,11 @@ export const getWeekEvents = ({
 
   return weekEvents;
 };
+
 /**
  * 特定の週で、表示できるイベントの上限数を超えているイベント数を数え、
  * 曜日をキー、超えているイベント数を値とするMapとして返す関数
  */
-
 export const getExceededEventCountByDayOfWeek = ({
   weekEvents,
   limit,

@@ -14,12 +14,14 @@ import { DraggingDateEvent, Event } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, DragDateState, MouseHistory } from "./date-column";
-import { WEEK_DAY_LABELS } from "../consts";
-import clsx from "clsx";
+import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
+
+export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
 export const WeeklyCalendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
+  const allDayEvents = events.filter((e) => e.allDay);
   const timedEvents = events.filter((e) => !e.allDay);
 
   const week = useMemo(() => {
@@ -79,7 +81,6 @@ export const WeeklyCalendar: React.FC = () => {
   };
 
   const scrollableRef = useRef<HTMLDivElement>(null);
-  const gridColsClass = "grid-cols-[75px,repeat(7,1fr)]";
   return (
     <div className="flex min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -100,30 +101,11 @@ export const WeeklyCalendar: React.FC = () => {
         ref={scrollableRef}
         onScroll={handleScroll}
       >
-        <div
-          className={clsx(
-            "sticky top-0 z-30 grid bg-neutral-100",
-            gridColsClass,
-          )}
-        >
-          <div className="flex select-none flex-col">
-            <div className="h-5" />
-            <div className="flex grow justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
-              終日
-            </div>
-          </div>
-          {week.map((date) => {
-            return (
-              <div className="flex flex-col" key={`${date}`}>
-                <div className="z-30 flex h-5 select-none items-center justify-center gap-1 pb-2 text-xs">
-                  <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
-                  <div>{date.getDate()}</div>
-                </div>
-                <div className="grow border-y border-r border-neutral-300"></div>
-              </div>
-            );
-          })}
-        </div>
+        <WeeklyCalendarDayHeader
+          week={week}
+          onCreateEvent={handleCreateEvent}
+          allDayEvents={allDayEvents}
+        />
 
         <div className="grid grid-cols-[75px,repeat(7,1fr)]">
           <div className="mr-2">
@@ -150,7 +132,7 @@ export const WeeklyCalendar: React.FC = () => {
             return (
               <DateColumn
                 date={date}
-                events={timedEvents}
+                timedEvents={timedEvents}
                 draggingEvent={draggingEvent}
                 onDraggingEventChange={setDraggingEvent}
                 dragState={dragState}

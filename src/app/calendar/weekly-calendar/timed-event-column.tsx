@@ -13,7 +13,7 @@ export const EVENT_DRAG_TYPE = "application/event";
 type Props = {
   dateColumnRef: RefObject<HTMLDivElement>;
   date: Date;
-  events: Event[];
+  timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
   onDragStart: (
     event: DragEvent<HTMLDivElement>,
@@ -23,16 +23,16 @@ type Props = {
   onEventUpdate: (event: DateEvent) => void;
 };
 
-export const DateEventColumn: React.FC<Props> = ({
+export const TimedEventColumn: React.FC<Props> = ({
   dateColumnRef,
   date,
-  events,
+  timedEvents,
   draggingEvent,
   onDragStart,
   onDragEnd,
   onEventUpdate,
 }) => {
-  const dateEvents = getDateEvents({ date, events });
+  const dateEvents = getDateEvents({ date, events: timedEvents });
 
   return dateEvents.map((event) => {
     const top = getTopFromDate(event.start);

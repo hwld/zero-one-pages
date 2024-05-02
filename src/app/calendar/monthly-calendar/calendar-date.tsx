@@ -6,7 +6,7 @@ import {
   max,
   min,
 } from "date-fns";
-import { DragDateRange, inDragDateRange } from "./utils";
+import { DragDateRange, isWithinDragDateRange } from "../utils";
 import { Event } from "../type";
 import clsx from "clsx";
 import { MouseEvent } from "react";
@@ -86,7 +86,7 @@ export const CalendarDate: React.FC<Props> = ({
       <div
         className={clsx(
           "h-full w-full",
-          dragDateRange && inDragDateRange(date, dragDateRange)
+          dragDateRange && isWithinDragDateRange(date, dragDateRange)
             ? "bg-neutral-500/15"
             : "",
         )}

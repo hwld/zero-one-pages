@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../consts";
+import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../consts";
 import {
-  DragDateRange,
   getCalendarDates,
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
 } from "./utils";
+import { DragDateRange } from "../utils";
 import { Event } from "../type";
 import { CalendarDate } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
@@ -57,7 +57,8 @@ export const MonthlyCalendar: React.FC<Props> = ({}) => {
       }
       const eventSpaceHeight = eventSpace.getBoundingClientRect().height;
       // read moreを表示するため、-1する
-      const eventLimit = Math.floor(eventSpaceHeight / EVENT_ROW_SIZE) - 1;
+      const eventLimit =
+        Math.floor(eventSpaceHeight / MONTHLY_EVENT_ROW_SIZE) - 1;
       setEventLimit(eventLimit);
     };
 
