@@ -94,6 +94,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
             (event) => event.top < eventLimit,
           );
           const exceededEventCountMap = getExceededEventCountByDayOfWeek({
+            week,
             weekEvents,
             limit: eventLimit,
           });

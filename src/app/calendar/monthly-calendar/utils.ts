@@ -154,9 +154,11 @@ export const getWeekEvents = ({
  * 曜日をキー、超えているイベント数を値とするMapとして返す関数
  */
 export const getExceededEventCountByDayOfWeek = ({
+  week,
   weekEvents,
   limit,
 }: {
+  week: Date[];
   weekEvents: WeekEvent[];
   limit: number;
 }) => {
@@ -169,6 +171,16 @@ export const getExceededEventCountByDayOfWeek = ({
       return eachDayOfInterval(event);
     })
     .reduce((map, date) => {
+      // 複数の週にまたがるイベントでは、指定した週以外の日付も含まれるので、それを取り除く
+      const isOutsideWeek = !isWithinInterval(date, {
+        start: week[0],
+        end: week[week.length - 1],
+      });
+
+      if (isOutsideWeek) {
+        return map;
+      }
+
       const weekDay = date.getDay();
       const overLimitEventCount = map.get(weekDay);
 

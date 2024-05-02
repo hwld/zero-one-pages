@@ -23,6 +23,7 @@ export const AllDayEventRow: React.FC<Props> = ({
   onExpandChange,
 }) => {
   const exceededEvents = getExceededEventCountByDayOfWeek({
+    week,
     weekEvents: weekAllDayEvents,
     limit: ALL_DAY_EVENT_DISPLAY_LIMIT,
   });
