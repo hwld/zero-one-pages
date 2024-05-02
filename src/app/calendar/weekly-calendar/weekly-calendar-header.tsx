@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { DragDateRange } from "../utils";
 import { max, min } from "date-fns";
 import { AllDayEventRow } from "./all-day-event-row";
+import { getWeekEvents } from "../monthly-calendar/utils";
+import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 
 export const DAY_TITLE_HEIGHT = 20;
 
@@ -21,10 +23,13 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   allDayEvents,
   onCreateEvent,
 }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const weekAllDayEvents = getWeekEvents({ week, events: allDayEvents });
+
   const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
     undefined,
   );
-
   useEffect(() => {
     const createEvent = () => {
       if (!dragDateRange) {
@@ -61,8 +66,22 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     >
       <div className="flex select-none flex-col">
         <div className="h-5" />
-        <div className="flex grow justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
-          終日
+        <div className="flex grow items-start justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
+          <div className="flex items-center gap-1">
+            終日
+            <button
+              className="grid size-6 place-items-center rounded text-[14px] text-neutral-500 transition-colors hover:bg-neutral-500/15"
+              onClick={() => {
+                setExpanded(!expanded);
+              }}
+            >
+              {expanded ? (
+                <TbArrowsDiagonalMinimize className="rotate-45" />
+              ) : (
+                <TbArrowsDiagonal2 className="rotate-45" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
       {week.map((date) => {
@@ -77,17 +96,20 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
             </div>
             <AllDayEventCell
               date={date}
-              events={allDayEvents}
+              events={weekAllDayEvents}
               dragDateRange={dragDateRange}
               onDragDateRangeChange={setDragDateRange}
+              expanded={expanded}
             />
           </div>
         );
       })}
       <AllDayEventRow
         week={week}
-        allDayEvents={allDayEvents}
+        weekAllDayEvents={weekAllDayEvents}
         isDraggingDate={!!dragDateRange}
+        expanded={expanded}
+        onExpandChange={setExpanded}
       />
     </div>
   );

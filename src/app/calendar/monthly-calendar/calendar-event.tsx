@@ -8,6 +8,7 @@ type Props = {
   top: number;
   startWeekDay: number;
   children: ReactNode;
+  onClick?: () => void;
 };
 
 export const CalendarEvent: React.FC<Props> = ({
@@ -17,9 +18,11 @@ export const CalendarEvent: React.FC<Props> = ({
   top,
   startWeekDay,
   children,
+  onClick,
 }) => {
   return (
     <button
+      onClick={onClick}
       className={clsx(
         "absolute pb-[1px] text-sm text-neutral-100",
         isDraggingDate ? "pointer-events-none" : "pointer-events-auto",

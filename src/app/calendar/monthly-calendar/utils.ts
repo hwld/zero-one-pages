@@ -150,6 +150,9 @@ export const getExceededEventCountByDayOfWeek = ({
   weekEvents: WeekEvent[];
   limit: number;
 }) => {
+  type WeekDay = number;
+  type ExceededEventCount = number;
+
   return weekEvents
     .filter((event) => event.top >= limit)
     .flatMap((event) => {
@@ -165,5 +168,5 @@ export const getExceededEventCountByDayOfWeek = ({
         map.set(weekDay, 1);
       }
       return map;
-    }, new Map<number, number>());
+    }, new Map<WeekDay, ExceededEventCount>());
 };
