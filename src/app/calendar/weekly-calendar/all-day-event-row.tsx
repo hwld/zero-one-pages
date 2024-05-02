@@ -1,4 +1,7 @@
-import { CalendarEvent } from "../monthly-calendar/calendar-event";
+import {
+  MoreWeekEventsCard,
+  WeekEventCard,
+} from "../monthly-calendar/week-event-card";
 import { getExceededEventCountByDayOfWeek } from "../monthly-calendar/utils";
 import { WeekEvent } from "../type";
 import { CELL_Y_MARGIN } from "./all-day-event-cell";
@@ -42,18 +45,12 @@ export const AllDayEventRow: React.FC<Props> = ({
     >
       {visibleWeekAllDayEvents.map((event) => {
         return (
-          <CalendarEvent
+          <WeekEventCard
             key={event.id}
+            weekEvent={event}
             height={EVENT_MIN_HEIGHT}
-            isDraggingDate={isDraggingDate}
-            top={event.top}
-            startWeekDay={event.startWeekDay}
-            range={event.endWeekDay - event.startWeekDay + 1}
-          >
-            <div className="flex h-full select-none items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800">
-              {event.title}
-            </div>
-          </CalendarEvent>
+            disablePointerEvents={isDraggingDate}
+          />
         );
       })}
       {expanded
@@ -66,21 +63,15 @@ export const AllDayEventRow: React.FC<Props> = ({
             }
 
             return (
-              <CalendarEvent
+              <MoreWeekEventsCard
                 key={weekDay}
+                count={count}
+                limit={ALL_DAY_EVENT_DISPLAY_LIMIT}
                 height={EVENT_MIN_HEIGHT}
-                isDraggingDate={isDraggingDate}
-                top={ALL_DAY_EVENT_DISPLAY_LIMIT}
-                startWeekDay={weekDay}
-                range={1}
-                onClick={() => {
-                  onExpandChange(true);
-                }}
-              >
-                <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-900/10">
-                  他<span className="mx-1">{count}</span>件
-                </div>
-              </CalendarEvent>
+                disablePointerEvents={isDraggingDate}
+                weekDay={weekDay}
+                onClick={() => onExpandChange(true)}
+              />
             );
           })}
     </div>

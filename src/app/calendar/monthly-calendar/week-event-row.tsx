@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { WeekEvent } from "../type";
-import { CalendarEvent } from "./calendar-event";
+import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 
 type Props = {
@@ -23,18 +23,12 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       >
         {weekEvents.map((event) => {
           return (
-            <CalendarEvent
+            <WeekEventCard
               key={event.id}
               height={MONTHLY_EVENT_ROW_SIZE}
-              isDraggingDate={isDraggingDate}
-              top={event.top}
-              startWeekDay={event.startWeekDay}
-              range={event.endWeekDay - event.startWeekDay + 1}
-            >
-              <div className="flex h-full items-center rounded bg-neutral-700 px-1 transition-colors hover:bg-neutral-800">
-                {event.title}
-              </div>
-            </CalendarEvent>
+              disablePointerEvents={isDraggingDate}
+              weekEvent={event}
+            />
           );
         })}
         {/* 表示上限を超えたイベントの数 */}
@@ -47,18 +41,14 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           }
 
           return (
-            <CalendarEvent
+            <MoreWeekEventsCard
               key={weekDay}
+              weekDay={weekDay}
+              count={count}
+              limit={eventLimit}
+              disablePointerEvents={isDraggingDate}
               height={MONTHLY_EVENT_ROW_SIZE}
-              isDraggingDate={isDraggingDate}
-              top={eventLimit}
-              startWeekDay={weekDay}
-              range={1}
-            >
-              <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-900/10">
-                他<span className="mx-1">{count}</span>件
-              </div>
-            </CalendarEvent>
+            />
           );
         })}
       </div>
