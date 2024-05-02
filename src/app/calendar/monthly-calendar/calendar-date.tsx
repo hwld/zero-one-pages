@@ -59,6 +59,7 @@ export const CalendarDate: React.FC<Props> = ({
 
     onCreateEvent({
       id: crypto.randomUUID(),
+      allDay: true,
       title: "event",
       start: eventStart,
       end: eventEnd,

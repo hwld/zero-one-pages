@@ -3,6 +3,7 @@ import { z } from "zod";
 export const eventSchema = z.object({
   id: z.string(),
   title: z.string(),
+  allDay: z.boolean(),
   start: z.coerce.date(),
   end: z.coerce.date(),
 });

@@ -144,6 +144,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
     onCreateEvent({
       id: crypto.randomUUID(),
+      allDay: false,
       start: minDate,
       end: maxDate,
       title: "event",

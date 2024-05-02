@@ -20,6 +20,7 @@ import clsx from "clsx";
 export const WeeklyCalendar: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
+  const timedEvents = events.filter((e) => !e.allDay);
 
   const week = useMemo(() => {
     const start = startOfDay(startOfWeek(date));
@@ -149,7 +150,7 @@ export const WeeklyCalendar: React.FC = () => {
             return (
               <DateColumn
                 date={date}
-                events={events}
+                events={timedEvents}
                 draggingEvent={draggingEvent}
                 onDraggingEventChange={setDraggingEvent}
                 dragState={dragState}
