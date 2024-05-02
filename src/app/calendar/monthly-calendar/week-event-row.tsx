@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { WeekEvent } from "../type";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
+import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 
 type Props = {
   week: Date[];
@@ -19,7 +20,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
     return (
       <div
         ref={ref}
-        className="pointer-events-none absolute bottom-0 left-0 top-6 mt-2 w-full gap-1"
+        className="pointer-events-none absolute bottom-0 left-0 w-full gap-1"
+        style={{ top: MONTHLY_DATE_HEADER_HEIGHT }}
       >
         {weekEvents.map((event) => {
           return (

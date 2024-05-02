@@ -5,20 +5,22 @@ import { AllDayEventCell } from "./all-day-event-cell";
 import { Event } from "../type";
 import { useEffect, useState } from "react";
 import { DragDateRange } from "../utils";
-import { max, min } from "date-fns";
+import { isSameDay, max, min } from "date-fns";
 import { AllDayEventRow } from "./all-day-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 
-export const DAY_TITLE_HEIGHT = 20;
+export const DAY_TITLE_HEIGHT = 28;
 
 type Props = {
+  currentDate: Date;
   week: Date[];
   allDayEvents: Event[];
   onCreateEvent: (event: Event) => void;
 };
 
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
+  currentDate,
   week,
   allDayEvents,
   onCreateEvent,
@@ -65,7 +67,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
       )}
     >
       <div className="flex select-none flex-col">
-        <div className="h-5" />
+        <div style={{ height: DAY_TITLE_HEIGHT }} />
         <div className="flex grow items-start justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
           <div className="flex items-center gap-1">
             終日
@@ -88,11 +90,19 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         return (
           <div className="flex flex-col" key={`${date}`}>
             <div
-              className="z-30 flex select-none items-center justify-center gap-1 pb-2 text-xs"
+              className="z-30 flex select-none items-center justify-center gap-1 pb-1 text-xs"
               style={{ height: DAY_TITLE_HEIGHT }}
             >
               <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
-              <div>{date.getDate()}</div>
+              <div
+                className={clsx(
+                  "grid size-5 place-items-center rounded",
+                  isSameDay(currentDate, date) &&
+                    "bg-blue-500 text-neutral-100",
+                )}
+              >
+                {date.getDate()}
+              </div>
             </div>
             <AllDayEventCell
               date={date}

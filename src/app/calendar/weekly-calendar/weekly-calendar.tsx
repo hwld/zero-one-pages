@@ -21,17 +21,19 @@ import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
 type Props = {
+  currentDate: Date;
   events: Event[];
   onCreateEvent: (event: Event) => void;
   onUpdateEvent: (event: Event) => void;
 };
 
 export const WeeklyCalendar: React.FC<Props> = ({
+  currentDate,
   events,
   onCreateEvent,
   onUpdateEvent,
 }) => {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(currentDate);
   const allDayEvents = events.filter((e) => e.allDay);
   const timedEvents = events.filter((e) => !e.allDay);
 
@@ -130,6 +132,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
         onScroll={handleScroll}
       >
         <WeeklyCalendarDayHeader
+          currentDate={currentDate}
           week={week}
           onCreateEvent={onCreateEvent}
           allDayEvents={allDayEvents}

@@ -4,9 +4,12 @@ import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
 import "./style.css";
 import { WeeklyCalendar } from "./weekly-calendar/weekly-calendar";
 import { Event } from "./type";
+import { useMinuteClock } from "./use-minute-clock";
 
 type CalendarType = "month" | "week";
 const Page = () => {
+  const currentDate = useMinuteClock();
+
   const [events, setEvents] = useState<Event[]>([]);
 
   const handleCreateEvent = (event: Event) => {
@@ -30,12 +33,17 @@ const Page = () => {
     switch (type) {
       case "month": {
         return (
-          <MonthlyCalendar events={events} onCreateEvent={handleCreateEvent} />
+          <MonthlyCalendar
+            currentDate={currentDate}
+            events={events}
+            onCreateEvent={handleCreateEvent}
+          />
         );
       }
       case "week": {
         return (
           <WeeklyCalendar
+            currentDate={currentDate}
             events={events}
             onCreateEvent={handleCreateEvent}
             onUpdateEvent={handleUpdateEvent}
@@ -46,7 +54,7 @@ const Page = () => {
         throw new Error(type satisfies never);
       }
     }
-  }, [events, type]);
+  }, [currentDate, events, type]);
 
   return (
     <div className="grid h-[100dvh] w-[100dvw] grid-rows-[min-content,1fr] gap-4 overflow-hidden bg-neutral-100 p-4 text-neutral-700">

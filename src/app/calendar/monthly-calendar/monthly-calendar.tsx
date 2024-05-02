@@ -12,10 +12,18 @@ import { WeekEventRow } from "./week-event-row";
 import { addMonths, max, min, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
 
-type Props = { events: Event[]; onCreateEvent: (event: Event) => void };
+type Props = {
+  currentDate: Date;
+  events: Event[];
+  onCreateEvent: (event: Event) => void;
+};
 
-export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
-  const [yearMonth, setYearMonth] = useState(new Date());
+export const MonthlyCalendar: React.FC<Props> = ({
+  currentDate,
+  events,
+  onCreateEvent,
+}) => {
+  const [yearMonth, setYearMonth] = useState(currentDate);
 
   const year = useMemo(() => {
     return yearMonth.getFullYear();
@@ -139,6 +147,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ events, onCreateEvent }) => {
               {week.map((date) => {
                 return (
                   <CalendarDate
+                    currentDate={currentDate}
                     calendarYearMonth={yearMonth}
                     key={date.getTime()}
                     date={date}
