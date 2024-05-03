@@ -31,7 +31,14 @@ export const getCalendarDates = ({
     end: endOfWeek(lastDay),
   });
   const calendar = calendarWeekStarts.map((weekStart) => {
-    return eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart) });
+    const tmp = eachDayOfInterval({
+      start: weekStart,
+      end: endOfWeek(weekStart),
+    });
+
+    // 最後の日付の時刻が0時0分になってしまうので、11時59分の日付を使う
+    const week = [...tmp.slice(0, -1), endOfWeek(weekStart)];
+    return week;
   });
 
   return calendar;
