@@ -68,11 +68,12 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       }
     };
 
-    const handleEventMouseDown = (
-      e: React.MouseEvent<HTMLButtonElement>,
+    const handleEventDragStart = (
+      e: React.DragEvent<HTMLButtonElement>,
       event: Event,
     ) => {
-      e.stopPropagation();
+      // dragの開始をハンドリングしたいだけなので他の挙動は抑制する
+      e.preventDefault();
 
       const date = getDateFromX(e.clientX);
       onChangeDragEvent({ event, dragStartDate: date, dragEndDate: date });
@@ -96,7 +97,9 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
                 height={MONTHLY_EVENT_ROW_SIZE}
                 disablePointerEvents={!!dragDateRange || !!dragEvent}
                 weekEvent={event}
-                onMouseDown={(e) => handleEventMouseDown(e, event)}
+                onMouseDown={(e) => e.stopPropagation()}
+                draggable
+                onDragStart={(e) => handleEventDragStart(e, event)}
               />
             </div>
           );
