@@ -134,19 +134,44 @@ export const getWeekEvents = ({
       }
     }
 
-    // 1週間のうち、開始の曜日と終了の曜日を求める
-    const overlappingDates = getOverlappingDates(
-      { start: week[0], end: week[week.length - 1] },
-      event,
-      { inclusive: true },
-    );
-    const startWeekDay = overlappingDates[0].getDay();
-    const endWeekDay = overlappingDates[overlappingDates.length - 1].getDay();
-
-    weekEvents.push({ ...event, top, startWeekDay, endWeekDay });
+    const weekEvent = convertEventToWeekEvent(event, { top, week });
+    if (weekEvent) {
+      weekEvents.push(weekEvent);
+    }
   }
 
   return weekEvents;
+};
+
+export const convertEventToWeekEvent = (
+  event: Event,
+  { top, week }: { top: number; week: Date[] },
+): WeekEvent | undefined => {
+  if (!week.length) {
+    return undefined;
+  }
+
+  const eventDatesInWeek = getOverlappingDates(
+    {
+      start: week.at(0)!,
+      end: week.at(-1)!,
+    },
+    event,
+    { inclusive: true },
+  );
+
+  if (!eventDatesInWeek.length) {
+    return undefined;
+  }
+
+  const weekEvent: WeekEvent = {
+    ...event,
+    top,
+    startWeekDay: eventDatesInWeek.at(0)!.getDay(),
+    endWeekDay: eventDatesInWeek.at(-1)!.getDay(),
+  };
+
+  return weekEvent;
 };
 
 /**

@@ -5,6 +5,8 @@ import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { DragDateRange, DragEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
+import { DragEventPreview } from "./drag-event-preview";
+import clsx from "clsx";
 
 type Props = {
   week: Date[];
@@ -87,14 +89,18 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       >
         {weekEvents.map((event) => {
           return (
-            <WeekEventCard
+            <div
               key={event.id}
-              topMargin={MONTHLY_DATE_HEADER_HEIGHT}
-              height={MONTHLY_EVENT_ROW_SIZE}
-              disablePointerEvents={isDraggingDate}
-              weekEvent={event}
-              onMouseDown={(e) => handleEventMouseDown(e, event)}
-            />
+              className={clsx(dragEvent?.event.id === event.id && "opacity-50")}
+            >
+              <WeekEventCard
+                topMargin={MONTHLY_DATE_HEADER_HEIGHT}
+                height={MONTHLY_EVENT_ROW_SIZE}
+                disablePointerEvents={isDraggingDate}
+                weekEvent={event}
+                onMouseDown={(e) => handleEventMouseDown(e, event)}
+              />
+            </div>
           );
         })}
         {/* 表示上限を超えたイベントの数 */}
@@ -118,6 +124,9 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
             />
           );
         })}
+        {dragEvent ? (
+          <DragEventPreview week={week} dragEvent={dragEvent} />
+        ) : null}
       </div>
     );
   },
