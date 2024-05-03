@@ -7,7 +7,6 @@ import {
 } from "date-fns";
 import { DragDateRange, isWithinDragDateRange } from "../utils";
 import clsx from "clsx";
-import { MouseEvent } from "react";
 
 export const MONTHLY_DATE_HEADER_HEIGHT = 32;
 
@@ -17,7 +16,6 @@ type Props = {
   date: Date;
   isLastWeek: boolean;
   dragDateRange: DragDateRange | undefined;
-  onDragDateRangeChange: (range: DragDateRange | undefined) => void;
 };
 
 export const CalendarDate: React.FC<Props> = ({
@@ -26,22 +24,7 @@ export const CalendarDate: React.FC<Props> = ({
   date,
   isLastWeek,
   dragDateRange,
-  onDragDateRangeChange,
 }) => {
-  const isDragging = !!dragDateRange;
-
-  const handleMouseDown = (event: MouseEvent) => {
-    if (event.button === 0) {
-      onDragDateRangeChange({ dragStartDate: date, dragEndDate: date });
-    }
-  };
-
-  const handleMouseEnter = () => {
-    if (isDragging) {
-      onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
-    }
-  };
-
   const isSameCalendarYearMonth =
     isSameMonth(calendarYearMonth, date) && isSameYear(calendarYearMonth, date);
 
@@ -53,8 +36,6 @@ export const CalendarDate: React.FC<Props> = ({
         isLastWeek && "border-b",
         isWeekend(date) ? "bg-neutral-200/25" : "",
       )}
-      onMouseDown={handleMouseDown}
-      onMouseEnter={handleMouseEnter}
     >
       <div
         className={clsx(

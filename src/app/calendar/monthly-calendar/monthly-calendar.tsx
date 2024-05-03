@@ -153,7 +153,6 @@ export const MonthlyCalendar: React.FC<Props> = ({
                     date={date}
                     isLastWeek={calendar.length - 1 === i}
                     dragDateRange={dragDateRange}
-                    onDragDateRangeChange={setDragDateRange}
                   />
                 );
               })}
@@ -164,6 +163,8 @@ export const MonthlyCalendar: React.FC<Props> = ({
                 weekEvents={filteredWeekEvents}
                 eventLimit={eventLimit}
                 exceededEventCountMap={exceededEventCountMap}
+                dragDateRange={dragDateRange}
+                onDragDateRangeChange={setDragDateRange}
               />
             </div>
           );

@@ -27,7 +27,7 @@ const Page = () => {
     );
   };
 
-  const [type, setType] = useState<CalendarType>("week");
+  const [type, setType] = useState<CalendarType>("month");
 
   const calendar = useMemo(() => {
     switch (type) {

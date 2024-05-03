@@ -9,6 +9,7 @@ type WeekEventCardBaseProps = {
   range?: number;
   top: number;
   startWeekDay: number;
+  topMargin?: number;
 } & ComponentPropsWithoutRef<"button">;
 
 const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
@@ -18,6 +19,7 @@ const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
   top,
   startWeekDay,
   children,
+  topMargin = 0,
   ...props
 }) => {
   return (
@@ -30,7 +32,7 @@ const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
       style={{
         height: `${height}px`,
         width: `calc(100% / 7  * ${range} - 10px)`,
-        top: `calc(${height}px * ${top})`,
+        top: `calc(${topMargin}px + ${height}px * ${top})`,
         left: `calc(100% / 7 * ${startWeekDay})`,
       }}
     >
@@ -43,11 +45,13 @@ type WeekEventCardProps = {
   height: number;
   disablePointerEvents: boolean;
   weekEvent: WeekEvent;
+  topMargin?: number;
 };
 export const WeekEventCard: React.FC<WeekEventCardProps> = ({
   height,
   disablePointerEvents,
   weekEvent,
+  topMargin,
 }) => {
   return (
     <WeekEventCardBase
@@ -56,6 +60,7 @@ export const WeekEventCard: React.FC<WeekEventCardProps> = ({
       top={weekEvent.top}
       startWeekDay={weekEvent.startWeekDay}
       range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
+      topMargin={topMargin}
     >
       <div className="flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800">
         {!weekEvent.allDay ? (
