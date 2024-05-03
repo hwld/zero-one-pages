@@ -13,7 +13,6 @@ type Props = {
   weekEvents: WeekEvent[];
   eventLimit: number;
   exceededEventCountMap: Map<number, number>;
-  isDraggingDate: boolean;
   dragDateRange: DragDateRange | undefined;
   onDragDateRangeChange: (range: DragDateRange | undefined) => void;
   dragEvent: DragEvent | undefined;
@@ -27,7 +26,6 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       weekEvents,
       eventLimit,
       exceededEventCountMap,
-      isDraggingDate,
       dragDateRange,
       onDragDateRangeChange,
       dragEvent,
@@ -96,7 +94,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               <WeekEventCard
                 topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                 height={MONTHLY_EVENT_ROW_SIZE}
-                disablePointerEvents={isDraggingDate}
+                disablePointerEvents={!!dragDateRange || !!dragEvent}
                 weekEvent={event}
                 onMouseDown={(e) => handleEventMouseDown(e, event)}
               />
@@ -119,7 +117,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={isDraggingDate}
+              disablePointerEvents={!!dragDateRange || !!dragEvent}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );

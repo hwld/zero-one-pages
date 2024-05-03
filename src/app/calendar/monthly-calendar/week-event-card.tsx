@@ -44,6 +44,7 @@ const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
 type WeekEventCardProps = {
   height: number;
   disablePointerEvents: boolean;
+  isDragging?: boolean;
   weekEvent: WeekEvent;
   topMargin?: number;
 } & Omit<ComponentPropsWithoutRef<"button">, "className">;
@@ -51,6 +52,7 @@ type WeekEventCardProps = {
 export const WeekEventCard: React.FC<WeekEventCardProps> = ({
   height,
   disablePointerEvents,
+  isDragging = false,
   weekEvent,
   topMargin,
   ...props
@@ -65,7 +67,12 @@ export const WeekEventCard: React.FC<WeekEventCardProps> = ({
       topMargin={topMargin}
       {...props}
     >
-      <div className="flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800">
+      <div
+        className={clsx(
+          "flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800",
+          isDragging && "bg-neutral-800 ring ring-blue-500",
+        )}
+      >
         {!weekEvent.allDay ? (
           <span className="mr-1">{format(weekEvent.start, "aa hh:mm")}</span>
         ) : null}

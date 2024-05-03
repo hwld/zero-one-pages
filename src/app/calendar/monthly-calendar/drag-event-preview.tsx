@@ -33,6 +33,7 @@ export const DragEventPreview: React.FC<Props> = ({ week, dragEvent }) => {
         height={MONTHLY_EVENT_ROW_SIZE}
         weekEvent={weekEvent}
         disablePointerEvents={true}
+        isDragging={true}
       />
     </div>
   );

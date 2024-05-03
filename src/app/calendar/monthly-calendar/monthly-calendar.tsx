@@ -195,7 +195,6 @@ export const MonthlyCalendar: React.FC<Props> = ({
               })}
               <WeekEventRow
                 ref={i === 0 ? firstWeekEventRowRef : undefined}
-                isDraggingDate={!!dragDateRange}
                 week={week}
                 weekEvents={filteredWeekEvents}
                 eventLimit={eventLimit}

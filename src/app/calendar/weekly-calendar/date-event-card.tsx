@@ -52,7 +52,7 @@ export const PreviewDateEventCard = forwardRef<
     <DateEventCardBase
       ref={ref}
       className={clsx(
-        "pointer-events-none z-20 w-full",
+        "pointer-events-none z-20 w-full ring ring-blue-500",
         visible ? "opacity-100" : "opacity-0",
       )}
       style={{
