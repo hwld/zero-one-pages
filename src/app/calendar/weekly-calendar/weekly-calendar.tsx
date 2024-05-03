@@ -162,6 +162,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
           {week.map((date) => {
             return (
               <DateColumn
+                currentDate={currentDate}
                 date={date}
                 timedEvents={timedEvents}
                 draggingEvent={draggingEvent}

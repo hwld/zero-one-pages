@@ -36,6 +36,7 @@ export type DragDateState = {
 };
 
 type Props = {
+  currentDate: Date;
   date: Date;
   timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
@@ -49,6 +50,7 @@ type Props = {
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
+    currentDate,
     date,
     timedEvents,
     draggingEvent,
@@ -248,6 +250,18 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             />
           );
         })}
+        {isSameDay(currentDate, date) ? (
+          <div
+            className="absolute z-30 h-[1px] w-full border-y-[1px] border-blue-500 bg-blue-500"
+            style={{
+              top:
+                (EVENT_MIN_HEIGHT / EVENT_MIN_MINUTES) *
+                differenceInMinutes(currentDate, startOfDay(currentDate)),
+            }}
+          >
+            <div className="absolute left-0 size-3 -translate-x-[50%] -translate-y-[50%] rounded-full bg-blue-500" />
+          </div>
+        ) : null}
         {dragState && isSameDay(date, dragState.targetDate) && (
           <NewEvent data={dragState} />
         )}

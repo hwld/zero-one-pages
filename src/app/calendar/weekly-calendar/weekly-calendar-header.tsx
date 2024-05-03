@@ -62,7 +62,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   return (
     <div
       className={clsx(
-        "sticky top-0 z-30 grid bg-neutral-100",
+        "sticky top-0 z-40 grid bg-neutral-100",
         WEEKLY_CALENDAR_GRID_COLS_CLASS,
       )}
     >
@@ -90,7 +90,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         return (
           <div className="flex flex-col" key={`${date}`}>
             <div
-              className="z-30 flex select-none items-center justify-center gap-1 pb-1 text-xs"
+              className="flex select-none items-center justify-center gap-1 pb-1 text-xs"
               style={{ height: DAY_TITLE_HEIGHT }}
             >
               <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
