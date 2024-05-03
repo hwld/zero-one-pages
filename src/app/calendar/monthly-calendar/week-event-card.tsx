@@ -46,12 +46,14 @@ type WeekEventCardProps = {
   disablePointerEvents: boolean;
   weekEvent: WeekEvent;
   topMargin?: number;
-};
+} & Omit<ComponentPropsWithoutRef<"button">, "className">;
+
 export const WeekEventCard: React.FC<WeekEventCardProps> = ({
   height,
   disablePointerEvents,
   weekEvent,
   topMargin,
+  ...props
 }) => {
   return (
     <WeekEventCardBase
@@ -61,6 +63,7 @@ export const WeekEventCard: React.FC<WeekEventCardProps> = ({
       startWeekDay={weekEvent.startWeekDay}
       range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
       topMargin={topMargin}
+      {...props}
     >
       <div className="flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800">
         {!weekEvent.allDay ? (
@@ -79,14 +82,17 @@ type MoreWeekEventsCardProps = {
   height: number;
   disablePointerEvents: boolean;
   weekDay: number;
+  topMargin?: number;
   onClick?: () => void;
 };
+
 export const MoreWeekEventsCard: React.FC<MoreWeekEventsCardProps> = ({
   count,
   limit,
   height,
   disablePointerEvents,
   weekDay,
+  topMargin,
   onClick,
 }) => {
   return (
@@ -96,7 +102,9 @@ export const MoreWeekEventsCard: React.FC<MoreWeekEventsCardProps> = ({
       top={limit}
       startWeekDay={weekDay}
       range={1}
+      onMouseDown={(e) => e.stopPropagation()}
       onClick={onClick}
+      topMargin={topMargin}
     >
       <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-900/10">
         他<span className="mx-1">{count}</span>件

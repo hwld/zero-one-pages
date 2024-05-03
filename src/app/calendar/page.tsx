@@ -37,6 +37,7 @@ const Page = () => {
             currentDate={currentDate}
             events={events}
             onCreateEvent={handleCreateEvent}
+            onUpdateEvent={handleUpdateEvent}
           />
         );
       }

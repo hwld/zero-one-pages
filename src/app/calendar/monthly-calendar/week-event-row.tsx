@@ -1,9 +1,9 @@
 import { forwardRef, useRef } from "react";
-import { WeekEvent } from "../type";
+import { Event, WeekEvent } from "../type";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DragDateRange } from "../utils";
+import { DragDateRange, DragEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
   isDraggingDate: boolean;
   dragDateRange: DragDateRange | undefined;
   onDragDateRangeChange: (range: DragDateRange | undefined) => void;
+  dragEvent: DragEvent | undefined;
+  onChangeDragEvent: (event: DragEvent | undefined) => void;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -26,6 +28,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       isDraggingDate,
       dragDateRange,
       onDragDateRangeChange,
+      dragEvent,
+      onChangeDragEvent,
     },
     _ref,
   ) {
@@ -43,7 +47,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       return week[weekDay];
     };
 
-    const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleRowMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
       if (event.button !== 0) {
         return;
       }
@@ -52,21 +56,34 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       onDragDateRangeChange({ dragStartDate: date, dragEndDate: date });
     };
 
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-      if (!dragDateRange) {
-        return;
+    const handleRowMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+      const date = getDateFromX(event.clientX);
+
+      if (dragDateRange) {
+        onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
       }
 
-      const date = getDateFromX(event.clientX);
-      onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
+      if (dragEvent) {
+        onChangeDragEvent({ ...dragEvent, dragEndDate: date });
+      }
+    };
+
+    const handleEventMouseDown = (
+      e: React.MouseEvent<HTMLButtonElement>,
+      event: Event,
+    ) => {
+      e.stopPropagation();
+
+      const date = getDateFromX(e.clientX);
+      onChangeDragEvent({ event, dragStartDate: date, dragEndDate: date });
     };
 
     return (
       <div
         ref={ref}
         className="absolute bottom-0 left-0 top-0 w-full gap-1"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
+        onMouseDown={handleRowMouseDown}
+        onMouseMove={handleRowMouseMove}
       >
         {weekEvents.map((event) => {
           return (
@@ -76,6 +93,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               height={MONTHLY_EVENT_ROW_SIZE}
               disablePointerEvents={isDraggingDate}
               weekEvent={event}
+              onMouseDown={(e) => handleEventMouseDown(e, event)}
             />
           );
         })}
@@ -91,6 +109,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           return (
             <MoreWeekEventsCard
               key={weekDay}
+              topMargin={MONTHLY_DATE_HEADER_HEIGHT}
               weekDay={weekDay}
               count={count}
               limit={eventLimit}

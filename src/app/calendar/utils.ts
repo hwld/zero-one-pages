@@ -1,5 +1,6 @@
 // TODO:
 import { isWithinInterval, min, max } from "date-fns";
+import { Event } from "./type";
 
 export type DragDateRange = {
   dragStartDate: Date;
@@ -14,3 +15,7 @@ export const isWithinDragDateRange = (date: Date, range: DragDateRange) => {
     end: max([dragStartDate, dragEndDate]),
   });
 };
+
+export type DragEvent = {
+  event: Event;
+} & DragDateRange;
