@@ -187,7 +187,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         end: endOfDay(date),
       },
       draggingEvent,
-      { inclusive: true },
     );
   }, [date, draggingEvent]);
 
