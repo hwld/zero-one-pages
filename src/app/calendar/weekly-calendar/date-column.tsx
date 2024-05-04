@@ -21,6 +21,7 @@ import {
   MutableRefObject,
   RefObject,
   forwardRef,
+  useEffect,
   useMemo,
   useRef,
 } from "react";
@@ -190,6 +191,15 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     );
   }, [date, draggingEvent]);
 
+  const currentTimeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!currentTimeRef.current) {
+      return;
+    }
+
+    currentTimeRef.current.scrollIntoView({ block: "center" });
+  }, []);
+
   return (
     <div className="flex flex-col gap-2" ref={ref}>
       <div
@@ -214,6 +224,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         })}
         {isSameDay(currentDate, date) ? (
           <div
+            ref={currentTimeRef}
             className="absolute z-30 h-[1px] w-full border-y-[1px] border-blue-500 bg-blue-500"
             style={{
               top:
