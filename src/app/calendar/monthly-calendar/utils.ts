@@ -11,6 +11,7 @@ import {
   differenceInCalendarDays,
   isWithinInterval,
   startOfDay,
+  endOfDay,
 } from "date-fns";
 import { Event, WeekEvent } from "../type";
 
@@ -31,14 +32,10 @@ export const getCalendarDates = ({
     end: endOfWeek(lastDay),
   });
   const calendar = calendarWeekStarts.map((weekStart) => {
-    const tmp = eachDayOfInterval({
+    return eachDayOfInterval({
       start: weekStart,
       end: endOfWeek(weekStart),
     });
-
-    // 最後の日付の時刻が0時0分になってしまうので、11時59分の日付を使う
-    const week = [...tmp.slice(0, -1), endOfWeek(weekStart)];
-    return week;
   });
 
   return calendar;
@@ -68,7 +65,7 @@ export const getWeekEvents = ({
   const sortedEvents = events
     .filter((event) => {
       const overlapping = areIntervalsOverlapping(
-        { start: week[0], end: week[week.length - 1] },
+        { start: startOfDay(week[0]), end: endOfDay(week[week.length - 1]) },
         event,
         { inclusive: true },
       );
@@ -160,8 +157,8 @@ export const convertEventToWeekEvent = (
 
   const eventDatesInWeek = getOverlappingDates(
     {
-      start: week.at(0)!,
-      end: week.at(-1)!,
+      start: startOfDay(week.at(0)!),
+      end: endOfDay(week.at(-1)!),
     },
     event,
     { inclusive: true },
@@ -205,8 +202,8 @@ export const getExceededEventCountByDayOfWeek = ({
     .reduce((map, date) => {
       // 複数の週にまたがるイベントでは、指定した週以外の日付も含まれるので、それを取り除く
       const isOutsideWeek = !isWithinInterval(date, {
-        start: week[0],
-        end: week[week.length - 1],
+        start: startOfDay(week[0]),
+        end: endOfDay(week[week.length - 1]),
       });
 
       if (isOutsideWeek) {
