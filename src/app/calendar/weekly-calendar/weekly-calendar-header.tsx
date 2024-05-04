@@ -4,7 +4,7 @@ import { WEEK_DAY_LABELS } from "../consts";
 import { AllDayEventCell } from "./all-day-event-cell";
 import { Event } from "../type";
 import { useEffect, useState } from "react";
-import { DragDateRange } from "../utils";
+import { DragDateRange, DragEvent, getEventFromDragEvent } from "../utils";
 import { isSameDay, max, min } from "date-fns";
 import { AllDayEventRow } from "./all-day-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
@@ -17,6 +17,7 @@ type Props = {
   week: Date[];
   allDayEvents: Event[];
   onCreateEvent: (event: Event) => void;
+  onUpdateEvent: (event: Event) => void;
 };
 
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
@@ -24,6 +25,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   week,
   allDayEvents,
   onCreateEvent,
+  onUpdateEvent,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -33,7 +35,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     undefined,
   );
   useEffect(() => {
-    const createEvent = (e: MouseEvent) => {
+    const createAllDayEvent = (e: MouseEvent) => {
       if (!dragDateRange || e.button !== 0) {
         return;
       }
@@ -53,11 +55,33 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
       setDragDateRange(undefined);
     };
 
-    document.addEventListener("mouseup", createEvent);
+    document.addEventListener("mouseup", createAllDayEvent);
     return () => {
-      document.removeEventListener("mouseup", createEvent);
+      document.removeEventListener("mouseup", createAllDayEvent);
     };
   }, [dragDateRange, onCreateEvent]);
+
+  const [dragAllDayEvent, setDragAllDayEvent] = useState<DragEvent | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    const moveAllDayEvent = (e: MouseEvent) => {
+      if (!dragAllDayEvent || e.button !== 0) {
+        return;
+      }
+
+      const newEvent = getEventFromDragEvent(dragAllDayEvent);
+      onUpdateEvent(newEvent);
+
+      setDragAllDayEvent(undefined);
+    };
+
+    document.addEventListener("mouseup", moveAllDayEvent);
+    return () => {
+      document.removeEventListener("mouseup", moveAllDayEvent);
+    };
+  }, [dragAllDayEvent, onUpdateEvent]);
 
   return (
     <div
@@ -108,7 +132,6 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
               date={date}
               events={weekAllDayEvents}
               dragDateRange={dragDateRange}
-              onDragDateRangeChange={setDragDateRange}
               expanded={expanded}
             />
           </div>
@@ -120,6 +143,10 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         isDraggingDate={!!dragDateRange}
         expanded={expanded}
         onExpandChange={setExpanded}
+        dragEvent={dragAllDayEvent}
+        onChangeDragEvent={setDragAllDayEvent}
+        dragDateRange={dragDateRange}
+        onChangeDragDateRange={setDragDateRange}
       />
     </div>
   );

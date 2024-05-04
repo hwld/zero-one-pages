@@ -5,18 +5,11 @@ import {
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
 } from "./utils";
-import { DragDateRange, DragEvent } from "../utils";
+import { DragDateRange, DragEvent, getEventFromDragEvent } from "../utils";
 import { Event } from "../type";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
-import {
-  addDays,
-  addMonths,
-  differenceInDays,
-  max,
-  min,
-  subMonths,
-} from "date-fns";
+import { addMonths, max, min, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
 
 type Props = {
@@ -124,14 +117,9 @@ export const MonthlyCalendar: React.FC<Props> = ({
         return;
       }
 
-      const { dragStartDate, dragEndDate } = dragEvent;
-      const diffDay = differenceInDays(dragEndDate, dragStartDate);
+      const newEvent = getEventFromDragEvent(dragEvent);
+      onUpdateEvent(newEvent);
 
-      const event = dragEvent.event;
-      const newStart = addDays(event.start, diffDay);
-      const newEnd = addDays(event.end, diffDay);
-
-      onUpdateEvent({ ...dragEvent.event, start: newStart, end: newEnd });
       setDragEvent(undefined);
     };
 

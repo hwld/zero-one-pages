@@ -152,6 +152,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
           currentDate={currentDate}
           week={week}
           onCreateEvent={onCreateEvent}
+          onUpdateEvent={onUpdateEvent}
           allDayEvents={allDayEvents}
         />
 

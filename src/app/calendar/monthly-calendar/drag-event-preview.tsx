@@ -4,11 +4,19 @@ import { addDays, differenceInDays } from "date-fns";
 import { WeekEvent } from "../type";
 import { convertEventToWeekEvent } from "./utils";
 import { WeekEventCard } from "./week-event-card";
-import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
-import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 
-type Props = { week: Date[]; dragEvent: DragEvent };
-export const DragEventPreview: React.FC<Props> = ({ week, dragEvent }) => {
+type Props = {
+  week: Date[];
+  dragEvent: DragEvent;
+  topMargin?: number;
+  height: number;
+};
+export const DragEventPreview: React.FC<Props> = ({
+  week,
+  dragEvent,
+  topMargin = 0,
+  height,
+}) => {
   const weekEvent: WeekEvent | undefined = useMemo(() => {
     const { event, dragStartDate, dragEndDate } = dragEvent;
 
@@ -29,8 +37,8 @@ export const DragEventPreview: React.FC<Props> = ({ week, dragEvent }) => {
   return (
     <div className="absolute left-0 top-0 w-full">
       <WeekEventCard
-        topMargin={MONTHLY_DATE_HEADER_HEIGHT}
-        height={MONTHLY_EVENT_ROW_SIZE}
+        topMargin={topMargin}
+        height={height}
         weekEvent={weekEvent}
         disablePointerEvents={true}
         isDragging={true}

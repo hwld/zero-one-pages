@@ -26,7 +26,6 @@ const calcCellHeight = (
 type Props = {
   date: Date;
   dragDateRange: DragDateRange | undefined;
-  onDragDateRangeChange: (range: DragDateRange) => void;
   events: Event[];
   expanded: boolean;
 };
@@ -35,21 +34,10 @@ export const AllDayEventCell: React.FC<Props> = ({
   date,
   dragDateRange,
   events,
-  onDragDateRangeChange,
   expanded,
 }) => {
   const eventsOnDate = events.filter((e) => isWithinInterval(date, e)).length;
   const isDragging = dragDateRange !== undefined;
-
-  const handleMouseDown = () => {
-    onDragDateRangeChange({ dragStartDate: date, dragEndDate: date });
-  };
-
-  const handleMouseEnter = () => {
-    if (isDragging) {
-      onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
-    }
-  };
 
   return (
     <div
@@ -59,8 +47,6 @@ export const AllDayEventCell: React.FC<Props> = ({
           ? "bg-neutral-500/15"
           : "",
       )}
-      onMouseDown={handleMouseDown}
-      onMouseEnter={handleMouseEnter}
       style={{
         height: `${calcCellHeight(eventsOnDate, { expanded })}px`,
       }}

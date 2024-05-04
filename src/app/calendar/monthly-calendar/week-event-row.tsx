@@ -126,7 +126,12 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           );
         })}
         {dragEvent ? (
-          <DragEventPreview week={week} dragEvent={dragEvent} />
+          <DragEventPreview
+            week={week}
+            dragEvent={dragEvent}
+            topMargin={MONTHLY_DATE_HEADER_HEIGHT}
+            height={MONTHLY_EVENT_ROW_SIZE}
+          />
         ) : null}
       </div>
     );
