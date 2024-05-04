@@ -100,7 +100,8 @@ export const pages: Page[] = [
     icon: CalendarIcon,
     href: "/calendar",
     title: "Calendar",
-    description: "予定を書き込めるカレンダー",
+    description:
+      "Google Calendarみたいなカレンダー。日付操作ライブラリだけ使った。",
     tags: ["PC", "PART", "WIP"],
   },
 ];

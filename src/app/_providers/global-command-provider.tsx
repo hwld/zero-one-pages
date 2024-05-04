@@ -155,7 +155,7 @@ export const GlobalCommand: React.FC = () => {
           <DialogPortal forceMount>
             <DialogOverlay asChild>
               <motion.div
-                className="fixed inset-0 bg-black/50"
+                className="fixed inset-0 z-[99] bg-black/50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -163,7 +163,7 @@ export const GlobalCommand: React.FC = () => {
             </DialogOverlay>
             <DialogContent asChild>
               <motion.div
-                className="fixed left-1/2 top-1/2 h-[350px] w-[95%] max-w-[550px] overflow-hidden rounded-lg border border-neutral-700 bg-neutral-900 text-neutral-200"
+                className="fixed left-1/2 top-1/2 z-[100] h-[350px] w-[95%] max-w-[550px] overflow-hidden rounded-lg border border-neutral-700 bg-neutral-900 text-neutral-200"
                 initial={{ opacity: 0, x: "-50%", y: "-60%" }}
                 animate={{ opacity: 1, x: "-50%", y: "-50%" }}
                 exit={{ opacity: 0, x: "-50%", y: "-60%" }}
