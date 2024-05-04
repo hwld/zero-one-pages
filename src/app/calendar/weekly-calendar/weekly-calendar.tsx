@@ -44,6 +44,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return eachDayOfInterval({ start, end });
   }, [date]);
 
+  // TODO: drag操作が増えてきてなんのための状態かわかりにくすぎる
   const [dragState, setDragState] = useState<DragDateState | undefined>(
     undefined,
   );
@@ -109,6 +110,22 @@ export const WeeklyCalendar: React.FC<Props> = ({
       document.removeEventListener("mouseup", createEvent);
     };
   }, [dragState, onCreateEvent]);
+
+  useEffect(() => {
+    const moveEvent = () => {
+      if (!draggingEvent) {
+        return;
+      }
+
+      onUpdateEvent(draggingEvent);
+      setDraggingEvent(undefined);
+    };
+
+    document.addEventListener("mouseup", moveEvent);
+    return () => {
+      document.removeEventListener("mouseup", moveEvent);
+    };
+  }, [draggingEvent, onUpdateEvent]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (

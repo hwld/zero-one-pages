@@ -1,5 +1,6 @@
 import {
   addMinutes,
+  areIntervalsOverlapping,
   differenceInMinutes,
   eachHourOfInterval,
   endOfDay,
@@ -22,7 +23,6 @@ import {
   forwardRef,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { DateEvent, DraggingDateEvent, Event } from "../type";
 import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
@@ -103,15 +103,13 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     });
   };
 
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
+  const updateDragState = (mouseY: number) => {
     if (!dragState || !columnRef.current || !scrollableRef.current) {
       return;
     }
 
     const columnY = columnRef.current.getBoundingClientRect().y;
-    const y = e.clientY - columnY;
+    const y = mouseY - columnY;
 
     mouseHistoryRef.current = {
       y,
@@ -123,51 +121,15 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     });
   };
 
-  const dropPreviewRef = useRef<HTMLDivElement>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  const handleDragStart = (
-    event: DragEvent<HTMLDivElement>,
-    dateEvent: DateEvent,
-  ) => {
-    if (!dropPreviewRef.current) {
-      return;
-    }
-
-    event.dataTransfer.setDragImage(dropPreviewRef.current, 0, 0);
-    event.dataTransfer.effectAllowed = "move";
-
-    const dateEventY = event.currentTarget.getBoundingClientRect().y;
-    onDraggingEventChange({
-      ...dateEvent,
-      dragStartY: event.clientY - dateEventY,
-    });
-  };
-
-  const handleDragEnd = () => {
-    onDraggingEventChange(undefined);
-  };
-
-  const [dropPreviewEventPart, setDropPreviewEventPart] = useState<
-    | {
-        top: string;
-        height: string;
-        start: Date;
-        end: Date;
-      }
-    | undefined
-  >(undefined);
-  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const updateDraggingEvent = (mouseY: number) => {
     if (!draggingEvent || !dropPreviewRef.current || !columnRef.current) {
       return;
     }
 
-    setIsDragOver(true);
     const columnRect = columnRef.current.getBoundingClientRect();
     const previewHeight = getHeightFromDate(draggingEvent);
 
-    let previewTop = e.clientY - columnRect.y - draggingEvent.dragStartY;
+    let previewTop = mouseY - columnRect.y - draggingEvent.dragStartY;
     if (previewTop < 0) {
       previewTop = 0;
     }
@@ -183,48 +145,51 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       differenceInMinutes(draggingEvent.end, draggingEvent.start),
     );
 
-    setDropPreviewEventPart({
-      top: `${previewTop}px`,
-      height: `${previewHeight}px`,
-      start: startDate,
-      end: endDate,
+    onDraggingEventChange({ ...draggingEvent, start: startDate, end: endDate });
+  };
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    if (dragState) {
+      updateDragState(e.clientY);
+    }
+
+    if (draggingEvent) {
+      updateDraggingEvent(e.clientY);
+    }
+  };
+
+  const dropPreviewRef = useRef<HTMLDivElement>(null);
+
+  const handleDragStart = (
+    event: DragEvent<HTMLDivElement>,
+    dateEvent: DateEvent,
+  ) => {
+    // dragImageがうまく設定できなかったので、DnD APIではなくマウスイベントで処理する
+    event.preventDefault();
+
+    const dateEventY = event.currentTarget.getBoundingClientRect().y;
+    onDraggingEventChange({
+      ...dateEvent,
+      dragStartY: event.clientY - dateEventY,
     });
   };
 
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  const handleDrop = () => {
+  const isPreviewVisible = useMemo(() => {
     if (!draggingEvent) {
-      return;
+      return false;
     }
 
-    onUpdateEvent({
-      ...draggingEvent,
-      start: dropPreviewEventPart?.start ?? draggingEvent.start,
-      end: dropPreviewEventPart?.end ?? draggingEvent.end,
-    });
-
-    setIsDragOver(false);
-    onDraggingEventChange(undefined);
-  };
-
-  const previewEvent = useMemo((): DateEvent | undefined => {
-    if (!draggingEvent) {
-      return undefined;
-    }
-
-    const start = dropPreviewEventPart
-      ? dropPreviewEventPart.start
-      : draggingEvent.start;
-
-    const end = dropPreviewEventPart
-      ? dropPreviewEventPart.end
-      : draggingEvent.end;
-
-    return { ...draggingEvent, start, end };
-  }, [draggingEvent, dropPreviewEventPart]);
+    return areIntervalsOverlapping(
+      {
+        start: startOfDay(date),
+        end: endOfDay(date),
+      },
+      draggingEvent,
+      { inclusive: true },
+    );
+  }, [date, draggingEvent]);
 
   return (
     <div className="flex flex-col gap-2" ref={ref}>
@@ -235,9 +200,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         draggable={false}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
       >
         {hours.map((hour, i) => {
           if (i === 0) {
@@ -267,24 +229,24 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           <NewEvent data={dragState} />
         )}
         {dateEvents.map((event) => {
+          const dragging = event.id === draggingEvent?.id;
+
           return (
             <DateEventCard
               dateColumnRef={columnRef}
               key={event.id}
               event={event}
               onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
               onEventUpdate={onUpdateEvent}
-              dragging={event.id === draggingEvent?.id}
+              dragging={dragging}
+              draggingOther={draggingEvent ? !dragging : false}
             />
           );
         })}
         <PreviewDateEventCard
           ref={dropPreviewRef}
-          event={previewEvent}
-          visible={isDragOver}
-          top={dropPreviewEventPart?.top}
-          height={dropPreviewEventPart?.height}
+          event={draggingEvent}
+          visible={isPreviewVisible}
         />
       </div>
     </div>

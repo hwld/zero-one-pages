@@ -50,21 +50,23 @@ export const PreviewDateEventCard = forwardRef<
   {
     event: DateEvent | undefined;
     visible: boolean;
-    top?: string;
-    height?: string;
   }
->(function PreviewDateEventCard({ event, visible, top, height }, ref) {
+>(function PreviewDateEventCard({ event, visible }, ref) {
+  const style = useMemo(() => {
+    const top = event && getTopFromDate(event.start);
+    const height = event && getHeightFromDate(event);
+
+    return { top, height };
+  }, [event]);
+
   return (
     <DateEventCardBase
       ref={ref}
       className={clsx(
-        "pointer-events-none z-20 w-full ring ring-blue-500",
+        "pointer-events-none z-20 w-full bg-neutral-800 ring ring-blue-500",
         visible ? "opacity-100" : "opacity-0",
       )}
-      style={{
-        top,
-        height,
-      }}
+      style={style}
     >
       {event && <DateEventCardContent event={event} />}
     </DateEventCardBase>
@@ -80,14 +82,21 @@ type DateEventCardProps = {
   dateColumnRef?: RefObject<HTMLDivElement>;
   event: DateEvent;
   dragging: boolean;
+  draggingOther: boolean;
   onDragStart: (e: DragEvent<HTMLDivElement>, event: DateEvent) => void;
-  onDragEnd: () => void;
   onEventUpdate: (event: DateEvent) => void;
 };
 
 export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
   function DateEventCard(
-    { event, dragging, dateColumnRef, onEventUpdate, onDragStart, onDragEnd },
+    {
+      event,
+      dragging,
+      draggingOther,
+      dateColumnRef,
+      onEventUpdate,
+      onDragStart,
+    },
     ref,
   ) {
     const [globalResizeState, setGlobalResizeState] = useAtom(resizeStateAtom);
@@ -217,7 +226,6 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
         onDragStart={(e) => {
           onDragStart(e, event);
         }}
-        onDragEnd={onDragEnd}
         style={{
           top: style.top,
           left: isResizing ? "0" : style.left,
@@ -225,7 +233,9 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
           width: isResizing ? "100%" : style.width,
         }}
         className={clsx(
-          !isResizingOtherEvents && "hover:z-10 hover:bg-neutral-800",
+          !isResizingOtherEvents &&
+            !draggingOther &&
+            "hover:z-10 hover:bg-neutral-800",
           isResizing && "z-20 bg-neutral-800",
           dragging ? "opacity-50" : "opacity-100",
         )}
