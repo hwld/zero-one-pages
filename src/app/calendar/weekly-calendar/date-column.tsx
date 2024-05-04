@@ -6,11 +6,11 @@ import {
   isSameDay,
   startOfDay,
 } from "date-fns";
-import { TimedEventColumn } from "./timed-event-column";
 import { NewEvent } from "./new-event";
 import {
   EVENT_MIN_HEIGHT,
   EVENT_MIN_MINUTES,
+  getDateEvents,
   getDateFromY,
   getHeightFromDate,
 } from "./utils";
@@ -25,7 +25,7 @@ import {
   useState,
 } from "react";
 import { DateEvent, DraggingDateEvent, Event } from "../type";
-import { PreviewDateEventCard } from "./date-event-card";
+import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -64,6 +64,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   ref,
 ) {
   const columnRef = useRef<HTMLDivElement>(null);
+  const dateEvents = getDateEvents({ date, events: timedEvents });
 
   const hours = useMemo(
     () =>
@@ -265,15 +266,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         {dragState && isSameDay(date, dragState.targetDate) && (
           <NewEvent data={dragState} />
         )}
-        <TimedEventColumn
-          dateColumnRef={columnRef}
-          date={date}
-          timedEvents={timedEvents}
-          draggingEvent={draggingEvent}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onUpdateEvent={onUpdateEvent}
-        />
+        {dateEvents.map((event) => {
+          return (
+            <DateEventCard
+              dateColumnRef={columnRef}
+              key={event.id}
+              event={event}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onEventUpdate={onUpdateEvent}
+              dragging={event.id === draggingEvent?.id}
+            />
+          );
+        })}
         <PreviewDateEventCard
           ref={dropPreviewRef}
           event={previewEvent}

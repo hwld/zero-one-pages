@@ -4,9 +4,15 @@ import {
   RefObject,
   forwardRef,
   useEffect,
+  useMemo,
 } from "react";
 import { DateEvent } from "../type";
-import { formatEventDateSpan, getDateFromY } from "./utils";
+import {
+  formatEventDateSpan,
+  getDateFromY,
+  getHeightFromDate,
+  getTopFromDate,
+} from "./utils";
 import { cn } from "@/lib/utils";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import clsx from "clsx";
@@ -77,25 +83,39 @@ type DateEventCardProps = {
   onDragStart: (e: DragEvent<HTMLDivElement>, event: DateEvent) => void;
   onDragEnd: () => void;
   onEventUpdate: (event: DateEvent) => void;
-  style: { top: number; height: number; left: string; width: string };
 };
 
 export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
   function DateEventCard(
-    {
-      event,
-      dragging,
-      dateColumnRef,
-      onEventUpdate,
-      onDragStart,
-      onDragEnd,
-      style,
-    },
+    { event, dragging, dateColumnRef, onEventUpdate, onDragStart, onDragEnd },
     ref,
   ) {
     const [globalResizeState, setGlobalResizeState] = useAtom(resizeStateAtom);
     const isResizing = globalResizeState?.eventId === event.id;
     const isResizingOtherEvents = globalResizeState && !isResizing;
+
+    const style = useMemo(() => {
+      const top = getTopFromDate(event.start);
+
+      const left =
+        event.prevOverlappings === 0
+          ? 0
+          : (93 / (event.totalOverlappings + 1)) * event.prevOverlappings;
+
+      const lastEventWidth =
+        event.totalOverlappings === 0 ? 93 : 93 / (event.totalOverlappings + 1);
+
+      const width =
+        event.totalOverlappings === 0
+          ? 93
+          : event.totalOverlappings === event.prevOverlappings
+            ? lastEventWidth
+            : lastEventWidth * 1.7;
+
+      const height = getHeightFromDate(event);
+
+      return { top, left: `${left}%`, width: `${width}%`, height };
+    }, [event]);
 
     const handleResizeStartFromEventStart = (
       e: React.MouseEvent<HTMLDivElement>,
