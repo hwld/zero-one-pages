@@ -15,8 +15,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DraggingDateEvent, Event } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
-import { DateColumn, EventCreationDragData, MouseHistory } from "./date-column";
+import { DateColumn, MouseHistory } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
+import { DragDateRange } from "../utils";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -45,7 +46,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
   }, [date]);
 
   const [eventCreationDragData, setEventCreationDragData] = useState<
-    EventCreationDragData | undefined
+    DragDateRange | undefined
   >(undefined);
 
   // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
@@ -66,7 +67,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
 
     setEventCreationDragData({
       ...eventCreationDragData,
-      endDate: getDateFromY(eventCreationDragData.targetDate, y),
+      dragEndDate: getDateFromY(eventCreationDragData.dragEndDate, y),
     });
   };
 
@@ -84,12 +85,12 @@ export const WeeklyCalendar: React.FC<Props> = ({
         return;
       }
 
-      const startDate = eventCreationDragData.startDate;
-      const endDate = eventCreationDragData.endDate;
+      const dragStartDate = eventCreationDragData.dragStartDate;
+      const dragEndDate = eventCreationDragData.dragEndDate;
 
-      if (startDate.getTime() !== endDate.getTime()) {
-        const minDate = min([startDate, endDate]);
-        const maxDate = max([startDate, endDate]);
+      if (dragStartDate.getTime() !== dragEndDate.getTime()) {
+        const minDate = min([dragStartDate, dragEndDate]);
+        const maxDate = max([dragStartDate, dragEndDate]);
 
         onCreateEvent({
           id: crypto.randomUUID(),

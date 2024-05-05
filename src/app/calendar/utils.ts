@@ -5,6 +5,9 @@ import {
   max,
   differenceInDays,
   addDays,
+  areIntervalsOverlapping,
+  startOfDay,
+  endOfDay,
 } from "date-fns";
 import { Event } from "./type";
 
@@ -20,6 +23,16 @@ export const isWithinDragDateRange = (date: Date, range: DragDateRange) => {
     start: min([dragStartDate, dragEndDate]),
     end: max([dragStartDate, dragEndDate]),
   });
+};
+
+export const areDragDateRangeOverlapping = (
+  date: Date,
+  range: DragDateRange,
+) => {
+  return areIntervalsOverlapping(
+    { start: startOfDay(date), end: endOfDay(date) },
+    { start: range.dragStartDate, end: range.dragEndDate },
+  );
 };
 
 export type DraggingEvent = {

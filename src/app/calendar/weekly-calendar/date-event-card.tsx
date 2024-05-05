@@ -54,7 +54,7 @@ export const PreviewDateEventCard = forwardRef<
   }
 >(function PreviewDateEventCard({ date, event, visible }, ref) {
   const style = useMemo(() => {
-    const top = event && getTopFromDate(event.start);
+    const top = event && getTopFromDate(event, date);
     const height = event && getHeightFromInterval(event, date);
 
     return { top, height };
@@ -81,6 +81,8 @@ const resizeStateAtom = atom<ResizeState>(undefined);
 
 type DateEventCardProps = {
   dateColumnRef?: RefObject<HTMLDivElement>;
+  // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
+  displayedDate: Date;
   event: DateEvent;
   dragging: boolean;
   draggingOther: boolean;
@@ -92,6 +94,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
   function DateEventCard(
     {
       event,
+      displayedDate,
       dragging,
       draggingOther,
       dateColumnRef,
@@ -105,7 +108,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
     const isResizingOtherEvents = globalResizeState && !isResizing;
 
     const style = useMemo(() => {
-      const top = getTopFromDate(event.start);
+      const top = getTopFromDate(event, displayedDate);
 
       const left =
         event.prevOverlappings === 0
@@ -122,12 +125,10 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
             ? lastEventWidth
             : lastEventWidth * 1.7;
 
-      // TODO: 複数の日にまたがるイベントに対応できるようにする
-      // monthly-calendar/utils.tsのconvertEventToWeekEventみたいなのが必要になると思う
-      const height = getHeightFromInterval(event, event.start);
+      const height = getHeightFromInterval(event, displayedDate);
 
       return { top, left: `${left}%`, width: `${width}%`, height };
-    }, [event]);
+    }, [displayedDate, event]);
 
     const handleResizeStartFromEventStart = (
       e: React.MouseEvent<HTMLDivElement>,

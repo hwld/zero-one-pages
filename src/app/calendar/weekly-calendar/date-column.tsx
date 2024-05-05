@@ -27,6 +27,7 @@ import {
 } from "react";
 import { DateEvent, DraggingDateEvent, Event } from "../type";
 import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
+import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -42,12 +43,10 @@ type Props = {
   timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
   onChangeDraggingEvent: (event: DraggingDateEvent | undefined) => void;
-  eventCreationDragData: EventCreationDragData | undefined;
+  eventCreationDragData: DragDateRange | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
-  onChangeEventCreationDragData: (
-    state: EventCreationDragData | undefined,
-  ) => void;
+  onChangeEventCreationDragData: (range: DragDateRange | undefined) => void;
   onUpdateEvent: (event: Event) => void;
 };
 
@@ -96,13 +95,12 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     const targetDate = startOfDay(date);
 
     // ドラッグ開始の時点では常にクリックした最小領域が期間として設定されるようにする
-    const startDate = getDateFromY(targetDate, y, "floor");
-    const endDate = addMinutes(startDate, EVENT_MIN_MINUTES);
+    const dragStartDate = getDateFromY(targetDate, y, "floor");
+    const dragEndDate = addMinutes(dragStartDate, EVENT_MIN_MINUTES);
 
     onChangeEventCreationDragData({
-      targetDate,
-      startDate,
-      endDate,
+      dragStartDate,
+      dragEndDate,
     });
   };
 
@@ -122,9 +120,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       y,
       scrollTop: scrollableRef.current.scrollTop,
     };
+    const dragEndDate = getDateFromY(date, y);
+
     onChangeEventCreationDragData({
       ...eventCreationDragData,
-      endDate: getDateFromY(eventCreationDragData.targetDate, y),
+      dragEndDate,
     });
   };
 
@@ -241,9 +241,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             <div className="absolute left-0 size-3 -translate-x-[50%] -translate-y-[50%] rounded-full bg-blue-500" />
           </div>
         ) : null}
-        {/* TODO: ドラッグを開始した日付だけじゃなく、複数の日付にまたがったイベントを作成できるようにする*/}
         {eventCreationDragData &&
-          isSameDay(date, eventCreationDragData.targetDate) && (
+          areDragDateRangeOverlapping(date, eventCreationDragData) && (
             <NewEvent
               date={date}
               eventCreationDragData={eventCreationDragData}
@@ -254,8 +253,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
           return (
             <DateEventCard
-              dateColumnRef={columnRef}
               key={event.id}
+              displayedDate={date}
+              dateColumnRef={columnRef}
               event={event}
               onDragStart={handleDragStart}
               onEventUpdate={onUpdateEvent}

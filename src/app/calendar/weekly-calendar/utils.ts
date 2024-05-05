@@ -4,7 +4,6 @@ import {
   startOfDay,
   Interval,
   differenceInMinutes,
-  isSameDay,
   areIntervalsOverlapping,
   format,
   getHours,
@@ -35,18 +34,27 @@ export const getDateFromY = (
 };
 
 /**
- *  日付に対応するweekly calendar上のtopを取得する
+ *  指定した期間がweekly calendar上で指定された日付に表示されるtopを取得する
  */
-export const getTopFromDate = (date: Date): number => {
+export const getTopFromDate = (
+  interval: { start: Date; end: Date },
+  day: Date,
+): number => {
+  if (startOfDay(day).getTime() > interval.start.getTime()) {
+    return 0;
+  }
+
   const top =
-    Math.floor((date.getHours() * 60 + date.getMinutes()) / EVENT_MIN_MINUTES) *
-    EVENT_MIN_HEIGHT;
+    Math.floor(
+      (interval.start.getHours() * 60 + interval.start.getMinutes()) /
+        EVENT_MIN_MINUTES,
+    ) * EVENT_MIN_HEIGHT;
 
   return top;
 };
 
 /**
- * 指定した期間がweekly calendar上で指定された日付に表示される高さを取得する
+ * 指定した期間がweekly calendar上で指定された日付に表示されるheightを取得する
  */
 export const getHeightFromInterval = (
   interval: Interval,
@@ -79,7 +87,12 @@ export const getDateEvents = ({
   events: Event[];
 }): DateEvent[] => {
   const sortedEvents = events
-    .filter((event) => isSameDay(date, event.start))
+    .filter((event) =>
+      areIntervalsOverlapping(
+        { start: startOfDay(date), end: endOfDay(date) },
+        event,
+      ),
+    )
     .sort((event1, event2) => {
       if (event1.start.getTime() > event2.start.getTime()) {
         return 1;
