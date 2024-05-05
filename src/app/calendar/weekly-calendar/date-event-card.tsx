@@ -10,7 +10,7 @@ import { DateEvent } from "../type";
 import {
   formatEventDateSpan,
   getDateFromY,
-  getHeightFromDate,
+  getHeightFromInterval,
   getTopFromDate,
 } from "./utils";
 import { cn } from "@/lib/utils";
@@ -48,16 +48,17 @@ const DateEventCardContent: React.FC<{ event: DateEvent }> = ({ event }) => {
 export const PreviewDateEventCard = forwardRef<
   HTMLDivElement,
   {
+    date: Date;
     event: DateEvent | undefined;
     visible: boolean;
   }
->(function PreviewDateEventCard({ event, visible }, ref) {
+>(function PreviewDateEventCard({ date, event, visible }, ref) {
   const style = useMemo(() => {
     const top = event && getTopFromDate(event.start);
-    const height = event && getHeightFromDate(event);
+    const height = event && getHeightFromInterval(event, date);
 
     return { top, height };
-  }, [event]);
+  }, [date, event]);
 
   return (
     <DateEventCardBase
@@ -121,7 +122,9 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
             ? lastEventWidth
             : lastEventWidth * 1.7;
 
-      const height = getHeightFromDate(event);
+      // TODO: 複数の日にまたがるイベントに対応できるようにする
+      // monthly-calendar/utils.tsのconvertEventToWeekEventみたいなのが必要になると思う
+      const height = getHeightFromInterval(event, event.start);
 
       return { top, left: `${left}%`, width: `${width}%`, height };
     }, [event]);

@@ -8,6 +8,9 @@ import {
   areIntervalsOverlapping,
   format,
   getHours,
+  endOfDay,
+  max,
+  min,
 } from "date-fns";
 import { DateEvent, Event } from "../type";
 
@@ -43,9 +46,24 @@ export const getTopFromDate = (date: Date): number => {
 };
 
 /**
- * 日付の範囲対応するweekly calendar上のheightを取得する
+ * 指定した期間がweekly calendar上で指定された日付に表示される高さを取得する
  */
-export const getHeightFromDate = ({ start, end }: Interval): number => {
+export const getHeightFromInterval = (
+  interval: Interval,
+  day: Date,
+): number => {
+  const startDay = startOfDay(day);
+  const endDay = endOfDay(day);
+
+  // intervalの範囲外のときは0
+  if (!areIntervalsOverlapping(interval, { start: startDay, end: endDay })) {
+    return 0;
+  }
+
+  // 指定された日付の範囲にあるintervalを取得する
+  const start = max([startDay, interval.start]);
+  const end = min([endDay, interval.end]);
+
   const height =
     Math.ceil(differenceInMinutes(end, start) / EVENT_MIN_MINUTES) *
     EVENT_MIN_HEIGHT;

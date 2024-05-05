@@ -1,9 +1,9 @@
 import { max, min } from "date-fns";
-import { getHeightFromDate, getTopFromDate } from "./utils";
+import { getHeightFromInterval, getTopFromDate } from "./utils";
 import { DragDateState } from "./date-column";
 
-type Props = { data: DragDateState };
-export const NewEvent: React.FC<Props> = ({ data }) => {
+type Props = { data: DragDateState; date: Date };
+export const NewEvent: React.FC<Props> = ({ data, date }) => {
   const startDate = data.startDate;
   const endDate = data.endDate;
 
@@ -11,7 +11,7 @@ export const NewEvent: React.FC<Props> = ({ data }) => {
   const end = max([startDate, endDate]);
 
   const top = getTopFromDate(start);
-  const height = getHeightFromDate({ start, end });
+  const height = getHeightFromInterval({ start, end }, date);
 
   return (
     <div

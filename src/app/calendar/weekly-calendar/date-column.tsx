@@ -13,7 +13,7 @@ import {
   EVENT_MIN_MINUTES,
   getDateEvents,
   getDateFromY,
-  getHeightFromDate,
+  getHeightFromInterval,
 } from "./utils";
 import {
   DragEvent,
@@ -128,7 +128,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     }
 
     const columnRect = columnRef.current.getBoundingClientRect();
-    const previewHeight = getHeightFromDate(draggingEvent);
+    const previewHeight = getHeightFromInterval(draggingEvent, date);
 
     let previewTop = mouseY - columnRect.y - draggingEvent.dragStartY;
     if (previewTop < 0) {
@@ -235,8 +235,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             <div className="absolute left-0 size-3 -translate-x-[50%] -translate-y-[50%] rounded-full bg-blue-500" />
           </div>
         ) : null}
+        {/* TODO: ドラッグを開始した日付だけじゃなく、複数の日付にまたがったイベントを作成できるようにする*/}
         {dragState && isSameDay(date, dragState.targetDate) && (
-          <NewEvent data={dragState} />
+          <NewEvent date={date} data={dragState} />
         )}
         {dateEvents.map((event) => {
           const dragging = event.id === draggingEvent?.id;
@@ -254,6 +255,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           );
         })}
         <PreviewDateEventCard
+          date={date}
           ref={dropPreviewRef}
           event={draggingEvent}
           visible={isPreviewVisible}
