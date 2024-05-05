@@ -15,7 +15,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DraggingDateEvent, Event } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
-import { DateColumn, DragDateState, MouseHistory } from "./date-column";
+import { DateColumn, EventCreationDragData, MouseHistory } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
@@ -44,10 +44,9 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return eachDayOfInterval({ start, end });
   }, [date]);
 
-  // TODO: drag操作が増えてきてなんのための状態かわかりにくすぎる
-  const [dragState, setDragState] = useState<DragDateState | undefined>(
-    undefined,
-  );
+  const [eventCreationDragData, setEventCreationDragData] = useState<
+    EventCreationDragData | undefined
+  >(undefined);
 
   // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
   const [draggingEvent, setDraggingEvent] = useState<
@@ -58,16 +57,16 @@ export const WeeklyCalendar: React.FC<Props> = ({
   const mouseHistoryRef = useRef<MouseHistory | undefined>(undefined);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!dragState || !mouseHistoryRef.current) {
+    if (!eventCreationDragData || !mouseHistoryRef.current) {
       return;
     }
 
     const delta = e.currentTarget.scrollTop - mouseHistoryRef.current.scrollTop;
     const y = mouseHistoryRef.current.y + delta;
 
-    setDragState({
-      ...dragState,
-      endDate: getDateFromY(dragState.targetDate, y),
+    setEventCreationDragData({
+      ...eventCreationDragData,
+      endDate: getDateFromY(eventCreationDragData.targetDate, y),
     });
   };
 
@@ -81,12 +80,12 @@ export const WeeklyCalendar: React.FC<Props> = ({
 
   useEffect(() => {
     const createEvent = (e: MouseEvent) => {
-      if (!dragState || e.button !== 0) {
+      if (!eventCreationDragData || e.button !== 0) {
         return;
       }
 
-      const startDate = dragState.startDate;
-      const endDate = dragState.endDate;
+      const startDate = eventCreationDragData.startDate;
+      const endDate = eventCreationDragData.endDate;
 
       if (startDate.getTime() !== endDate.getTime()) {
         const minDate = min([startDate, endDate]);
@@ -101,7 +100,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
         });
       }
 
-      setDragState(undefined);
+      setEventCreationDragData(undefined);
       mouseHistoryRef.current = undefined;
     };
 
@@ -109,7 +108,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", createEvent);
     };
-  }, [dragState, onCreateEvent]);
+  }, [eventCreationDragData, onCreateEvent]);
 
   useEffect(() => {
     const moveEvent = () => {
@@ -184,9 +183,9 @@ export const WeeklyCalendar: React.FC<Props> = ({
                 date={date}
                 timedEvents={timedEvents}
                 draggingEvent={draggingEvent}
-                onDraggingEventChange={setDraggingEvent}
-                dragState={dragState}
-                onDragStateChange={setDragState}
+                onChangeDraggingEvent={setDraggingEvent}
+                eventCreationDragData={eventCreationDragData}
+                onChangeEventCreationDragData={setEventCreationDragData}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onUpdateEvent={onUpdateEvent}

@@ -5,7 +5,11 @@ import {
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
 } from "./utils";
-import { DragDateRange, DragEvent, getEventFromDragEvent } from "../utils";
+import {
+  DragDateRange,
+  DraggingEvent,
+  getEventFromDraggingEvent,
+} from "../utils";
 import { Event } from "../type";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
@@ -52,7 +56,9 @@ export const MonthlyCalendar: React.FC<Props> = ({
   );
 
   // イベント移動のためのDrag
-  const [dragEvent, setDragEvent] = useState<DragEvent | undefined>(undefined);
+  const [draggingEvent, setDraggingEvent] = useState<DraggingEvent | undefined>(
+    undefined,
+  );
 
   const firstWeekEventRowRef = useRef<HTMLDivElement>(null);
   const [eventLimit, setEventLimit] = useState(0);
@@ -113,21 +119,21 @@ export const MonthlyCalendar: React.FC<Props> = ({
 
   useEffect(() => {
     const moveEvent = (e: MouseEvent) => {
-      if (!dragEvent || e.button !== 0) {
+      if (!draggingEvent || e.button !== 0) {
         return;
       }
 
-      const newEvent = getEventFromDragEvent(dragEvent);
+      const newEvent = getEventFromDraggingEvent(draggingEvent);
       onUpdateEvent(newEvent);
 
-      setDragEvent(undefined);
+      setDraggingEvent(undefined);
     };
 
     document.addEventListener("mouseup", moveEvent);
     return () => {
       document.removeEventListener("mouseup", moveEvent);
     };
-  }, [dragEvent, onUpdateEvent]);
+  }, [draggingEvent, onUpdateEvent]);
 
   return (
     <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
@@ -188,9 +194,9 @@ export const MonthlyCalendar: React.FC<Props> = ({
                 eventLimit={eventLimit}
                 exceededEventCountMap={exceededEventCountMap}
                 dragDateRange={dragDateRange}
-                onDragDateRangeChange={setDragDateRange}
-                dragEvent={dragEvent}
-                onChangeDragEvent={setDragEvent}
+                onChangeDragDateRange={setDragDateRange}
+                draggingEvent={draggingEvent}
+                onChangeDraggingEvent={setDraggingEvent}
               />
             </div>
           );

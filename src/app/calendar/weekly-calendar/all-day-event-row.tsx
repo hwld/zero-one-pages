@@ -7,9 +7,9 @@ import { Event, WeekEvent } from "../type";
 import { CELL_Y_MARGIN } from "./all-day-event-cell";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
-import { DragDateRange, DragEvent } from "../utils";
+import { DragDateRange, DraggingEvent } from "../utils";
 import { useRef } from "react";
-import { DragEventPreview } from "../monthly-calendar/drag-event-preview";
+import { DraggingEventPreview } from "../monthly-calendar/dragging-event-preview";
 import clsx from "clsx";
 
 export const ALL_DAY_EVENT_DISPLAY_LIMIT = 2;
@@ -19,9 +19,9 @@ type Props = {
   weekAllDayEvents: WeekEvent[];
   isDraggingDate: boolean;
   expanded: boolean;
-  onExpandChange: (expanded: boolean) => void;
-  dragEvent: DragEvent | undefined;
-  onChangeDragEvent: (event: DragEvent | undefined) => void;
+  onChangeExpand: (expanded: boolean) => void;
+  draggingEvent: DraggingEvent | undefined;
+  onChangeDraggingEvent: (event: DraggingEvent | undefined) => void;
   dragDateRange: DragDateRange | undefined;
   onChangeDragDateRange: (range: DragDateRange) => void;
 };
@@ -31,9 +31,9 @@ export const AllDayEventRow: React.FC<Props> = ({
   weekAllDayEvents,
   isDraggingDate,
   expanded,
-  onExpandChange,
-  dragEvent,
-  onChangeDragEvent,
+  onChangeExpand,
+  draggingEvent,
+  onChangeDraggingEvent,
   dragDateRange,
   onChangeDragDateRange,
 }) => {
@@ -74,8 +74,8 @@ export const AllDayEventRow: React.FC<Props> = ({
       onChangeDragDateRange({ ...dragDateRange, dragEndDate: date });
     }
 
-    if (dragEvent) {
-      onChangeDragEvent({ ...dragEvent, dragEndDate: date });
+    if (draggingEvent) {
+      onChangeDraggingEvent({ ...draggingEvent, dragEndDate: date });
     }
   };
 
@@ -83,7 +83,7 @@ export const AllDayEventRow: React.FC<Props> = ({
     e.preventDefault();
 
     const date = getDateFromX(e.clientX);
-    onChangeDragEvent({ event, dragStartDate: date, dragEndDate: date });
+    onChangeDraggingEvent({ event, dragStartDate: date, dragEndDate: date });
   };
 
   return (
@@ -95,7 +95,7 @@ export const AllDayEventRow: React.FC<Props> = ({
       onMouseMove={handleRowMouseMove}
     >
       {visibleWeekAllDayEvents.map((event) => {
-        const isDragging = dragEvent?.event.id === event.id;
+        const isDragging = draggingEvent?.event.id === event.id;
 
         return (
           <div key={event.id} className={clsx(isDragging && "opacity-50")}>
@@ -103,7 +103,7 @@ export const AllDayEventRow: React.FC<Props> = ({
               weekEvent={event}
               height={EVENT_MIN_HEIGHT}
               disablePointerEvents={
-                isDraggingDate || !!(dragEvent && !isDragging)
+                isDraggingDate || !!(draggingEvent && !isDragging)
               }
               onMouseDown={(e) => e.stopPropagation()}
               draggable
@@ -127,16 +127,16 @@ export const AllDayEventRow: React.FC<Props> = ({
                 count={count}
                 limit={ALL_DAY_EVENT_DISPLAY_LIMIT}
                 height={EVENT_MIN_HEIGHT}
-                disablePointerEvents={isDraggingDate || !!dragEvent}
+                disablePointerEvents={isDraggingDate || !!draggingEvent}
                 weekDay={weekDay}
-                onClick={() => onExpandChange(true)}
+                onClick={() => onChangeExpand(true)}
               />
             );
           })}
-      {dragEvent ? (
-        <DragEventPreview
+      {draggingEvent ? (
+        <DraggingEventPreview
           week={week}
-          dragEvent={dragEvent}
+          draggingEvent={draggingEvent}
           height={EVENT_MIN_HEIGHT}
         />
       ) : null}

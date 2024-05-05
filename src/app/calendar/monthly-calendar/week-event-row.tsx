@@ -3,9 +3,9 @@ import { Event, WeekEvent } from "../type";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DragDateRange, DragEvent } from "../utils";
+import { DragDateRange, DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
-import { DragEventPreview } from "./drag-event-preview";
+import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
 
 type Props = {
@@ -14,9 +14,9 @@ type Props = {
   eventLimit: number;
   exceededEventCountMap: Map<number, number>;
   dragDateRange: DragDateRange | undefined;
-  onDragDateRangeChange: (range: DragDateRange | undefined) => void;
-  dragEvent: DragEvent | undefined;
-  onChangeDragEvent: (event: DragEvent | undefined) => void;
+  onChangeDragDateRange: (range: DragDateRange | undefined) => void;
+  draggingEvent: DraggingEvent | undefined;
+  onChangeDraggingEvent: (event: DraggingEvent | undefined) => void;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -27,9 +27,9 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       eventLimit,
       exceededEventCountMap,
       dragDateRange,
-      onDragDateRangeChange,
-      dragEvent,
-      onChangeDragEvent,
+      onChangeDragDateRange,
+      draggingEvent,
+      onChangeDraggingEvent,
     },
     _ref,
   ) {
@@ -53,18 +53,18 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       }
 
       const date = getDateFromX(event.clientX);
-      onDragDateRangeChange({ dragStartDate: date, dragEndDate: date });
+      onChangeDragDateRange({ dragStartDate: date, dragEndDate: date });
     };
 
     const handleRowMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
       const date = getDateFromX(event.clientX);
 
       if (dragDateRange) {
-        onDragDateRangeChange({ ...dragDateRange, dragEndDate: date });
+        onChangeDragDateRange({ ...dragDateRange, dragEndDate: date });
       }
 
-      if (dragEvent) {
-        onChangeDragEvent({ ...dragEvent, dragEndDate: date });
+      if (draggingEvent) {
+        onChangeDraggingEvent({ ...draggingEvent, dragEndDate: date });
       }
     };
 
@@ -76,7 +76,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       e.preventDefault();
 
       const date = getDateFromX(e.clientX);
-      onChangeDragEvent({ event, dragStartDate: date, dragEndDate: date });
+      onChangeDraggingEvent({ event, dragStartDate: date, dragEndDate: date });
     };
 
     return (
@@ -90,12 +90,14 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           return (
             <div
               key={event.id}
-              className={clsx(dragEvent?.event.id === event.id && "opacity-50")}
+              className={clsx(
+                draggingEvent?.event.id === event.id && "opacity-50",
+              )}
             >
               <WeekEventCard
                 topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                 height={MONTHLY_EVENT_ROW_SIZE}
-                disablePointerEvents={!!dragDateRange || !!dragEvent}
+                disablePointerEvents={!!dragDateRange || !!draggingEvent}
                 weekEvent={event}
                 onMouseDown={(e) => e.stopPropagation()}
                 draggable
@@ -120,15 +122,15 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={!!dragDateRange || !!dragEvent}
+              disablePointerEvents={!!dragDateRange || !!draggingEvent}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );
         })}
-        {dragEvent ? (
-          <DragEventPreview
+        {draggingEvent ? (
+          <DraggingEventPreview
             week={week}
-            dragEvent={dragEvent}
+            draggingEvent={draggingEvent}
             topMargin={MONTHLY_DATE_HEADER_HEIGHT}
             height={MONTHLY_EVENT_ROW_SIZE}
           />

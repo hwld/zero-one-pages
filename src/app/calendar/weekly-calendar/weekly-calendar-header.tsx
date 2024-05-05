@@ -4,7 +4,11 @@ import { WEEK_DAY_LABELS } from "../consts";
 import { AllDayEventCell } from "./all-day-event-cell";
 import { Event } from "../type";
 import { useEffect, useState } from "react";
-import { DragDateRange, DragEvent, getEventFromDragEvent } from "../utils";
+import {
+  DragDateRange,
+  DraggingEvent,
+  getEventFromDraggingEvent,
+} from "../utils";
 import { isSameDay, max, min } from "date-fns";
 import { AllDayEventRow } from "./all-day-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
@@ -61,9 +65,9 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     };
   }, [dragDateRange, onCreateEvent]);
 
-  const [dragAllDayEvent, setDragAllDayEvent] = useState<DragEvent | undefined>(
-    undefined,
-  );
+  const [dragAllDayEvent, setDragAllDayEvent] = useState<
+    DraggingEvent | undefined
+  >(undefined);
 
   useEffect(() => {
     const moveAllDayEvent = (e: MouseEvent) => {
@@ -71,7 +75,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         return;
       }
 
-      const newEvent = getEventFromDragEvent(dragAllDayEvent);
+      const newEvent = getEventFromDraggingEvent(dragAllDayEvent);
       onUpdateEvent(newEvent);
 
       setDragAllDayEvent(undefined);
@@ -142,9 +146,9 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         weekAllDayEvents={weekAllDayEvents}
         isDraggingDate={!!dragDateRange}
         expanded={expanded}
-        onExpandChange={setExpanded}
-        dragEvent={dragAllDayEvent}
-        onChangeDragEvent={setDragAllDayEvent}
+        onChangeExpand={setExpanded}
+        draggingEvent={dragAllDayEvent}
+        onChangeDraggingEvent={setDragAllDayEvent}
         dragDateRange={dragDateRange}
         onChangeDragDateRange={setDragDateRange}
       />

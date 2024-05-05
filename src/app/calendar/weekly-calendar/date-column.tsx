@@ -30,7 +30,7 @@ import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
-export type DragDateState = {
+export type EventCreationDragData = {
   targetDate: Date;
   startDate: Date;
   endDate: Date;
@@ -41,11 +41,13 @@ type Props = {
   date: Date;
   timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
-  onDraggingEventChange: (event: DraggingDateEvent | undefined) => void;
-  dragState: DragDateState | undefined;
+  onChangeDraggingEvent: (event: DraggingDateEvent | undefined) => void;
+  eventCreationDragData: EventCreationDragData | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
-  onDragStateChange: (state: DragDateState | undefined) => void;
+  onChangeEventCreationDragData: (
+    state: EventCreationDragData | undefined,
+  ) => void;
   onUpdateEvent: (event: Event) => void;
 };
 
@@ -55,11 +57,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     date,
     timedEvents,
     draggingEvent,
-    onDraggingEventChange,
+    onChangeDraggingEvent,
     scrollableRef,
     mouseHistoryRef,
-    dragState,
-    onDragStateChange,
+    eventCreationDragData,
+    onChangeEventCreationDragData,
     onUpdateEvent,
   },
   ref,
@@ -76,7 +78,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     [date],
   );
 
-  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+  const handleColumnMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
     if (!columnRef.current || !scrollableRef.current || e.button !== 0) {
@@ -97,15 +99,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     const startDate = getDateFromY(targetDate, y, "floor");
     const endDate = addMinutes(startDate, EVENT_MIN_MINUTES);
 
-    onDragStateChange({
+    onChangeEventCreationDragData({
       targetDate,
       startDate,
       endDate,
     });
   };
 
-  const updateDragState = (mouseY: number) => {
-    if (!dragState || !columnRef.current || !scrollableRef.current) {
+  const updateEventCreationDragData = (mouseY: number) => {
+    if (
+      !eventCreationDragData ||
+      !columnRef.current ||
+      !scrollableRef.current
+    ) {
       return;
     }
 
@@ -116,9 +122,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       y,
       scrollTop: scrollableRef.current.scrollTop,
     };
-    onDragStateChange({
-      ...dragState,
-      endDate: getDateFromY(dragState.targetDate, y),
+    onChangeEventCreationDragData({
+      ...eventCreationDragData,
+      endDate: getDateFromY(eventCreationDragData.targetDate, y),
     });
   };
 
@@ -146,14 +152,14 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       differenceInMinutes(draggingEvent.end, draggingEvent.start),
     );
 
-    onDraggingEventChange({ ...draggingEvent, start: startDate, end: endDate });
+    onChangeDraggingEvent({ ...draggingEvent, start: startDate, end: endDate });
   };
 
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+  const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    if (dragState) {
-      updateDragState(e.clientY);
+    if (eventCreationDragData) {
+      updateEventCreationDragData(e.clientY);
     }
 
     if (draggingEvent) {
@@ -171,7 +177,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     event.preventDefault();
 
     const dateEventY = event.currentTarget.getBoundingClientRect().y;
-    onDraggingEventChange({
+    onChangeDraggingEvent({
       ...dateEvent,
       dragStartY: event.clientY - dateEventY,
     });
@@ -207,8 +213,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         className="relative border-r border-neutral-300"
         style={{ height: EVENT_MIN_HEIGHT * 4 * 24 }}
         draggable={false}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
+        onMouseDown={handleColumnMouseDown}
+        onMouseMove={handleColumnMouseMove}
       >
         {hours.map((hour, i) => {
           if (i === 0) {
@@ -236,9 +242,13 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           </div>
         ) : null}
         {/* TODO: ドラッグを開始した日付だけじゃなく、複数の日付にまたがったイベントを作成できるようにする*/}
-        {dragState && isSameDay(date, dragState.targetDate) && (
-          <NewEvent date={date} data={dragState} />
-        )}
+        {eventCreationDragData &&
+          isSameDay(date, eventCreationDragData.targetDate) && (
+            <NewEvent
+              date={date}
+              eventCreationDragData={eventCreationDragData}
+            />
+          )}
         {dateEvents.map((event) => {
           const dragging = event.id === draggingEvent?.id;
 

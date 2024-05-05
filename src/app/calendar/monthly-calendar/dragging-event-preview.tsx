@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DragEvent } from "../utils";
+import { DraggingEvent } from "../utils";
 import { addDays, differenceInDays } from "date-fns";
 import { WeekEvent } from "../type";
 import { convertEventToWeekEvent } from "./utils";
@@ -7,18 +7,18 @@ import { WeekEventCard } from "./week-event-card";
 
 type Props = {
   week: Date[];
-  dragEvent: DragEvent;
+  draggingEvent: DraggingEvent;
   topMargin?: number;
   height: number;
 };
-export const DragEventPreview: React.FC<Props> = ({
+export const DraggingEventPreview: React.FC<Props> = ({
   week,
-  dragEvent,
+  draggingEvent,
   topMargin = 0,
   height,
 }) => {
   const weekEvent: WeekEvent | undefined = useMemo(() => {
-    const { event, dragStartDate, dragEndDate } = dragEvent;
+    const { event, dragStartDate, dragEndDate } = draggingEvent;
 
     const diffDay = differenceInDays(dragEndDate, dragStartDate);
     const newEvent = {
@@ -28,7 +28,7 @@ export const DragEventPreview: React.FC<Props> = ({
     };
 
     return convertEventToWeekEvent(newEvent, { top: 0, week });
-  }, [dragEvent, week]);
+  }, [draggingEvent, week]);
 
   if (!weekEvent) {
     return null;

@@ -22,12 +22,14 @@ export const isWithinDragDateRange = (date: Date, range: DragDateRange) => {
   });
 };
 
-export type DragEvent = {
+export type DraggingEvent = {
   event: Event;
 } & DragDateRange;
 
-export const getEventFromDragEvent = (dragEvent: DragEvent): Event => {
-  const { event, dragStartDate, dragEndDate } = dragEvent;
+export const getEventFromDraggingEvent = (
+  draggingEvent: DraggingEvent,
+): Event => {
+  const { event, dragStartDate, dragEndDate } = draggingEvent;
   const diffDay = differenceInDays(dragEndDate, dragStartDate);
 
   const newStart = addDays(event.start, diffDay);
