@@ -19,22 +19,20 @@ import { NavigationButton } from "../navigation-button";
 import { DateColumn, MouseHistory } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import { DragDateRange } from "../utils";
+import { useCreateEvent } from "../queries/use-create-event";
+import { useUpdateEvent } from "../queries/use-update-event";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
 type Props = {
   currentDate: Date;
   events: Event[];
-  onCreateEvent: (event: Event) => void;
-  onUpdateEvent: (event: Partial<Event> & { id: string }) => void;
 };
 
-export const WeeklyCalendar: React.FC<Props> = ({
-  currentDate,
-  events,
-  onCreateEvent,
-  onUpdateEvent,
-}) => {
+export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
+  const craeteEventMutation = useCreateEvent();
+  const updateEventMutation = useUpdateEvent();
+
   const [date, setDate] = useState(currentDate);
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
@@ -87,8 +85,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
         const minDate = min([dragStartDate, dragEndDate]);
         const maxDate = max([dragStartDate, dragEndDate]);
 
-        onCreateEvent({
-          id: crypto.randomUUID(),
+        craeteEventMutation.mutate({
           allDay: false,
           start: minDate,
           end: maxDate,
@@ -104,7 +101,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", createEvent);
     };
-  }, [eventCreationDragData, onCreateEvent]);
+  }, [craeteEventMutation, eventCreationDragData]);
 
   // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
   const [draggingEvent, setDraggingEvent] = useState<
@@ -117,7 +114,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
         return;
       }
 
-      onUpdateEvent(draggingEvent);
+      updateEventMutation.mutate(draggingEvent);
       setDraggingEvent(undefined);
     };
 
@@ -125,7 +122,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", moveEvent);
     };
-  }, [draggingEvent, onUpdateEvent]);
+  }, [draggingEvent, updateEventMutation]);
 
   const [resizingEvent, setResizingEvent] = useState<
     ResizingDateEvent | undefined
@@ -137,7 +134,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
         return;
       }
 
-      onUpdateEvent(resizingEvent);
+      updateEventMutation.mutate(resizingEvent);
       setResizingEvent(undefined);
     };
 
@@ -145,7 +142,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", endResizeEvent);
     };
-  }, [onUpdateEvent, resizingEvent]);
+  }, [resizingEvent, updateEventMutation]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
@@ -171,8 +168,6 @@ export const WeeklyCalendar: React.FC<Props> = ({
         <WeeklyCalendarDayHeader
           currentDate={currentDate}
           week={week}
-          onCreateEvent={onCreateEvent}
-          onUpdateEvent={onUpdateEvent}
           longTermEvents={longTermEvents}
         />
 

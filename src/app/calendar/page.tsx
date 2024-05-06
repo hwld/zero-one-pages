@@ -3,53 +3,23 @@ import { useMemo, useState } from "react";
 import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
 import "./style.css";
 import { WeeklyCalendar } from "./weekly-calendar/weekly-calendar";
-import { Event } from "./mocks/event-store";
 import { useMinuteClock } from "./use-minute-clock";
+import { useEvents } from "./queries/use-events";
 
 type CalendarType = "month" | "week";
 const Page = () => {
   const currentDate = useMinuteClock();
+  const { data: events = [] } = useEvents();
 
-  const [events, setEvents] = useState<Event[]>([]);
-
-  const handleCreateEvent = (event: Event) => {
-    setEvents((e) => [...e, event]);
-  };
-
-  const handleUpdateEvent = (updatedEvent: Partial<Event> & { id: string }) => {
-    setEvents((events) =>
-      events.map((event): Event => {
-        if (event.id === updatedEvent.id) {
-          return { ...event, ...updatedEvent };
-        }
-        return event;
-      }),
-    );
-  };
-
-  const [type, setType] = useState<CalendarType>("week");
+  const [type, setType] = useState<CalendarType>("month");
 
   const calendar = useMemo(() => {
     switch (type) {
       case "month": {
-        return (
-          <MonthlyCalendar
-            currentDate={currentDate}
-            events={events}
-            onCreateEvent={handleCreateEvent}
-            onUpdateEvent={handleUpdateEvent}
-          />
-        );
+        return <MonthlyCalendar currentDate={currentDate} events={events} />;
       }
       case "week": {
-        return (
-          <WeeklyCalendar
-            currentDate={currentDate}
-            events={events}
-            onCreateEvent={handleCreateEvent}
-            onUpdateEvent={handleUpdateEvent}
-          />
-        );
+        return <WeeklyCalendar currentDate={currentDate} events={events} />;
       }
       default: {
         throw new Error(type satisfies never);

@@ -13,6 +13,8 @@ import { isSameDay, max, min } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
+import { useCreateEvent } from "../queries/use-create-event";
+import { useUpdateEvent } from "../queries/use-update-event";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -20,17 +22,16 @@ type Props = {
   currentDate: Date;
   week: Date[];
   longTermEvents: Event[];
-  onCreateEvent: (event: Event) => void;
-  onUpdateEvent: (event: Event) => void;
 };
 
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   currentDate,
   week,
   longTermEvents,
-  onCreateEvent,
-  onUpdateEvent,
 }) => {
+  const createEventMutation = useCreateEvent();
+  const updateEventMutatin = useUpdateEvent();
+
   const [expanded, setExpanded] = useState(false);
 
   const weekLongTermEvents = getWeekEvents({ week, events: longTermEvents });
@@ -49,13 +50,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
       const start = min([dragStartDate, dragEndDate]);
       const end = max([dragStartDate, dragEndDate]);
 
-      onCreateEvent({
-        id: crypto.randomUUID(),
-        title: "event",
-        allDay: true,
-        start,
-        end,
-      });
+      createEventMutation.mutate({ title: "event", allDay: true, start, end });
       setDragDateRange(undefined);
     };
 
@@ -63,7 +58,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", createAllDayEvent);
     };
-  }, [dragDateRange, onCreateEvent]);
+  }, [createEventMutation, dragDateRange]);
 
   const [draggingLongTermEvent, setDraggingLongTermEvent] = useState<
     DraggingEvent | undefined
@@ -76,7 +71,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
       }
 
       const newEvent = getEventFromDraggingEvent(draggingLongTermEvent);
-      onUpdateEvent(newEvent);
+      updateEventMutatin.mutate(newEvent);
 
       setDraggingLongTermEvent(undefined);
     };
@@ -85,7 +80,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", moveLongTermEvent);
     };
-  }, [draggingLongTermEvent, onUpdateEvent]);
+  }, [draggingLongTermEvent, updateEventMutatin]);
 
   return (
     <div

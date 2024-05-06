@@ -15,20 +15,18 @@ import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
 import { addMonths, max, min, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
+import { useCreateEvent } from "../queries/use-create-event";
+import { useUpdateEvent } from "../queries/use-update-event";
 
 type Props = {
   currentDate: Date;
   events: Event[];
-  onCreateEvent: (event: Event) => void;
-  onUpdateEvent: (event: Event) => void;
 };
 
-export const MonthlyCalendar: React.FC<Props> = ({
-  currentDate,
-  events,
-  onCreateEvent,
-  onUpdateEvent,
-}) => {
+export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
+  const createEventMutation = useCreateEvent();
+  const updateEventMutation = useUpdateEvent();
+
   const [yearMonth, setYearMonth] = useState(currentDate);
 
   const year = useMemo(() => {
@@ -101,8 +99,7 @@ export const MonthlyCalendar: React.FC<Props> = ({
         dragDateRange.dragEndDate,
       ]);
 
-      onCreateEvent({
-        id: crypto.randomUUID(),
+      createEventMutation.mutate({
         allDay: true,
         title: "event",
         start: eventStart,
@@ -115,7 +112,7 @@ export const MonthlyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", createEvent);
     };
-  }, [dragDateRange, onCreateEvent]);
+  }, [createEventMutation, dragDateRange]);
 
   useEffect(() => {
     const moveEvent = (e: MouseEvent) => {
@@ -124,7 +121,7 @@ export const MonthlyCalendar: React.FC<Props> = ({
       }
 
       const newEvent = getEventFromDraggingEvent(draggingEvent);
-      onUpdateEvent(newEvent);
+      updateEventMutation.mutate(newEvent);
 
       setDraggingEvent(undefined);
     };
@@ -133,7 +130,7 @@ export const MonthlyCalendar: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mouseup", moveEvent);
     };
-  }, [draggingEvent, onUpdateEvent]);
+  }, [draggingEvent, updateEventMutation]);
 
   return (
     <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">

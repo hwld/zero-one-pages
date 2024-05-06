@@ -12,21 +12,7 @@ export const CalendarAPI = {
 
 export const createEventInputSchema = z.object({
   title: z.string().min(1).max(200),
-  allDay: z
-    .union([z.literal("true"), z.literal("false")])
-    .transform((value) => {
-      switch (value) {
-        case "true": {
-          return true;
-        }
-        case "false": {
-          return false;
-        }
-        default: {
-          throw new Error(value satisfies never);
-        }
-      }
-    }),
+  allDay: z.boolean(),
   start: z.coerce.date(),
   end: z.coerce.date(),
 });
@@ -99,7 +85,8 @@ export const calendarApiHandlers = [
   http.post(CalendarAPI.events(), async ({ request }) => {
     await delay();
 
-    const input = createEventInputSchema.parse(request);
+    const body = await request.json();
+    const input = createEventInputSchema.parse(body);
     const createdEvent = eventStore.add(input);
 
     return HttpResponse.json(createdEvent);
@@ -109,7 +96,8 @@ export const calendarApiHandlers = [
     await delay();
 
     const eventId = z.string().parse(params.id);
-    const input = updateEventInputSchema.parse(request);
+    const body = await request.json();
+    const input = updateEventInputSchema.parse(body);
     const updatedEvent = eventStore.update({ ...input, id: eventId });
 
     if (!updatedEvent) {
