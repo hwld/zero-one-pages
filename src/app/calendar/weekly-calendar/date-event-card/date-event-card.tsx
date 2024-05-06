@@ -1,75 +1,10 @@
-import {
-  ComponentPropsWithoutRef,
-  DragEvent,
-  forwardRef,
-  useMemo,
-} from "react";
-import { DateEvent, ResizingDateEventState } from "../type";
-import {
-  formatEventDateSpan,
-  getHeightFromInterval,
-  getTopFromDate,
-} from "./utils";
-import { cn } from "@/lib/utils";
+import { DragEvent, forwardRef, useMemo } from "react";
+import { DateEvent, ResizingDateEvent } from "../../type";
+import { getHeightFromInterval, getTopFromDate } from "../utils";
 import clsx from "clsx";
+import { DateEventCardBase, DateEventCardContent } from "./base";
 
-const DateEventCardBase = forwardRef<
-  HTMLDivElement,
-  ComponentPropsWithoutRef<"div">
->(function DateEventCardBase({ className, children, ...props }, ref) {
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "absolute flex select-none flex-col justify-start overflow-hidden rounded border border-neutral-500 bg-neutral-700 px-1 pt-[1px] text-neutral-100 transition-colors",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
-
-const DateEventCardContent: React.FC<{ event: DateEvent }> = ({ event }) => {
-  return (
-    <>
-      <div className="text-xs">{event.title}</div>
-      <div className="text-xs">{formatEventDateSpan(event)}</div>
-    </>
-  );
-};
-
-export const PreviewDateEventCard = forwardRef<
-  HTMLDivElement,
-  {
-    date: Date;
-    event: DateEvent | undefined;
-    visible: boolean;
-  }
->(function PreviewDateEventCard({ date, event, visible }, ref) {
-  const style = useMemo(() => {
-    const top = event && getTopFromDate(event, date);
-    const height = event && getHeightFromInterval(event, date);
-
-    return { top, height };
-  }, [date, event]);
-
-  return (
-    <DateEventCardBase
-      ref={ref}
-      className={clsx(
-        "pointer-events-none z-20 w-full bg-neutral-800 ring ring-blue-500",
-        visible ? "opacity-100" : "opacity-0",
-      )}
-      style={style}
-    >
-      {event && <DateEventCardContent event={event} />}
-    </DateEventCardBase>
-  );
-});
-
-type DateEventCardProps = {
+type Props = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
   displayedDate: Date;
   event: DateEvent;
@@ -77,13 +12,12 @@ type DateEventCardProps = {
   draggingOther: boolean;
   onDragStart: (e: DragEvent<HTMLDivElement>, event: DateEvent) => void;
   isResizing: boolean;
+  hidden?: boolean;
   isResizingOther: boolean;
-  onChangeResizingEventState: (
-    state: ResizingDateEventState | undefined,
-  ) => void;
+  onChangeResizingEvent: (event: ResizingDateEvent | undefined) => void;
 };
 
-export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
+export const DateEventCard = forwardRef<HTMLDivElement, Props>(
   function DateEventCard(
     {
       event,
@@ -91,9 +25,9 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       dragging,
       draggingOther,
       onDragStart,
-      isResizing,
+      hidden = false,
       isResizingOther,
-      onChangeResizingEventState,
+      onChangeResizingEvent,
     },
     ref,
   ) {
@@ -126,7 +60,10 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       e.stopPropagation();
       e.preventDefault();
 
-      onChangeResizingEventState({ event, origin: "eventEnd" });
+      onChangeResizingEvent({
+        ...event,
+        origin: "eventEnd",
+      });
     };
 
     const handleResizeStartFromEventEnd = (
@@ -135,8 +72,15 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       e.stopPropagation();
       e.preventDefault();
 
-      onChangeResizingEventState({ event, origin: "eventStart" });
+      onChangeResizingEvent({
+        ...event,
+        origin: "eventStart",
+      });
     };
+
+    if (hidden) {
+      return null;
+    }
 
     return (
       <DateEventCardBase
@@ -148,17 +92,11 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
         onDragStart={(e) => {
           onDragStart(e, event);
         }}
-        style={{
-          top: style.top,
-          left: isResizing ? "0" : style.left,
-          height: style.height,
-          width: isResizing ? "100%" : style.width,
-        }}
+        style={style}
         className={clsx(
           !isResizingOther &&
             !draggingOther &&
             "hover:z-10 hover:bg-neutral-800",
-          isResizing && "z-20 bg-neutral-800",
           dragging ? "opacity-50" : "opacity-100",
         )}
       >

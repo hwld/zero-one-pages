@@ -16,13 +16,13 @@ const Page = () => {
     setEvents((e) => [...e, event]);
   };
 
-  const handleUpdateEvent = (event: Event) => {
+  const handleUpdateEvent = (updatedEvent: Partial<Event> & { id: string }) => {
     setEvents((events) =>
-      events.map((e) => {
-        if (e.id === event.id) {
-          return event;
+      events.map((event): Event => {
+        if (event.id === updatedEvent.id) {
+          return { ...event, ...updatedEvent };
         }
-        return e;
+        return event;
       }),
     );
   };

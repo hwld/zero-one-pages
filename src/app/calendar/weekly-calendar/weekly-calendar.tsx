@@ -12,7 +12,7 @@ import {
   max,
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DraggingDateEvent, Event, ResizingDateEventState } from "../type";
+import { DraggingDateEvent, Event, ResizingDateEvent } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, MouseHistory } from "./date-column";
@@ -25,7 +25,7 @@ type Props = {
   currentDate: Date;
   events: Event[];
   onCreateEvent: (event: Event) => void;
-  onUpdateEvent: (event: Event) => void;
+  onUpdateEvent: (event: Partial<Event> & { id: string }) => void;
 };
 
 export const WeeklyCalendar: React.FC<Props> = ({
@@ -127,22 +127,25 @@ export const WeeklyCalendar: React.FC<Props> = ({
     };
   }, [draggingEvent, onUpdateEvent]);
 
-  const [resizingEventState, setResizingEventState] = useState<
-    ResizingDateEventState | undefined
+  const [resizingEvent, setResizingEvent] = useState<
+    ResizingDateEvent | undefined
   >(undefined);
 
   useEffect(() => {
     const endResizeEvent = () => {
-      if (resizingEventState) {
-        setResizingEventState(undefined);
+      if (!resizingEvent) {
+        return;
       }
+
+      onUpdateEvent(resizingEvent);
+      setResizingEvent(undefined);
     };
 
     document.addEventListener("mouseup", endResizeEvent);
     return () => {
       document.removeEventListener("mouseup", endResizeEvent);
     };
-  }, [resizingEventState]);
+  }, [onUpdateEvent, resizingEvent]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
@@ -207,9 +210,8 @@ export const WeeklyCalendar: React.FC<Props> = ({
                 onChangeEventCreationDragData={setEventCreationDragData}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
-                onUpdateEvent={onUpdateEvent}
-                resizingEventState={resizingEventState}
-                onChangeResizingEventState={setResizingEventState}
+                resizingEvent={resizingEvent}
+                onChangeResizingEvent={setResizingEvent}
               />
             );
           })}

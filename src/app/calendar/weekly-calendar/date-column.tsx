@@ -32,10 +32,12 @@ import {
   DateEvent,
   DraggingDateEvent,
   Event,
-  ResizingDateEventState,
+  ResizingDateEvent,
 } from "../type";
-import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
+import { DateEventCard } from "./date-event-card/date-event-card";
 import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
+import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
+import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -55,11 +57,8 @@ type Props = {
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   eventCreationDragData: DragDateRange | undefined;
   onChangeEventCreationDragData: (range: DragDateRange | undefined) => void;
-  onUpdateEvent: (event: Event) => void;
-  resizingEventState: ResizingDateEventState | undefined;
-  onChangeResizingEventState: (
-    state: ResizingDateEventState | undefined,
-  ) => void;
+  resizingEvent: ResizingDateEvent | undefined;
+  onChangeResizingEvent: (event: ResizingDateEvent | undefined) => void;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
@@ -73,9 +72,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     mouseHistoryRef,
     eventCreationDragData,
     onChangeEventCreationDragData,
-    onUpdateEvent,
-    resizingEventState,
-    onChangeResizingEventState,
+    resizingEvent,
+    onChangeResizingEvent,
   },
   ref,
 ) {
@@ -170,7 +168,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   };
 
   const updateResizingEventState = (mouseY: number) => {
-    if (!columnRef.current || !resizingEventState) {
+    if (!columnRef.current || !resizingEvent) {
       return;
     }
 
@@ -181,28 +179,24 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
     const mouseOverDate = getDateFromY(date, y);
 
-    const { origin: resizeOrigin, event: resizingEvent } = resizingEventState;
-
-    switch (resizeOrigin) {
+    switch (resizingEvent.origin) {
       case "eventStart": {
         if (isSameMinute(resizingEvent.start, mouseOverDate)) {
           return;
         }
 
         if (isBefore(mouseOverDate, resizingEvent.start)) {
-          const updatedEvent = {
+          onChangeResizingEvent({
             ...resizingEvent,
+            origin: "eventEnd",
             start: mouseOverDate,
             end: resizingEvent.start,
-          };
-
-          onUpdateEvent(updatedEvent);
-          onChangeResizingEventState({
-            event: updatedEvent,
-            origin: "eventEnd",
           });
         } else {
-          onUpdateEvent({ ...resizingEvent, end: mouseOverDate });
+          onChangeResizingEvent({
+            ...resizingEvent,
+            end: mouseOverDate,
+          });
         }
         return;
       }
@@ -212,20 +206,22 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         }
 
         if (isAfter(mouseOverDate, resizingEvent.end)) {
-          const updatedEvent = { ...resizingEvent, end: mouseOverDate };
-
-          onUpdateEvent(updatedEvent);
-          onChangeResizingEventState({
-            event: updatedEvent,
+          onChangeResizingEvent({
+            ...resizingEvent,
             origin: "eventStart",
+            start: resizingEvent.end,
+            end: mouseOverDate,
           });
         } else {
-          onUpdateEvent({ ...resizingEvent, start: mouseOverDate });
+          onChangeResizingEvent({
+            ...resizingEvent,
+            start: mouseOverDate,
+          });
         }
         return;
       }
       default: {
-        throw new Error(resizeOrigin satisfies never);
+        throw new Error(resizingEvent.origin satisfies never);
       }
     }
   };
@@ -241,7 +237,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       updateDraggingEvent(e.clientY);
     }
 
-    if (resizingEventState) {
+    if (resizingEvent) {
       updateResizingEventState(e.clientY);
     }
   };
@@ -262,7 +258,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     });
   };
 
-  const isPreviewVisible = useMemo(() => {
+  const isDragPreviewVisible = useMemo(() => {
     if (!draggingEvent) {
       return false;
     }
@@ -275,6 +271,20 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       draggingEvent,
     );
   }, [date, draggingEvent]);
+
+  const isResizePreviewVisible = useMemo(() => {
+    if (!resizingEvent) {
+      return false;
+    }
+
+    return areIntervalsOverlapping(
+      {
+        start: startOfDay(date),
+        end: endOfDay(date),
+      },
+      resizingEvent,
+    );
+  }, [date, resizingEvent]);
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -329,27 +339,33 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           )}
         {dateEvents.map((event) => {
           const dragging = event.id === draggingEvent?.id;
+          const isResizing = resizingEvent?.id === event.id;
 
-          const isResizing = resizingEventState?.event.id === event.id;
           return (
             <DateEventCard
               key={event.id}
+              hidden={isResizing}
               displayedDate={date}
               event={event}
               onDragStart={handleDragStart}
               dragging={dragging}
               draggingOther={draggingEvent ? !dragging : false}
-              onChangeResizingEventState={onChangeResizingEventState}
               isResizing={isResizing}
-              isResizingOther={(resizingEventState && !isResizing) ?? false}
+              isResizingOther={resizingEvent ? !isResizing : false}
+              onChangeResizingEvent={onChangeResizingEvent}
             />
           );
         })}
-        <PreviewDateEventCard
+        <DragPreviewDateEventCard
           date={date}
           ref={dropPreviewRef}
           event={draggingEvent}
-          visible={isPreviewVisible}
+          visible={isDragPreviewVisible}
+        />
+        <ResizePreviewDateEventCard
+          date={date}
+          event={resizingEvent}
+          visible={isResizePreviewVisible}
         />
       </div>
     </div>

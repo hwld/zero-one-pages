@@ -29,7 +29,6 @@ export type DateEvent = Event & {
 
 export type DraggingDateEvent = DateEvent & { dragStartY: number };
 
-export type ResizingDateEventState = {
+export type ResizingDateEvent = DateEvent & {
   origin: "eventStart" | "eventEnd";
-  event: DateEvent;
 };
