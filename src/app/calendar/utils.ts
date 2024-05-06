@@ -9,7 +9,7 @@ import {
   startOfDay,
   endOfDay,
 } from "date-fns";
-import { Event } from "./type";
+import { Event } from "./mocks/event-store";
 
 export type DragDateRange = {
   dragStartDate: Date;

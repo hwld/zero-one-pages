@@ -13,7 +13,8 @@ import {
   startOfDay,
   endOfDay,
 } from "date-fns";
-import { Event, WeekEvent } from "../type";
+import { WeekEvent } from "../type";
+import { Event } from "../mocks/event-store";
 
 export const getCalendarDates = ({
   year,

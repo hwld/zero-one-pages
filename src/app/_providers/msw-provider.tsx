@@ -10,6 +10,7 @@ import {
 import { setupWorker } from "msw/browser";
 import { todo1Handlers } from "@/app/todo-1/_mocks/api";
 import { githubProjcetApiHandler } from "../github-project/_mocks/api";
+import { calendarApiHandlers } from "../calendar/mocks/api";
 
 type MswState = { isMockserverUp: boolean };
 const MswContext = createContext<MswState | undefined>(undefined);
@@ -34,6 +35,7 @@ export const MswProvider: React.FC<{ children: ReactNode }> = ({
       ...todo1Handlers,
       ...todo2Handlers,
       ...githubProjcetApiHandler,
+      ...calendarApiHandlers,
     ];
     const worker = setupWorker(...handlers);
 

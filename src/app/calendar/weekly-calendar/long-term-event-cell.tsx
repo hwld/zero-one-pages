@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Event } from "../type";
+import { Event } from "../mocks/event-store";
 import { DragDateRange, isWithinDragDateRange } from "../utils";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { isWithinInterval } from "date-fns";

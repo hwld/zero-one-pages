@@ -27,12 +27,8 @@ import {
   useMemo,
   useRef,
 } from "react";
-import {
-  DateEvent,
-  DraggingDateEvent,
-  Event,
-  ResizingDateEvent,
-} from "../type";
+import { DateEvent, DraggingDateEvent, ResizingDateEvent } from "../type";
+import { Event } from "../mocks/event-store";
 import { DateEventCard } from "./date-event-card/date-event-card";
 import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";

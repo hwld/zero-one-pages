@@ -12,7 +12,8 @@ import {
   max,
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DraggingDateEvent, Event, ResizingDateEvent } from "../type";
+import { DraggingDateEvent, ResizingDateEvent } from "../type";
+import { Event } from "../mocks/event-store";
 import { EVENT_MIN_HEIGHT, getDateFromY, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, MouseHistory } from "./date-column";

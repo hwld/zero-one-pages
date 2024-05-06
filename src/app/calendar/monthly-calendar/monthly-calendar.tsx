@@ -10,7 +10,7 @@ import {
   DraggingEvent,
   getEventFromDraggingEvent,
 } from "../utils";
-import { Event } from "../type";
+import { Event } from "../mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
 import { addMonths, max, min, subMonths } from "date-fns";

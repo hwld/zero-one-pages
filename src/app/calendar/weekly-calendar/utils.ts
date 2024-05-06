@@ -12,7 +12,8 @@ import {
   min,
   differenceInHours,
 } from "date-fns";
-import { DateEvent, Event } from "../type";
+import { DateEvent } from "../type";
+import { Event } from "../mocks/event-store";
 
 export const EVENT_MIN_HEIGHT = 17;
 export const EVENT_MIN_MINUTES = 15;

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
 import "./style.css";
 import { WeeklyCalendar } from "./weekly-calendar/weekly-calendar";
-import { Event } from "./type";
+import { Event } from "./mocks/event-store";
 import { useMinuteClock } from "./use-minute-clock";
 
 type CalendarType = "month" | "week";

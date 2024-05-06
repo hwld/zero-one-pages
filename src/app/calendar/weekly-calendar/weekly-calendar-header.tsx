@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { WEEKLY_CALENDAR_GRID_COLS_CLASS } from "./weekly-calendar";
 import { WEEK_DAY_LABELS } from "../consts";
 import { LongTermEventCell } from "./long-term-event-cell";
-import { Event } from "../type";
+import { Event } from "../mocks/event-store";
 import { useEffect, useState } from "react";
 import {
   DragDateRange,

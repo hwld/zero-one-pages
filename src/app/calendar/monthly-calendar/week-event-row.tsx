@@ -1,5 +1,6 @@
 import { forwardRef, useRef } from "react";
-import { Event, WeekEvent } from "../type";
+import { WeekEvent } from "../type";
+import { Event } from "../mocks/event-store";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";

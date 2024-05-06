@@ -3,7 +3,8 @@ import {
   WeekEventCard,
 } from "../monthly-calendar/week-event-card";
 import { getExceededEventCountByDayOfWeek } from "../monthly-calendar/utils";
-import { Event, WeekEvent } from "../type";
+import { WeekEvent } from "../type";
+import { Event } from "../mocks/event-store";
 import { CELL_Y_MARGIN } from "./long-term-event-cell";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
