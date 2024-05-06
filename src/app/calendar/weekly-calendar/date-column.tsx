@@ -4,7 +4,10 @@ import {
   differenceInMinutes,
   eachHourOfInterval,
   endOfDay,
+  isAfter,
+  isBefore,
   isSameDay,
+  isSameMinute,
   startOfDay,
 } from "date-fns";
 import { NewEvent } from "./new-event";
@@ -25,7 +28,12 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { DateEvent, DraggingDateEvent, Event } from "../type";
+import {
+  DateEvent,
+  DraggingDateEvent,
+  Event,
+  ResizingDateEventState,
+} from "../type";
 import { DateEventCard, PreviewDateEventCard } from "./date-event-card";
 import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
 
@@ -43,11 +51,15 @@ type Props = {
   timedEvents: Event[];
   draggingEvent: DraggingDateEvent | undefined;
   onChangeDraggingEvent: (event: DraggingDateEvent | undefined) => void;
-  eventCreationDragData: DragDateRange | undefined;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
+  eventCreationDragData: DragDateRange | undefined;
   onChangeEventCreationDragData: (range: DragDateRange | undefined) => void;
   onUpdateEvent: (event: Event) => void;
+  resizingEventState: ResizingDateEventState | undefined;
+  onChangeResizingEventState: (
+    state: ResizingDateEventState | undefined,
+  ) => void;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
@@ -62,6 +74,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     eventCreationDragData,
     onChangeEventCreationDragData,
     onUpdateEvent,
+    resizingEventState,
+    onChangeResizingEventState,
   },
   ref,
 ) {
@@ -155,6 +169,67 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     onChangeDraggingEvent({ ...draggingEvent, start: startDate, end: endDate });
   };
 
+  const updateResizingEventState = (mouseY: number) => {
+    if (!columnRef.current || !resizingEventState) {
+      return;
+    }
+
+    const y = mouseY - columnRef.current.getBoundingClientRect().y;
+    if (y < 0) {
+      return;
+    }
+
+    const mouseOverDate = getDateFromY(date, y);
+
+    const { origin: resizeOrigin, event: resizingEvent } = resizingEventState;
+
+    switch (resizeOrigin) {
+      case "eventStart": {
+        if (isSameMinute(resizingEvent.start, mouseOverDate)) {
+          return;
+        }
+
+        if (isBefore(mouseOverDate, resizingEvent.start)) {
+          const updatedEvent = {
+            ...resizingEvent,
+            start: mouseOverDate,
+            end: resizingEvent.start,
+          };
+
+          onUpdateEvent(updatedEvent);
+          onChangeResizingEventState({
+            event: updatedEvent,
+            origin: "eventEnd",
+          });
+        } else {
+          onUpdateEvent({ ...resizingEvent, end: mouseOverDate });
+        }
+        return;
+      }
+      case "eventEnd": {
+        if (isSameMinute(resizingEvent.end, mouseOverDate)) {
+          return;
+        }
+
+        if (isAfter(mouseOverDate, resizingEvent.end)) {
+          const updatedEvent = { ...resizingEvent, end: mouseOverDate };
+
+          onUpdateEvent(updatedEvent);
+          onChangeResizingEventState({
+            event: updatedEvent,
+            origin: "eventStart",
+          });
+        } else {
+          onUpdateEvent({ ...resizingEvent, start: mouseOverDate });
+        }
+        return;
+      }
+      default: {
+        throw new Error(resizeOrigin satisfies never);
+      }
+    }
+  };
+
   const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
@@ -164,6 +239,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
     if (draggingEvent) {
       updateDraggingEvent(e.clientY);
+    }
+
+    if (resizingEventState) {
+      updateResizingEventState(e.clientY);
     }
   };
 
@@ -251,16 +330,18 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         {dateEvents.map((event) => {
           const dragging = event.id === draggingEvent?.id;
 
+          const isResizing = resizingEventState?.event.id === event.id;
           return (
             <DateEventCard
               key={event.id}
               displayedDate={date}
-              dateColumnRef={columnRef}
               event={event}
               onDragStart={handleDragStart}
-              onEventUpdate={onUpdateEvent}
               dragging={dragging}
               draggingOther={draggingEvent ? !dragging : false}
+              onChangeResizingEventState={onChangeResizingEventState}
+              isResizing={isResizing}
+              isResizingOther={(resizingEventState && !isResizing) ?? false}
             />
           );
         })}

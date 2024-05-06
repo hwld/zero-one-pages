@@ -12,7 +12,7 @@ import {
   max,
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DraggingDateEvent, Event } from "../type";
+import { DraggingDateEvent, Event, ResizingDateEventState } from "../type";
 import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, MouseHistory } from "./date-column";
@@ -47,11 +47,6 @@ export const WeeklyCalendar: React.FC<Props> = ({
 
   const [eventCreationDragData, setEventCreationDragData] = useState<
     DragDateRange | undefined
-  >(undefined);
-
-  // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
-  const [draggingEvent, setDraggingEvent] = useState<
-    DraggingDateEvent | undefined
   >(undefined);
 
   // マウスイベントが発生したときのyとscrollableのscrollTipを保存する
@@ -111,6 +106,11 @@ export const WeeklyCalendar: React.FC<Props> = ({
     };
   }, [eventCreationDragData, onCreateEvent]);
 
+  // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
+  const [draggingEvent, setDraggingEvent] = useState<
+    DraggingDateEvent | undefined
+  >(undefined);
+
   useEffect(() => {
     const moveEvent = () => {
       if (!draggingEvent) {
@@ -126,6 +126,23 @@ export const WeeklyCalendar: React.FC<Props> = ({
       document.removeEventListener("mouseup", moveEvent);
     };
   }, [draggingEvent, onUpdateEvent]);
+
+  const [resizingEventState, setResizingEventState] = useState<
+    ResizingDateEventState | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const endResizeEvent = () => {
+      if (resizingEventState) {
+        setResizingEventState(undefined);
+      }
+    };
+
+    document.addEventListener("mouseup", endResizeEvent);
+    return () => {
+      document.removeEventListener("mouseup", endResizeEvent);
+    };
+  }, [resizingEventState]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
@@ -180,6 +197,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
           {week.map((date) => {
             return (
               <DateColumn
+                key={`${date}`}
                 currentDate={currentDate}
                 date={date}
                 timedEvents={timedEvents}
@@ -190,7 +208,8 @@ export const WeeklyCalendar: React.FC<Props> = ({
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 onUpdateEvent={onUpdateEvent}
-                key={`${date}`}
+                resizingEventState={resizingEventState}
+                onChangeResizingEventState={setResizingEventState}
               />
             );
           })}

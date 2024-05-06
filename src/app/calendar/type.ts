@@ -16,14 +16,20 @@ export const weekEventSchema = eventSchema.merge(
     endWeekDay: z.number(),
   }),
 );
-export type WeekEvent = z.infer<typeof weekEventSchema>;
+export type WeekEvent = Event & {
+  top: number;
+  startWeekDay: number;
+  endWeekDay: number;
+};
 
-export const dateEventSchema = eventSchema.merge(
-  z.object({
-    prevOverlappings: z.number(),
-    totalOverlappings: z.number(),
-  }),
-);
-export type DateEvent = z.infer<typeof dateEventSchema>;
+export type DateEvent = Event & {
+  prevOverlappings: number;
+  totalOverlappings: number;
+};
 
 export type DraggingDateEvent = DateEvent & { dragStartY: number };
+
+export type ResizingDateEventState = {
+  origin: "eventStart" | "eventEnd";
+  event: DateEvent;
+};
