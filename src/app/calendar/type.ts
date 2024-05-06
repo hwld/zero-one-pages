@@ -27,7 +27,9 @@ export type DateEvent = Event & {
   totalOverlappings: number;
 };
 
-export type DraggingDateEvent = DateEvent & { dragStartY: number };
+export type DraggingDateEvent = DateEvent & {
+  prevMouseOverDate: Date;
+};
 
 export type ResizingDateEvent = DateEvent & {
   origin: "eventStart" | "eventEnd";

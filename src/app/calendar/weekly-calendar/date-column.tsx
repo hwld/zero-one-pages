@@ -16,7 +16,6 @@ import {
   EVENT_MIN_MINUTES,
   getDateEvents,
   getDateFromY,
-  getHeightFromInterval,
 } from "./utils";
 import {
   DragEvent,
@@ -146,25 +145,25 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     }
 
     const columnRect = columnRef.current.getBoundingClientRect();
-    const previewHeight = getHeightFromInterval(draggingEvent, date);
 
-    let previewTop = mouseY - columnRect.y - draggingEvent.dragStartY;
-    if (previewTop < 0) {
-      previewTop = 0;
-    }
-    if (previewTop > columnRect.height - previewHeight) {
-      previewTop = columnRect.height - previewHeight;
-    }
-    const gap = previewTop % EVENT_MIN_HEIGHT;
-    previewTop = previewTop - gap;
+    const y = mouseY - columnRect.y;
+    const mouseOverDate = getDateFromY(date, y);
 
-    const startDate = getDateFromY(date, previewTop);
-    const endDate = addMinutes(
-      startDate,
-      differenceInMinutes(draggingEvent.end, draggingEvent.start),
+    if (isSameMinute(mouseOverDate, draggingEvent.prevMouseOverDate)) {
+      return;
+    }
+
+    const diffMinutes = differenceInMinutes(
+      mouseOverDate,
+      draggingEvent.prevMouseOverDate,
     );
 
-    onChangeDraggingEvent({ ...draggingEvent, start: startDate, end: endDate });
+    onChangeDraggingEvent({
+      ...draggingEvent,
+      start: addMinutes(draggingEvent.start, diffMinutes),
+      end: addMinutes(draggingEvent.end, diffMinutes),
+      prevMouseOverDate: mouseOverDate,
+    });
   };
 
   const updateResizingEventState = (mouseY: number) => {
@@ -244,17 +243,22 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
   const dropPreviewRef = useRef<HTMLDivElement>(null);
 
-  const handleDragStart = (
+  const handleEventDragStart = (
     event: DragEvent<HTMLDivElement>,
     dateEvent: DateEvent,
   ) => {
-    // dragImageがうまく設定できなかったので、DnD APIではなくマウスイベントで処理する
     event.preventDefault();
 
-    const dateEventY = event.currentTarget.getBoundingClientRect().y;
+    if (!columnRef.current) {
+      return;
+    }
+
+    const y = event.clientY - columnRef.current?.getBoundingClientRect().y;
+    const dragStartDate = getDateFromY(date, y);
+
     onChangeDraggingEvent({
       ...dateEvent,
-      dragStartY: event.clientY - dateEventY,
+      prevMouseOverDate: dragStartDate,
     });
   };
 
@@ -347,7 +351,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
               hidden={isResizing}
               displayedDate={date}
               event={event}
-              onDragStart={handleDragStart}
+              onDragStart={handleEventDragStart}
               dragging={dragging}
               draggingOther={draggingEvent ? !dragging : false}
               isResizing={isResizing}

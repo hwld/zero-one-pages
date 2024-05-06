@@ -18,6 +18,7 @@ export const EVENT_MIN_MINUTES = 15;
 
 /**
  * 年月日とweekly calendar上のy軸から日付を取得する
+ * @param y 0を00時00分としたときの数値
  */
 export const getDateFromY = (
   yearMonthDate: Date,
