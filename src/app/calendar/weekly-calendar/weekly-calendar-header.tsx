@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { WEEKLY_CALENDAR_GRID_COLS_CLASS } from "./weekly-calendar";
 import { WEEK_DAY_LABELS } from "../consts";
-import { AllDayEventCell } from "./all-day-event-cell";
+import { LongTermEventCell } from "./long-term-event-cell";
 import { Event } from "../type";
 import { useEffect, useState } from "react";
 import {
@@ -10,7 +10,7 @@ import {
   getEventFromDraggingEvent,
 } from "../utils";
 import { isSameDay, max, min } from "date-fns";
-import { AllDayEventRow } from "./all-day-event-row";
+import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 
@@ -19,7 +19,7 @@ export const DAY_TITLE_HEIGHT = 28;
 type Props = {
   currentDate: Date;
   week: Date[];
-  allDayEvents: Event[];
+  longTermEvents: Event[];
   onCreateEvent: (event: Event) => void;
   onUpdateEvent: (event: Event) => void;
 };
@@ -27,13 +27,13 @@ type Props = {
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   currentDate,
   week,
-  allDayEvents,
+  longTermEvents,
   onCreateEvent,
   onUpdateEvent,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const weekAllDayEvents = getWeekEvents({ week, events: allDayEvents });
+  const weekLongTermEvents = getWeekEvents({ week, events: longTermEvents });
 
   const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
     undefined,
@@ -65,27 +65,27 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     };
   }, [dragDateRange, onCreateEvent]);
 
-  const [dragAllDayEvent, setDragAllDayEvent] = useState<
+  const [draggingLongTermEvent, setDraggingLongTermEvent] = useState<
     DraggingEvent | undefined
   >(undefined);
 
   useEffect(() => {
-    const moveAllDayEvent = (e: MouseEvent) => {
-      if (!dragAllDayEvent || e.button !== 0) {
+    const moveLongTermEvent = (e: MouseEvent) => {
+      if (!draggingLongTermEvent || e.button !== 0) {
         return;
       }
 
-      const newEvent = getEventFromDraggingEvent(dragAllDayEvent);
+      const newEvent = getEventFromDraggingEvent(draggingLongTermEvent);
       onUpdateEvent(newEvent);
 
-      setDragAllDayEvent(undefined);
+      setDraggingLongTermEvent(undefined);
     };
 
-    document.addEventListener("mouseup", moveAllDayEvent);
+    document.addEventListener("mouseup", moveLongTermEvent);
     return () => {
-      document.removeEventListener("mouseup", moveAllDayEvent);
+      document.removeEventListener("mouseup", moveLongTermEvent);
     };
-  }, [dragAllDayEvent, onUpdateEvent]);
+  }, [draggingLongTermEvent, onUpdateEvent]);
 
   return (
     <div
@@ -98,7 +98,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         <div style={{ height: DAY_TITLE_HEIGHT }} />
         <div className="flex grow items-start justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
           <div className="flex items-center gap-1">
-            終日
+            長期
             <button
               className="grid size-6 place-items-center rounded text-[14px] text-neutral-500 transition-colors hover:bg-neutral-500/15"
               onClick={() => {
@@ -132,23 +132,23 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
                 {date.getDate()}
               </div>
             </div>
-            <AllDayEventCell
+            <LongTermEventCell
               date={date}
-              events={weekAllDayEvents}
+              events={weekLongTermEvents}
               dragDateRange={dragDateRange}
               expanded={expanded}
             />
           </div>
         );
       })}
-      <AllDayEventRow
+      <LongTermEventRow
         week={week}
-        weekAllDayEvents={weekAllDayEvents}
+        weekLongTermEvents={weekLongTermEvents}
         isDraggingDate={!!dragDateRange}
         expanded={expanded}
         onChangeExpand={setExpanded}
-        draggingEvent={dragAllDayEvent}
-        onChangeDraggingEvent={setDragAllDayEvent}
+        draggingEvent={draggingLongTermEvent}
+        onChangeDraggingEvent={setDraggingLongTermEvent}
         dragDateRange={dragDateRange}
         onChangeDragDateRange={setDragDateRange}
       />

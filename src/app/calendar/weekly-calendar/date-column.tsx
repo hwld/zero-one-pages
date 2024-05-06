@@ -49,7 +49,7 @@ export type EventCreationDragData = {
 type Props = {
   currentDate: Date;
   date: Date;
-  timedEvents: Event[];
+  events: Event[];
   draggingEvent: DraggingDateEvent | undefined;
   onChangeDraggingEvent: (event: DraggingDateEvent | undefined) => void;
   scrollableRef: RefObject<HTMLDivElement>;
@@ -64,7 +64,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   {
     currentDate,
     date,
-    timedEvents,
+    events,
     draggingEvent,
     onChangeDraggingEvent,
     scrollableRef,
@@ -77,7 +77,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   ref,
 ) {
   const columnRef = useRef<HTMLDivElement>(null);
-  const dateEvents = getDateEvents({ date, events: timedEvents });
+  const dateEvents = getDateEvents({ date, events: events });
 
   const hours = useMemo(
     () =>

@@ -10,6 +10,7 @@ import {
   endOfDay,
   max,
   min,
+  differenceInHours,
 } from "date-fns";
 import { DateEvent, Event } from "../type";
 
@@ -161,4 +162,29 @@ export const formatEventDateSpan = (event: DateEvent) => {
     return `${format(event.start, "h:mm")}~${format(event.end, "h:mm a")}`;
   }
   return `${format(event.start, "h:mm a")}~${format(event.end, "h:mm a")}`;
+};
+
+type SplitEventResult = {
+  /**
+   * 終日イベントと期間が24時間を超えるイベント
+   */
+  longTermEvents: Event[];
+  defaultEvents: Event[];
+};
+
+export const splitEvent = (events: Event[]): SplitEventResult => {
+  const longTermEvents: Event[] = [];
+  const defaultEvents: Event[] = [];
+
+  events.forEach((event) => {
+    if (event.allDay || differenceInHours(event.end, event.start) > 24) {
+      longTermEvents.push(event);
+      return;
+    }
+
+    defaultEvents.push(event);
+    return;
+  });
+
+  return { longTermEvents, defaultEvents };
 };

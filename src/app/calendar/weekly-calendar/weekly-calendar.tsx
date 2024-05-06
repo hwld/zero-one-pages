@@ -13,7 +13,7 @@ import {
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DraggingDateEvent, Event, ResizingDateEvent } from "../type";
-import { EVENT_MIN_HEIGHT, getDateFromY } from "./utils";
+import { EVENT_MIN_HEIGHT, getDateFromY, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn, MouseHistory } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
@@ -35,8 +35,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
   onUpdateEvent,
 }) => {
   const [date, setDate] = useState(currentDate);
-  const allDayEvents = events.filter((e) => e.allDay);
-  const timedEvents = events.filter((e) => !e.allDay);
+  const { longTermEvents, defaultEvents } = splitEvent(events);
 
   const week = useMemo(() => {
     const start = startOfDay(startOfWeek(date));
@@ -173,7 +172,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
           week={week}
           onCreateEvent={onCreateEvent}
           onUpdateEvent={onUpdateEvent}
-          allDayEvents={allDayEvents}
+          longTermEvents={longTermEvents}
         />
 
         <div className="grid grid-cols-[75px,repeat(7,1fr)]">
@@ -203,7 +202,7 @@ export const WeeklyCalendar: React.FC<Props> = ({
                 key={`${date}`}
                 currentDate={currentDate}
                 date={date}
-                timedEvents={timedEvents}
+                events={defaultEvents}
                 draggingEvent={draggingEvent}
                 onChangeDraggingEvent={setDraggingEvent}
                 eventCreationDragData={eventCreationDragData}

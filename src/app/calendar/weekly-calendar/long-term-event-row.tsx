@@ -4,7 +4,7 @@ import {
 } from "../monthly-calendar/week-event-card";
 import { getExceededEventCountByDayOfWeek } from "../monthly-calendar/utils";
 import { Event, WeekEvent } from "../type";
-import { CELL_Y_MARGIN } from "./all-day-event-cell";
+import { CELL_Y_MARGIN } from "./long-term-event-cell";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
 import { DragDateRange, DraggingEvent } from "../utils";
@@ -12,11 +12,11 @@ import { useRef } from "react";
 import { DraggingEventPreview } from "../monthly-calendar/dragging-event-preview";
 import clsx from "clsx";
 
-export const ALL_DAY_EVENT_DISPLAY_LIMIT = 2;
+export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 
 type Props = {
   week: Date[];
-  weekAllDayEvents: WeekEvent[];
+  weekLongTermEvents: WeekEvent[];
   isDraggingDate: boolean;
   expanded: boolean;
   onChangeExpand: (expanded: boolean) => void;
@@ -26,9 +26,9 @@ type Props = {
   onChangeDragDateRange: (range: DragDateRange) => void;
 };
 
-export const AllDayEventRow: React.FC<Props> = ({
+export const LongTermEventRow: React.FC<Props> = ({
   week,
-  weekAllDayEvents,
+  weekLongTermEvents,
   isDraggingDate,
   expanded,
   onChangeExpand,
@@ -40,15 +40,15 @@ export const AllDayEventRow: React.FC<Props> = ({
   const rowRef = useRef<HTMLDivElement>(null);
   const exceededEvents = getExceededEventCountByDayOfWeek({
     week,
-    weekEvents: weekAllDayEvents,
-    limit: ALL_DAY_EVENT_DISPLAY_LIMIT,
+    weekEvents: weekLongTermEvents,
+    limit: LONG_TERM_EVENT_DISPLAY_LIMIT,
   });
 
-  const visibleWeekAllDayEvents = weekAllDayEvents.filter((e) => {
+  const visibleWeekLongTermEvents = weekLongTermEvents.filter((e) => {
     if (expanded) {
       return true;
     }
-    return e.top < ALL_DAY_EVENT_DISPLAY_LIMIT;
+    return e.top < LONG_TERM_EVENT_DISPLAY_LIMIT;
   });
 
   const getDateFromX = (x: number) => {
@@ -94,7 +94,7 @@ export const AllDayEventRow: React.FC<Props> = ({
       onMouseDown={handleRowMouseDown}
       onMouseMove={handleRowMouseMove}
     >
-      {visibleWeekAllDayEvents.map((event) => {
+      {visibleWeekLongTermEvents.map((event) => {
         const isDragging = draggingEvent?.event.id === event.id;
 
         return (
@@ -125,7 +125,7 @@ export const AllDayEventRow: React.FC<Props> = ({
               <MoreWeekEventsCard
                 key={weekDay}
                 count={count}
-                limit={ALL_DAY_EVENT_DISPLAY_LIMIT}
+                limit={LONG_TERM_EVENT_DISPLAY_LIMIT}
                 height={EVENT_MIN_HEIGHT}
                 disablePointerEvents={isDraggingDate || !!draggingEvent}
                 weekDay={weekDay}
