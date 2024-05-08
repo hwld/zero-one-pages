@@ -69,15 +69,16 @@ export const WeekEventCard: React.FC<WeekEventCardProps> = ({
     >
       <div
         className={clsx(
-          "flex h-full items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800",
+          "flex h-full flex-nowrap items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800",
           isDragging && "bg-neutral-800 ring ring-blue-500",
         )}
       >
         {!weekEvent.allDay ? (
-          <span className="mr-1">{format(weekEvent.start, "aa hh:mm")}</span>
+          <span className="mr-1 text-nowrap text-neutral-300">
+            {format(weekEvent.start, "aa hh:mm")}
+          </span>
         ) : null}
-
-        {weekEvent.title}
+        <span className="truncate">{weekEvent.title}</span>
       </div>
     </WeekEventCardBase>
   );
