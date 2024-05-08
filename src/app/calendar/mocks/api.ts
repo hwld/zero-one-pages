@@ -10,15 +10,27 @@ export const CalendarAPI = {
   event: (id?: string) => `${CalendarAPI.events()}/${id ?? ":id"}`,
 };
 
-export const createEventInputSchema = z.object({
-  title: z
-    .string()
-    .min(1, "タイトルを入力してください")
-    .max(200, "タイトルは最大200文字です"),
-  allDay: z.boolean(),
-  start: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
-  end: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
-});
+type CreateEventInputSchemaKeys = "title" | "allDay" | "start" | "end";
+
+export const createEventInputSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "タイトルを入力してください")
+      .max(200, "タイトルは200文字以下で入力してください"),
+    allDay: z.boolean(),
+    start: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
+    end: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
+  } satisfies Record<CreateEventInputSchemaKeys, unknown>)
+  .refine(
+    (input) => {
+      return input.start.getTime() <= input.end.getTime();
+    },
+    {
+      message: "開始日時は終了日時より前に設定してください",
+      path: ["start"] satisfies CreateEventInputSchemaKeys[],
+    },
+  );
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 
 export const updateEventInputSchema = createEventInputSchema;
