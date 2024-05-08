@@ -4,8 +4,8 @@ import { useUpdateEvent } from "../queries/use-update-event";
 import { Event } from "../mocks/event-store";
 
 export type MoveEventActions = {
-  startMove: (event: Event, moveStart: Date) => void;
-  updateMoveEnd: (moveEnd: Date) => void;
+  startMove: (event: Event, moveStartDate: Date) => void;
+  updateMoveEnd: (moveEndDate: Date) => void;
   move: () => void;
 };
 
@@ -47,9 +47,9 @@ export const useMoveEventOnMonthlyCalendar = () => {
     setMovingEvent(undefined);
   }, [movingEvent, updateEventMutation]);
 
-  const actions = useMemo((): MoveEventActions => {
+  const moveEventActions = useMemo((): MoveEventActions => {
     return { startMove, updateMoveEnd, move };
   }, [updateMoveEnd, startMove, move]);
 
-  return { movingEvent, moveEventActions: actions };
+  return { movingEvent, moveEventActions };
 };

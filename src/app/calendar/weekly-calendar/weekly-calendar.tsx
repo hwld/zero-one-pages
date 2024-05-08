@@ -12,7 +12,6 @@ import {
   max,
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DraggingDateEvent, ResizingDateEvent } from "../type";
 import { Event } from "../mocks/event-store";
 import { EVENT_MIN_HEIGHT, getDateFromY, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
@@ -20,7 +19,8 @@ import { DateColumn, MouseHistory } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import { DragDateRange } from "../utils";
 import { useCreateEvent } from "../queries/use-create-event";
-import { useUpdateEvent } from "../queries/use-update-event";
+import { useMoveEventOnWeeklyCalendar } from "./use-move-event";
+import { useResizeEventOnWeeklyCalendar } from "./use-resize-event";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -31,7 +31,6 @@ type Props = {
 
 export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   const craeteEventMutation = useCreateEvent();
-  const updateEventMutation = useUpdateEvent();
 
   const [date, setDate] = useState(currentDate);
   const { longTermEvents, defaultEvents } = splitEvent(events);
@@ -103,46 +102,34 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     };
   }, [craeteEventMutation, eventCreationDragData]);
 
-  // dragOverでもドラッグしてるデータにアクセスしたいので、dataTransferではなくstateで管理する
-  const [draggingEvent, setDraggingEvent] = useState<
-    DraggingDateEvent | undefined
-  >(undefined);
-
+  const { movingEvent, moveEventActions } = useMoveEventOnWeeklyCalendar();
   useEffect(() => {
-    const moveEvent = () => {
-      if (!draggingEvent) {
-        return;
+    const moveEvent = (e: MouseEvent) => {
+      if (e.button === 0) {
+        moveEventActions.move();
       }
-
-      updateEventMutation.mutate(draggingEvent);
-      setDraggingEvent(undefined);
     };
 
     document.addEventListener("mouseup", moveEvent);
     return () => {
       document.removeEventListener("mouseup", moveEvent);
     };
-  }, [draggingEvent, updateEventMutation]);
+  }, [moveEventActions, movingEvent]);
 
-  const [resizingEvent, setResizingEvent] = useState<
-    ResizingDateEvent | undefined
-  >(undefined);
-
+  const { resizingEvent, resizeEventActions } =
+    useResizeEventOnWeeklyCalendar();
   useEffect(() => {
-    const endResizeEvent = () => {
-      if (!resizingEvent) {
-        return;
+    const endResizeEvent = (e: MouseEvent) => {
+      if (e.button === 0) {
+        resizeEventActions.resize();
       }
-
-      updateEventMutation.mutate(resizingEvent);
-      setResizingEvent(undefined);
     };
 
     document.addEventListener("mouseup", endResizeEvent);
     return () => {
       document.removeEventListener("mouseup", endResizeEvent);
     };
-  }, [resizingEvent, updateEventMutation]);
+  }, [resizeEventActions]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
@@ -199,14 +186,14 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                 currentDate={currentDate}
                 date={date}
                 events={defaultEvents}
-                draggingEvent={draggingEvent}
-                onChangeDraggingEvent={setDraggingEvent}
+                movingEvent={movingEvent}
+                moveEventActions={moveEventActions}
                 eventCreationDragData={eventCreationDragData}
                 onChangeEventCreationDragData={setEventCreationDragData}
                 scrollableRef={scrollableRef}
                 mouseHistoryRef={mouseHistoryRef}
                 resizingEvent={resizingEvent}
-                onChangeResizingEvent={setResizingEvent}
+                resizeEventActions={resizeEventActions}
               />
             );
           })}

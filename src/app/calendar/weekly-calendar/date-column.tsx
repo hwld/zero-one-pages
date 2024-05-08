@@ -4,10 +4,7 @@ import {
   differenceInMinutes,
   eachHourOfInterval,
   endOfDay,
-  isAfter,
-  isBefore,
   isSameDay,
-  isSameMinute,
   startOfDay,
 } from "date-fns";
 import { NewEvent } from "./new-event";
@@ -33,6 +30,8 @@ import { DateEventCard } from "./date-event-card/date-event-card";
 import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
 import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
+import { MoveEventActions } from "./use-move-event";
+import { ResizeEventActions } from "./use-resize-event";
 
 export type MouseHistory = { y: number; scrollTop: number };
 
@@ -46,14 +45,14 @@ type Props = {
   currentDate: Date;
   date: Date;
   events: Event[];
-  draggingEvent: DraggingDateEvent | undefined;
-  onChangeDraggingEvent: (event: DraggingDateEvent | undefined) => void;
+  movingEvent: DraggingDateEvent | undefined;
+  moveEventActions: MoveEventActions;
   scrollableRef: RefObject<HTMLDivElement>;
   mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
   eventCreationDragData: DragDateRange | undefined;
   onChangeEventCreationDragData: (range: DragDateRange | undefined) => void;
   resizingEvent: ResizingDateEvent | undefined;
-  onChangeResizingEvent: (event: ResizingDateEvent | undefined) => void;
+  resizeEventActions: ResizeEventActions;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
@@ -61,14 +60,14 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     currentDate,
     date,
     events,
-    draggingEvent,
-    onChangeDraggingEvent,
+    movingEvent,
+    moveEventActions,
     scrollableRef,
     mouseHistoryRef,
     eventCreationDragData,
     onChangeEventCreationDragData,
     resizingEvent,
-    onChangeResizingEvent,
+    resizeEventActions,
   },
   ref,
 ) {
@@ -135,34 +134,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     });
   };
 
-  const updateDraggingEvent = (mouseY: number) => {
-    if (!draggingEvent || !dropPreviewRef.current || !columnRef.current) {
+  const updateMoveDest = (mouseY: number) => {
+    if (!movingEvent || !dropPreviewRef.current || !columnRef.current) {
       return;
     }
 
     const columnRect = columnRef.current.getBoundingClientRect();
-
     const y = mouseY - columnRect.y;
     const mouseOverDate = getDateFromY(date, y);
 
-    if (isSameMinute(mouseOverDate, draggingEvent.prevMouseOverDate)) {
-      return;
-    }
-
-    const diffMinutes = differenceInMinutes(
-      mouseOverDate,
-      draggingEvent.prevMouseOverDate,
-    );
-
-    onChangeDraggingEvent({
-      ...draggingEvent,
-      start: addMinutes(draggingEvent.start, diffMinutes),
-      end: addMinutes(draggingEvent.end, diffMinutes),
-      prevMouseOverDate: mouseOverDate,
-    });
+    moveEventActions.updateMoveDest(mouseOverDate);
   };
 
-  const updateResizingEventState = (mouseY: number) => {
+  const updateResizeDest = (mouseY: number) => {
     if (!columnRef.current || !resizingEvent) {
       return;
     }
@@ -171,54 +155,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     if (y < 0) {
       return;
     }
-
     const mouseOverDate = getDateFromY(date, y);
 
-    switch (resizingEvent.origin) {
-      case "eventStart": {
-        if (isSameMinute(resizingEvent.start, mouseOverDate)) {
-          return;
-        }
-
-        if (isBefore(mouseOverDate, resizingEvent.start)) {
-          onChangeResizingEvent({
-            ...resizingEvent,
-            origin: "eventEnd",
-            start: mouseOverDate,
-            end: resizingEvent.start,
-          });
-        } else {
-          onChangeResizingEvent({
-            ...resizingEvent,
-            end: mouseOverDate,
-          });
-        }
-        return;
-      }
-      case "eventEnd": {
-        if (isSameMinute(resizingEvent.end, mouseOverDate)) {
-          return;
-        }
-
-        if (isAfter(mouseOverDate, resizingEvent.end)) {
-          onChangeResizingEvent({
-            ...resizingEvent,
-            origin: "eventStart",
-            start: resizingEvent.end,
-            end: mouseOverDate,
-          });
-        } else {
-          onChangeResizingEvent({
-            ...resizingEvent,
-            start: mouseOverDate,
-          });
-        }
-        return;
-      }
-      default: {
-        throw new Error(resizingEvent.origin satisfies never);
-      }
-    }
+    resizeEventActions.updateResizeDest(mouseOverDate);
   };
 
   const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -228,12 +167,12 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       updateEventCreationDragData(e.clientY);
     }
 
-    if (draggingEvent) {
-      updateDraggingEvent(e.clientY);
+    if (movingEvent) {
+      updateMoveDest(e.clientY);
     }
 
     if (resizingEvent) {
-      updateResizingEventState(e.clientY);
+      updateResizeDest(e.clientY);
     }
   };
 
@@ -252,14 +191,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     const y = event.clientY - columnRef.current?.getBoundingClientRect().y;
     const dragStartDate = getDateFromY(date, y);
 
-    onChangeDraggingEvent({
-      ...dateEvent,
-      prevMouseOverDate: dragStartDate,
-    });
+    moveEventActions.startMove(dateEvent, dragStartDate);
   };
 
   const isDragPreviewVisible = useMemo(() => {
-    if (!draggingEvent) {
+    if (!movingEvent) {
       return false;
     }
 
@@ -268,9 +204,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         start: startOfDay(date),
         end: endOfDay(date),
       },
-      draggingEvent,
+      movingEvent,
     );
-  }, [date, draggingEvent]);
+  }, [movingEvent, date]);
 
   const isResizePreviewVisible = useMemo(() => {
     if (!resizingEvent) {
@@ -338,7 +274,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             />
           )}
         {dateEvents.map((event) => {
-          const dragging = event.id === draggingEvent?.id;
+          const dragging = event.id === movingEvent?.id;
           const isResizing = resizingEvent?.id === event.id;
 
           return (
@@ -349,17 +285,17 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
               event={event}
               onDragStart={handleEventDragStart}
               dragging={dragging}
-              draggingOther={draggingEvent ? !dragging : false}
+              draggingOther={movingEvent ? !dragging : false}
               isResizing={isResizing}
               isResizingOther={resizingEvent ? !isResizing : false}
-              onChangeResizingEvent={onChangeResizingEvent}
+              resizeEventActions={resizeEventActions}
             />
           );
         })}
         <DragPreviewDateEventCard
           date={date}
           ref={dropPreviewRef}
-          event={draggingEvent}
+          event={movingEvent}
           visible={isDragPreviewVisible}
         />
         <ResizePreviewDateEventCard

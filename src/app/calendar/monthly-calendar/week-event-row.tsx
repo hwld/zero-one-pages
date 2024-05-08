@@ -4,11 +4,11 @@ import { Event } from "../mocks/event-store";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DragDateRange } from "../utils";
+import { DragDateRange, DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
-import { MoveEventActions, MovingEvent } from "./use-move-event";
+import { MoveEventActions } from "./use-move-event";
 
 type Props = {
   week: Date[];
@@ -17,7 +17,7 @@ type Props = {
   exceededEventCountMap: Map<number, number>;
   dragDateRange: DragDateRange | undefined;
   onChangeDragDateRange: (range: DragDateRange | undefined) => void;
-  movingEvent: MovingEvent | undefined;
+  movingEvent: DraggingEvent | undefined;
   moveEventActions: MoveEventActions;
 };
 

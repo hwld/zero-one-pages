@@ -110,10 +110,9 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
 
   useEffect(() => {
     const handleMouseUp = (e: MouseEvent) => {
-      if (e.button !== 0) {
-        return;
+      if (e.button === 0) {
+        moveEventActions.move();
       }
-      moveEventActions.move();
     };
 
     document.addEventListener("mouseup", handleMouseUp);

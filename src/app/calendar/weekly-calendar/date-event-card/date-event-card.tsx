@@ -1,8 +1,9 @@
 import { DragEvent, forwardRef, useMemo } from "react";
-import { DateEvent, ResizingDateEvent } from "../../type";
+import { DateEvent } from "../../type";
 import { getHeightFromInterval, getTopFromDate } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
+import { ResizeEventActions } from "../use-resize-event";
 
 type Props = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
@@ -14,7 +15,7 @@ type Props = {
   isResizing: boolean;
   hidden?: boolean;
   isResizingOther: boolean;
-  onChangeResizingEvent: (event: ResizingDateEvent | undefined) => void;
+  resizeEventActions: ResizeEventActions;
 };
 
 export const DateEventCard = forwardRef<HTMLDivElement, Props>(
@@ -27,7 +28,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, Props>(
       onDragStart,
       hidden = false,
       isResizingOther,
-      onChangeResizingEvent,
+      resizeEventActions,
     },
     ref,
   ) {
@@ -60,10 +61,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, Props>(
       e.stopPropagation();
       e.preventDefault();
 
-      onChangeResizingEvent({
-        ...event,
-        origin: "eventEnd",
-      });
+      resizeEventActions.startResize({ event, origin: "eventEnd" });
     };
 
     const handleResizeStartFromEventEnd = (
@@ -72,10 +70,7 @@ export const DateEventCard = forwardRef<HTMLDivElement, Props>(
       e.stopPropagation();
       e.preventDefault();
 
-      onChangeResizingEvent({
-        ...event,
-        origin: "eventStart",
-      });
+      resizeEventActions.startResize({ event, origin: "eventStart" });
     };
 
     if (hidden) {
