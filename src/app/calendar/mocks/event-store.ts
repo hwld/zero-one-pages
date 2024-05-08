@@ -5,8 +5,8 @@ export const eventSchema = z.object({
   id: z.string(),
   title: z.string(),
   allDay: z.boolean(),
-  start: z.coerce.date(),
-  end: z.coerce.date(),
+  start: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
+  end: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
 });
 export type Event = z.infer<typeof eventSchema>;
 

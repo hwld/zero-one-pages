@@ -11,10 +11,13 @@ export const CalendarAPI = {
 };
 
 export const createEventInputSchema = z.object({
-  title: z.string().min(1).max(200),
+  title: z
+    .string()
+    .min(1, "タイトルを入力してください")
+    .max(200, "タイトルは最大200文字です"),
   allDay: z.boolean(),
-  start: z.coerce.date(),
-  end: z.coerce.date(),
+  start: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
+  end: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
 });
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 

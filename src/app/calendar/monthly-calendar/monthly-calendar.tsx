@@ -14,6 +14,8 @@ import { NavigationButton } from "../navigation-button";
 import { useCreateEvent } from "../queries/use-create-event";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { useMoveEventOnMonthlyCalendar } from "./use-move-event";
+import { CreateEventFormDialog } from "./create-event-form-dialog";
+import { CreateEventInput } from "../mocks/api";
 
 type Props = {
   currentDate: Date;
@@ -75,6 +77,16 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     undefined,
   );
 
+  // TODO:
+  // undefinedでdialogが閉じてる状態で、それ以外の場合は開いてる
+  const [eventFormState, setEventFormState] =
+    useState<Partial<CreateEventInput>>();
+
+  const handleCloseDialog = () => {
+    setDragDateRange(undefined);
+    setEventFormState(undefined);
+  };
+
   useEffect(() => {
     const createEvent = (event: MouseEvent) => {
       if (!dragDateRange || event.button !== 0) {
@@ -91,13 +103,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         dragDateRange.dragEndDate,
       ]);
 
-      createEventMutation.mutate({
-        allDay: true,
-        title: "event",
-        start: eventStart,
-        end: eventEnd,
-      });
-      setDragDateRange(undefined);
+      setEventFormState({ allDay: true, start: eventStart, end: eventEnd });
     };
 
     document.addEventListener("mouseup", createEvent);
@@ -122,72 +128,78 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   }, [moveEventActions, updateEventMutation]);
 
   return (
-    <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
-      <div className="flex items-center gap-2">
-        <NavigationButton dir="prev" onClick={handleGoPrevMonth} />
-        <div className="flex select-none items-center">
-          <div className="mx-1 text-lg tabular-nums">{year}</div>年
-          <div className="mx-1 w-6 text-center text-lg tabular-nums">
-            {month}
+    <>
+      <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
+        <div className="flex items-center gap-2">
+          <NavigationButton dir="prev" onClick={handleGoPrevMonth} />
+          <div className="flex select-none items-center">
+            <div className="mx-1 text-lg tabular-nums">{year}</div>年
+            <div className="mx-1 w-6 text-center text-lg tabular-nums">
+              {month}
+            </div>
+            月
           </div>
-          月
+          <NavigationButton dir="next" onClick={handleGoNextMonth} />
         </div>
-        <NavigationButton dir="next" onClick={handleGoNextMonth} />
-      </div>
-      <div className="grid w-full grid-cols-7">
-        {WEEK_DAY_LABELS.map((weekDay) => {
-          return (
-            <div className="text-center text-xs" key={weekDay}>
-              {weekDay}
-            </div>
-          );
-        })}
-      </div>
-      <div className="grid">
-        {calendar.map((week, i) => {
-          const weekEvents = getWeekEvents({ week, events });
+        <div className="grid w-full grid-cols-7">
+          {WEEK_DAY_LABELS.map((weekDay) => {
+            return (
+              <div className="text-center text-xs" key={weekDay}>
+                {weekDay}
+              </div>
+            );
+          })}
+        </div>
+        <div className="grid">
+          {calendar.map((week, i) => {
+            const weekEvents = getWeekEvents({ week, events });
 
-          const filteredWeekEvents = weekEvents.filter(
-            (event) => event.top < eventLimit,
-          );
-          const exceededEventCountMap = getExceededEventCountByDayOfWeek({
-            week,
-            weekEvents,
-            limit: eventLimit,
-          });
+            const filteredWeekEvents = weekEvents.filter(
+              (event) => event.top < eventLimit,
+            );
+            const exceededEventCountMap = getExceededEventCountByDayOfWeek({
+              week,
+              weekEvents,
+              limit: eventLimit,
+            });
 
-          return (
-            <div
-              key={`${week[0]}`}
-              className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7"
-            >
-              {week.map((date) => {
-                return (
-                  <CalendarDate
-                    currentDate={currentDate}
-                    calendarYearMonth={yearMonth}
-                    key={date.getTime()}
-                    date={date}
-                    isLastWeek={calendar.length - 1 === i}
-                    dragDateRange={dragDateRange}
-                  />
-                );
-              })}
-              <WeekEventRow
-                ref={i === 0 ? firstWeekEventRowRef : undefined}
-                week={week}
-                weekEvents={filteredWeekEvents}
-                eventLimit={eventLimit}
-                exceededEventCountMap={exceededEventCountMap}
-                dragDateRange={dragDateRange}
-                onChangeDragDateRange={setDragDateRange}
-                movingEvent={movingEvent}
-                moveEventActions={moveEventActions}
-              />
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={`${week[0]}`}
+                className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7"
+              >
+                {week.map((date) => {
+                  return (
+                    <CalendarDate
+                      currentDate={currentDate}
+                      calendarYearMonth={yearMonth}
+                      key={date.getTime()}
+                      date={date}
+                      isLastWeek={calendar.length - 1 === i}
+                      dragDateRange={dragDateRange}
+                    />
+                  );
+                })}
+                <WeekEventRow
+                  ref={i === 0 ? firstWeekEventRowRef : undefined}
+                  week={week}
+                  weekEvents={filteredWeekEvents}
+                  eventLimit={eventLimit}
+                  exceededEventCountMap={exceededEventCountMap}
+                  dragDateRange={dragDateRange}
+                  onChangeDragDateRange={setDragDateRange}
+                  movingEvent={movingEvent}
+                  moveEventActions={moveEventActions}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <CreateEventFormDialog
+        defaultValues={eventFormState}
+        onClose={handleCloseDialog}
+      />
+    </>
   );
 };
