@@ -5,11 +5,7 @@ import {
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
 } from "./utils";
-import {
-  DragDateRange,
-  DraggingEvent,
-  getEventFromDraggingEvent,
-} from "../utils";
+import { DragDateRange } from "../utils";
 import { Event } from "../mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
@@ -17,6 +13,7 @@ import { addMonths, max, min, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
 import { useCreateEvent } from "../queries/use-create-event";
 import { useUpdateEvent } from "../queries/use-update-event";
+import { useMoveEventOnMonthlyCalendar } from "./use-move-event";
 
 type Props = {
   currentDate: Date;
@@ -48,16 +45,6 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     return getCalendarDates({ year, month });
   }, [month, year]);
 
-  // イベント作成のためのDrag
-  const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
-    undefined,
-  );
-
-  // イベント移動のためのDrag
-  const [draggingEvent, setDraggingEvent] = useState<DraggingEvent | undefined>(
-    undefined,
-  );
-
   const firstWeekEventRowRef = useRef<HTMLDivElement>(null);
   const [eventLimit, setEventLimit] = useState(0);
 
@@ -82,6 +69,11 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
       window.removeEventListener("reset", measure);
     };
   }, [yearMonth]);
+
+  // イベント作成のためのDrag
+  const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     const createEvent = (event: MouseEvent) => {
@@ -114,23 +106,21 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     };
   }, [createEventMutation, dragDateRange]);
 
+  const { movingEvent, moveEventActions } = useMoveEventOnMonthlyCalendar();
+
   useEffect(() => {
-    const moveEvent = (e: MouseEvent) => {
-      if (!draggingEvent || e.button !== 0) {
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button !== 0) {
         return;
       }
-
-      const newEvent = getEventFromDraggingEvent(draggingEvent);
-      updateEventMutation.mutate(newEvent);
-
-      setDraggingEvent(undefined);
+      moveEventActions.move();
     };
 
-    document.addEventListener("mouseup", moveEvent);
+    document.addEventListener("mouseup", handleMouseUp);
     return () => {
-      document.removeEventListener("mouseup", moveEvent);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [draggingEvent, updateEventMutation]);
+  }, [moveEventActions, updateEventMutation]);
 
   return (
     <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
@@ -192,8 +182,8 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                 exceededEventCountMap={exceededEventCountMap}
                 dragDateRange={dragDateRange}
                 onChangeDragDateRange={setDragDateRange}
-                draggingEvent={draggingEvent}
-                onChangeDraggingEvent={setDraggingEvent}
+                movingEvent={movingEvent}
+                moveEventActions={moveEventActions}
               />
             </div>
           );

@@ -4,10 +4,11 @@ import { Event } from "../mocks/event-store";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DragDateRange, DraggingEvent } from "../utils";
+import { DragDateRange } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
+import { MoveEventActions, MovingEvent } from "./use-move-event";
 
 type Props = {
   week: Date[];
@@ -16,8 +17,8 @@ type Props = {
   exceededEventCountMap: Map<number, number>;
   dragDateRange: DragDateRange | undefined;
   onChangeDragDateRange: (range: DragDateRange | undefined) => void;
-  draggingEvent: DraggingEvent | undefined;
-  onChangeDraggingEvent: (event: DraggingEvent | undefined) => void;
+  movingEvent: MovingEvent | undefined;
+  moveEventActions: MoveEventActions;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -29,8 +30,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       exceededEventCountMap,
       dragDateRange,
       onChangeDragDateRange,
-      draggingEvent,
-      onChangeDraggingEvent,
+      movingEvent,
+      moveEventActions,
     },
     _ref,
   ) {
@@ -64,8 +65,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
         onChangeDragDateRange({ ...dragDateRange, dragEndDate: date });
       }
 
-      if (draggingEvent) {
-        onChangeDraggingEvent({ ...draggingEvent, dragEndDate: date });
+      if (movingEvent) {
+        moveEventActions.updateMoveEnd(date);
       }
     };
 
@@ -77,7 +78,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       e.preventDefault();
 
       const date = getDateFromX(e.clientX);
-      onChangeDraggingEvent({ event, dragStartDate: date, dragEndDate: date });
+      moveEventActions.startMove(event, date);
     };
 
     return (
@@ -92,13 +93,13 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
             <div
               key={event.id}
               className={clsx(
-                draggingEvent?.event.id === event.id && "opacity-50",
+                movingEvent?.event.id === event.id && "opacity-50",
               )}
             >
               <WeekEventCard
                 topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                 height={MONTHLY_EVENT_ROW_SIZE}
-                disablePointerEvents={!!dragDateRange || !!draggingEvent}
+                disablePointerEvents={!!dragDateRange || !!movingEvent}
                 weekEvent={event}
                 onMouseDown={(e) => e.stopPropagation()}
                 draggable
@@ -123,15 +124,15 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={!!dragDateRange || !!draggingEvent}
+              disablePointerEvents={!!dragDateRange || !!movingEvent}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );
         })}
-        {draggingEvent ? (
+        {movingEvent ? (
           <DraggingEventPreview
             week={week}
-            draggingEvent={draggingEvent}
+            draggingEvent={movingEvent}
             topMargin={MONTHLY_DATE_HEADER_HEIGHT}
             height={MONTHLY_EVENT_ROW_SIZE}
           />
