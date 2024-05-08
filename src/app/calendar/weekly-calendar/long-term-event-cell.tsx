@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Event } from "../mocks/event-store";
 import { DragDateRange, isWithinDragDateRange } from "../utils";
 import { EVENT_MIN_HEIGHT } from "./utils";
-import { isWithinInterval } from "date-fns";
+import { endOfDay, isWithinInterval, startOfDay } from "date-fns";
 import { LONG_TERM_EVENT_DISPLAY_LIMIT } from "./long-term-event-row";
 
 export const CELL_Y_MARGIN = 4;
@@ -36,7 +36,12 @@ export const LongTermEventCell: React.FC<Props> = ({
   events,
   expanded,
 }) => {
-  const eventsOnDate = events.filter((e) => isWithinInterval(date, e)).length;
+  const eventsOnDate = events.filter((e) =>
+    isWithinInterval(date, {
+      start: startOfDay(e.start),
+      end: endOfDay(e.end),
+    }),
+  ).length;
   const isDragging = dragDateRange !== undefined;
 
   return (
