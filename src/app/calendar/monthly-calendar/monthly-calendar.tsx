@@ -80,7 +80,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   // TODO:
   // undefinedでdialogが閉じてる状態で、それ以外の場合は開いてる
   const [eventFormState, setEventFormState] =
-    useState<Partial<CreateEventInput>>();
+    useState<Omit<CreateEventInput, "title">>();
 
   const handleCloseDialog = () => {
     setDragDateRange(undefined);

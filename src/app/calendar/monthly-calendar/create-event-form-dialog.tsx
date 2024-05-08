@@ -8,7 +8,7 @@ import { DragDateRange } from "../utils";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
-  defaultFormValues: Partial<CreateEventInput> | undefined;
+  defaultFormValues: Omit<CreateEventInput, "title"> | undefined;
   onChangeEventPeriodPreview: Dispatch<
     SetStateAction<DragDateRange | undefined>
   >;

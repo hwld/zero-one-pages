@@ -6,13 +6,14 @@ import {
   useMemo,
   Dispatch,
   SetStateAction,
+  useState,
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
 import { CreateEventInput, createEventInputSchema } from "../mocks/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse, startOfDay } from "date-fns";
+import { addDays, differenceInDays, format, parse, startOfDay } from "date-fns";
 import { DragDateRange } from "../utils";
 
 export const CREATE_EVENT_FORM_ID = "create-event-form-id";
@@ -31,7 +32,7 @@ type Props = {
     SetStateAction<DragDateRange | undefined>
   >;
   onCreateEvent: (input: CreateEventInput) => void;
-  defaultValues: Partial<CreateEventInput>;
+  defaultValues: Omit<CreateEventInput, "title">;
 };
 
 export const CreateEventForm: React.FC<Props> = ({
@@ -39,10 +40,16 @@ export const CreateEventForm: React.FC<Props> = ({
   onCreateEvent,
   defaultValues,
 }) => {
+  const [defaultDayDifference] = useState(() =>
+    differenceInDays(defaultValues.end, defaultValues.start),
+  );
+
   const {
     register,
     handleSubmit,
     control,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<CreateEventInput>({
     defaultValues,
@@ -59,6 +66,49 @@ export const CreateEventForm: React.FC<Props> = ({
       start: startDate,
       end: endDate,
     });
+  };
+
+  const handleChangePeriodStart = (newStart: Date) => {
+    const start = newStart;
+    const end = addDays(start, defaultDayDifference);
+
+    onChangeEventPeriodPreview((preview) => {
+      if (!preview) {
+        return undefined;
+      }
+      return {
+        ...preview,
+        dragEndDate: startOfDay(end),
+        dragStartDate: startOfDay(start),
+      };
+    });
+
+    setValue("start", start);
+    setValue("end", end);
+  };
+
+  const handleChangePeriodEnd = (newEnd: Date) => {
+    let start = getValues("start");
+    let end = newEnd;
+
+    if (newEnd.getTime() < start.getTime()) {
+      start = end;
+    }
+
+    onChangeEventPeriodPreview((preview) => {
+      if (!preview) {
+        return undefined;
+      }
+
+      return {
+        ...preview,
+        dragStartDate: startOfDay(start),
+        dragEndDate: startOfDay(end),
+      };
+    });
+
+    setValue("start", start);
+    setValue("end", end);
   };
 
   return (
@@ -91,19 +141,12 @@ export const CreateEventForm: React.FC<Props> = ({
           <Controller
             control={control}
             name="start"
-            render={({ field: { onChange, ...otherField }, fieldState }) => {
+            render={({ field: { onChange: _, ...otherField }, fieldState }) => {
               return (
                 <DateInput
                   isAllDay={isAllDay}
                   error={!!fieldState.error}
-                  onChange={(date) => {
-                    onChangeEventPeriodPreview((preview) =>
-                      preview
-                        ? { ...preview, dragStartDate: startOfDay(date) }
-                        : undefined,
-                    );
-                    onChange(date);
-                  }}
+                  onChange={handleChangePeriodStart}
                   {...otherField}
                 />
               );
@@ -114,19 +157,12 @@ export const CreateEventForm: React.FC<Props> = ({
           <Controller
             control={control}
             name="end"
-            render={({ field: { onChange, ...otherField }, fieldState }) => {
+            render={({ field: { onChange: _, ...otherField }, fieldState }) => {
               return (
                 <DateInput
                   isAllDay={isAllDay}
                   error={!!fieldState.error}
-                  onChange={(date) => {
-                    onChangeEventPeriodPreview((preview) =>
-                      preview
-                        ? { ...preview, dragEndDate: startOfDay(date) }
-                        : undefined,
-                    );
-                    onChange(date);
-                  }}
+                  onChange={handleChangePeriodEnd}
                   {...otherField}
                 />
               );
