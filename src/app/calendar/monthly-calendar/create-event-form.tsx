@@ -4,6 +4,8 @@ import {
   ComponentPropsWithoutRef,
   ReactNode,
   useMemo,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
@@ -11,6 +13,7 @@ import { CreateEventInput, createEventInputSchema } from "../mocks/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse, startOfDay } from "date-fns";
+import { DragDateRange } from "../utils";
 
 export const CREATE_EVENT_FORM_ID = "create-event-form-id";
 
@@ -24,11 +27,15 @@ const getDateFormatString = (allDay: boolean = false) => {
 };
 
 type Props = {
+  onChangeEventPeriodPreview: Dispatch<
+    SetStateAction<DragDateRange | undefined>
+  >;
   onCreateEvent: (input: CreateEventInput) => void;
   defaultValues: Partial<CreateEventInput>;
 };
 
 export const CreateEventForm: React.FC<Props> = ({
+  onChangeEventPeriodPreview,
   onCreateEvent,
   defaultValues,
 }) => {
@@ -84,12 +91,20 @@ export const CreateEventForm: React.FC<Props> = ({
           <Controller
             control={control}
             name="start"
-            render={({ field, fieldState }) => {
+            render={({ field: { onChange, ...otherField }, fieldState }) => {
               return (
                 <DateInput
                   isAllDay={isAllDay}
                   error={!!fieldState.error}
-                  {...field}
+                  onChange={(date) => {
+                    onChangeEventPeriodPreview((preview) =>
+                      preview
+                        ? { ...preview, dragStartDate: startOfDay(date) }
+                        : undefined,
+                    );
+                    onChange(date);
+                  }}
+                  {...otherField}
                 />
               );
             }}
@@ -99,12 +114,20 @@ export const CreateEventForm: React.FC<Props> = ({
           <Controller
             control={control}
             name="end"
-            render={({ field, fieldState }) => {
+            render={({ field: { onChange, ...otherField }, fieldState }) => {
               return (
                 <DateInput
                   isAllDay={isAllDay}
                   error={!!fieldState.error}
-                  {...field}
+                  onChange={(date) => {
+                    onChangeEventPeriodPreview((preview) =>
+                      preview
+                        ? { ...preview, dragEndDate: startOfDay(date) }
+                        : undefined,
+                    );
+                    onChange(date);
+                  }}
+                  {...otherField}
                 />
               );
             }}
@@ -140,8 +163,8 @@ const DateInput = forwardRef<
   HTMLInputElement,
   Omit<InputProps, "value" | "onChange"> & {
     isAllDay: boolean;
-    value: Date | null;
-    onChange: (date: Date | null) => void;
+    value: Date;
+    onChange: (date: Date) => void;
   }
 >(function DateInput({ isAllDay, value, onChange, ...props }, ref) {
   const valueStr = useMemo(() => {

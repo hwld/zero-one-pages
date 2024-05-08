@@ -197,7 +197,8 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         </div>
       </div>
       <CreateEventFormDialog
-        defaultValues={eventFormState}
+        defaultFormValues={eventFormState}
+        onChangeEventPeriodPreview={setDragDateRange}
         onClose={handleCloseDialog}
       />
     </>

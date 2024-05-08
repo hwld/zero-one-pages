@@ -4,17 +4,23 @@ import { CreateEventInput } from "../mocks/api";
 import { useCreateEvent } from "../queries/use-create-event";
 import { CREATE_EVENT_FORM_ID, CreateEventForm } from "./create-event-form";
 import clsx from "clsx";
+import { DragDateRange } from "../utils";
+import { Dispatch, SetStateAction } from "react";
 
 type Props = {
-  defaultValues: Partial<CreateEventInput> | undefined;
+  defaultFormValues: Partial<CreateEventInput> | undefined;
+  onChangeEventPeriodPreview: Dispatch<
+    SetStateAction<DragDateRange | undefined>
+  >;
   onClose: () => void;
 };
 export const CreateEventFormDialog: React.FC<Props> = ({
-  defaultValues,
+  defaultFormValues,
+  onChangeEventPeriodPreview,
   onClose,
 }) => {
   const createEventMutation = useCreateEvent();
-  const isOpen = defaultValues !== undefined;
+  const isOpen = defaultFormValues !== undefined;
 
   const handleChangeOpen = (open: boolean) => {
     if (!open) {
@@ -44,10 +50,11 @@ export const CreateEventFormDialog: React.FC<Props> = ({
             <TbX size={18} />
           </button>
         </div>
-        {defaultValues !== undefined && (
+        {defaultFormValues !== undefined && (
           <CreateEventForm
-            defaultValues={defaultValues}
+            defaultValues={defaultFormValues}
             onCreateEvent={handleCreateEvent}
+            onChangeEventPeriodPreview={onChangeEventPeriodPreview}
           />
         )}
         <div className="flex gap-2 self-end">
