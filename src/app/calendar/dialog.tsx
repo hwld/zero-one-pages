@@ -30,7 +30,7 @@ export const Dialog: React.FC<Props> = ({ children, isOpen, onChangeOpen }) => {
     <FloatingPortal>
       <AnimatePresence>
         {isOpen && (
-          <FloatingOverlay lockScroll>
+          <FloatingOverlay lockScroll className="z-50">
             <div className="fixed inset-0 bg-black/5">
               <FloatingFocusManager context={context}>
                 <div ref={refs.setFloating} {...getFloatingProps()}>

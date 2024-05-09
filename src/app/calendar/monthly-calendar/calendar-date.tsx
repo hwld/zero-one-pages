@@ -5,7 +5,7 @@ import {
   isSaturday,
   isWeekend,
 } from "date-fns";
-import { DragDateRange, isWithinDragDateRange } from "../utils";
+import { DragDateRange, isDayWithinDragDateRange } from "../utils";
 import clsx from "clsx";
 
 export const MONTHLY_DATE_HEADER_HEIGHT = 32;
@@ -40,7 +40,7 @@ export const CalendarDate: React.FC<Props> = ({
       <div
         className={clsx(
           "h-full w-full",
-          dragDateRange && isWithinDragDateRange(date, dragDateRange)
+          dragDateRange && isDayWithinDragDateRange(date, dragDateRange)
             ? "bg-neutral-500/15"
             : "",
         )}

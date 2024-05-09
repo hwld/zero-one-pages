@@ -21,6 +21,8 @@ import { DragDateRange } from "../utils";
 import { useCreateEvent } from "../queries/use-create-event";
 import { useMoveEventOnWeeklyCalendar } from "./use-move-event";
 import { useResizeEventOnWeeklyCalendar } from "./use-resize-event";
+import { CreateEventInput } from "../mocks/api";
+import { CreateEventFormDialog } from "../create-event-form-dialog";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -71,6 +73,16 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     setDate(subDays(startOfWeek(date), 1));
   };
 
+  // TODO: rename
+  const [eventFormState, setEventFormState] =
+    useState<Omit<CreateEventInput, "title">>();
+
+  const handleCloseFormDialog = () => {
+    setEventFormState(undefined);
+    setEventCreationDragData(undefined);
+    mouseHistoryRef.current = undefined;
+  };
+
   useEffect(() => {
     const createEvent = (e: MouseEvent) => {
       if (!eventCreationDragData || e.button !== 0) {
@@ -84,16 +96,8 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         const minDate = min([dragStartDate, dragEndDate]);
         const maxDate = max([dragStartDate, dragEndDate]);
 
-        craeteEventMutation.mutate({
-          allDay: false,
-          start: minDate,
-          end: maxDate,
-          title: "event",
-        });
+        setEventFormState({ allDay: false, start: minDate, end: maxDate });
       }
-
-      setEventCreationDragData(undefined);
-      mouseHistoryRef.current = undefined;
     };
 
     document.addEventListener("mouseup", createEvent);
@@ -133,72 +137,81 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
 
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
-    <div className="flex min-h-0 flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <NavigationButton dir="prev" onClick={handlePrevWeek} />
-        <div className="flex select-none items-center">
-          <div className="mx-1 text-lg tabular-nums">{date.getFullYear()}</div>
-          年
-          <div className="mx-1 w-6 text-center text-lg tabular-nums">
-            {date.getMonth() + 1}
+    <>
+      <div className="flex min-h-0 flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <NavigationButton dir="prev" onClick={handlePrevWeek} />
+          <div className="flex select-none items-center">
+            <div className="mx-1 text-lg tabular-nums">
+              {date.getFullYear()}
+            </div>
+            年
+            <div className="mx-1 w-6 text-center text-lg tabular-nums">
+              {date.getMonth() + 1}
+            </div>
+            月
           </div>
-          月
+          <NavigationButton dir="next" onClick={handleNextWeek} />
         </div>
-        <NavigationButton dir="next" onClick={handleNextWeek} />
-      </div>
 
-      <div
-        className="flex w-full flex-col overflow-auto"
-        ref={scrollableRef}
-        onScroll={handleScroll}
-      >
-        <WeeklyCalendarDayHeader
-          currentDate={currentDate}
-          week={week}
-          longTermEvents={longTermEvents}
-        />
+        <div
+          className="flex w-full flex-col overflow-auto"
+          ref={scrollableRef}
+          onScroll={handleScroll}
+        >
+          <WeeklyCalendarDayHeader
+            currentDate={currentDate}
+            week={week}
+            longTermEvents={longTermEvents}
+          />
 
-        <div className="grid grid-cols-[75px,repeat(7,1fr)]">
-          <div className="mr-2">
-            {eachHourOfInterval({
-              start: startOfDay(date),
-              end: endOfDay(date),
-            }).map((h, i) => {
+          <div className="grid grid-cols-[75px,repeat(7,1fr)]">
+            <div className="mr-2">
+              {eachHourOfInterval({
+                start: startOfDay(date),
+                end: endOfDay(date),
+              }).map((h, i) => {
+                return (
+                  <div
+                    className="relative select-none whitespace-nowrap tabular-nums text-neutral-400"
+                    key={i}
+                    style={{
+                      height: EVENT_MIN_HEIGHT * 4,
+                      top: i !== 0 ? "-6px" : undefined,
+                      fontSize: "12px",
+                    }}
+                  >
+                    {format(h, "hh:mm a")}
+                  </div>
+                );
+              })}
+            </div>
+            {week.map((date) => {
               return (
-                <div
-                  className="relative select-none whitespace-nowrap tabular-nums text-neutral-400"
-                  key={i}
-                  style={{
-                    height: EVENT_MIN_HEIGHT * 4,
-                    top: i !== 0 ? "-6px" : undefined,
-                    fontSize: "12px",
-                  }}
-                >
-                  {format(h, "hh:mm a")}
-                </div>
+                <DateColumn
+                  key={`${date}`}
+                  currentDate={currentDate}
+                  date={date}
+                  events={defaultEvents}
+                  movingEvent={movingEvent}
+                  moveEventActions={moveEventActions}
+                  eventCreationDragData={eventCreationDragData}
+                  onChangeEventCreationDragData={setEventCreationDragData}
+                  scrollableRef={scrollableRef}
+                  mouseHistoryRef={mouseHistoryRef}
+                  resizingEvent={resizingEvent}
+                  resizeEventActions={resizeEventActions}
+                />
               );
             })}
           </div>
-          {week.map((date) => {
-            return (
-              <DateColumn
-                key={`${date}`}
-                currentDate={currentDate}
-                date={date}
-                events={defaultEvents}
-                movingEvent={movingEvent}
-                moveEventActions={moveEventActions}
-                eventCreationDragData={eventCreationDragData}
-                onChangeEventCreationDragData={setEventCreationDragData}
-                scrollableRef={scrollableRef}
-                mouseHistoryRef={mouseHistoryRef}
-                resizingEvent={resizingEvent}
-                resizeEventActions={resizeEventActions}
-              />
-            );
-          })}
         </div>
       </div>
-    </div>
+      <CreateEventFormDialog
+        defaultFormValues={eventFormState}
+        onChangeEventPeriodPreview={setEventCreationDragData}
+        onClose={handleCloseFormDialog}
+      />
+    </>
   );
 };

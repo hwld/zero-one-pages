@@ -10,11 +10,17 @@ import {
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
-import { CreateEventInput, createEventInputSchema } from "../mocks/api";
+import { CreateEventInput, createEventInputSchema } from "./mocks/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addDays, differenceInDays, format, parse, startOfDay } from "date-fns";
-import { DragDateRange } from "../utils";
+import {
+  addMinutes,
+  differenceInMinutes,
+  format,
+  parse,
+  startOfDay,
+} from "date-fns";
+import { DragDateRange } from "./utils";
 
 export const CREATE_EVENT_FORM_ID = "create-event-form-id";
 
@@ -38,11 +44,9 @@ type Props = {
 export const CreateEventForm: React.FC<Props> = ({
   onChangeEventPeriodPreview,
   onCreateEvent,
-  defaultValues,
+  defaultValues: _defaultValues,
 }) => {
-  const [defaultDayDifference] = useState(() =>
-    differenceInDays(defaultValues.end, defaultValues.start),
-  );
+  const [defaultValues] = useState(_defaultValues);
 
   const {
     register,
@@ -69,8 +73,11 @@ export const CreateEventForm: React.FC<Props> = ({
   };
 
   const handleChangePeriodStart = (newStart: Date) => {
-    const start = newStart;
-    const end = addDays(start, defaultDayDifference);
+    const oldStart = getValues("start");
+    const oldEnd = getValues("end");
+
+    const diffMinutes = differenceInMinutes(newStart, oldStart);
+    const nweEnd = addMinutes(oldEnd, diffMinutes);
 
     onChangeEventPeriodPreview((preview) => {
       if (!preview) {
@@ -78,21 +85,20 @@ export const CreateEventForm: React.FC<Props> = ({
       }
       return {
         ...preview,
-        dragEndDate: startOfDay(end),
-        dragStartDate: startOfDay(start),
+        dragEndDate: nweEnd,
+        dragStartDate: newStart,
       };
     });
 
-    setValue("start", start);
-    setValue("end", end);
+    setValue("start", newStart);
+    setValue("end", nweEnd);
   };
 
   const handleChangePeriodEnd = (newEnd: Date) => {
-    let start = getValues("start");
-    let end = newEnd;
+    let newStart = getValues("start");
 
-    if (newEnd.getTime() < start.getTime()) {
-      start = end;
+    if (newEnd.getTime() < newStart.getTime()) {
+      newStart = newEnd;
     }
 
     onChangeEventPeriodPreview((preview) => {
@@ -102,13 +108,13 @@ export const CreateEventForm: React.FC<Props> = ({
 
       return {
         ...preview,
-        dragStartDate: startOfDay(start),
-        dragEndDate: startOfDay(end),
+        dragStartDate: newStart,
+        dragEndDate: newEnd,
       };
     });
 
-    setValue("start", start);
-    setValue("end", end);
+    setValue("start", newStart);
+    setValue("end", newEnd);
   };
 
   return (

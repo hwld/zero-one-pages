@@ -14,7 +14,7 @@ import { NavigationButton } from "../navigation-button";
 import { useCreateEvent } from "../queries/use-create-event";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { useMoveEventOnMonthlyCalendar } from "./use-move-event";
-import { CreateEventFormDialog } from "./create-event-form-dialog";
+import { CreateEventFormDialog } from "../create-event-form-dialog";
 import { CreateEventInput } from "../mocks/api";
 
 type Props = {

@@ -1,10 +1,10 @@
-import { Dialog } from "../dialog";
+import { Dialog } from "./dialog";
 import { TbLoader2, TbX } from "react-icons/tb";
-import { CreateEventInput } from "../mocks/api";
-import { useCreateEvent } from "../queries/use-create-event";
+import { CreateEventInput } from "./mocks/api";
+import { useCreateEvent } from "./queries/use-create-event";
 import { CREATE_EVENT_FORM_ID, CreateEventForm } from "./create-event-form";
 import clsx from "clsx";
-import { DragDateRange } from "../utils";
+import { DragDateRange } from "./utils";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {

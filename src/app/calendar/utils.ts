@@ -16,12 +16,16 @@ export type DragDateRange = {
   dragEndDate: Date;
 };
 
-export const isWithinDragDateRange = (date: Date, range: DragDateRange) => {
-  const { dragStartDate, dragEndDate } = range;
+export const isDayWithinDragDateRange = (
+  yearMonthDay: Date,
+  range: DragDateRange,
+) => {
+  const dragStart = startOfDay(range.dragStartDate);
+  const dragEnd = endOfDay(range.dragEndDate);
 
-  return isWithinInterval(date, {
-    start: min([dragStartDate, dragEndDate]),
-    end: max([dragStartDate, dragEndDate]),
+  return isWithinInterval(yearMonthDay, {
+    start: min([dragStart, dragEnd]),
+    end: max([dragStart, dragEnd]),
   });
 };
 

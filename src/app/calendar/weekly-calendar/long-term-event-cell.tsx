@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { Event } from "../mocks/event-store";
-import { DragDateRange, isWithinDragDateRange } from "../utils";
+import { DragDateRange, isDayWithinDragDateRange } from "../utils";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { endOfDay, isWithinInterval, startOfDay } from "date-fns";
 import { LONG_TERM_EVENT_DISPLAY_LIMIT } from "./long-term-event-row";
@@ -48,7 +48,7 @@ export const LongTermEventCell: React.FC<Props> = ({
     <div
       className={clsx(
         "grow border-y border-r border-neutral-300",
-        isDragging && isWithinDragDateRange(date, dragDateRange)
+        isDragging && isDayWithinDragDateRange(date, dragDateRange)
           ? "bg-neutral-500/15"
           : "",
       )}
