@@ -48,20 +48,19 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
 
   const updateMoveDest: MoveEventActions["updateMoveDest"] = useCallback(
     (day: Date, y: number) => {
-      if (scrollableRef.current) {
-        mouseHistoryRef.current = {
-          prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
-        };
-      }
-
       const moveDest = getDateFromY(day, y);
-
       if (
         !movingEvent ||
         isSameMinute(moveDest, movingEvent.prevMouseOverDate)
       ) {
         return;
+      }
+
+      if (scrollableRef.current) {
+        mouseHistoryRef.current = {
+          prevY: y,
+          prevScrollTop: scrollableRef.current.scrollTop,
+        };
       }
 
       const diffMinutes = differenceInMinutes(
@@ -88,7 +87,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
       const delta = scrollTop - mouseHistoryRef.current.prevScrollTop;
       const y = mouseHistoryRef.current.prevY + delta;
 
-      updateMoveDest(movingEvent.end, y);
+      updateMoveDest(movingEvent.prevMouseOverDate, y);
     },
     [movingEvent, updateMoveDest],
   );

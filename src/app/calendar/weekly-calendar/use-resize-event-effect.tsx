@@ -117,7 +117,12 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
       const delta = scrollTop - mouseHistoryRef.current.prevScrollTop;
       const y = mouseHistoryRef.current.prevY + delta;
 
-      updateResizeDest(resizingEvent.end, y);
+      updateResizeDest(
+        resizingEvent.origin === "eventEnd"
+          ? resizingEvent.start
+          : resizingEvent.end,
+        y,
+      );
     },
     [resizingEvent, updateResizeDest],
   );
