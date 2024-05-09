@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Event, eventSchema, eventStore } from "./event-store";
 import { taskStore } from "@/app/todo-1/_mocks/task-store";
 import { fetcher } from "@/lib/fetcher";
+import { isSameMinute } from "date-fns";
 
 export const CalendarAPI = {
   base: "/calendar/api",
@@ -29,6 +30,18 @@ export const createEventInputSchema = z
     {
       message: "開始日時は終了日時より前に設定してください",
       path: ["start"] satisfies CreateEventInputSchemaKeys[],
+    },
+  )
+  .refine(
+    (input) => {
+      if (input.allDay) {
+        return true;
+      }
+      return !isSameMinute(input.start, input.end);
+    },
+    {
+      message: "開始日時と異なる日時を設定してください",
+      path: ["end"] satisfies CreateEventInputSchemaKeys[],
     },
   );
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
