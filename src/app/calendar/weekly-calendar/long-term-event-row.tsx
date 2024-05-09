@@ -8,36 +8,45 @@ import { Event } from "../mocks/event-store";
 import { CELL_Y_MARGIN } from "./long-term-event-cell";
 import { EVENT_MIN_HEIGHT } from "./utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
-import { DragDateRange, DraggingEvent } from "../utils";
+import { DraggingEvent } from "../utils";
 import { useRef } from "react";
 import { DraggingEventPreview } from "../monthly-calendar/dragging-event-preview";
 import clsx from "clsx";
+import {
+  PrepareCreateEventActions,
+  PrepareCreateEventState,
+} from "../monthly-calendar/use-prepare-create-event";
+import { MoveEventActions } from "../monthly-calendar/use-move-event";
 
 export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 
 type Props = {
   week: Date[];
   weekLongTermEvents: WeekEvent[];
-  isDraggingDate: boolean;
+
   expanded: boolean;
   onChangeExpand: (expanded: boolean) => void;
-  draggingEvent: DraggingEvent | undefined;
-  onChangeDraggingEvent: (event: DraggingEvent | undefined) => void;
-  dragDateRange: DragDateRange | undefined;
-  onChangeDragDateRange: (range: DragDateRange) => void;
+
+  movingEvent: DraggingEvent | undefined;
+  moveEventActions: MoveEventActions;
+
+  prepareCreateEventState: PrepareCreateEventState;
+  prepareCreateEventActions: PrepareCreateEventActions;
 };
 
 export const LongTermEventRow: React.FC<Props> = ({
   week,
   weekLongTermEvents,
-  isDraggingDate,
   expanded,
   onChangeExpand,
-  draggingEvent,
-  onChangeDraggingEvent,
-  dragDateRange,
-  onChangeDragDateRange,
+  movingEvent,
+  moveEventActions,
+  prepareCreateEventState,
+  prepareCreateEventActions,
 }) => {
+  const isDraggingForCreate =
+    prepareCreateEventState.dragDateRange !== undefined;
+
   const rowRef = useRef<HTMLDivElement>(null);
   const exceededEvents = getExceededEventCountByDayOfWeek({
     week,
@@ -65,18 +74,18 @@ export const LongTermEventRow: React.FC<Props> = ({
 
   const handleRowMouseDown = (e: React.MouseEvent) => {
     const date = getDateFromX(e.clientX);
-    onChangeDragDateRange({ dragStartDate: date, dragEndDate: date });
+    prepareCreateEventActions.startDrag(date);
   };
 
   const handleRowMouseMove = (e: React.MouseEvent) => {
     const date = getDateFromX(e.clientX);
 
-    if (dragDateRange) {
-      onChangeDragDateRange({ ...dragDateRange, dragEndDate: date });
+    if (isDraggingForCreate) {
+      prepareCreateEventActions.updateDragEnd(date);
     }
 
-    if (draggingEvent) {
-      onChangeDraggingEvent({ ...draggingEvent, dragEndDate: date });
+    if (movingEvent) {
+      moveEventActions.updateMoveEnd(date);
     }
   };
 
@@ -84,7 +93,7 @@ export const LongTermEventRow: React.FC<Props> = ({
     e.preventDefault();
 
     const date = getDateFromX(e.clientX);
-    onChangeDraggingEvent({ event, dragStartDate: date, dragEndDate: date });
+    moveEventActions.startMove(event, date);
   };
 
   return (
@@ -96,15 +105,15 @@ export const LongTermEventRow: React.FC<Props> = ({
       onMouseMove={handleRowMouseMove}
     >
       {visibleWeekLongTermEvents.map((event) => {
-        const isDragging = draggingEvent?.event.id === event.id;
+        const isMoving = movingEvent?.event.id === event.id;
 
         return (
-          <div key={event.id} className={clsx(isDragging && "opacity-50")}>
+          <div key={event.id} className={clsx(isMoving && "opacity-50")}>
             <WeekEventCard
               weekEvent={event}
               height={EVENT_MIN_HEIGHT}
               disablePointerEvents={
-                isDraggingDate || !!(draggingEvent && !isDragging)
+                isDraggingForCreate || !!(movingEvent && !isMoving)
               }
               onMouseDown={(e) => e.stopPropagation()}
               draggable
@@ -128,16 +137,16 @@ export const LongTermEventRow: React.FC<Props> = ({
                 count={count}
                 limit={LONG_TERM_EVENT_DISPLAY_LIMIT}
                 height={EVENT_MIN_HEIGHT}
-                disablePointerEvents={isDraggingDate || !!draggingEvent}
+                disablePointerEvents={isDraggingForCreate || !!movingEvent}
                 weekDay={weekDay}
                 onClick={() => onChangeExpand(true)}
               />
             );
           })}
-      {draggingEvent ? (
+      {movingEvent ? (
         <DraggingEventPreview
           week={week}
-          draggingEvent={draggingEvent}
+          draggingEvent={movingEvent}
           height={EVENT_MIN_HEIGHT}
         />
       ) : null}

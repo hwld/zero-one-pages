@@ -8,21 +8,17 @@ import {
   format,
   addDays,
   subDays,
-  min,
-  max,
 } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Event } from "../mocks/event-store";
-import { EVENT_MIN_HEIGHT, getDateFromY, splitEvent } from "./utils";
+import { EVENT_MIN_HEIGHT, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
-import { DateColumn, MouseHistory } from "./date-column";
+import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
-import { DragDateRange } from "../utils";
-import { useCreateEvent } from "../queries/use-create-event";
-import { useMoveEventOnWeeklyCalendar } from "./use-move-event";
-import { useResizeEventOnWeeklyCalendar } from "./use-resize-event";
-import { CreateEventInput } from "../mocks/api";
+import { useMoveEvent } from "./use-move-event";
+import { useResizeEvent } from "./use-resize-event";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
+import { usePrepareCreateEvent } from "./use-prepare-create-event";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -32,8 +28,6 @@ type Props = {
 };
 
 export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
-  const craeteEventMutation = useCreateEvent();
-
   const [date, setDate] = useState(currentDate);
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
@@ -44,25 +38,12 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     return eachDayOfInterval({ start, end });
   }, [date]);
 
-  const [eventCreationDragData, setEventCreationDragData] = useState<
-    DragDateRange | undefined
-  >(undefined);
-
-  // マウスイベントが発生したときのyとscrollableのscrollTipを保存する
-  const mouseHistoryRef = useRef<MouseHistory | undefined>(undefined);
+  const scrollableElementRef = useRef<HTMLDivElement>(null);
+  const { prepareCreateEventState, prepareCreateEventActions } =
+    usePrepareCreateEvent({ scrollableElementRef });
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!eventCreationDragData || !mouseHistoryRef.current) {
-      return;
-    }
-
-    const delta = e.currentTarget.scrollTop - mouseHistoryRef.current.scrollTop;
-    const y = mouseHistoryRef.current.y + delta;
-
-    setEventCreationDragData({
-      ...eventCreationDragData,
-      dragEndDate: getDateFromY(eventCreationDragData.dragEndDate, y),
-    });
+    prepareCreateEventActions.scroll(e.currentTarget.scrollTop);
   };
 
   const handleNextWeek = () => {
@@ -73,40 +54,20 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     setDate(subDays(startOfWeek(date), 1));
   };
 
-  // TODO: rename
-  const [eventFormState, setEventFormState] =
-    useState<Omit<CreateEventInput, "title">>();
-
-  const handleCloseFormDialog = () => {
-    setEventFormState(undefined);
-    setEventCreationDragData(undefined);
-    mouseHistoryRef.current = undefined;
-  };
-
   useEffect(() => {
-    const createEvent = (e: MouseEvent) => {
-      if (!eventCreationDragData || e.button !== 0) {
-        return;
-      }
-
-      const dragStartDate = eventCreationDragData.dragStartDate;
-      const dragEndDate = eventCreationDragData.dragEndDate;
-
-      if (dragStartDate.getTime() !== dragEndDate.getTime()) {
-        const minDate = min([dragStartDate, dragEndDate]);
-        const maxDate = max([dragStartDate, dragEndDate]);
-
-        setEventFormState({ allDay: false, start: minDate, end: maxDate });
+    const openCreateEventDialog = (e: MouseEvent) => {
+      if (e.button === 0) {
+        prepareCreateEventActions.setDefaultValues();
       }
     };
 
-    document.addEventListener("mouseup", createEvent);
+    document.addEventListener("mouseup", openCreateEventDialog);
     return () => {
-      document.removeEventListener("mouseup", createEvent);
+      document.removeEventListener("mouseup", openCreateEventDialog);
     };
-  }, [craeteEventMutation, eventCreationDragData]);
+  }, [prepareCreateEventActions]);
 
-  const { movingEvent, moveEventActions } = useMoveEventOnWeeklyCalendar();
+  const { movingEvent, moveEventActions } = useMoveEvent();
   useEffect(() => {
     const moveEvent = (e: MouseEvent) => {
       if (e.button === 0) {
@@ -120,8 +81,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     };
   }, [moveEventActions, movingEvent]);
 
-  const { resizingEvent, resizeEventActions } =
-    useResizeEventOnWeeklyCalendar();
+  const { resizingEvent, resizeEventActions } = useResizeEvent();
   useEffect(() => {
     const endResizeEvent = (e: MouseEvent) => {
       if (e.button === 0) {
@@ -135,7 +95,6 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     };
   }, [resizeEventActions]);
 
-  const scrollableRef = useRef<HTMLDivElement>(null);
   return (
     <>
       <div className="flex min-h-0 flex-col gap-2">
@@ -156,7 +115,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
 
         <div
           className="flex w-full flex-col overflow-auto"
-          ref={scrollableRef}
+          ref={scrollableElementRef}
           onScroll={handleScroll}
         >
           <WeeklyCalendarDayHeader
@@ -195,10 +154,8 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                   events={defaultEvents}
                   movingEvent={movingEvent}
                   moveEventActions={moveEventActions}
-                  eventCreationDragData={eventCreationDragData}
-                  onChangeEventCreationDragData={setEventCreationDragData}
-                  scrollableRef={scrollableRef}
-                  mouseHistoryRef={mouseHistoryRef}
+                  prepareCreateEventState={prepareCreateEventState}
+                  prepareCreateEventActions={prepareCreateEventActions}
                   resizingEvent={resizingEvent}
                   resizeEventActions={resizeEventActions}
                 />
@@ -208,9 +165,10 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         </div>
       </div>
       <CreateEventFormDialog
-        defaultFormValues={eventFormState}
-        onChangeEventPeriodPreview={setEventCreationDragData}
-        onClose={handleCloseFormDialog}
+        isOpen={prepareCreateEventState.defaultCreateEventValues !== undefined}
+        onClose={prepareCreateEventActions.clearState}
+        defaultFormValues={prepareCreateEventState.defaultCreateEventValues}
+        onChangeEventPeriodPreview={prepareCreateEventActions.setDragDateRange}
       />
     </>
   );

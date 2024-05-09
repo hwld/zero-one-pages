@@ -9,9 +9,8 @@ export type MoveEventActions = {
   move: () => void;
 };
 
-export const useMoveEventOnMonthlyCalendar = () => {
+export const useMoveEvent = () => {
   const updateEventMutation = useUpdateEvent();
-
   const [movingEvent, setMovingEvent] = useState<DraggingEvent>();
 
   const startMove: MoveEventActions["startMove"] = useCallback(

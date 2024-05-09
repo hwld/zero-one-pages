@@ -4,19 +4,13 @@ import { WEEK_DAY_LABELS } from "../consts";
 import { LongTermEventCell } from "./long-term-event-cell";
 import { Event } from "../mocks/event-store";
 import { useEffect, useState } from "react";
-import {
-  DragDateRange,
-  DraggingEvent,
-  getEventFromDraggingEvent,
-} from "../utils";
-import { isSameDay, max, min } from "date-fns";
+import { isSameDay } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
-import { useCreateEvent } from "../queries/use-create-event";
-import { useUpdateEvent } from "../queries/use-update-event";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { CreateEventInput } from "../mocks/api";
+import { usePrepareCreateEvent } from "../monthly-calendar/use-prepare-create-event";
+import { useMoveEvent } from "../monthly-calendar/use-move-event";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -31,68 +25,39 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   week,
   longTermEvents,
 }) => {
-  const createEventMutation = useCreateEvent();
-  const updateEventMutatin = useUpdateEvent();
-
   const [expanded, setExpanded] = useState(false);
-
   const weekLongTermEvents = getWeekEvents({ week, events: longTermEvents });
 
-  // TODO: rename
-  const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
-    undefined,
-  );
-
-  // TODO: rename
-  const [eventFormState, setEventFormState] =
-    useState<Omit<CreateEventInput, "title">>();
-
-  const handleCloseFormDialog = () => {
-    setEventFormState(undefined);
-    setDragDateRange(undefined);
-  };
+  const { prepareCreateEventState, prepareCreateEventActions } =
+    usePrepareCreateEvent();
 
   useEffect(() => {
     const createAllDayEvent = (e: MouseEvent) => {
-      if (!dragDateRange || e.button !== 0) {
-        return;
+      if (e.button === 0) {
+        prepareCreateEventActions.setDefaultValues();
       }
-
-      const { dragStartDate, dragEndDate } = dragDateRange;
-
-      const start = min([dragStartDate, dragEndDate]);
-      const end = max([dragStartDate, dragEndDate]);
-
-      setEventFormState({ allDay: true, start, end });
     };
 
     document.addEventListener("mouseup", createAllDayEvent);
     return () => {
       document.removeEventListener("mouseup", createAllDayEvent);
     };
-  }, [createEventMutation, dragDateRange]);
+  }, [prepareCreateEventActions]);
 
-  const [draggingLongTermEvent, setDraggingLongTermEvent] = useState<
-    DraggingEvent | undefined
-  >(undefined);
+  const { movingEvent, moveEventActions } = useMoveEvent();
 
   useEffect(() => {
     const moveLongTermEvent = (e: MouseEvent) => {
-      if (!draggingLongTermEvent || e.button !== 0) {
-        return;
+      if (e.button === 0) {
+        moveEventActions.move();
       }
-
-      const newEvent = getEventFromDraggingEvent(draggingLongTermEvent);
-      updateEventMutatin.mutate(newEvent);
-
-      setDraggingLongTermEvent(undefined);
     };
 
     document.addEventListener("mouseup", moveLongTermEvent);
     return () => {
       document.removeEventListener("mouseup", moveLongTermEvent);
     };
-  }, [draggingLongTermEvent, updateEventMutatin]);
+  }, [moveEventActions]);
 
   return (
     <>
@@ -143,7 +108,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
               <LongTermEventCell
                 date={date}
                 events={weekLongTermEvents}
-                dragDateRange={dragDateRange}
+                dragDateRangeForCreate={prepareCreateEventState.dragDateRange}
                 expanded={expanded}
               />
             </div>
@@ -152,19 +117,19 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
         <LongTermEventRow
           week={week}
           weekLongTermEvents={weekLongTermEvents}
-          isDraggingDate={!!dragDateRange}
           expanded={expanded}
           onChangeExpand={setExpanded}
-          draggingEvent={draggingLongTermEvent}
-          onChangeDraggingEvent={setDraggingLongTermEvent}
-          dragDateRange={dragDateRange}
-          onChangeDragDateRange={setDragDateRange}
+          movingEvent={movingEvent}
+          moveEventActions={moveEventActions}
+          prepareCreateEventState={prepareCreateEventState}
+          prepareCreateEventActions={prepareCreateEventActions}
         />
       </div>
       <CreateEventFormDialog
-        defaultFormValues={eventFormState}
-        onChangeEventPeriodPreview={setDragDateRange}
-        onClose={handleCloseFormDialog}
+        isOpen={prepareCreateEventState.defaultCreateEventValues !== undefined}
+        defaultFormValues={prepareCreateEventState.defaultCreateEventValues}
+        onChangeEventPeriodPreview={prepareCreateEventActions.setDragDateRange}
+        onClose={prepareCreateEventActions.clearState}
       />
     </>
   );

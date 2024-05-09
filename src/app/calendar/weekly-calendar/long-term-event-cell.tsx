@@ -25,14 +25,14 @@ const calcCellHeight = (
 
 type Props = {
   date: Date;
-  dragDateRange: DragDateRange | undefined;
+  dragDateRangeForCreate: DragDateRange | undefined;
   events: Event[];
   expanded: boolean;
 };
 
 export const LongTermEventCell: React.FC<Props> = ({
   date,
-  dragDateRange,
+  dragDateRangeForCreate,
   events,
   expanded,
 }) => {
@@ -42,13 +42,13 @@ export const LongTermEventCell: React.FC<Props> = ({
       end: endOfDay(e.end),
     }),
   ).length;
-  const isDragging = dragDateRange !== undefined;
+  const isDragging = dragDateRangeForCreate !== undefined;
 
   return (
     <div
       className={clsx(
         "grow border-y border-r border-neutral-300",
-        isDragging && isDayWithinDragDateRange(date, dragDateRange)
+        isDragging && isDayWithinDragDateRange(date, dragDateRangeForCreate)
           ? "bg-neutral-500/15"
           : "",
       )}

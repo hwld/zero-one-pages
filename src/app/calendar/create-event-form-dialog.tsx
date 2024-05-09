@@ -8,6 +8,7 @@ import { DragDateRange } from "./utils";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
+  isOpen: boolean;
   defaultFormValues: Omit<CreateEventInput, "title"> | undefined;
   onChangeEventPeriodPreview: Dispatch<
     SetStateAction<DragDateRange | undefined>
@@ -15,12 +16,12 @@ type Props = {
   onClose: () => void;
 };
 export const CreateEventFormDialog: React.FC<Props> = ({
+  isOpen,
   defaultFormValues,
   onChangeEventPeriodPreview,
   onClose,
 }) => {
   const createEventMutation = useCreateEvent();
-  const isOpen = defaultFormValues !== undefined;
 
   const handleChangeOpen = (open: boolean) => {
     if (!open) {

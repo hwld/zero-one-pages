@@ -9,7 +9,7 @@ export type MoveEventActions = {
   move: () => void;
 };
 
-export const useMoveEventOnWeeklyCalendar = () => {
+export const useMoveEvent = () => {
   const updateEventMutation = useUpdateEvent();
 
   const [movingEvent, setMovingEvent] = useState<DraggingDateEvent>();

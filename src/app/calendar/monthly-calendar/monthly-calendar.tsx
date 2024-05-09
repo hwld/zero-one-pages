@@ -5,17 +5,14 @@ import {
   getExceededEventCountByDayOfWeek,
   getWeekEvents,
 } from "./utils";
-import { DragDateRange } from "../utils";
 import { Event } from "../mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
-import { addMonths, max, min, subMonths } from "date-fns";
+import { addMonths, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
-import { useCreateEvent } from "../queries/use-create-event";
-import { useUpdateEvent } from "../queries/use-update-event";
-import { useMoveEventOnMonthlyCalendar } from "./use-move-event";
+import { useMoveEvent } from "./use-move-event";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { CreateEventInput } from "../mocks/api";
+import { usePrepareCreateEvent } from "./use-prepare-create-event";
 
 type Props = {
   currentDate: Date;
@@ -23,9 +20,6 @@ type Props = {
 };
 
 export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
-  const createEventMutation = useCreateEvent();
-  const updateEventMutation = useUpdateEvent();
-
   const [yearMonth, setYearMonth] = useState(currentDate);
 
   const year = useMemo(() => {
@@ -72,47 +66,23 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     };
   }, [yearMonth]);
 
-  // イベント作成のためのDrag
-  const [dragDateRange, setDragDateRange] = useState<DragDateRange | undefined>(
-    undefined,
-  );
-
-  // TODO:
-  // undefinedでdialogが閉じてる状態で、それ以外の場合は開いてる
-  const [eventFormState, setEventFormState] =
-    useState<Omit<CreateEventInput, "title">>();
-
-  const handleCloseDialog = () => {
-    setDragDateRange(undefined);
-    setEventFormState(undefined);
-  };
+  const { prepareCreateEventState, prepareCreateEventActions } =
+    usePrepareCreateEvent();
 
   useEffect(() => {
-    const createEvent = (event: MouseEvent) => {
-      if (!dragDateRange || event.button !== 0) {
-        return;
+    const openCreateEventDialog = (event: MouseEvent) => {
+      if (event.button === 0) {
+        prepareCreateEventActions.setDefaultValues();
       }
-
-      const eventStart = min([
-        dragDateRange.dragStartDate,
-        dragDateRange.dragEndDate,
-      ]);
-
-      const eventEnd = max([
-        dragDateRange.dragStartDate,
-        dragDateRange.dragEndDate,
-      ]);
-
-      setEventFormState({ allDay: true, start: eventStart, end: eventEnd });
     };
 
-    document.addEventListener("mouseup", createEvent);
+    document.addEventListener("mouseup", openCreateEventDialog);
     return () => {
-      document.removeEventListener("mouseup", createEvent);
+      document.removeEventListener("mouseup", openCreateEventDialog);
     };
-  }, [createEventMutation, dragDateRange]);
+  }, [prepareCreateEventActions]);
 
-  const { movingEvent, moveEventActions } = useMoveEventOnMonthlyCalendar();
+  const { movingEvent, moveEventActions } = useMoveEvent();
 
   useEffect(() => {
     const handleMouseUp = (e: MouseEvent) => {
@@ -125,7 +95,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [moveEventActions, updateEventMutation]);
+  }, [moveEventActions]);
 
   return (
     <>
@@ -176,7 +146,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                       key={date.getTime()}
                       date={date}
                       isLastWeek={calendar.length - 1 === i}
-                      dragDateRange={dragDateRange}
+                      prepareCreateEventState={prepareCreateEventState}
                     />
                   );
                 })}
@@ -186,8 +156,10 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                   weekEvents={filteredWeekEvents}
                   eventLimit={eventLimit}
                   exceededEventCountMap={exceededEventCountMap}
-                  dragDateRange={dragDateRange}
-                  onChangeDragDateRange={setDragDateRange}
+                  isDraggingForCreate={
+                    prepareCreateEventState.dragDateRange !== undefined
+                  }
+                  prepareCreateEventActions={prepareCreateEventActions}
                   movingEvent={movingEvent}
                   moveEventActions={moveEventActions}
                 />
@@ -197,9 +169,10 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         </div>
       </div>
       <CreateEventFormDialog
-        defaultFormValues={eventFormState}
-        onChangeEventPeriodPreview={setDragDateRange}
-        onClose={handleCloseDialog}
+        isOpen={prepareCreateEventState.defaultCreateEventValues !== undefined}
+        onClose={prepareCreateEventActions.clearState}
+        defaultFormValues={prepareCreateEventState.defaultCreateEventValues}
+        onChangeEventPeriodPreview={prepareCreateEventActions.setDragDateRange}
       />
     </>
   );

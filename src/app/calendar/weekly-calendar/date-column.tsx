@@ -1,5 +1,4 @@
 import {
-  addMinutes,
   areIntervalsOverlapping,
   differenceInMinutes,
   eachHourOfInterval,
@@ -17,8 +16,6 @@ import {
 import {
   DragEvent,
   MouseEvent,
-  MutableRefObject,
-  RefObject,
   forwardRef,
   useEffect,
   useMemo,
@@ -27,13 +24,15 @@ import {
 import { DateEvent, DraggingDateEvent, ResizingDateEvent } from "../type";
 import { Event } from "../mocks/event-store";
 import { DateEventCard } from "./date-event-card/date-event-card";
-import { DragDateRange, areDragDateRangeOverlapping } from "../utils";
+import { areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
 import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
 import { MoveEventActions } from "./use-move-event";
 import { ResizeEventActions } from "./use-resize-event";
-
-export type MouseHistory = { y: number; scrollTop: number };
+import {
+  PrepareCreateEventActions,
+  PrepareCreateEventState,
+} from "./use-prepare-create-event";
 
 export type EventCreationDragData = {
   targetDate: Date;
@@ -47,10 +46,10 @@ type Props = {
   events: Event[];
   movingEvent: DraggingDateEvent | undefined;
   moveEventActions: MoveEventActions;
-  scrollableRef: RefObject<HTMLDivElement>;
-  mouseHistoryRef: MutableRefObject<MouseHistory | undefined>;
-  eventCreationDragData: DragDateRange | undefined;
-  onChangeEventCreationDragData: (range: DragDateRange | undefined) => void;
+
+  prepareCreateEventState: PrepareCreateEventState;
+  prepareCreateEventActions: PrepareCreateEventActions;
+
   resizingEvent: ResizingDateEvent | undefined;
   resizeEventActions: ResizeEventActions;
 };
@@ -62,15 +61,16 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     events,
     movingEvent,
     moveEventActions,
-    scrollableRef,
-    mouseHistoryRef,
-    eventCreationDragData,
-    onChangeEventCreationDragData,
+    prepareCreateEventState,
+    prepareCreateEventActions,
     resizingEvent,
     resizeEventActions,
   },
   ref,
 ) {
+  const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
+  const isDraggingForCreate = dragDateRangeForCreate !== undefined;
+
   const columnRef = useRef<HTMLDivElement>(null);
   const dateEvents = getDateEvents({ date, events: events });
 
@@ -86,52 +86,25 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const handleColumnMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    if (!columnRef.current || !scrollableRef.current || e.button !== 0) {
+    if (!columnRef.current || e.button !== 0) {
       return;
     }
 
     const columnY = columnRef.current.getBoundingClientRect().y;
     const y = e.clientY - columnY;
 
-    mouseHistoryRef.current = {
-      y,
-      scrollTop: scrollableRef.current.scrollTop,
-    };
-
-    const targetDate = startOfDay(date);
-
-    // ドラッグ開始の時点では常にクリックした最小領域が期間として設定されるようにする
-    const dragStartDate = getDateFromY(targetDate, y, "floor");
-    const dragEndDate = addMinutes(dragStartDate, EVENT_MIN_MINUTES);
-
-    onChangeEventCreationDragData({
-      dragStartDate,
-      dragEndDate,
-    });
+    prepareCreateEventActions.startDrag(date, y);
   };
 
-  const updateEventCreationDragData = (mouseY: number) => {
-    if (
-      !eventCreationDragData ||
-      !columnRef.current ||
-      !scrollableRef.current
-    ) {
+  const updateDragDateRangeForCreate = (mouseY: number) => {
+    if (!isDraggingForCreate || !columnRef.current) {
       return;
     }
 
     const columnY = columnRef.current.getBoundingClientRect().y;
     const y = mouseY - columnY;
 
-    mouseHistoryRef.current = {
-      y,
-      scrollTop: scrollableRef.current.scrollTop,
-    };
-    const dragEndDate = getDateFromY(date, y);
-
-    onChangeEventCreationDragData({
-      ...eventCreationDragData,
-      dragEndDate,
-    });
+    prepareCreateEventActions.updateDragEnd(date, y);
   };
 
   const updateMoveDest = (mouseY: number) => {
@@ -163,8 +136,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    if (eventCreationDragData) {
-      updateEventCreationDragData(e.clientY);
+    if (isDraggingForCreate) {
+      updateDragDateRangeForCreate(e.clientY);
     }
 
     if (movingEvent) {
@@ -231,6 +204,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     currentTimeRef.current.scrollIntoView({ block: "center" });
   }, []);
 
+  const isEventPreviewVisible =
+    dragDateRangeForCreate &&
+    areDragDateRangeOverlapping(date, dragDateRangeForCreate);
+
   return (
     <div className="flex flex-col gap-2" ref={ref}>
       <div
@@ -266,13 +243,12 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             <div className="absolute left-0 size-3 -translate-x-[50%] -translate-y-[50%] rounded-full bg-blue-500" />
           </div>
         ) : null}
-        {eventCreationDragData &&
-          areDragDateRangeOverlapping(date, eventCreationDragData) && (
-            <NewEvent
-              date={date}
-              eventCreationDragData={eventCreationDragData}
-            />
-          )}
+        {isEventPreviewVisible && (
+          <NewEvent
+            date={date}
+            eventCreationDragData={dragDateRangeForCreate}
+          />
+        )}
         {dateEvents.map((event) => {
           const dragging = event.id === movingEvent?.id;
           const isResizing = resizingEvent?.id === event.id;

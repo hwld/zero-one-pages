@@ -4,19 +4,20 @@ import { Event } from "../mocks/event-store";
 import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DragDateRange, DraggingEvent } from "../utils";
+import { DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
 import { MoveEventActions } from "./use-move-event";
+import { PrepareCreateEventActions } from "./use-prepare-create-event";
 
 type Props = {
   week: Date[];
   weekEvents: WeekEvent[];
   eventLimit: number;
   exceededEventCountMap: Map<number, number>;
-  dragDateRange: DragDateRange | undefined;
-  onChangeDragDateRange: (range: DragDateRange | undefined) => void;
+  isDraggingForCreate: boolean;
+  prepareCreateEventActions: PrepareCreateEventActions;
   movingEvent: DraggingEvent | undefined;
   moveEventActions: MoveEventActions;
 };
@@ -28,8 +29,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       weekEvents,
       eventLimit,
       exceededEventCountMap,
-      dragDateRange,
-      onChangeDragDateRange,
+      isDraggingForCreate,
+      prepareCreateEventActions,
       movingEvent,
       moveEventActions,
     },
@@ -55,14 +56,14 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       }
 
       const date = getDateFromX(event.clientX);
-      onChangeDragDateRange({ dragStartDate: date, dragEndDate: date });
+      prepareCreateEventActions.startDrag(date);
     };
 
     const handleRowMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
       const date = getDateFromX(event.clientX);
 
-      if (dragDateRange) {
-        onChangeDragDateRange({ ...dragDateRange, dragEndDate: date });
+      if (isDraggingForCreate) {
+        prepareCreateEventActions.updateDragEnd(date);
       }
 
       if (movingEvent) {
@@ -99,7 +100,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               <WeekEventCard
                 topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                 height={MONTHLY_EVENT_ROW_SIZE}
-                disablePointerEvents={!!dragDateRange || !!movingEvent}
+                disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
                 weekEvent={event}
                 onMouseDown={(e) => e.stopPropagation()}
                 draggable
@@ -124,7 +125,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={!!dragDateRange || !!movingEvent}
+              disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );

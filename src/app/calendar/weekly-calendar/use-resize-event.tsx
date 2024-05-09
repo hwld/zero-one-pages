@@ -12,7 +12,7 @@ export type ResizeEventActions = {
   resize: () => void;
 };
 
-export const useResizeEventOnWeeklyCalendar = () => {
+export const useResizeEvent = () => {
   const updateEventMutation = useUpdateEvent();
   const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
 
