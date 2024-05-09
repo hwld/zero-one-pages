@@ -6,6 +6,7 @@ import {
   Dispatch,
   RefObject,
   useRef,
+  useEffect,
 } from "react";
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../mocks/api";
@@ -29,7 +30,10 @@ export type PrepareCreateEventActions = {
 };
 
 type Params = { scrollableElementRef: RefObject<HTMLElement> };
-export const usePrepareCreateEvent = ({ scrollableElementRef }: Params) => {
+
+export const usePrepareCreateEventEffect = ({
+  scrollableElementRef,
+}: Params) => {
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
@@ -137,6 +141,19 @@ export const usePrepareCreateEvent = ({ scrollableElementRef }: Params) => {
       clearState,
     };
   }, [clearState, scroll, setDefaultValues, startDrag, updateDragEnd]);
+
+  useEffect(() => {
+    const openCreateEventDialog = (e: MouseEvent) => {
+      if (e.button === 0) {
+        setDefaultValues();
+      }
+    };
+
+    document.addEventListener("mouseup", openCreateEventDialog);
+    return () => {
+      document.removeEventListener("mouseup", openCreateEventDialog);
+    };
+  }, [setDefaultValues]);
 
   return { prepareCreateEventState, prepareCreateEventActions };
 };

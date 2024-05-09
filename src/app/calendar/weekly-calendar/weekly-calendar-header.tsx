@@ -3,14 +3,14 @@ import { WEEKLY_CALENDAR_GRID_COLS_CLASS } from "./weekly-calendar";
 import { WEEK_DAY_LABELS } from "../consts";
 import { LongTermEventCell } from "./long-term-event-cell";
 import { Event } from "../mocks/event-store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { isSameDay } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { usePrepareCreateEvent } from "../monthly-calendar/use-prepare-create-event";
-import { useMoveEvent } from "../monthly-calendar/use-move-event";
+import { usePrepareCreateEventEffect } from "../monthly-calendar/use-prepare-create-event-effect";
+import { useMoveEventEffect } from "../monthly-calendar/use-move-event-effect";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -29,35 +29,8 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   const weekLongTermEvents = getWeekEvents({ week, events: longTermEvents });
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
-
-  useEffect(() => {
-    const createAllDayEvent = (e: MouseEvent) => {
-      if (e.button === 0) {
-        prepareCreateEventActions.setDefaultValues();
-      }
-    };
-
-    document.addEventListener("mouseup", createAllDayEvent);
-    return () => {
-      document.removeEventListener("mouseup", createAllDayEvent);
-    };
-  }, [prepareCreateEventActions]);
-
-  const { movingEvent, moveEventActions } = useMoveEvent();
-
-  useEffect(() => {
-    const moveLongTermEvent = (e: MouseEvent) => {
-      if (e.button === 0) {
-        moveEventActions.move();
-      }
-    };
-
-    document.addEventListener("mouseup", moveLongTermEvent);
-    return () => {
-      document.removeEventListener("mouseup", moveLongTermEvent);
-    };
-  }, [moveEventActions]);
+    usePrepareCreateEventEffect();
+  const { movingEvent, moveEventActions } = useMoveEventEffect();
 
   return (
     <>

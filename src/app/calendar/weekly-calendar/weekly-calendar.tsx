@@ -9,16 +9,16 @@ import {
   addDays,
   subDays,
 } from "date-fns";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Event } from "../mocks/event-store";
 import { EVENT_MIN_HEIGHT, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
-import { useMoveEvent } from "./use-move-event";
-import { useResizeEvent } from "./use-resize-event";
+import { useMoveEventEffect } from "./use-move-event-effect";
+import { useResizeEventEffect } from "./use-resize-event-effect";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { usePrepareCreateEvent } from "./use-prepare-create-event";
+import { usePrepareCreateEventEffect } from "./use-prepare-create-event-effect";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -39,8 +39,11 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   }, [date]);
 
   const scrollableElementRef = useRef<HTMLDivElement>(null);
+
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent({ scrollableElementRef });
+    usePrepareCreateEventEffect({ scrollableElementRef });
+  const { movingEvent, moveEventActions } = useMoveEventEffect();
+  const { resizingEvent, resizeEventActions } = useResizeEventEffect();
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     prepareCreateEventActions.scroll(e.currentTarget.scrollTop);
@@ -53,47 +56,6 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   const handlePrevWeek = () => {
     setDate(subDays(startOfWeek(date), 1));
   };
-
-  useEffect(() => {
-    const openCreateEventDialog = (e: MouseEvent) => {
-      if (e.button === 0) {
-        prepareCreateEventActions.setDefaultValues();
-      }
-    };
-
-    document.addEventListener("mouseup", openCreateEventDialog);
-    return () => {
-      document.removeEventListener("mouseup", openCreateEventDialog);
-    };
-  }, [prepareCreateEventActions]);
-
-  const { movingEvent, moveEventActions } = useMoveEvent();
-  useEffect(() => {
-    const moveEvent = (e: MouseEvent) => {
-      if (e.button === 0) {
-        moveEventActions.move();
-      }
-    };
-
-    document.addEventListener("mouseup", moveEvent);
-    return () => {
-      document.removeEventListener("mouseup", moveEvent);
-    };
-  }, [moveEventActions, movingEvent]);
-
-  const { resizingEvent, resizeEventActions } = useResizeEvent();
-  useEffect(() => {
-    const endResizeEvent = (e: MouseEvent) => {
-      if (e.button === 0) {
-        resizeEventActions.resize();
-      }
-    };
-
-    document.addEventListener("mouseup", endResizeEvent);
-    return () => {
-      document.removeEventListener("mouseup", endResizeEvent);
-    };
-  }, [resizeEventActions]);
 
   return (
     <>

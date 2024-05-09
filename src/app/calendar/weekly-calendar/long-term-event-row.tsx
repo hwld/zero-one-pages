@@ -15,8 +15,8 @@ import clsx from "clsx";
 import {
   PrepareCreateEventActions,
   PrepareCreateEventState,
-} from "../monthly-calendar/use-prepare-create-event";
-import { MoveEventActions } from "../monthly-calendar/use-move-event";
+} from "../monthly-calendar/use-prepare-create-event-effect";
+import { MoveEventActions } from "../monthly-calendar/use-move-event-effect";
 
 export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 

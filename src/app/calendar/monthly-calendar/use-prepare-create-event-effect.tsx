@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
   Dispatch,
+  useEffect,
 } from "react";
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../mocks/api";
@@ -24,7 +25,7 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-export const usePrepareCreateEvent = () => {
+export const usePrepareCreateEventEffect = () => {
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
@@ -85,6 +86,19 @@ export const usePrepareCreateEvent = () => {
       clearState,
     };
   }, [clearState, setDefaultValues, startDrag, updateDragEnd]);
+
+  useEffect(() => {
+    const openCreateEventDialog = (event: MouseEvent) => {
+      if (event.button === 0) {
+        setDefaultValues();
+      }
+    };
+
+    document.addEventListener("mouseup", openCreateEventDialog);
+    return () => {
+      document.removeEventListener("mouseup", openCreateEventDialog);
+    };
+  }, [setDefaultValues]);
 
   return { prepareCreateEventState, prepareCreateEventActions };
 };

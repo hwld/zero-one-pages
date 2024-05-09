@@ -10,9 +10,9 @@ import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
 import { addMonths, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
-import { useMoveEvent } from "./use-move-event";
+import { useMoveEventEffect } from "./use-move-event-effect";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { usePrepareCreateEvent } from "./use-prepare-create-event";
+import { usePrepareCreateEventEffect } from "./use-prepare-create-event-effect";
 
 type Props = {
   currentDate: Date;
@@ -67,35 +67,8 @@ export const MonthlyCalendar: React.FC<Props> = ({ currentDate, events }) => {
   }, [yearMonth]);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
-
-  useEffect(() => {
-    const openCreateEventDialog = (event: MouseEvent) => {
-      if (event.button === 0) {
-        prepareCreateEventActions.setDefaultValues();
-      }
-    };
-
-    document.addEventListener("mouseup", openCreateEventDialog);
-    return () => {
-      document.removeEventListener("mouseup", openCreateEventDialog);
-    };
-  }, [prepareCreateEventActions]);
-
-  const { movingEvent, moveEventActions } = useMoveEvent();
-
-  useEffect(() => {
-    const handleMouseUp = (e: MouseEvent) => {
-      if (e.button === 0) {
-        moveEventActions.move();
-      }
-    };
-
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [moveEventActions]);
+    usePrepareCreateEventEffect();
+  const { movingEvent, moveEventActions } = useMoveEventEffect();
 
   return (
     <>

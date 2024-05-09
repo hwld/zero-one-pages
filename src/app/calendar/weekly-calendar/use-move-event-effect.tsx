@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { DateEvent, DraggingDateEvent } from "../type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
@@ -9,7 +9,7 @@ export type MoveEventActions = {
   move: () => void;
 };
 
-export const useMoveEvent = () => {
+export const useMoveEventEffect = () => {
   const updateEventMutation = useUpdateEvent();
 
   const [movingEvent, setMovingEvent] = useState<DraggingDateEvent>();
@@ -60,6 +60,19 @@ export const useMoveEvent = () => {
   const moveEventActions = useMemo((): MoveEventActions => {
     return { startMove, updateMoveDest, move };
   }, [updateMoveDest, startMove, move]);
+
+  useEffect(() => {
+    const moveEvent = (e: MouseEvent) => {
+      if (e.button === 0) {
+        move();
+      }
+    };
+
+    document.addEventListener("mouseup", moveEvent);
+    return () => {
+      document.removeEventListener("mouseup", moveEvent);
+    };
+  }, [move]);
 
   return { movingEvent, moveEventActions };
 };

@@ -27,12 +27,12 @@ import { DateEventCard } from "./date-event-card/date-event-card";
 import { areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
 import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
-import { MoveEventActions } from "./use-move-event";
-import { ResizeEventActions } from "./use-resize-event";
+import { MoveEventActions } from "./use-move-event-effect";
+import { ResizeEventActions } from "./use-resize-event-effect";
 import {
   PrepareCreateEventActions,
   PrepareCreateEventState,
-} from "./use-prepare-create-event";
+} from "./use-prepare-create-event-effect";
 
 export type EventCreationDragData = {
   targetDate: Date;

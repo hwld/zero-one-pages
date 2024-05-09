@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DateEvent, ResizingDateEvent } from "../type";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
@@ -12,7 +12,7 @@ export type ResizeEventActions = {
   resize: () => void;
 };
 
-export const useResizeEvent = () => {
+export const useResizeEventEffect = () => {
   const updateEventMutation = useUpdateEvent();
   const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
 
@@ -90,6 +90,19 @@ export const useResizeEvent = () => {
   const resizeEventActions: ResizeEventActions = useMemo(() => {
     return { startResize, updateResizeDest, resize };
   }, [resize, startResize, updateResizeDest]);
+
+  useEffect(() => {
+    const endResizeEvent = (e: MouseEvent) => {
+      if (e.button === 0) {
+        resize();
+      }
+    };
+
+    document.addEventListener("mouseup", endResizeEvent);
+    return () => {
+      document.removeEventListener("mouseup", endResizeEvent);
+    };
+  }, [resize]);
 
   return { resizingEvent, resizeEventActions };
 };

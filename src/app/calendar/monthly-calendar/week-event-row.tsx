@@ -8,8 +8,8 @@ import { DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
-import { MoveEventActions } from "./use-move-event";
-import { PrepareCreateEventActions } from "./use-prepare-create-event";
+import { MoveEventActions } from "./use-move-event-effect";
+import { PrepareCreateEventActions } from "./use-prepare-create-event-effect";
 
 type Props = {
   week: Date[];

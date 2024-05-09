@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DraggingEvent, getEventFromDraggingEvent } from "../utils";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { Event } from "../mocks/event-store";
@@ -9,7 +9,7 @@ export type MoveEventActions = {
   move: () => void;
 };
 
-export const useMoveEvent = () => {
+export const useMoveEventEffect = () => {
   const updateEventMutation = useUpdateEvent();
   const [movingEvent, setMovingEvent] = useState<DraggingEvent>();
 
@@ -49,6 +49,19 @@ export const useMoveEvent = () => {
   const moveEventActions = useMemo((): MoveEventActions => {
     return { startMove, updateMoveEnd, move };
   }, [updateMoveEnd, startMove, move]);
+
+  useEffect(() => {
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 0) {
+        move();
+      }
+    };
+
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [move]);
 
   return { movingEvent, moveEventActions };
 };

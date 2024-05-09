@@ -3,7 +3,7 @@ import { DateEvent } from "../../type";
 import { getHeightFromInterval, getTopFromDate } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
-import { ResizeEventActions } from "../use-resize-event";
+import { ResizeEventActions } from "../use-resize-event-effect";
 
 type Props = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
