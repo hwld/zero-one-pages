@@ -21,11 +21,11 @@ export const isDayWithinDragDateRange = (
   range: DragDateRange,
 ) => {
   const dragStart = startOfDay(range.dragStartDate);
-  const dragEnd = endOfDay(range.dragEndDate);
+  const dragEnd = startOfDay(range.dragEndDate);
 
   return isWithinInterval(yearMonthDay, {
-    start: min([dragStart, dragEnd]),
-    end: max([dragStart, dragEnd]),
+    start: startOfDay(min([dragStart, dragEnd])),
+    end: endOfDay(max([dragStart, dragEnd])),
   });
 };
 
