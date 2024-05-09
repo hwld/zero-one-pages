@@ -97,6 +97,13 @@ export const usePrepareCreateEventEffect = ({
     [dragDateRange, updateDragEnd],
   );
 
+  const clearState: PrepareCreateEventActions["clearState"] =
+    useCallback(() => {
+      setDragDateRange(undefined);
+      setDefaultCreateEventValues(undefined);
+      mouseHistoryRef.current = undefined;
+    }, []);
+
   const [defaultCreateEventValues, setDefaultCreateEventValues] =
     useState<PrepareCreateEventState["defaultCreateEventValues"]>();
 
@@ -117,15 +124,10 @@ export const usePrepareCreateEventEffect = ({
           start: eventStart,
           end: eventEnd,
         });
+      } else {
+        clearState();
       }
-    }, [dragDateRange]);
-
-  const clearState: PrepareCreateEventActions["clearState"] =
-    useCallback(() => {
-      setDragDateRange(undefined);
-      setDefaultCreateEventValues(undefined);
-      mouseHistoryRef.current = undefined;
-    }, []);
+    }, [clearState, dragDateRange]);
 
   const prepareCreateEventState: PrepareCreateEventState = useMemo(() => {
     return { dragDateRange, defaultCreateEventValues };
