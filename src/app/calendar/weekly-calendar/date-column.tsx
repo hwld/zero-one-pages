@@ -7,12 +7,7 @@ import {
   startOfDay,
 } from "date-fns";
 import { NewEvent } from "./new-event";
-import {
-  EVENT_MIN_HEIGHT,
-  EVENT_MIN_MINUTES,
-  getDateEvents,
-  getDateFromY,
-} from "./utils";
+import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
 import {
   DragEvent,
   MouseEvent,
@@ -23,7 +18,10 @@ import {
 } from "react";
 import { DateEvent, DraggingDateEvent, ResizingDateEvent } from "../type";
 import { Event } from "../mocks/event-store";
-import { DateEventCard } from "./date-event-card/date-event-card";
+import {
+  DateEventCard,
+  DateEventCardProps,
+} from "./date-event-card/date-event-card";
 import { areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
 import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
@@ -114,9 +112,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
     const columnRect = columnRef.current.getBoundingClientRect();
     const y = mouseY - columnRect.y;
-    const mouseOverDate = getDateFromY(date, y);
 
-    moveEventActions.updateMoveDest(mouseOverDate);
+    moveEventActions.updateMoveDest(date, y);
   };
 
   const updateResizeDest = (mouseY: number) => {
@@ -128,9 +125,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     if (y < 0) {
       return;
     }
-    const mouseOverDate = getDateFromY(date, y);
 
-    resizeEventActions.updateResizeDest(mouseOverDate);
+    resizeEventActions.updateResizeDest(date, y);
   };
 
   const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -162,9 +158,19 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     }
 
     const y = event.clientY - columnRef.current?.getBoundingClientRect().y;
-    const dragStartDate = getDateFromY(date, y);
+    moveEventActions.startMove(dateEvent, { date, y });
+  };
 
-    moveEventActions.startMove(dateEvent, dragStartDate);
+  const handleStartResizeEvent: DateEventCardProps["onStartResize"] = (
+    e,
+    { event, origin },
+  ) => {
+    if (!columnRef.current) {
+      return;
+    }
+
+    const y = e.clientY - columnRef.current.getBoundingClientRect().y;
+    resizeEventActions.startResize({ event, origin, y });
   };
 
   const isDragPreviewVisible = useMemo(() => {
@@ -264,7 +270,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
               draggingOther={movingEvent ? !dragging : false}
               isResizing={isResizing}
               isResizingOther={resizingEvent ? !isResizing : false}
-              resizeEventActions={resizeEventActions}
+              onStartResize={handleStartResizeEvent}
             />
           );
         })}

@@ -1,40 +1,71 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { DateEvent, DraggingDateEvent } from "../type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
+import { MouseHistory, getDateFromY } from "./utils";
 
 export type MoveEventActions = {
-  startMove: (event: DateEvent, moveStartDate: Date) => void;
-  updateMoveDest: (moveDestDate: Date) => void;
+  startMove: (event: DateEvent, moveStart: { date: Date; y: number }) => void;
+  updateMoveDest: (day: Date, y: number) => void;
+  scroll: (scrollTop: number) => void;
   move: () => void;
 };
 
-export const useMoveEventEffect = () => {
+type Params = { scrollableRef: RefObject<HTMLElement> };
+
+export const useMoveEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
 
   const [movingEvent, setMovingEvent] = useState<DraggingDateEvent>();
 
+  const mouseHistoryRef = useRef<MouseHistory>();
+
   const startMove: MoveEventActions["startMove"] = useCallback(
-    (event, moveStartDate) => {
+    (event, { date, y }) => {
+      if (scrollableRef.current) {
+        mouseHistoryRef.current = {
+          prevY: y,
+          prevScrollTop: scrollableRef.current.scrollTop,
+        };
+      }
+
+      const moveStartDate = getDateFromY(date, y);
+
       setMovingEvent({
         ...event,
         prevMouseOverDate: moveStartDate,
       });
     },
-    [],
+    [scrollableRef],
   );
 
   const updateMoveDest: MoveEventActions["updateMoveDest"] = useCallback(
-    (moveEndDate: Date) => {
+    (day: Date, y: number) => {
+      if (scrollableRef.current) {
+        mouseHistoryRef.current = {
+          prevY: y,
+          prevScrollTop: scrollableRef.current.scrollTop,
+        };
+      }
+
+      const moveDest = getDateFromY(day, y);
+
       if (
         !movingEvent ||
-        isSameMinute(moveEndDate, movingEvent.prevMouseOverDate)
+        isSameMinute(moveDest, movingEvent.prevMouseOverDate)
       ) {
         return;
       }
 
       const diffMinutes = differenceInMinutes(
-        moveEndDate,
+        moveDest,
         movingEvent.prevMouseOverDate,
       );
 
@@ -42,10 +73,24 @@ export const useMoveEventEffect = () => {
         ...movingEvent,
         start: addMinutes(movingEvent.start, diffMinutes),
         end: addMinutes(movingEvent.end, diffMinutes),
-        prevMouseOverDate: moveEndDate,
+        prevMouseOverDate: moveDest,
       });
     },
-    [movingEvent],
+    [movingEvent, scrollableRef],
+  );
+
+  const scroll: MoveEventActions["scroll"] = useCallback(
+    (scrollTop) => {
+      if (!movingEvent || !mouseHistoryRef.current) {
+        return;
+      }
+
+      const delta = scrollTop - mouseHistoryRef.current.prevScrollTop;
+      const y = mouseHistoryRef.current.prevY + delta;
+
+      updateMoveDest(movingEvent.end, y);
+    },
+    [movingEvent, updateMoveDest],
   );
 
   const move: MoveEventActions["move"] = useCallback(() => {
@@ -58,8 +103,8 @@ export const useMoveEventEffect = () => {
   }, [movingEvent, updateEventMutation]);
 
   const moveEventActions = useMemo((): MoveEventActions => {
-    return { startMove, updateMoveDest, move };
-  }, [updateMoveDest, startMove, move]);
+    return { startMove, updateMoveDest, scroll, move };
+  }, [startMove, updateMoveDest, scroll, move]);
 
   useEffect(() => {
     const moveEvent = (e: MouseEvent) => {

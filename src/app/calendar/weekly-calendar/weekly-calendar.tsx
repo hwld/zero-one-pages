@@ -38,15 +38,31 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     return eachDayOfInterval({ start, end });
   }, [date]);
 
-  const scrollableElementRef = useRef<HTMLDivElement>(null);
+  const scrollableRef = useRef<HTMLDivElement>(null);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEventEffect({ scrollableElementRef });
-  const { movingEvent, moveEventActions } = useMoveEventEffect();
-  const { resizingEvent, resizeEventActions } = useResizeEventEffect();
+    usePrepareCreateEventEffect({ scrollableRef });
+  const { movingEvent, moveEventActions } = useMoveEventEffect({
+    scrollableRef,
+  });
+  const { resizingEvent, resizeEventActions } = useResizeEventEffect({
+    scrollableRef,
+  });
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    prepareCreateEventActions.scroll(e.currentTarget.scrollTop);
+    const scrollTop = e.currentTarget.scrollTop;
+
+    if (prepareCreateEventState) {
+      prepareCreateEventActions.scroll(scrollTop);
+    }
+
+    if (movingEvent) {
+      moveEventActions.scroll(scrollTop);
+    }
+
+    if (resizingEvent) {
+      resizeEventActions.scroll(scrollTop);
+    }
   };
 
   const handleNextWeek = () => {
@@ -77,7 +93,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
 
         <div
           className="flex w-full flex-col overflow-auto"
-          ref={scrollableElementRef}
+          ref={scrollableRef}
           onScroll={handleScroll}
         >
           <WeeklyCalendarDayHeader

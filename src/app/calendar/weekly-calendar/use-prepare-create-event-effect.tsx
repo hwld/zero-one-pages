@@ -11,7 +11,7 @@ import {
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../mocks/api";
 import { addMinutes, max, min, startOfDay } from "date-fns";
-import { EVENT_MIN_MINUTES, getDateFromY } from "./utils";
+import { EVENT_MIN_MINUTES, MouseHistory, getDateFromY } from "./utils";
 
 export type PrepareCreateEventState = {
   dragDateRange: DragDateRange | undefined;
@@ -29,26 +29,22 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-type Params = { scrollableElementRef: RefObject<HTMLElement> };
+type Params = { scrollableRef: RefObject<HTMLElement> };
 
-export const usePrepareCreateEventEffect = ({
-  scrollableElementRef,
-}: Params) => {
+export const usePrepareCreateEventEffect = ({ scrollableRef }: Params) => {
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
   // マウスイベントが発生したときのyとscrollableのscrollTopを保存して、スクロールされたときに
   // これを使用してdragDateRangeを更新する
-  const mouseHistoryRef = useRef<
-    { prevY: number; prevScrollTop: number } | undefined
-  >(undefined);
+  const mouseHistoryRef = useRef<MouseHistory>();
 
   const startDrag: PrepareCreateEventActions["startDrag"] = useCallback(
     (day, y) => {
-      if (scrollableElementRef.current) {
+      if (scrollableRef.current) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableElementRef.current.scrollTop,
+          prevScrollTop: scrollableRef.current.scrollTop,
         };
       }
 
@@ -60,7 +56,7 @@ export const usePrepareCreateEventEffect = ({
 
       setDragDateRange({ dragStartDate, dragEndDate });
     },
-    [scrollableElementRef],
+    [scrollableRef],
   );
 
   const updateDragEnd: PrepareCreateEventActions["updateDragEnd"] = useCallback(
@@ -69,10 +65,10 @@ export const usePrepareCreateEventEffect = ({
         return;
       }
 
-      if (scrollableElementRef.current) {
+      if (scrollableRef.current) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableElementRef.current.scrollTop,
+          prevScrollTop: scrollableRef.current.scrollTop,
         };
       }
 
@@ -80,7 +76,7 @@ export const usePrepareCreateEventEffect = ({
       const dragEndDate = getDateFromY(targetDate, y);
       setDragDateRange({ ...dragDateRange, dragEndDate });
     },
-    [dragDateRange, scrollableElementRef],
+    [dragDateRange, scrollableRef],
   );
 
   const scroll: PrepareCreateEventActions["scroll"] = useCallback(

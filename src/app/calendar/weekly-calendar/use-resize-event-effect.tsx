@@ -1,30 +1,60 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { DateEvent, ResizingDateEvent } from "../type";
 import { useUpdateEvent } from "../queries/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
+import { MouseHistory, getDateFromY } from "./utils";
 
 export type ResizeEventActions = {
   startResize: (params: {
     event: DateEvent;
     origin: ResizingDateEvent["origin"];
+    y: number;
   }) => void;
-  updateResizeDest: (resizeDestDate: Date) => void;
+  scroll: (scrollTop: number) => void;
+  updateResizeDest: (day: Date, y: number) => void;
   resize: () => void;
 };
 
-export const useResizeEventEffect = () => {
+type Params = { scrollableRef: RefObject<HTMLElement> };
+
+export const useResizeEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
   const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
 
+  const mouseHistoryRef = useRef<MouseHistory>();
+
   const startResize: ResizeEventActions["startResize"] = useCallback(
-    ({ event, origin }) => {
+    ({ event, origin, y }) => {
+      if (scrollableRef.current) {
+        mouseHistoryRef.current = {
+          prevY: y,
+          prevScrollTop: scrollableRef.current.scrollTop,
+        };
+      }
+
       setResizingEvent({ ...event, origin });
     },
-    [],
+    [scrollableRef],
   );
 
   const updateResizeDest: ResizeEventActions["updateResizeDest"] = useCallback(
-    (resizeDest) => {
+    (day, y) => {
+      if (scrollableRef.current) {
+        mouseHistoryRef.current = {
+          prevY: y,
+          prevScrollTop: scrollableRef.current.scrollTop,
+        };
+      }
+
+      const resizeDest = getDateFromY(day, y);
+
       if (!resizingEvent) {
         return;
       }
@@ -75,7 +105,21 @@ export const useResizeEventEffect = () => {
         }
       }
     },
-    [resizingEvent],
+    [resizingEvent, scrollableRef],
+  );
+
+  const scroll: ResizeEventActions["scroll"] = useCallback(
+    (scrollTop) => {
+      if (!resizingEvent || !mouseHistoryRef.current) {
+        return;
+      }
+
+      const delta = scrollTop - mouseHistoryRef.current.prevScrollTop;
+      const y = mouseHistoryRef.current.prevY + delta;
+
+      updateResizeDest(resizingEvent.end, y);
+    },
+    [resizingEvent, updateResizeDest],
   );
 
   const resize: ResizeEventActions["resize"] = useCallback(() => {
@@ -88,8 +132,8 @@ export const useResizeEventEffect = () => {
   }, [resizingEvent, updateEventMutation]);
 
   const resizeEventActions: ResizeEventActions = useMemo(() => {
-    return { startResize, updateResizeDest, resize };
-  }, [resize, startResize, updateResizeDest]);
+    return { startResize, updateResizeDest, scroll, resize };
+  }, [resize, scroll, startResize, updateResizeDest]);
 
   useEffect(() => {
     const endResizeEvent = (e: MouseEvent) => {

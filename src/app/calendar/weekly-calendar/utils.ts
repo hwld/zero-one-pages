@@ -15,6 +15,8 @@ import {
 import { DateEvent } from "../type";
 import { Event } from "../mocks/event-store";
 
+export type MouseHistory = { prevY: number; prevScrollTop: number };
+
 export const EVENT_MIN_HEIGHT = 17;
 export const EVENT_MIN_MINUTES = 15;
 
