@@ -1,7 +1,6 @@
 import { HttpResponse, delay, http } from "msw";
 import { z } from "zod";
 import { Event, eventSchema, eventStore } from "./event-store";
-import { taskStore } from "@/app/todo-1/_mocks/task-store";
 import { fetcher } from "@/lib/fetcher";
 import { isSameMinute } from "date-fns";
 
@@ -139,7 +138,7 @@ export const calendarApiHandlers = [
     await delay();
 
     const id = z.string().parse(params.id);
-    taskStore.remove(id);
+    eventStore.remove(id);
 
     return HttpResponse.json({});
   }),

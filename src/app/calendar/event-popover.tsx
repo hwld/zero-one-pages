@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
 import { IconType } from "react-icons/lib";
 import { format, isSameDay, isSameYear } from "date-fns";
+import { useDeleteEvent } from "./queries/use-delete-event";
 
 type Props = {
   event: Event;
@@ -39,10 +40,13 @@ export const EventPopover: React.FC<Props> = ({
     placement,
     middleware: [offset(8), flip(), shift({ padding: 8 })],
   });
-
   const dismiss = useDismiss(context);
-
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+
+  const deleteEventMutation = useDeleteEvent();
+  const handleDelete = () => {
+    deleteEventMutation.mutate(event.id);
+  };
 
   return (
     <>
@@ -76,7 +80,7 @@ export const EventPopover: React.FC<Props> = ({
                       </div>
                       <div className="flex">
                         <Button icon={TbPencilMinus} />
-                        <Button icon={TbTrash} />
+                        <Button icon={TbTrash} onClick={handleDelete} />
                         <Button
                           autoFocus
                           icon={TbX}
