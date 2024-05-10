@@ -13,7 +13,7 @@ import {
 import { Slot } from "@radix-ui/react-slot";
 import { ComponentPropsWithoutRef, ReactNode, useMemo } from "react";
 import { Event } from "./mocks/event-store";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
 import { IconType } from "react-icons/lib";
 import { format, isSameDay, isSameYear } from "date-fns";
@@ -34,6 +34,8 @@ export const EventPopover: React.FC<Props> = ({
   onChangeOpen,
   placement = "bottom",
 }) => {
+  const isPresent = useIsPresent();
+
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: onChangeOpen,
@@ -54,7 +56,7 @@ export const EventPopover: React.FC<Props> = ({
         {children}
       </Slot>
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && isPresent && (
           <FloatingPortal>
             <FloatingOverlay
               lockScroll

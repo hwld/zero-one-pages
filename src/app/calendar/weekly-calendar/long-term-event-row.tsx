@@ -1,7 +1,3 @@
-import {
-  MoreWeekEventsCard,
-  WeekEventCard,
-} from "../monthly-calendar/week-event-card";
 import { getExceededEventCountByDayOfWeek } from "../monthly-calendar/utils";
 import { WeekEvent } from "../type";
 import { Event } from "../mocks/event-store";
@@ -10,13 +6,16 @@ import { EVENT_MIN_HEIGHT } from "./utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
 import { DraggingEvent } from "../utils";
 import { useRef } from "react";
-import { DraggingEventPreview } from "../monthly-calendar/dragging-event-preview";
 import clsx from "clsx";
 import {
   PrepareCreateEventActions,
   PrepareCreateEventState,
 } from "../monthly-calendar/use-prepare-create-event-effect";
 import { MoveEventActions } from "../monthly-calendar/use-move-event-effect";
+import { AnimatePresence, motion } from "framer-motion";
+import { WeekEventCard } from "../monthly-calendar/week-event-card/week-event-card";
+import { MoreWeekEventsCard } from "../monthly-calendar/week-event-card/more-week-even";
+import { DragPreviewWeekEventsCard } from "../monthly-calendar/week-event-card/drag-preview";
 
 export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 
@@ -104,24 +103,30 @@ export const LongTermEventRow: React.FC<Props> = ({
       onMouseDown={handleRowMouseDown}
       onMouseMove={handleRowMouseMove}
     >
-      {visibleWeekLongTermEvents.map((event) => {
-        const isMoving = movingEvent?.event.id === event.id;
+      <AnimatePresence>
+        {visibleWeekLongTermEvents.map((event) => {
+          const isMoving = movingEvent?.event.id === event.id;
 
-        return (
-          <div key={event.id} className={clsx(isMoving && "opacity-50")}>
-            <WeekEventCard
-              weekEvent={event}
-              height={EVENT_MIN_HEIGHT}
-              disablePointerEvents={
-                isDraggingForCreate || !!(movingEvent && !isMoving)
-              }
-              onMouseDown={(e) => e.stopPropagation()}
-              draggable
-              onDragStart={(e) => handleEventDragStart(e, event)}
-            />
-          </div>
-        );
-      })}
+          return (
+            <motion.div
+              key={event.id}
+              className={clsx(isMoving && "opacity-50")}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            >
+              <WeekEventCard
+                weekEvent={event}
+                height={EVENT_MIN_HEIGHT}
+                disablePointerEvents={
+                  isDraggingForCreate || !!(movingEvent && !isMoving)
+                }
+                onMouseDown={(e) => e.stopPropagation()}
+                draggable
+                onDragStart={(e) => handleEventDragStart(e, event)}
+              />
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
       {expanded
         ? null
         : week.map((date) => {
@@ -144,7 +149,7 @@ export const LongTermEventRow: React.FC<Props> = ({
             );
           })}
       {movingEvent ? (
-        <DraggingEventPreview
+        <DragPreviewWeekEventsCard
           week={week}
           draggingEvent={movingEvent}
           height={EVENT_MIN_HEIGHT}

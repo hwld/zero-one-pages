@@ -24,6 +24,7 @@ import {
   PrepareCreateEventActions,
   PrepareCreateEventState,
 } from "./use-prepare-create-event-effect";
+import { AnimatePresence, motion } from "framer-motion";
 
 export type EventCreationDragData = {
   targetDate: Date;
@@ -248,25 +249,32 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             eventCreationDragData={dragDateRangeForCreate}
           />
         )}
-        {dateEvents.map((event) => {
-          const dragging = event.id === movingEvent?.id;
-          const isResizing = resizingEvent?.id === event.id;
+        <AnimatePresence>
+          {dateEvents.map((event) => {
+            const dragging = event.id === movingEvent?.id;
+            const isResizing = resizingEvent?.id === event.id;
 
-          return (
-            <DateEventCard
-              key={event.id}
-              hidden={isResizing}
-              displayedDate={date}
-              event={event}
-              onDragStart={handleEventDragStart}
-              dragging={dragging}
-              draggingOther={movingEvent ? !dragging : false}
-              isResizing={isResizing}
-              isResizingOther={resizingEvent ? !isResizing : false}
-              onStartResize={handleStartResizeEvent}
-            />
-          );
-        })}
+            return (
+              <motion.div
+                key={event.id}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              >
+                <DateEventCard
+                  key={event.id}
+                  hidden={isResizing}
+                  displayedDate={date}
+                  event={event}
+                  onDragStart={handleEventDragStart}
+                  dragging={dragging}
+                  draggingOther={movingEvent ? !dragging : false}
+                  isResizing={isResizing}
+                  isResizingOther={resizingEvent ? !isResizing : false}
+                  onStartResize={handleStartResizeEvent}
+                />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
         <DragPreviewDateEventCard
           date={date}
           ref={dropPreviewRef}

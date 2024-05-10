@@ -1,15 +1,17 @@
 import { forwardRef, useRef } from "react";
 import { WeekEvent } from "../type";
 import { Event } from "../mocks/event-store";
-import { MoreWeekEventsCard, WeekEventCard } from "./week-event-card";
 import { MONTHLY_EVENT_ROW_SIZE } from "../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
-import { DraggingEventPreview } from "./dragging-event-preview";
 import clsx from "clsx";
 import { MoveEventActions } from "./use-move-event-effect";
 import { PrepareCreateEventActions } from "./use-prepare-create-event-effect";
+import { AnimatePresence, motion } from "framer-motion";
+import { WeekEventCard } from "./week-event-card/week-event-card";
+import { DragPreviewWeekEventsCard } from "./week-event-card/drag-preview";
+import { MoreWeekEventsCard } from "./week-event-card/more-week-even";
 
 type Props = {
   week: Date[];
@@ -89,26 +91,29 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
         onMouseDown={handleRowMouseDown}
         onMouseMove={handleRowMouseMove}
       >
-        {weekEvents.map((event) => {
-          return (
-            <div
-              key={event.id}
-              className={clsx(
-                movingEvent?.event.id === event.id && "opacity-50",
-              )}
-            >
-              <WeekEventCard
-                topMargin={MONTHLY_DATE_HEADER_HEIGHT}
-                height={MONTHLY_EVENT_ROW_SIZE}
-                disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
-                weekEvent={event}
-                onMouseDown={(e) => e.stopPropagation()}
-                draggable
-                onDragStart={(e) => handleEventDragStart(e, event)}
-              />
-            </div>
-          );
-        })}
+        <AnimatePresence>
+          {weekEvents.map((event) => {
+            return (
+              <motion.div
+                key={event.id}
+                className={clsx(
+                  movingEvent?.event.id === event.id && "opacity-50",
+                )}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              >
+                <WeekEventCard
+                  topMargin={MONTHLY_DATE_HEADER_HEIGHT}
+                  height={MONTHLY_EVENT_ROW_SIZE}
+                  disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
+                  weekEvent={event}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  draggable
+                  onDragStart={(e) => handleEventDragStart(e, event)}
+                />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
         {/* 表示上限を超えたイベントの数 */}
         {week.map((date) => {
           const weekDay = date.getDay();
@@ -131,7 +136,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           );
         })}
         {movingEvent ? (
-          <DraggingEventPreview
+          <DragPreviewWeekEventsCard
             week={week}
             draggingEvent={movingEvent}
             topMargin={MONTHLY_DATE_HEADER_HEIGHT}
