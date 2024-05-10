@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, forwardRef, useState } from "react";
+import { ComponentPropsWithoutRef, forwardRef, useRef, useState } from "react";
 import { WeekEvent } from "../type";
 import { format } from "date-fns";
 import { EventPopover } from "../event-popover";
@@ -64,6 +64,8 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, WeekEventCardProps>(
       isDragging = false,
       weekEvent,
       topMargin,
+      onMouseDown,
+      onMouseMove,
       onClick,
       ...props
     },
@@ -71,9 +73,22 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, WeekEventCardProps>(
   ) {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
+    const isClick = useRef(false);
+    const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onMouseDown?.(e);
+      isClick.current = true;
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onMouseMove?.(e);
+      isClick.current = false;
+    };
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e);
-      setIsPopoverOpen(true);
+      if (isClick.current) {
+        setIsPopoverOpen(true);
+      }
     };
 
     return (
@@ -90,6 +105,8 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, WeekEventCardProps>(
           startWeekDay={weekEvent.startWeekDay}
           range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
           topMargin={topMargin}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
           onClick={handleClick}
           {...props}
         >

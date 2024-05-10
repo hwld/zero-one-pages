@@ -1,4 +1,11 @@
-import { DragEvent, forwardRef, useMemo, useState } from "react";
+import {
+  DragEvent,
+  SyntheticEvent,
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { DateEvent, ResizingDateEvent } from "../../type";
 import { getHeightFromInterval, getTopFromDate } from "../utils";
 import clsx from "clsx";
@@ -78,6 +85,27 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
 
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
+    const isClick = useRef(false);
+    const handleMouseDown = (e: SyntheticEvent) => {
+      isClick.current = true;
+      e.stopPropagation();
+    };
+
+    const handleMouseMove = () => {
+      isClick.current = false;
+    };
+
+    const handleClick = () => {
+      if (!isClick.current) {
+        return;
+      }
+      setIsPopoverOpen(true);
+    };
+
+    const handleDragStart = (e: React.DragEvent) => {
+      onDragStart(e, event);
+    };
+
     if (hidden) {
       return null;
     }
@@ -92,15 +120,10 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
         <DateEventCardBase
           ref={ref}
           draggable
-          onClick={() => {
-            setIsPopoverOpen(true);
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-          }}
-          onDragStart={(e) => {
-            onDragStart(e, event);
-          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onClick={handleClick}
+          onDragStart={handleDragStart}
           style={style}
           className={clsx(
             !isResizingOther &&
