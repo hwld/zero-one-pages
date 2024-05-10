@@ -10,7 +10,7 @@ type Props = {
   visible: boolean;
 };
 
-export const DragPreviewDateEventCard = forwardRef<HTMLDivElement, Props>(
+export const DragPreviewDateEventCard = forwardRef<HTMLButtonElement, Props>(
   function PreviewDateEventCard({ date, event, visible }, ref) {
     const style = useMemo(() => {
       const top = event && getTopFromDate(event, date);

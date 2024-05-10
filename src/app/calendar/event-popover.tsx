@@ -1,4 +1,5 @@
 import {
+  FloatingFocusManager,
   FloatingOverlay,
   FloatingPortal,
   Placement,
@@ -56,35 +57,43 @@ export const EventPopover: React.FC<Props> = ({
               className="z-[100]"
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <div
-                ref={refs.setFloating}
-                style={floatingStyles}
-                {...getFloatingProps()}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.1 }}
-                  className="w-[320px] space-y-2 rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-700 shadow"
+              <FloatingFocusManager context={context}>
+                <div
+                  ref={refs.setFloating}
+                  style={floatingStyles}
+                  {...getFloatingProps()}
                 >
-                  <div className="flex items-center justify-between px-2 pt-2">
-                    <div className="text-xs text-neutral-400">イベント詳細</div>
-                    <div className="flex">
-                      <Button icon={TbPencilMinus} />
-                      <Button icon={TbTrash} />
-                      <Button icon={TbX} onClick={() => onChangeOpen(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.1 }}
+                    className="w-[320px] space-y-2 rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-700 shadow"
+                  >
+                    <div className="flex items-center justify-between px-2 pt-2">
+                      <div className="text-xs text-neutral-400">
+                        イベント詳細
+                      </div>
+                      <div className="flex">
+                        <Button icon={TbPencilMinus} />
+                        <Button icon={TbTrash} />
+                        <Button
+                          autoFocus
+                          icon={TbX}
+                          onClick={() => onChangeOpen(false)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-2 px-4 pb-4">
-                    <div className="font-bold">{event.title}</div>
-                    <div className="flex items-center gap-1 text-sm">
-                      <TbClockHour5 size={18} className="shrink-0" />
-                      <EventPeriod event={event} />
+                    <div className="space-y-2 px-4 pb-4">
+                      <div className="font-bold">{event.title}</div>
+                      <div className="flex items-center gap-1 text-sm">
+                        <TbClockHour5 size={18} className="shrink-0" />
+                        <EventPeriod event={event} />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </div>
+                  </motion.div>
+                </div>
+              </FloatingFocusManager>
             </FloatingOverlay>
           </FloatingPortal>
         )}
@@ -153,7 +162,7 @@ const Button: React.FC<
 > = ({ icon: Icon, ...props }) => {
   return (
     <button
-      className="grid size-7 place-items-center rounded text-neutral-600 transition-colors hover:bg-black/10"
+      className="grid size-7 place-items-center rounded text-neutral-600 ring-neutral-500 transition-colors hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2"
       {...props}
     >
       <Icon size="60%" />

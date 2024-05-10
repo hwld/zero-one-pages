@@ -1,8 +1,9 @@
-import { DragEvent, forwardRef, useMemo } from "react";
+import { DragEvent, forwardRef, useMemo, useState } from "react";
 import { DateEvent, ResizingDateEvent } from "../../type";
 import { getHeightFromInterval, getTopFromDate } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
+import { EventPopover } from "../../event-popover";
 
 export type DateEventCardProps = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
@@ -10,7 +11,7 @@ export type DateEventCardProps = {
   event: DateEvent;
   dragging: boolean;
   draggingOther: boolean;
-  onDragStart: (e: DragEvent<HTMLDivElement>, event: DateEvent) => void;
+  onDragStart: (e: React.DragEvent, event: DateEvent) => void;
   isResizing: boolean;
   hidden?: boolean;
   isResizingOther: boolean;
@@ -20,7 +21,7 @@ export type DateEventCardProps = {
   ) => void;
 };
 
-export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
+export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
   function DateEventCard(
     {
       event,
@@ -75,38 +76,50 @@ export const DateEventCard = forwardRef<HTMLDivElement, DateEventCardProps>(
       onStartResize(e, { event, origin: "eventStart" });
     };
 
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
     if (hidden) {
       return null;
     }
 
     return (
-      <DateEventCardBase
-        ref={ref}
-        draggable
-        onMouseDown={(e) => {
-          e.stopPropagation();
-        }}
-        onDragStart={(e) => {
-          onDragStart(e, event);
-        }}
-        style={style}
-        className={clsx(
-          !isResizingOther &&
-            !draggingOther &&
-            "hover:z-10 hover:bg-neutral-800",
-          dragging ? "opacity-50" : "opacity-100",
-        )}
+      <EventPopover
+        event={event}
+        isOpen={isPopoverOpen}
+        onChangeOpen={setIsPopoverOpen}
+        placement="right-start"
       >
-        <div
-          className="absolute inset-x-0 top-0 h-1 cursor-ns-resize"
-          onMouseDown={handleResizeStartFromEventStart}
-        />
-        <DateEventCardContent event={event} />
-        <div
-          className="absolute inset-x-0 bottom-0 h-1 cursor-ns-resize"
-          onMouseDown={handleResizeStartFromEventEnd}
-        />
-      </DateEventCardBase>
+        <DateEventCardBase
+          ref={ref}
+          draggable
+          onClick={() => {
+            setIsPopoverOpen(true);
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+          onDragStart={(e) => {
+            onDragStart(e, event);
+          }}
+          style={style}
+          className={clsx(
+            !isResizingOther &&
+              !draggingOther &&
+              "hover:z-10 hover:bg-neutral-800",
+            dragging ? "opacity-50" : "opacity-100",
+          )}
+        >
+          <div
+            className="absolute inset-x-0 top-0 h-1 cursor-ns-resize"
+            onMouseDown={handleResizeStartFromEventStart}
+          />
+          <DateEventCardContent event={event} />
+          <div
+            className="absolute inset-x-0 bottom-0 h-1 cursor-ns-resize"
+            onMouseDown={handleResizeStartFromEventEnd}
+          />
+        </DateEventCardBase>
+      </EventPopover>
     );
   },
 );

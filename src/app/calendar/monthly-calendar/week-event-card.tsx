@@ -1,7 +1,8 @@
 import clsx from "clsx";
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef, useState } from "react";
 import { WeekEvent } from "../type";
 import { format } from "date-fns";
+import { EventPopover } from "../event-popover";
 
 type WeekEventCardBaseProps = {
   disablePointerEvents: boolean;
@@ -12,34 +13,40 @@ type WeekEventCardBaseProps = {
   topMargin?: number;
 } & ComponentPropsWithoutRef<"button">;
 
-const WeekEventCardBase: React.FC<WeekEventCardBaseProps> = ({
-  disablePointerEvents,
-  height,
-  range = 1,
-  top,
-  startWeekDay,
-  children,
-  topMargin = 0,
-  ...props
-}) => {
-  return (
-    <button
-      {...props}
-      className={clsx(
-        "absolute select-none pb-[1px] text-sm text-neutral-100",
-        disablePointerEvents ? "pointer-events-none" : "pointer-events-auto",
-      )}
-      style={{
-        height: `${height}px`,
-        width: `calc(100% / 7  * ${range} - 10px)`,
-        top: `calc(${topMargin}px + ${height}px * ${top})`,
-        left: `calc(100% / 7 * ${startWeekDay})`,
-      }}
-    >
-      {children}
-    </button>
-  );
-};
+const WeekEventCardBase = forwardRef<HTMLButtonElement, WeekEventCardBaseProps>(
+  function WeekEventCardBase(
+    {
+      disablePointerEvents,
+      height,
+      range = 1,
+      top,
+      startWeekDay,
+      children,
+      topMargin = 0,
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        className={clsx(
+          "group absolute select-none pb-[1px] text-sm text-neutral-100 focus-visible:outline-none",
+          disablePointerEvents ? "pointer-events-none" : "pointer-events-auto",
+        )}
+        style={{
+          height: `${height}px`,
+          width: `calc(100% / 7  * ${range} - 10px)`,
+          top: `calc(${topMargin}px + ${height}px * ${top})`,
+          left: `calc(100% / 7 * ${startWeekDay})`,
+        }}
+      >
+        {children}
+      </button>
+    );
+  },
+);
 
 type WeekEventCardProps = {
   height: number;
@@ -49,40 +56,61 @@ type WeekEventCardProps = {
   topMargin?: number;
 } & Omit<ComponentPropsWithoutRef<"button">, "className">;
 
-export const WeekEventCard: React.FC<WeekEventCardProps> = ({
-  height,
-  disablePointerEvents,
-  isDragging = false,
-  weekEvent,
-  topMargin,
-  ...props
-}) => {
-  return (
-    <WeekEventCardBase
-      height={height}
-      disablePointerEvents={disablePointerEvents}
-      top={weekEvent.top}
-      startWeekDay={weekEvent.startWeekDay}
-      range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
-      topMargin={topMargin}
-      {...props}
-    >
-      <div
-        className={clsx(
-          "flex h-full flex-nowrap items-center rounded bg-neutral-700 px-1 text-xs transition-colors hover:bg-neutral-800",
-          isDragging && "bg-neutral-800 ring ring-blue-500",
-        )}
+export const WeekEventCard = forwardRef<HTMLButtonElement, WeekEventCardProps>(
+  function WeekEventCard(
+    {
+      height,
+      disablePointerEvents,
+      isDragging = false,
+      weekEvent,
+      topMargin,
+      onClick,
+      ...props
+    },
+    ref,
+  ) {
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(e);
+      setIsPopoverOpen(true);
+    };
+
+    return (
+      <EventPopover
+        event={weekEvent}
+        isOpen={isPopoverOpen}
+        onChangeOpen={setIsPopoverOpen}
       >
-        {!weekEvent.allDay ? (
-          <span className="mr-1 text-nowrap text-neutral-300">
-            {format(weekEvent.start, "aa hh:mm")}
-          </span>
-        ) : null}
-        <span className="truncate">{weekEvent.title}</span>
-      </div>
-    </WeekEventCardBase>
-  );
-};
+        <WeekEventCardBase
+          ref={ref}
+          height={height}
+          disablePointerEvents={disablePointerEvents}
+          top={weekEvent.top}
+          startWeekDay={weekEvent.startWeekDay}
+          range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
+          topMargin={topMargin}
+          onClick={handleClick}
+          {...props}
+        >
+          <div
+            className={clsx(
+              "flex h-full flex-nowrap items-center rounded bg-neutral-700 px-1 text-xs ring-blue-500 transition-colors hover:bg-neutral-800 group-focus-visible:ring",
+              isDragging && "bg-neutral-800 ring",
+            )}
+          >
+            {!weekEvent.allDay ? (
+              <span className="mr-1 text-nowrap text-neutral-300">
+                {format(weekEvent.start, "aa hh:mm")}
+              </span>
+            ) : null}
+            <span className="truncate">{weekEvent.title}</span>
+          </div>
+        </WeekEventCardBase>
+      </EventPopover>
+    );
+  },
+);
 
 type MoreWeekEventsCardProps = {
   count: number;
@@ -114,7 +142,7 @@ export const MoreWeekEventsCard: React.FC<MoreWeekEventsCardProps> = ({
       onClick={onClick}
       topMargin={topMargin}
     >
-      <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-900/10">
+      <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 ring-blue-500 transition-colors hover:bg-neutral-900/10">
         他<span className="mx-1">{count}</span>件
       </div>
     </WeekEventCardBase>

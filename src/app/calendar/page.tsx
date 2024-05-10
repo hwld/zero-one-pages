@@ -28,7 +28,10 @@ const Page = () => {
   }, [currentDate, events, type]);
 
   return (
-    <div className="grid h-[100dvh] w-[100dvw] grid-rows-[min-content,1fr] gap-4 overflow-hidden bg-neutral-100 p-4 text-neutral-700">
+    <div
+      className="grid h-[100dvh] w-[100dvw] grid-rows-[min-content,1fr] gap-4 overflow-hidden bg-neutral-100 p-4 text-neutral-700"
+      style={{ colorScheme: "light" }}
+    >
       <div className="text-end">
         <select
           className="h-8 w-[100px] rounded border border-neutral-300 bg-neutral-100 px-2"

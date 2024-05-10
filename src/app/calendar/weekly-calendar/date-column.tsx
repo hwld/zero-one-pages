@@ -8,14 +8,7 @@ import {
 } from "date-fns";
 import { NewEvent } from "./new-event";
 import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
-import {
-  DragEvent,
-  MouseEvent,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { forwardRef, useEffect, useMemo, useRef } from "react";
 import { DateEvent, DraggingDateEvent, ResizingDateEvent } from "../type";
 import { Event } from "../mocks/event-store";
 import {
@@ -81,7 +74,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     [date],
   );
 
-  const handleColumnMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+  const handleColumnMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (!columnRef.current || e.button !== 0) {
@@ -129,7 +122,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     resizeEventActions.updateResizeDest(date, y);
   };
 
-  const handleColumnMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+  const handleColumnMouseMove = (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (isDraggingForCreate) {
@@ -145,10 +138,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     }
   };
 
-  const dropPreviewRef = useRef<HTMLDivElement>(null);
+  const dropPreviewRef = useRef<HTMLButtonElement>(null);
 
   const handleEventDragStart = (
-    event: DragEvent<HTMLDivElement>,
+    event: React.DragEvent,
     dateEvent: DateEvent,
   ) => {
     event.preventDefault();
