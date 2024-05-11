@@ -73,17 +73,13 @@ export const EventForm: React.FC<Props> = ({
   };
 
   const handleChangePeriodStart = (newStart: Date) => {
-    if (!onChangeEventPeriodPreview) {
-      return;
-    }
-
     const oldStart = getValues("start");
     const oldEnd = getValues("end");
 
     const diffMinutes = differenceInMinutes(newStart, oldStart);
     const nweEnd = addMinutes(oldEnd, diffMinutes);
 
-    onChangeEventPeriodPreview((preview) => {
+    onChangeEventPeriodPreview?.((preview) => {
       if (!preview) {
         return undefined;
       }
@@ -99,17 +95,13 @@ export const EventForm: React.FC<Props> = ({
   };
 
   const handleChangePeriodEnd = (newEnd: Date) => {
-    if (!onChangeEventPeriodPreview) {
-      return;
-    }
-
     let newStart = getValues("start");
 
     if (newEnd.getTime() < newStart.getTime()) {
       newStart = newEnd;
     }
 
-    onChangeEventPeriodPreview((preview) => {
+    onChangeEventPeriodPreview?.((preview) => {
       if (!preview) {
         return undefined;
       }
