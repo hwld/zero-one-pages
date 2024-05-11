@@ -9,6 +9,7 @@ import {
 } from "@floating-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
+import { TbX } from "react-icons/tb";
 
 type Props = {
   children: ReactNode;
@@ -53,4 +54,33 @@ export const Dialog: React.FC<Props> = ({ children, isOpen, onChangeOpen }) => {
       )}
     </AnimatePresence>
   );
+};
+
+export const DialogContent: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return <div className="flex flex-col gap-6">{children}</div>;
+};
+
+export const DialogTitle: React.FC<{
+  children: string;
+  onClose: () => void;
+}> = ({ children, onClose }) => {
+  return (
+    <div className="flex justify-between gap-2">
+      <div className="select-none text-sm text-neutral-500">{children}</div>
+      <button
+        className="absolute right-2 top-2 grid size-6 place-items-center rounded transition-colors hover:bg-black/10"
+        onClick={onClose}
+      >
+        <TbX size={18} />
+      </button>
+    </div>
+  );
+};
+
+export const DialogAction: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return <div className="flex gap-2 self-end">{children}</div>;
 };

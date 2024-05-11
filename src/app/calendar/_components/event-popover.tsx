@@ -84,15 +84,18 @@ export const EventPopover: React.FC<Props> = ({
                         イベント詳細
                       </div>
                       <div className="flex">
-                        <Button
+                        <EventPopoverButton
                           icon={TbPencilMinus}
                           onClick={() => {
                             onChangeOpen(false);
                             setIsUpdateDialogOpen(true);
                           }}
                         />
-                        <Button icon={TbTrash} onClick={handleDelete} />
-                        <Button
+                        <EventPopoverButton
+                          icon={TbTrash}
+                          onClick={handleDelete}
+                        />
+                        <EventPopoverButton
                           autoFocus
                           icon={TbX}
                           onClick={() => onChangeOpen(false)}
@@ -178,7 +181,7 @@ const EventPeriod: React.FC<{ event: Event }> = ({ event }) => {
   return <div className="tabular-nums">{content}</div>;
 };
 
-const Button: React.FC<
+const EventPopoverButton: React.FC<
   { icon: IconType } & ComponentPropsWithoutRef<"button">
 > = ({ icon: Icon, ...props }) => {
   return (
