@@ -10,9 +10,10 @@ export const CalendarAPI = {
   event: (id?: string) => `${CalendarAPI.events()}/${id ?? ":id"}`,
 };
 
-type CreateEventInputSchemaKeys = "title" | "allDay" | "start" | "end";
-
-export const createEventInputSchema = z
+// 今のところcreateInputとupdateInputは同じなのでこれを使う。
+// 別々にしたくなったタイミングで(create|update)EventInputSchemaを変更する
+type EventInputSchemaKeys = "title" | "allDay" | "start" | "end";
+export const eventInputSchema = z
   .object({
     title: z
       .string()
@@ -21,14 +22,14 @@ export const createEventInputSchema = z
     allDay: z.boolean(),
     start: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
     end: z.union([z.string(), z.date()]).pipe(z.coerce.date()),
-  } satisfies Record<CreateEventInputSchemaKeys, unknown>)
+  } satisfies Record<EventInputSchemaKeys, unknown>)
   .refine(
     (input) => {
       return input.start.getTime() <= input.end.getTime();
     },
     {
       message: "開始日時は終了日時より前に設定してください",
-      path: ["start"] satisfies CreateEventInputSchemaKeys[],
+      path: ["start"] satisfies EventInputSchemaKeys[],
     },
   )
   .refine(
@@ -40,12 +41,15 @@ export const createEventInputSchema = z
     },
     {
       message: "開始日時と異なる日時を設定してください",
-      path: ["end"] satisfies CreateEventInputSchemaKeys[],
+      path: ["end"] satisfies EventInputSchemaKeys[],
     },
   );
+export type EventInput = z.infer<typeof eventInputSchema>;
+
+export const createEventInputSchema = eventInputSchema;
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 
-export const updateEventInputSchema = createEventInputSchema;
+export const updateEventInputSchema = eventInputSchema;
 export type UpdateEventInput = z.infer<typeof updateEventInputSchema>;
 
 export const fetchEvents = async (): Promise<Event[]> => {

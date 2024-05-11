@@ -10,7 +10,7 @@ import {
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
-import { CreateEventInput, createEventInputSchema } from "./mocks/api";
+import { EventInput, eventInputSchema } from "./mocks/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -22,7 +22,7 @@ import {
 } from "date-fns";
 import { DragDateRange } from "./utils";
 
-export const CREATE_EVENT_FORM_ID = "create-event-form-id";
+export const EVENT_FORM_ID = "event-form-id";
 
 // input[type="date"|"datetime-locale"]に合わせる
 const getDateFormatString = (allDay: boolean = false) => {
@@ -34,16 +34,16 @@ const getDateFormatString = (allDay: boolean = false) => {
 };
 
 type Props = {
-  onChangeEventPeriodPreview: Dispatch<
+  onChangeEventPeriodPreview?: Dispatch<
     SetStateAction<DragDateRange | undefined>
   >;
-  onCreateEvent: (input: CreateEventInput) => void;
-  defaultValues: Omit<CreateEventInput, "title">;
+  onSubmit: (input: EventInput) => void;
+  defaultValues: Omit<EventInput, "title">;
 };
 
-export const CreateEventForm: React.FC<Props> = ({
+export const EventForm: React.FC<Props> = ({
   onChangeEventPeriodPreview,
-  onCreateEvent,
+  onSubmit,
   defaultValues: _defaultValues,
 }) => {
   const [defaultValues] = useState(_defaultValues);
@@ -55,17 +55,17 @@ export const CreateEventForm: React.FC<Props> = ({
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<CreateEventInput>({
+  } = useForm<EventInput>({
     defaultValues,
-    resolver: zodResolver(createEventInputSchema),
+    resolver: zodResolver(eventInputSchema),
   });
   const isAllDay = useWatch({ control, name: "allDay" });
 
-  const handleCreateEvent = (data: CreateEventInput) => {
+  const handleSubmitEvent = (data: EventInput) => {
     const startDate = data.allDay ? startOfDay(data.start) : data.start;
     const endDate = data.allDay ? startOfDay(data.end) : data.end;
 
-    onCreateEvent({
+    onSubmit({
       ...data,
       start: startDate,
       end: endDate,
@@ -73,6 +73,10 @@ export const CreateEventForm: React.FC<Props> = ({
   };
 
   const handleChangePeriodStart = (newStart: Date) => {
+    if (!onChangeEventPeriodPreview) {
+      return;
+    }
+
     const oldStart = getValues("start");
     const oldEnd = getValues("end");
 
@@ -95,6 +99,10 @@ export const CreateEventForm: React.FC<Props> = ({
   };
 
   const handleChangePeriodEnd = (newEnd: Date) => {
+    if (!onChangeEventPeriodPreview) {
+      return;
+    }
+
     let newStart = getValues("start");
 
     if (newEnd.getTime() < newStart.getTime()) {
@@ -119,9 +127,9 @@ export const CreateEventForm: React.FC<Props> = ({
 
   return (
     <form
-      id={CREATE_EVENT_FORM_ID}
+      id={EVENT_FORM_ID}
       className="flex flex-col gap-4"
-      onSubmit={handleSubmit(handleCreateEvent)}
+      onSubmit={handleSubmit(handleSubmitEvent)}
     >
       <FormField icon={TbTextCaption} error={errors.title?.message}>
         <Input

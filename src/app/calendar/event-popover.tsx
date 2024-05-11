@@ -11,13 +11,14 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { Slot } from "@radix-ui/react-slot";
-import { ComponentPropsWithoutRef, ReactNode, useMemo } from "react";
+import { ComponentPropsWithoutRef, ReactNode, useMemo, useState } from "react";
 import { Event } from "./mocks/event-store";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
 import { IconType } from "react-icons/lib";
 import { format, isSameDay, isSameYear } from "date-fns";
 import { useDeleteEvent } from "./queries/use-delete-event";
+import { UpdateEventFormDialog } from "./update-event-form-dialog";
 
 type Props = {
   event: Event;
@@ -50,6 +51,8 @@ export const EventPopover: React.FC<Props> = ({
     deleteEvent(event.id);
   };
 
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+
   return (
     <>
       <Slot ref={refs.setReference} {...getReferenceProps()}>
@@ -81,7 +84,13 @@ export const EventPopover: React.FC<Props> = ({
                         イベント詳細
                       </div>
                       <div className="flex">
-                        <Button icon={TbPencilMinus} />
+                        <Button
+                          icon={TbPencilMinus}
+                          onClick={() => {
+                            onChangeOpen(false);
+                            setIsUpdateDialogOpen(true);
+                          }}
+                        />
                         <Button icon={TbTrash} onClick={handleDelete} />
                         <Button
                           autoFocus
@@ -104,6 +113,12 @@ export const EventPopover: React.FC<Props> = ({
           </FloatingPortal>
         )}
       </AnimatePresence>
+      <UpdateEventFormDialog
+        isOpen={isUpdateDialogOpen}
+        onClose={() => setIsUpdateDialogOpen(false)}
+        eventId={event.id}
+        defaultFormValues={event}
+      />
     </>
   );
 };
