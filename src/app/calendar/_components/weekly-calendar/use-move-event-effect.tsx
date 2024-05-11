@@ -24,6 +24,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
 
   const [movingEvent, setMovingEvent] = useState<DraggingDateEvent>();
+  const [isEventMoving, setIsEventMoving] = useState(false);
 
   const mouseHistoryRef = useRef<MouseHistory>();
 
@@ -38,6 +39,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
 
       const moveStartDate = getDateFromY(date, y);
 
+      setIsEventMoving(true);
       setMovingEvent({
         ...event,
         prevMouseOverDate: moveStartDate,
@@ -50,6 +52,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
     (day: Date, y: number) => {
       const moveDest = getDateFromY(day, y);
       if (
+        !isEventMoving ||
         !movingEvent ||
         isSameMinute(moveDest, movingEvent.prevMouseOverDate)
       ) {
@@ -75,12 +78,12 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
         prevMouseOverDate: moveDest,
       });
     },
-    [movingEvent, scrollableRef],
+    [isEventMoving, movingEvent, scrollableRef],
   );
 
   const scroll: MoveEventActions["scroll"] = useCallback(
     (scrollTop) => {
-      if (!movingEvent || !mouseHistoryRef.current) {
+      if (!isEventMoving || !movingEvent || !mouseHistoryRef.current) {
         return;
       }
 
@@ -89,7 +92,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
 
       updateMoveDest(movingEvent.prevMouseOverDate, y);
     },
-    [movingEvent, updateMoveDest],
+    [isEventMoving, movingEvent, updateMoveDest],
   );
 
   const move: MoveEventActions["move"] = useCallback(() => {
@@ -97,8 +100,12 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
       return;
     }
 
-    updateEventMutation.mutate(movingEvent);
-    setMovingEvent(undefined);
+    updateEventMutation.mutate(movingEvent, {
+      onSettled: () => {
+        setMovingEvent(undefined);
+      },
+    });
+    setIsEventMoving(false);
   }, [movingEvent, updateEventMutation]);
 
   const moveEventActions = useMemo((): MoveEventActions => {
@@ -118,5 +125,5 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [move]);
 
-  return { movingEvent, moveEventActions };
+  return { isEventMoving, movingEvent, moveEventActions };
 };

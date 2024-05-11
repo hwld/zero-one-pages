@@ -12,9 +12,11 @@ export type MoveEventActions = {
 export const useMoveEventEffect = () => {
   const updateEventMutation = useUpdateEvent();
   const [movingEvent, setMovingEvent] = useState<DraggingEvent>();
+  const [isEventMoving, setIsEventMoving] = useState(false);
 
   const startMove: MoveEventActions["startMove"] = useCallback(
     (event, moveStartDate) => {
+      setIsEventMoving(true);
       setMovingEvent({
         event,
         dragStartDate: moveStartDate,
@@ -26,13 +28,13 @@ export const useMoveEventEffect = () => {
 
   const updateMoveEnd: MoveEventActions["updateMoveEnd"] = useCallback(
     (moveEndDate: Date) => {
-      if (!movingEvent) {
+      if (!isEventMoving || !movingEvent) {
         return;
       }
 
       setMovingEvent({ ...movingEvent, dragEndDate: moveEndDate });
     },
-    [movingEvent],
+    [isEventMoving, movingEvent],
   );
 
   const move: MoveEventActions["move"] = useCallback(() => {
@@ -41,9 +43,12 @@ export const useMoveEventEffect = () => {
     }
 
     const updatedEvent = getEventFromDraggingEvent(movingEvent);
-    updateEventMutation.mutate(updatedEvent);
-
-    setMovingEvent(undefined);
+    updateEventMutation.mutate(updatedEvent, {
+      onSettled: () => {
+        setMovingEvent(undefined);
+      },
+    });
+    setIsEventMoving(false);
   }, [movingEvent, updateEventMutation]);
 
   const moveEventActions = useMemo((): MoveEventActions => {
@@ -63,5 +68,5 @@ export const useMoveEventEffect = () => {
     };
   }, [move]);
 
-  return { movingEvent, moveEventActions };
+  return { isEventMoving, movingEvent, moveEventActions };
 };

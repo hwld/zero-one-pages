@@ -27,6 +27,7 @@ type Params = { scrollableRef: RefObject<HTMLElement> };
 export const useResizeEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
   const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
+  const [isEventResizing, setIsEventResizing] = useState(false);
 
   const mouseHistoryRef = useRef<MouseHistory>();
 
@@ -39,6 +40,7 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
         };
       }
 
+      setIsEventResizing(true);
       setResizingEvent({ ...event, origin });
     },
     [scrollableRef],
@@ -55,7 +57,7 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
 
       const resizeDest = getDateFromY(day, y);
 
-      if (!resizingEvent) {
+      if (!isEventResizing || !resizingEvent) {
         return;
       }
 
@@ -105,12 +107,12 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
         }
       }
     },
-    [resizingEvent, scrollableRef],
+    [isEventResizing, resizingEvent, scrollableRef],
   );
 
   const scroll: ResizeEventActions["scroll"] = useCallback(
     (scrollTop) => {
-      if (!resizingEvent || !mouseHistoryRef.current) {
+      if (!isEventResizing || !resizingEvent || !mouseHistoryRef.current) {
         return;
       }
 
@@ -124,7 +126,7 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
         y,
       );
     },
-    [resizingEvent, updateResizeDest],
+    [isEventResizing, resizingEvent, updateResizeDest],
   );
 
   const resize: ResizeEventActions["resize"] = useCallback(() => {
@@ -132,8 +134,12 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
       return;
     }
 
-    updateEventMutation.mutate(resizingEvent);
-    setResizingEvent(undefined);
+    updateEventMutation.mutate(resizingEvent, {
+      onSettled: () => {
+        setResizingEvent(undefined);
+      },
+    });
+    setIsEventResizing(false);
   }, [resizingEvent, updateEventMutation]);
 
   const resizeEventActions: ResizeEventActions = useMemo(() => {
@@ -153,5 +159,5 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [resize]);
 
-  return { resizingEvent, resizeEventActions };
+  return { isEventResizing, resizingEvent, resizeEventActions };
 };
