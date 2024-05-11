@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eventSchema, Event } from "./mocks/event-store";
+import { eventSchema, Event } from "./_mocks/event-store";
 
 export const weekEventSchema = eventSchema.merge(
   z.object({

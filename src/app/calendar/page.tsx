@@ -1,10 +1,10 @@
 "use client";
 import { useMemo, useState } from "react";
-import { MonthlyCalendar } from "./monthly-calendar/monthly-calendar";
+import { MonthlyCalendar } from "./_components/monthly-calendar/monthly-calendar";
 import "./style.css";
-import { WeeklyCalendar } from "./weekly-calendar/weekly-calendar";
-import { useMinuteClock } from "./use-minute-clock";
-import { useEvents } from "./queries/use-events";
+import { WeeklyCalendar } from "./_components/weekly-calendar/weekly-calendar";
+import { useMinuteClock } from "./_components/use-minute-clock";
+import { useEvents } from "./_queries/use-events";
 
 type CalendarType = "month" | "week";
 const Page = () => {
