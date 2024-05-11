@@ -17,7 +17,6 @@ import {
 } from "./date-event-card/date-event-card";
 import { areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
-import { ResizePreviewDateEventCard } from "./date-event-card/resize-preview";
 import { MoveEventActions } from "./use-move-event-effect";
 import { ResizeEventActions } from "./use-resize-event-effect";
 import {
@@ -42,6 +41,7 @@ type Props = {
   prepareCreateEventState: PrepareCreateEventState;
   prepareCreateEventActions: PrepareCreateEventActions;
 
+  isEventResizing: boolean;
   resizingEvent: ResizingDateEvent | undefined;
   resizeEventActions: ResizeEventActions;
 };
@@ -55,6 +55,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     moveEventActions,
     prepareCreateEventState,
     prepareCreateEventActions,
+    isEventResizing,
     resizingEvent,
     resizeEventActions,
   },
@@ -181,20 +182,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     );
   }, [movingEvent, date]);
 
-  const isResizePreviewVisible = useMemo(() => {
-    if (!resizingEvent) {
-      return false;
-    }
-
-    return areIntervalsOverlapping(
-      {
-        start: startOfDay(date),
-        end: endOfDay(date),
-      },
-      resizingEvent,
-    );
-  }, [date, resizingEvent]);
-
   const currentTimeRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!currentTimeRef.current) {
@@ -252,7 +239,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         <AnimatePresence>
           {dateEvents.map((event) => {
             const dragging = event.id === movingEvent?.id;
-            const isResizing = resizingEvent?.id === event.id;
 
             return (
               <motion.div
@@ -261,14 +247,13 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
               >
                 <DateEventCard
                   key={event.id}
-                  hidden={isResizing}
                   displayedDate={date}
                   event={event}
                   onDragStart={handleEventDragStart}
                   dragging={dragging}
                   draggingOther={movingEvent ? !dragging : false}
-                  isResizing={isResizing}
-                  isResizingOther={resizingEvent ? !isResizing : false}
+                  isSomeEventResizing={isEventResizing}
+                  resizingEvent={resizingEvent}
                   onStartResize={handleStartResizeEvent}
                 />
               </motion.div>
@@ -280,11 +265,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           ref={dropPreviewRef}
           event={movingEvent}
           visible={isDragPreviewVisible}
-        />
-        <ResizePreviewDateEventCard
-          date={date}
-          event={resizingEvent}
-          visible={isResizePreviewVisible}
         />
       </div>
     </div>

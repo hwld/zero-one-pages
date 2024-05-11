@@ -7,7 +7,11 @@ import {
   useState,
 } from "react";
 import { DateEvent, ResizingDateEvent } from "../../../type";
-import { getHeightFromInterval, getTopFromDate } from "../utils";
+import {
+  calcDateEventCardStyle,
+  getHeightFromInterval,
+  getTopFromDate,
+} from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
 import { EventPopover } from "../../event-popover";
@@ -19,9 +23,11 @@ export type DateEventCardProps = {
   dragging: boolean;
   draggingOther: boolean;
   onDragStart: (e: React.DragEvent, event: DateEvent) => void;
-  isResizing: boolean;
-  hidden?: boolean;
-  isResizingOther: boolean;
+
+  // resizeが反映されていない場合は、isSomeEventResizingがfalseでもresizingEventがundefinedではない可能性がある。
+  // そのため、resizingEventだけでresize中かを判定することはできない
+  isSomeEventResizing: boolean;
+  resizingEvent: ResizingDateEvent | undefined;
   onStartResize: (
     e: React.MouseEvent,
     params: { event: DateEvent; origin: ResizingDateEvent["origin"] },
@@ -36,47 +42,41 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
       dragging,
       draggingOther,
       onDragStart,
-      hidden = false,
-      isResizingOther,
+      isSomeEventResizing,
+      resizingEvent,
       onStartResize,
     },
     ref,
   ) {
+    const isResizing = isSomeEventResizing
+      ? resizingEvent?.id === event.id
+      : false;
+    const isOtherEventResizing = isSomeEventResizing ? !isResizing : false;
+
+    const isInteractive = !draggingOther && !isOtherEventResizing;
+
     const style = useMemo(() => {
-      const top = getTopFromDate(event, displayedDate);
+      if (isSomeEventResizing && resizingEvent?.id === event.id) {
+        const top = getTopFromDate(resizingEvent, displayedDate);
+        const height = getHeightFromInterval(resizingEvent, displayedDate);
+        return { top, height, width: "100%" };
+      }
 
-      const left =
-        event.prevOverlappings === 0
-          ? 0
-          : (93 / (event.totalOverlappings + 1)) * event.prevOverlappings;
+      if (!isSomeEventResizing && resizingEvent?.id === event.id) {
+        return calcDateEventCardStyle({ event: resizingEvent, displayedDate });
+      }
 
-      const lastEventWidth =
-        event.totalOverlappings === 0 ? 93 : 93 / (event.totalOverlappings + 1);
+      return calcDateEventCardStyle({ event, displayedDate });
+    }, [displayedDate, event, isSomeEventResizing, resizingEvent]);
 
-      const width =
-        event.totalOverlappings === 0
-          ? 93
-          : event.totalOverlappings === event.prevOverlappings
-            ? lastEventWidth
-            : lastEventWidth * 1.7;
-
-      const height = getHeightFromInterval(event, displayedDate);
-
-      return { top, left: `${left}%`, width: `${width}%`, height };
-    }, [displayedDate, event]);
-
-    const handleResizeStartFromEventStart = (
-      e: React.MouseEvent<HTMLDivElement>,
-    ) => {
+    const handleResizeStartFromEventStart = (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
 
       onStartResize(e, { event, origin: "eventEnd" });
     };
 
-    const handleResizeStartFromEventEnd = (
-      e: React.MouseEvent<HTMLDivElement>,
-    ) => {
+    const handleResizeStartFromEventEnd = (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -106,10 +106,6 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
       onDragStart(e, event);
     };
 
-    if (hidden) {
-      return null;
-    }
-
     return (
       <EventPopover
         event={event}
@@ -126,9 +122,7 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
           onDragStart={handleDragStart}
           style={style}
           className={clsx(
-            !isResizingOther &&
-              !draggingOther &&
-              "hover:z-10 hover:bg-neutral-800",
+            isInteractive && "hover:z-10 hover:bg-neutral-800",
             dragging ? "opacity-50" : "opacity-100",
           )}
         >

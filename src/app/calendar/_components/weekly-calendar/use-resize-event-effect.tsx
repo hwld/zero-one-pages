@@ -26,6 +26,8 @@ type Params = { scrollableRef: RefObject<HTMLElement> };
 
 export const useResizeEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
+
+  // TODO: reizeが終わってもresizingEventがundefined以外になり得るから、resizingEventっていう名前は分かりづらい気がする
   const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
   const [isEventResizing, setIsEventResizing] = useState(false);
 

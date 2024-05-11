@@ -191,3 +191,32 @@ export const splitEvent = (events: Event[]): SplitEventResult => {
 
   return { longTermEvents, defaultEvents };
 };
+
+export const calcDateEventCardStyle = ({
+  event,
+  displayedDate,
+}: {
+  displayedDate: Date;
+  event: DateEvent;
+}) => {
+  const top = getTopFromDate(event, displayedDate);
+
+  const left =
+    event.prevOverlappings === 0
+      ? 0
+      : (93 / (event.totalOverlappings + 1)) * event.prevOverlappings;
+
+  const lastEventWidth =
+    event.totalOverlappings === 0 ? 93 : 93 / (event.totalOverlappings + 1);
+
+  const width =
+    event.totalOverlappings === 0
+      ? 93
+      : event.totalOverlappings === event.prevOverlappings
+        ? lastEventWidth
+        : lastEventWidth * 1.7;
+
+  const height = getHeightFromInterval(event, displayedDate);
+
+  return { top, left: `${left}%`, width: `${width}%`, height };
+};
