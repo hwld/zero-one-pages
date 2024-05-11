@@ -56,6 +56,7 @@ export const CreateEventFormDialog: React.FC<Props> = ({
             defaultValues={defaultFormValues}
             onSubmit={handleCreateEvent}
             onChangeEventPeriodPreview={onChangeEventPeriodPreview}
+            isPending={createEventMutation.isPending}
           />
         )}
         <div className="flex gap-2 self-end">

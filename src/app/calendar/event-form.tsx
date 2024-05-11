@@ -39,11 +39,13 @@ type Props = {
   >;
   onSubmit: (input: EventInput) => void;
   defaultValues: Omit<EventInput, "title">;
+  isPending?: boolean;
 };
 
 export const EventForm: React.FC<Props> = ({
   onChangeEventPeriodPreview,
   onSubmit,
+  isPending,
   defaultValues: _defaultValues,
 }) => {
   const [defaultValues] = useState(_defaultValues);
@@ -62,6 +64,10 @@ export const EventForm: React.FC<Props> = ({
   const isAllDay = useWatch({ control, name: "allDay" });
 
   const handleSubmitEvent = (data: EventInput) => {
+    if (isPending) {
+      return;
+    }
+
     const startDate = data.allDay ? startOfDay(data.start) : data.start;
     const endDate = data.allDay ? startOfDay(data.end) : data.end;
 
@@ -120,8 +126,8 @@ export const EventForm: React.FC<Props> = ({
   return (
     <form
       id={EVENT_FORM_ID}
-      className="flex flex-col gap-4"
       onSubmit={handleSubmit(handleSubmitEvent)}
+      className="flex flex-col gap-4"
     >
       <FormField icon={TbTextCaption} error={errors.title?.message}>
         <Input

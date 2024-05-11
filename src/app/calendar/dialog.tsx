@@ -32,7 +32,7 @@ export const Dialog: React.FC<Props> = ({ children, isOpen, onChangeOpen }) => {
         <FloatingPortal>
           <FloatingOverlay
             lockScroll
-            className="insert-0 fixed z-50 bg-black/5"
+            className="z-50 bg-black/5"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <FloatingFocusManager context={context}>

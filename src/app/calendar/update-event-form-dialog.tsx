@@ -54,6 +54,7 @@ export const UpdateEventFormDialog: React.FC<Props> = ({
         <EventForm
           defaultValues={defaultFormValues}
           onSubmit={handleUpdateEvent}
+          isPending={updateEventMutation.isPending}
         />
         <div className="flex gap-2 self-end">
           <button
