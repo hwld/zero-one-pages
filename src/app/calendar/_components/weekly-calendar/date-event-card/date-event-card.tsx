@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { DateEvent, ResizingDateEvent } from "../../../type";
+import { DateEvent, ResizeEventPreview } from "../../../type";
 import {
   calcDateEventCardStyle,
   getHeightFromInterval,
@@ -24,13 +24,11 @@ export type DateEventCardProps = {
   draggingOther: boolean;
   onDragStart: (e: React.DragEvent, event: DateEvent) => void;
 
-  // resizeが反映されていない場合は、isSomeEventResizingがfalseでもresizingEventがundefinedではない可能性がある。
-  // そのため、resizingEventだけでresize中かを判定することはできない
   isSomeEventResizing: boolean;
-  resizingEvent: ResizingDateEvent | undefined;
+  resizeEventPreview: ResizeEventPreview | undefined;
   onStartResize: (
     e: React.MouseEvent,
-    params: { event: DateEvent; origin: ResizingDateEvent["origin"] },
+    params: { event: DateEvent; origin: ResizeEventPreview["origin"] },
   ) => void;
 };
 
@@ -43,31 +41,34 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
       draggingOther,
       onDragStart,
       isSomeEventResizing,
-      resizingEvent,
+      resizeEventPreview,
       onStartResize,
     },
     ref,
   ) {
     const isResizing = isSomeEventResizing
-      ? resizingEvent?.id === event.id
+      ? resizeEventPreview?.id === event.id
       : false;
     const isOtherEventResizing = isSomeEventResizing ? !isResizing : false;
 
     const isInteractive = !draggingOther && !isOtherEventResizing;
 
     const style = useMemo(() => {
-      if (isSomeEventResizing && resizingEvent?.id === event.id) {
-        const top = getTopFromDate(resizingEvent, displayedDate);
-        const height = getHeightFromInterval(resizingEvent, displayedDate);
+      if (isSomeEventResizing && resizeEventPreview?.id === event.id) {
+        const top = getTopFromDate(resizeEventPreview, displayedDate);
+        const height = getHeightFromInterval(resizeEventPreview, displayedDate);
         return { top, height, width: "100%" };
       }
 
-      if (!isSomeEventResizing && resizingEvent?.id === event.id) {
-        return calcDateEventCardStyle({ event: resizingEvent, displayedDate });
+      if (!isSomeEventResizing && resizeEventPreview?.id === event.id) {
+        return calcDateEventCardStyle({
+          event: resizeEventPreview,
+          displayedDate,
+        });
       }
 
       return calcDateEventCardStyle({ event, displayedDate });
-    }, [displayedDate, event, isSomeEventResizing, resizingEvent]);
+    }, [displayedDate, event, isSomeEventResizing, resizeEventPreview]);
 
     const handleResizeStartFromEventStart = (e: React.MouseEvent) => {
       e.stopPropagation();

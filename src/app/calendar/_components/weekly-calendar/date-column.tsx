@@ -9,7 +9,7 @@ import {
 import { NewEvent } from "./new-event";
 import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { DateEvent, DraggingDateEvent, ResizingDateEvent } from "../../type";
+import { DateEvent, DraggingDateEvent, ResizeEventPreview } from "../../type";
 import { Event } from "../../_mocks/event-store";
 import {
   DateEventCard,
@@ -42,7 +42,7 @@ type Props = {
   prepareCreateEventActions: PrepareCreateEventActions;
 
   isEventResizing: boolean;
-  resizingEvent: ResizingDateEvent | undefined;
+  resizeEventPreview: ResizeEventPreview | undefined;
   resizeEventActions: ResizeEventActions;
 };
 
@@ -56,7 +56,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     prepareCreateEventState,
     prepareCreateEventActions,
     isEventResizing,
-    resizingEvent,
+    resizeEventPreview,
     resizeEventActions,
   },
   ref,
@@ -112,7 +112,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   };
 
   const updateResizeDest = (mouseY: number) => {
-    if (!columnRef.current || !resizingEvent) {
+    if (!columnRef.current || !isEventResizing) {
       return;
     }
 
@@ -135,7 +135,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       updateMoveDest(e.clientY);
     }
 
-    if (resizingEvent) {
+    if (isEventResizing) {
       updateResizeDest(e.clientY);
     }
   };
@@ -253,7 +253,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
                   dragging={dragging}
                   draggingOther={movingEvent ? !dragging : false}
                   isSomeEventResizing={isEventResizing}
-                  resizingEvent={resizingEvent}
+                  resizeEventPreview={resizeEventPreview}
                   onStartResize={handleStartResizeEvent}
                 />
               </motion.div>

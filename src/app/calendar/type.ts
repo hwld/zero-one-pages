@@ -23,6 +23,6 @@ export type DraggingDateEvent = DateEvent & {
   prevMouseOverDate: Date;
 };
 
-export type ResizingDateEvent = DateEvent & {
+export type ResizeEventPreview = DateEvent & {
   origin: "eventStart" | "eventEnd";
 };

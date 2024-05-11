@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { DateEvent, ResizingDateEvent } from "../../type";
+import { DateEvent, ResizeEventPreview } from "../../type";
 import { useUpdateEvent } from "../../_queries/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import { MouseHistory, getDateFromY } from "./utils";
@@ -14,7 +14,7 @@ import { MouseHistory, getDateFromY } from "./utils";
 export type ResizeEventActions = {
   startResize: (params: {
     event: DateEvent;
-    origin: ResizingDateEvent["origin"];
+    origin: ResizeEventPreview["origin"];
     y: number;
   }) => void;
   scroll: (scrollTop: number) => void;
@@ -27,8 +27,8 @@ type Params = { scrollableRef: RefObject<HTMLElement> };
 export const useResizeEventEffect = ({ scrollableRef }: Params) => {
   const updateEventMutation = useUpdateEvent();
 
-  // TODO: reizeが終わってもresizingEventがundefined以外になり得るから、resizingEventっていう名前は分かりづらい気がする
-  const [resizingEvent, setResizingEvent] = useState<ResizingDateEvent>();
+  const [resizeEventPreview, setResizeEventPreview] =
+    useState<ResizeEventPreview>();
   const [isEventResizing, setIsEventResizing] = useState(false);
 
   const mouseHistoryRef = useRef<MouseHistory>();
@@ -43,7 +43,7 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
       }
 
       setIsEventResizing(true);
-      setResizingEvent({ ...event, origin });
+      setResizeEventPreview({ ...event, origin });
     },
     [scrollableRef],
   );
@@ -59,62 +59,62 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
 
       const resizeDest = getDateFromY(day, y);
 
-      if (!isEventResizing || !resizingEvent) {
+      if (!isEventResizing || !resizeEventPreview) {
         return;
       }
 
-      switch (resizingEvent.origin) {
+      switch (resizeEventPreview.origin) {
         case "eventStart": {
-          if (isSameMinute(resizingEvent.start, resizeDest)) {
+          if (isSameMinute(resizeEventPreview.start, resizeDest)) {
             return;
           }
 
-          if (isBefore(resizeDest, resizingEvent.start)) {
-            setResizingEvent({
-              ...resizingEvent,
+          if (isBefore(resizeDest, resizeEventPreview.start)) {
+            setResizeEventPreview({
+              ...resizeEventPreview,
               origin: "eventEnd",
               start: resizeDest,
-              end: resizingEvent.start,
+              end: resizeEventPreview.start,
             });
           } else {
-            setResizingEvent({
-              ...resizingEvent,
+            setResizeEventPreview({
+              ...resizeEventPreview,
               end: resizeDest,
             });
           }
           return;
         }
         case "eventEnd": {
-          if (isSameMinute(resizingEvent.end, resizeDest)) {
+          if (isSameMinute(resizeEventPreview.end, resizeDest)) {
             return;
           }
 
-          if (isAfter(resizeDest, resizingEvent.end)) {
-            setResizingEvent({
-              ...resizingEvent,
+          if (isAfter(resizeDest, resizeEventPreview.end)) {
+            setResizeEventPreview({
+              ...resizeEventPreview,
               origin: "eventStart",
-              start: resizingEvent.end,
+              start: resizeEventPreview.end,
               end: resizeDest,
             });
           } else {
-            setResizingEvent({
-              ...resizingEvent,
+            setResizeEventPreview({
+              ...resizeEventPreview,
               start: resizeDest,
             });
           }
           return;
         }
         default: {
-          throw new Error(resizingEvent.origin satisfies never);
+          throw new Error(resizeEventPreview.origin satisfies never);
         }
       }
     },
-    [isEventResizing, resizingEvent, scrollableRef],
+    [isEventResizing, resizeEventPreview, scrollableRef],
   );
 
   const scroll: ResizeEventActions["scroll"] = useCallback(
     (scrollTop) => {
-      if (!isEventResizing || !resizingEvent || !mouseHistoryRef.current) {
+      if (!isEventResizing || !resizeEventPreview || !mouseHistoryRef.current) {
         return;
       }
 
@@ -122,27 +122,27 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
       const y = mouseHistoryRef.current.prevY + delta;
 
       updateResizeDest(
-        resizingEvent.origin === "eventEnd"
-          ? resizingEvent.start
-          : resizingEvent.end,
+        resizeEventPreview.origin === "eventEnd"
+          ? resizeEventPreview.start
+          : resizeEventPreview.end,
         y,
       );
     },
-    [isEventResizing, resizingEvent, updateResizeDest],
+    [isEventResizing, resizeEventPreview, updateResizeDest],
   );
 
   const resize: ResizeEventActions["resize"] = useCallback(() => {
-    if (!resizingEvent) {
+    if (!resizeEventPreview) {
       return;
     }
 
-    updateEventMutation.mutate(resizingEvent, {
+    updateEventMutation.mutate(resizeEventPreview, {
       onSettled: () => {
-        setResizingEvent(undefined);
+        setResizeEventPreview(undefined);
       },
     });
     setIsEventResizing(false);
-  }, [resizingEvent, updateEventMutation]);
+  }, [resizeEventPreview, updateEventMutation]);
 
   const resizeEventActions: ResizeEventActions = useMemo(() => {
     return { startResize, updateResizeDest, scroll, resize };
@@ -161,5 +161,9 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [resize]);
 
-  return { isEventResizing, resizingEvent, resizeEventActions };
+  return {
+    isEventResizing,
+    resizeEventPreview,
+    resizeEventActions,
+  };
 };
