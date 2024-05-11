@@ -65,11 +65,15 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const isDraggingForCreate = dragDateRangeForCreate !== undefined;
 
   const columnRef = useRef<HTMLDivElement>(null);
-  const dateEvents = getDateEvents({ date, events: events });
-  const resizePreviewEvents = getDateEvents({
+  const displayedDateEvents = getDateEvents({
     date,
-    events: resizeEventPreview ? [resizeEventPreview] : [],
-  }).filter((e) => !dateEvents.find((event) => event.id === e.id));
+    events: events.map((event): Event => {
+      if (event.id === resizeEventPreview?.id) {
+        return resizeEventPreview;
+      }
+      return event;
+    }),
+  });
 
   const hours = useMemo(
     () =>
@@ -241,8 +245,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           />
         )}
         <AnimatePresence>
-          {[...dateEvents, ...resizePreviewEvents].map((event) => {
+          {displayedDateEvents.map((event) => {
             const dragging = event.id === movingEvent?.id;
+            const isResizing =
+              isEventResizing && resizeEventPreview?.id === event.id;
 
             return (
               <motion.div
@@ -256,8 +262,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
                   onDragStart={handleEventDragStart}
                   dragging={dragging}
                   draggingOther={movingEvent ? !dragging : false}
+                  isResizing={isResizing}
                   isSomeEventResizing={isEventResizing}
-                  resizeEventPreview={resizeEventPreview}
                   onStartResize={handleStartResizeEvent}
                 />
               </motion.div>
