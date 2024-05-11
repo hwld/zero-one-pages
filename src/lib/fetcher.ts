@@ -1,13 +1,13 @@
 type Resource = Parameters<typeof fetch>[0];
-type Options = Omit<RequestInit, "method" | "body"> & { body?: {} };
+export type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
 
-type Args = [Resource, Options?];
+type Args = [Resource, FetchOptions?];
 
 class Fetcher {
   private async fetch(
     method: string,
     resource: Resource,
-    options?: Options,
+    options?: FetchOptions,
   ): Promise<Response> {
     const body = options?.body && JSON.stringify(options.body);
 

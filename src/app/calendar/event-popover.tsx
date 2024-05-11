@@ -45,9 +45,9 @@ export const EventPopover: React.FC<Props> = ({
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
 
-  const deleteEventMutation = useDeleteEvent();
+  const deleteEvent = useDeleteEvent();
   const handleDelete = () => {
-    deleteEventMutation.mutate(event.id);
+    deleteEvent(event.id);
   };
 
   return (

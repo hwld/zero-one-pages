@@ -12,9 +12,11 @@ import * as RxToast from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { TbInfoCircle, TbX } from "react-icons/tb";
 
-type Toast = { id: string; title: string } & (
+type CloseFn = (option?: { withoutCallback: boolean }) => void;
+
+type Toast = { id: string; title: string; onClose?: () => void } & (
   | { action?: undefined }
-  | { action: (params: { close: () => void }) => void; actionText: string }
+  | { action: (params: { close: CloseFn }) => void; actionText: string }
 );
 // 普通にOmitを使うとkeyofで共有のプロパティしか返さないのでunion distributionを使ってすべてのkeyをリストアップできるようにする
 type CreateToastInput<T = Toast> = T extends unknown ? Omit<T, "id"> : never;
@@ -26,18 +28,31 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const toastState = useState<Toast[]>([]);
   const [toasts, setToasts] = toastState;
 
-  const closeToast = (id: string) => {
-    setToasts((toasts) => toasts.filter((t) => t.id !== id));
-  };
+  const closeToast = (toast: Toast, option?: { withoutCallback: boolean }) => {
+    setToasts((toasts) => toasts.filter((t) => t.id !== toast.id));
 
-  const handleOpenChange = (open: boolean, toast: Toast) => {
-    if (!open) {
-      closeToast(toast.id);
+    if (!option?.withoutCallback) {
+      toast.onClose?.();
     }
   };
 
+  const handleOpenChange = (open: boolean, toast: Toast) => {
+    if (open) {
+      return;
+    }
+    closeToast(toast);
+  };
+
+  const handleClickClose = (toast: Toast) => {
+    closeToast(toast);
+  };
+
   const handleClickAction = (toast: Toast) => {
-    toast.action?.({ close: () => closeToast(toast.id) });
+    toast.action?.({
+      close: (option?) => {
+        closeToast(toast, option);
+      },
+    });
   };
 
   return (
@@ -72,7 +87,7 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
                     <button
                       className="rounde grid size-6 place-items-center rounded transition-colors hover:bg-black/10"
                       onClick={() => {
-                        closeToast(toast.id);
+                        handleClickClose(toast);
                       }}
                     >
                       <TbX />
