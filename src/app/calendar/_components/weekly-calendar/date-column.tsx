@@ -66,6 +66,10 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
 
   const columnRef = useRef<HTMLDivElement>(null);
   const dateEvents = getDateEvents({ date, events: events });
+  const resizePreviewEvents = getDateEvents({
+    date,
+    events: resizeEventPreview ? [resizeEventPreview] : [],
+  }).filter((e) => !dateEvents.find((event) => event.id === e.id));
 
   const hours = useMemo(
     () =>
@@ -237,7 +241,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           />
         )}
         <AnimatePresence>
-          {dateEvents.map((event) => {
+          {[...dateEvents, ...resizePreviewEvents].map((event) => {
             const dragging = event.id === movingEvent?.id;
 
             return (

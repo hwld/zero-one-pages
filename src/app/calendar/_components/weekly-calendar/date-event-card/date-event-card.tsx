@@ -131,7 +131,11 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
             className="absolute inset-x-0 top-0 h-1 cursor-ns-resize"
             onMouseDown={handleResizeStartFromEventStart}
           />
-          <DateEventCardContent event={event} />
+          <DateEventCardContent
+            event={
+              resizeEventPreview?.id === event.id ? resizeEventPreview : event
+            }
+          />
           <div
             className="absolute inset-x-0 bottom-0 h-1 cursor-ns-resize"
             onMouseDown={handleResizeStartFromEventEnd}
