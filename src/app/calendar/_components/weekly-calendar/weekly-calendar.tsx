@@ -42,9 +42,10 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
 
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateEventEffect({ scrollableRef });
-  const { isEventMoving, movingEvent, moveEventActions } = useMoveEventEffect({
-    scrollableRef,
-  });
+  const { isEventMoving, moveEventPreview, moveEventActions } =
+    useMoveEventEffect({
+      scrollableRef,
+    });
   const { isEventResizing, resizeEventPreview, resizeEventActions } =
     useResizeEventEffect({
       scrollableRef,
@@ -57,7 +58,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
       prepareCreateEventActions.scroll(scrollTop);
     }
 
-    if (movingEvent) {
+    if (moveEventPreview) {
       moveEventActions.scroll(scrollTop);
     }
 
@@ -132,7 +133,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                   date={date}
                   events={defaultEvents}
                   isEventMoving={isEventMoving}
-                  movingEvent={movingEvent}
+                  moveEventPreview={moveEventPreview}
                   moveEventActions={moveEventActions}
                   prepareCreateEventState={prepareCreateEventState}
                   prepareCreateEventActions={prepareCreateEventActions}

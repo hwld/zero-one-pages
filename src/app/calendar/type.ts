@@ -19,7 +19,7 @@ export type DateEvent = Event & {
   totalOverlappings: number;
 };
 
-export type DraggingDateEvent = DateEvent & {
+export type MoveEventPreview = DateEvent & {
   prevMouseOverDate: Date;
   sourceDateEvent: DateEvent;
 };

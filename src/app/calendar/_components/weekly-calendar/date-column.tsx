@@ -8,7 +8,7 @@ import {
 import { NewEvent } from "./new-event";
 import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { DateEvent, DraggingDateEvent, ResizeEventPreview } from "../../type";
+import { DateEvent, MoveEventPreview, ResizeEventPreview } from "../../type";
 import { Event } from "../../_mocks/event-store";
 import {
   DateEventCard,
@@ -36,7 +36,7 @@ type Props = {
   events: Event[];
 
   isEventMoving: boolean;
-  movingEvent: DraggingDateEvent | undefined;
+  moveEventPreview: MoveEventPreview | undefined;
   moveEventActions: MoveEventActions;
 
   prepareCreateEventState: PrepareCreateEventState;
@@ -53,7 +53,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     date,
     events,
     isEventMoving,
-    movingEvent,
+    moveEventPreview,
     moveEventActions,
     prepareCreateEventState,
     prepareCreateEventActions,
@@ -74,8 +74,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         return resizeEventPreview;
       }
 
-      if (!isEventMoving && event.id === movingEvent?.id) {
-        return movingEvent;
+      if (!isEventMoving && event.id === moveEventPreview?.id) {
+        return moveEventPreview;
       }
 
       return event;
@@ -116,7 +116,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   };
 
   const updateMoveDest = (mouseY: number) => {
-    if (!movingEvent || !columnRef.current) {
+    if (!moveEventPreview || !columnRef.current) {
       return;
     }
 
@@ -146,7 +146,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       updateDragDateRangeForCreate(e.clientY);
     }
 
-    if (movingEvent) {
+    if (moveEventPreview) {
       updateMoveDest(e.clientY);
     }
 
@@ -237,9 +237,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         )}
         <AnimatePresence>
           {displayedDateEvents.map((event) => {
-            const isDragging = isEventMoving && movingEvent?.id === event.id;
-            const isResizing =
-              isEventResizing && resizeEventPreview?.id === event.id;
+            const isDragPreview = moveEventPreview?.id === event.id;
+            const isResizePreview = resizeEventPreview?.id === event.id;
+
+            const isDragging = isEventMoving && isDragPreview;
+            const isResizing = isEventResizing && isResizePreview;
 
             return (
               <motion.div
@@ -247,7 +249,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
                 <DateEventCard
-                  key={event.id}
                   displayedDate={date}
                   event={event}
                   isDragging={isDragging}
@@ -263,7 +264,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         </AnimatePresence>
         <DragPreviewDateEventCard
           date={date}
-          event={movingEvent}
+          event={moveEventPreview}
           isSomeEventMoving={isEventMoving}
         />
       </div>
