@@ -9,9 +9,9 @@ import { useEvents } from "./_queries/use-events";
 type CalendarType = "month" | "week";
 const Page = () => {
   const currentDate = useMinuteClock();
-  const { data: events = [] } = useEvents();
+  const { events } = useEvents();
 
-  const [type, setType] = useState<CalendarType>("month");
+  const [type, setType] = useState<CalendarType>("week");
 
   const calendar = useMemo(() => {
     switch (type) {

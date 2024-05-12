@@ -1,21 +1,58 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eventsQueryOption } from "./use-events";
 import { useToast } from "../_components/toast";
-import { useCallback } from "react";
+import {
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useState,
+  useContext,
+} from "react";
 import { deleteEvent } from "../_mocks/api";
 
-// TODO: 削除待機中に新しいイベントなどが作成されてrefetchされると、キャッシュの状態が更新されて
-// 削除したイベントが現れてしまう
+type _Context = [
+  pendingDeleteEventIds: string[],
+  setPendingDeleteEvents: Dispatch<SetStateAction<string[]>>,
+];
+const _Context = createContext<_Context | undefined>(undefined);
+
+const _usePendingDeleteEvents = () => {
+  const ctx = useContext(_Context);
+  if (!ctx) {
+    throw new Error("DeleteEventProviderが存在しません");
+  }
+
+  return ctx;
+};
+
+export const usePendingDeleteEvents = (): {
+  pendingDeleteEventIds: _Context[0];
+} => {
+  const ctx = _usePendingDeleteEvents();
+  return { pendingDeleteEventIds: ctx[0] };
+};
+
 export const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [_, setPendingDeleteEventIds] = _usePendingDeleteEvents();
 
   const { mutate: deleteEventMutate } = useMutation({
     mutationFn: (id: string) => {
       return deleteEvent(id);
     },
+    onSettled: async (_, __, id) => {
+      await queryClient.refetchQueries({
+        queryKey: eventsQueryOption.queryKey,
+      });
+      setPendingDeleteEventIds((pendingIds) =>
+        pendingIds.filter((pendingId) => pendingId !== id),
+      );
+    },
   });
 
-  const queryClient = useQueryClient();
   return useCallback(
     async (id: string) => {
       const queryKey = eventsQueryOption.queryKey;
@@ -29,17 +66,18 @@ export const useDeleteEvent = () => {
         return;
       }
 
-      queryClient.setQueryData(queryKey, (oldEvents) => {
-        return oldEvents && oldEvents.filter((event) => event.id !== id);
-      });
+      setPendingDeleteEventIds((pendingIds) => [
+        ...pendingIds.filter((pendingId) => pendingId !== deletedEvent.id),
+        deletedEvent.id,
+      ]);
 
       toast({
         title: "イベントを削除しました",
         actionText: "元に戻す",
         action: ({ close }) => {
-          queryClient.setQueryData(queryKey, (oldEvents) => {
-            return oldEvents ? [...oldEvents, deletedEvent] : [deletedEvent];
-          });
+          setPendingDeleteEventIds((pendingIds) =>
+            pendingIds.filter((pendingId) => pendingId !== deletedEvent.id),
+          );
           close({ withoutCallback: true });
         },
         onClose: () => {
@@ -47,6 +85,16 @@ export const useDeleteEvent = () => {
         },
       });
     },
-    [deleteEventMutate, queryClient, toast],
+    [deleteEventMutate, queryClient, setPendingDeleteEventIds, toast],
+  );
+};
+
+export const DeleteEventProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const pendingDeleteState = useState<string[]>([]);
+
+  return (
+    <_Context.Provider value={pendingDeleteState}>{children}</_Context.Provider>
   );
 };

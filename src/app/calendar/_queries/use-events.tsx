@@ -1,6 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { fetchEvents } from "../_mocks/api";
 import { useMswState } from "@/app/_providers/msw-provider";
+import { usePendingDeleteEvents } from "./use-delete-event";
 
 export const eventsQueryOption = queryOptions({
   queryKey: ["events"],
@@ -10,10 +11,17 @@ export const eventsQueryOption = queryOptions({
 });
 
 export const useEvents = () => {
+  const { pendingDeleteEventIds } = usePendingDeleteEvents();
   const { isMockserverUp } = useMswState();
 
-  return useQuery({
+  const { data: events = [] } = useQuery({
     ...eventsQueryOption,
     enabled: isMockserverUp,
   });
+
+  const filteredEvents = events.filter(
+    (e) => !pendingDeleteEventIds.includes(e.id),
+  );
+
+  return { events: filteredEvents };
 };
