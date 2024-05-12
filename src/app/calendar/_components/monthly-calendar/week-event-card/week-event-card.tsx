@@ -6,9 +6,9 @@ import { WeekEventCardBase, WeekEventCardContent } from "./base";
 type Props = {
   height: number;
   disablePointerEvents: boolean;
-  isDragging?: boolean;
   weekEvent: WeekEvent;
   topMargin?: number;
+  isDragging: boolean;
 } & Omit<ComponentPropsWithoutRef<"button">, "className">;
 
 export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
@@ -16,12 +16,12 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
     {
       height,
       disablePointerEvents,
-      isDragging = false,
       weekEvent,
       topMargin,
       onMouseDown,
       onMouseMove,
       onClick,
+      isDragging,
       ...props
     },
     ref,
@@ -64,8 +64,9 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
           onMouseMove={handleMouseMove}
           onClick={handleClick}
           {...props}
+          className={isDragging ? "opacity-50" : ""}
         >
-          <WeekEventCardContent weekEvent={weekEvent} isDragging={isDragging} />
+          <WeekEventCardContent weekEvent={weekEvent} isDragging={false} />
         </WeekEventCardBase>
       </EventPopover>
     );

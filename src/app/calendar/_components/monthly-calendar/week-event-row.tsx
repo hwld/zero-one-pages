@@ -4,7 +4,6 @@ import { Event } from "../../_mocks/event-store";
 import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { useMergedRef } from "@mantine/hooks";
-import clsx from "clsx";
 import { useMoveEvent } from "./move-event-provider";
 import { PrepareCreateEventActions } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
@@ -33,7 +32,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
     },
     _ref,
   ) {
-    const { moveEventPreview, moveEventActions } = useMoveEvent();
+    const { isEventMoving, moveEventPreview, moveEventActions } =
+      useMoveEvent();
 
     const rowRef = useRef<HTMLDivElement>(null);
     const ref = useMergedRef(_ref, rowRef);
@@ -90,20 +90,20 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       >
         <AnimatePresence>
           {weekEvents.map((event) => {
+            const isDragPreview = moveEventPreview?.event.id === event.id;
+
+            const isDragging = isEventMoving && isDragPreview;
+
             return (
               <motion.div
                 key={event.id}
-                className={clsx(
-                  moveEventPreview?.event.id === event.id && "opacity-50",
-                )}
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
                 <WeekEventCard
+                  isDragging={isDragging}
                   topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                   height={MONTHLY_EVENT_ROW_SIZE}
-                  disablePointerEvents={
-                    !!isDraggingForCreate || !!moveEventPreview
-                  }
+                  disablePointerEvents={isDraggingForCreate || isEventMoving}
                   weekEvent={event}
                   onMouseDown={(e) => e.stopPropagation()}
                   draggable
@@ -129,19 +129,19 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={!!isDraggingForCreate || !!moveEventPreview}
+              disablePointerEvents={isDraggingForCreate || isEventMoving}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );
         })}
-        {moveEventPreview ? (
+        {isEventMoving && moveEventPreview && (
           <DragPreviewWeekEventsCard
             week={week}
             draggingEvent={moveEventPreview}
             topMargin={MONTHLY_DATE_HEADER_HEIGHT}
             height={MONTHLY_EVENT_ROW_SIZE}
           />
-        ) : null}
+        )}
       </div>
     );
   },

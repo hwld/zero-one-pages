@@ -10,12 +10,13 @@ import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
 import { addMonths, subMonths } from "date-fns";
 import { NavigationButton } from "../navigation-button";
-import { MoveEventProvider } from "./move-event-provider";
+import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
 import {
   PrepareCreateEventProvider,
   usePrepareCreateEvent,
 } from "./prepare-create-event-provider";
+import { getEventFromDraggingEvent } from "../utils";
 
 type Props = {
   currentDate: Date;
@@ -72,6 +73,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
     };
   }, [yearMonth]);
 
+  const { isEventMoving, moveEventPreview } = useMoveEvent();
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateEvent();
 
@@ -100,7 +102,16 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
         </div>
         <div className="grid">
           {calendar.map((week, i) => {
-            const weekEvents = getWeekEvents({ week, events });
+            const weekEvents = getWeekEvents({
+              week,
+              events: events.map((event): Event => {
+                if (!isEventMoving && moveEventPreview?.event.id === event.id) {
+                  return getEventFromDraggingEvent(moveEventPreview);
+                }
+
+                return event;
+              }),
+            });
 
             const filteredWeekEvents = weekEvents.filter(
               (event) => event.top < eventLimit,

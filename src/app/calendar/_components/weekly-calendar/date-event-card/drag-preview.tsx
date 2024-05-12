@@ -7,16 +7,12 @@ import { areIntervalsOverlapping, endOfDay, startOfDay } from "date-fns";
 
 type Props = {
   date: Date;
-  event: DateEvent | undefined;
-  isSomeEventMoving: boolean;
+  event: DateEvent;
 };
 
 export const DragPreviewDateEventCard = forwardRef<HTMLButtonElement, Props>(
-  function DragPreviewDateEventCard({ date, event, isSomeEventMoving }, ref) {
+  function DragPreviewDateEventCard({ date, event }, ref) {
     const style = useMemo(() => {
-      if (!event || !isSomeEventMoving) {
-        return { display: "none" };
-      }
       if (
         event &&
         !areIntervalsOverlapping(event, {
@@ -31,12 +27,14 @@ export const DragPreviewDateEventCard = forwardRef<HTMLButtonElement, Props>(
       const height = event && getHeightFromInterval(event, date);
 
       return { top, height };
-    }, [date, event, isSomeEventMoving]);
+    }, [date, event]);
 
     return (
       <DateEventCardBase
         ref={ref}
-        className={clsx("pointer-events-none z-20 w-full bg-neutral-800")}
+        className={clsx(
+          "pointer-events-none z-20 w-full bg-neutral-800 ring ring-blue-500",
+        )}
         style={style}
       >
         {event && <DateEventCardContent event={event} />}

@@ -259,11 +259,9 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             );
           })}
         </AnimatePresence>
-        <DragPreviewDateEventCard
-          date={date}
-          event={moveEventPreview}
-          isSomeEventMoving={isEventMoving}
-        />
+        {isEventMoving && moveEventPreview && (
+          <DragPreviewDateEventCard date={date} event={moveEventPreview} />
+        )}
       </div>
     </div>
   );

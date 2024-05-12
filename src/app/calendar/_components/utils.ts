@@ -39,6 +39,7 @@ export const areDragDateRangeOverlapping = (
   );
 };
 
+// TODO: rename
 export type DraggingEvent = {
   event: Event;
 } & DragDateRange;

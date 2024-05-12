@@ -22,6 +22,7 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
       startWeekDay,
       children,
       topMargin = 0,
+      className,
       ...props
     },
     ref,
@@ -33,6 +34,7 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
         className={clsx(
           "group absolute select-none pb-[1px] text-sm text-neutral-100 focus-visible:outline-none",
           disablePointerEvents ? "pointer-events-none" : "pointer-events-auto",
+          className,
         )}
         style={{
           height: `${height}px`,

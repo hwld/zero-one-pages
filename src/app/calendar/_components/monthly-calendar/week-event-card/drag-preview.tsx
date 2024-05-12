@@ -1,8 +1,7 @@
 import { forwardRef, useMemo } from "react";
 import { WeekEvent } from "../../../type";
 import { WeekEventCardBase, WeekEventCardContent } from "./base";
-import { DraggingEvent } from "../../utils";
-import { differenceInDays, addDays } from "date-fns";
+import { DraggingEvent, getEventFromDraggingEvent } from "../../utils";
 import { convertEventToWeekEvent } from "../utils";
 
 type Props = {
@@ -15,15 +14,7 @@ type Props = {
 export const DragPreviewWeekEventsCard = forwardRef<HTMLButtonElement, Props>(
   function WeekEventCard({ week, draggingEvent, topMargin = 0, height }, ref) {
     const weekEvent: WeekEvent | undefined = useMemo(() => {
-      const { event, dragStartDate, dragEndDate } = draggingEvent;
-
-      const diffDay = differenceInDays(dragEndDate, dragStartDate);
-      const newEvent = {
-        ...event,
-        start: addDays(event.start, diffDay),
-        end: addDays(event.end, diffDay),
-      };
-
+      const newEvent = getEventFromDraggingEvent(draggingEvent);
       return convertEventToWeekEvent(newEvent, { top: 0, week });
     }, [draggingEvent, week]);
 
@@ -42,7 +33,6 @@ export const DragPreviewWeekEventsCard = forwardRef<HTMLButtonElement, Props>(
           range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
           top={weekEvent.top}
         >
-          {" "}
           <WeekEventCardContent weekEvent={weekEvent} isDragging={true} />
         </WeekEventCardBase>
       </div>

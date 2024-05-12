@@ -11,6 +11,7 @@ import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
 import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
 import { useMoveEvent } from "../monthly-calendar/move-event-provider";
+import { getEventFromDraggingEvent } from "../utils";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -25,12 +26,22 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   week,
   longTermEvents,
 }) => {
+  const { isEventMoving, moveEventPreview } = useMoveEvent();
+
   const [expanded, setExpanded] = useState(false);
-  const weekLongTermEvents = getWeekEvents({ week, events: longTermEvents });
+  const weekLongTermEvents = getWeekEvents({
+    week,
+    events: longTermEvents.map((event) => {
+      if (!isEventMoving && moveEventPreview?.event.id === event.id) {
+        return getEventFromDraggingEvent(moveEventPreview);
+      }
+
+      return event;
+    }),
+  });
 
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateEvent();
-  const { moveEventPreview, moveEventActions } = useMoveEvent();
 
   return (
     <>
@@ -92,10 +103,6 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
           weekLongTermEvents={weekLongTermEvents}
           expanded={expanded}
           onChangeExpand={setExpanded}
-          moveEventPreview={moveEventPreview}
-          moveEventActions={moveEventActions}
-          prepareCreateEventState={prepareCreateEventState}
-          prepareCreateEventActions={prepareCreateEventActions}
         />
       </div>
       <CreateEventFormDialog
