@@ -21,6 +21,7 @@ export type DateEvent = Event & {
 
 export type DraggingDateEvent = DateEvent & {
   prevMouseOverDate: Date;
+  sourceDateEvent: DateEvent;
 };
 
 export type ResizeEventPreview = DateEvent & {

@@ -43,6 +43,7 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
       setMovingEvent({
         ...event,
         prevMouseOverDate: moveStartDate,
+        sourceDateEvent: event,
       });
     },
     [scrollableRef],

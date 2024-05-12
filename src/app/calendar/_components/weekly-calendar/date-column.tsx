@@ -1,5 +1,4 @@
 import {
-  areIntervalsOverlapping,
   differenceInMinutes,
   eachHourOfInterval,
   endOfDay,
@@ -35,6 +34,8 @@ type Props = {
   currentDate: Date;
   date: Date;
   events: Event[];
+
+  isEventMoving: boolean;
   movingEvent: DraggingDateEvent | undefined;
   moveEventActions: MoveEventActions;
 
@@ -51,6 +52,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     currentDate,
     date,
     events,
+    isEventMoving,
     movingEvent,
     moveEventActions,
     prepareCreateEventState,
@@ -71,6 +73,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       if (event.id === resizeEventPreview?.id) {
         return resizeEventPreview;
       }
+
+      if (!isEventMoving && event.id === movingEvent?.id) {
+        return movingEvent;
+      }
+
       return event;
     }),
   });
@@ -109,7 +116,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   };
 
   const updateMoveDest = (mouseY: number) => {
-    if (!movingEvent || !dropPreviewRef.current || !columnRef.current) {
+    if (!movingEvent || !columnRef.current) {
       return;
     }
 
@@ -148,8 +155,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     }
   };
 
-  const dropPreviewRef = useRef<HTMLButtonElement>(null);
-
   const handleEventDragStart = (
     event: React.DragEvent,
     dateEvent: DateEvent,
@@ -175,20 +180,6 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     const y = e.clientY - columnRef.current.getBoundingClientRect().y;
     resizeEventActions.startResize({ event, origin, y });
   };
-
-  const isDragPreviewVisible = useMemo(() => {
-    if (!movingEvent) {
-      return false;
-    }
-
-    return areIntervalsOverlapping(
-      {
-        start: startOfDay(date),
-        end: endOfDay(date),
-      },
-      movingEvent,
-    );
-  }, [movingEvent, date]);
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -246,7 +237,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         )}
         <AnimatePresence>
           {displayedDateEvents.map((event) => {
-            const dragging = event.id === movingEvent?.id;
+            const isDragging = isEventMoving && movingEvent?.id === event.id;
             const isResizing =
               isEventResizing && resizeEventPreview?.id === event.id;
 
@@ -259,11 +250,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
                   key={event.id}
                   displayedDate={date}
                   event={event}
+                  isDragging={isDragging}
+                  isOtherEventDragging={isEventMoving ? !isDragging : false}
                   onDragStart={handleEventDragStart}
-                  dragging={dragging}
-                  draggingOther={movingEvent ? !dragging : false}
                   isResizing={isResizing}
-                  isSomeEventResizing={isEventResizing}
+                  isOtherEventResizing={isEventResizing ? !isResizing : false}
                   onStartResize={handleStartResizeEvent}
                 />
               </motion.div>
@@ -272,9 +263,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
         </AnimatePresence>
         <DragPreviewDateEventCard
           date={date}
-          ref={dropPreviewRef}
           event={movingEvent}
-          visible={isDragPreviewVisible}
+          isSomeEventMoving={isEventMoving}
         />
       </div>
     </div>

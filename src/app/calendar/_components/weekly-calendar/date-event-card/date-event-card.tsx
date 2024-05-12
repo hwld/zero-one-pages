@@ -16,12 +16,13 @@ export type DateEventCardProps = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
   displayedDate: Date;
   event: DateEvent;
-  dragging: boolean;
-  draggingOther: boolean;
+
+  isDragging: boolean;
+  isOtherEventDragging: boolean;
   onDragStart: (e: React.DragEvent, event: DateEvent) => void;
 
-  isSomeEventResizing: boolean;
   isResizing: boolean;
+  isOtherEventResizing: boolean;
   onStartResize: (
     e: React.MouseEvent,
     params: { event: DateEvent; origin: ResizeEventPreview["origin"] },
@@ -33,18 +34,16 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
     {
       event,
       displayedDate,
-      dragging,
-      draggingOther,
+      isOtherEventDragging,
       onDragStart,
-      isSomeEventResizing,
+      isDragging,
+      isOtherEventResizing,
       isResizing,
       onStartResize,
     },
     ref,
   ) {
-    const isOtherEventResizing = isSomeEventResizing ? !isResizing : false;
-
-    const isInteractive = !draggingOther && !isOtherEventResizing;
+    const isInteractive = !isOtherEventDragging && !isOtherEventResizing;
 
     const style = useMemo(() => {
       const base = calcDateEventCardStyle({ event, displayedDate });
@@ -110,7 +109,7 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
           style={style}
           className={clsx(
             isInteractive && "hover:z-10 hover:bg-neutral-800",
-            dragging ? "opacity-50" : "opacity-100",
+            isDragging && "opacity-50",
           )}
         >
           <div
