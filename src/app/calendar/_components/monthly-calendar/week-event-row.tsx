@@ -3,11 +3,10 @@ import { WeekEvent } from "../../type";
 import { Event } from "../../_mocks/event-store";
 import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { DraggingEvent } from "../utils";
 import { useMergedRef } from "@mantine/hooks";
 import clsx from "clsx";
-import { MoveEventActions } from "./use-move-event-effect";
-import { PrepareCreateEventActions } from "./use-prepare-create-event-effect";
+import { useMoveEvent } from "./move-event-provider";
+import { PrepareCreateEventActions } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { WeekEventCard } from "./week-event-card/week-event-card";
 import { DragPreviewWeekEventsCard } from "./week-event-card/drag-preview";
@@ -20,8 +19,6 @@ type Props = {
   exceededEventCountMap: Map<number, number>;
   isDraggingForCreate: boolean;
   prepareCreateEventActions: PrepareCreateEventActions;
-  movingEvent: DraggingEvent | undefined;
-  moveEventActions: MoveEventActions;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -33,11 +30,11 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       exceededEventCountMap,
       isDraggingForCreate,
       prepareCreateEventActions,
-      movingEvent,
-      moveEventActions,
     },
     _ref,
   ) {
+    const { moveEventPreview, moveEventActions } = useMoveEvent();
+
     const rowRef = useRef<HTMLDivElement>(null);
     const ref = useMergedRef(_ref, rowRef);
 
@@ -68,7 +65,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
         prepareCreateEventActions.updateDragEnd(date);
       }
 
-      if (movingEvent) {
+      if (moveEventPreview) {
         moveEventActions.updateMoveEnd(date);
       }
     };
@@ -97,14 +94,16 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               <motion.div
                 key={event.id}
                 className={clsx(
-                  movingEvent?.event.id === event.id && "opacity-50",
+                  moveEventPreview?.event.id === event.id && "opacity-50",
                 )}
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
                 <WeekEventCard
                   topMargin={MONTHLY_DATE_HEADER_HEIGHT}
                   height={MONTHLY_EVENT_ROW_SIZE}
-                  disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
+                  disablePointerEvents={
+                    !!isDraggingForCreate || !!moveEventPreview
+                  }
                   weekEvent={event}
                   onMouseDown={(e) => e.stopPropagation()}
                   draggable
@@ -130,15 +129,15 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
-              disablePointerEvents={!!isDraggingForCreate || !!movingEvent}
+              disablePointerEvents={!!isDraggingForCreate || !!moveEventPreview}
               height={MONTHLY_EVENT_ROW_SIZE}
             />
           );
         })}
-        {movingEvent ? (
+        {moveEventPreview ? (
           <DragPreviewWeekEventsCard
             week={week}
-            draggingEvent={movingEvent}
+            draggingEvent={moveEventPreview}
             topMargin={MONTHLY_DATE_HEADER_HEIGHT}
             height={MONTHLY_EVENT_ROW_SIZE}
           />

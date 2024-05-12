@@ -7,7 +7,7 @@ import {
 } from "date-fns";
 import { isDayWithinDragDateRange } from "../utils";
 import clsx from "clsx";
-import { PrepareCreateEventState } from "./use-prepare-create-event-effect";
+import { PrepareCreateEventState } from "./prepare-create-event-provider";
 
 export const MONTHLY_DATE_HEADER_HEIGHT = 32;
 

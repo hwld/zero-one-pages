@@ -19,6 +19,7 @@ export type DateEvent = Event & {
   totalOverlappings: number;
 };
 
+// TODO: weekly-calendarでしかつかってない。
 export type MoveEventPreview = DateEvent & {
   prevMouseOverDate: Date;
   updatedAt: number;

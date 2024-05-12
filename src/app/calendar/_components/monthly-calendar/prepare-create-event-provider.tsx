@@ -5,6 +5,9 @@ import {
   useState,
   Dispatch,
   useEffect,
+  useContext,
+  createContext,
+  PropsWithChildren,
 } from "react";
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../../_mocks/api";
@@ -25,7 +28,26 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-export const usePrepareCreateEventEffect = () => {
+type PrepareCreateEventContext = {
+  prepareCreateEventState: PrepareCreateEventState;
+  prepareCreateEventActions: PrepareCreateEventActions;
+};
+
+const Context = createContext<PrepareCreateEventContext | undefined>(undefined);
+
+export const usePrepareCreateEvent = (): PrepareCreateEventContext => {
+  const ctx = useContext(Context);
+  if (!ctx) {
+    throw new Error("PrepareCreateEventProviderが存在しません");
+  }
+  return ctx;
+};
+
+// TODO:　各操作のProviderがweekly-calendarとmonthly-calendar毎に存在しているが、weekly-calendarのlong-term-event-rowではmonthly-calendarのProviderを使用したいので、カレンダー単位ではなくイベントの型で分けたい
+// DateEventとWeekEventで分けられる？
+export const PrepareCreateEventProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
@@ -77,16 +99,6 @@ export const usePrepareCreateEventEffect = () => {
     return { dragDateRange, defaultCreateEventValues };
   }, [defaultCreateEventValues, dragDateRange]);
 
-  const prepareCreateEventActions: PrepareCreateEventActions = useMemo(() => {
-    return {
-      setDragDateRange,
-      startDrag,
-      updateDragEnd,
-      setDefaultValues,
-      clearState,
-    };
-  }, [clearState, setDefaultValues, startDrag, updateDragEnd]);
-
   useEffect(() => {
     const openCreateEventDialog = (event: MouseEvent) => {
       if (event.button === 0) {
@@ -100,5 +112,25 @@ export const usePrepareCreateEventEffect = () => {
     };
   }, [setDefaultValues]);
 
-  return { prepareCreateEventState, prepareCreateEventActions };
+  const value: PrepareCreateEventContext = useMemo(
+    () => ({
+      prepareCreateEventState,
+      prepareCreateEventActions: {
+        setDragDateRange,
+        startDrag,
+        updateDragEnd,
+        setDefaultValues,
+        clearState,
+      },
+    }),
+    [
+      clearState,
+      prepareCreateEventState,
+      setDefaultValues,
+      startDrag,
+      updateDragEnd,
+    ],
+  );
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
