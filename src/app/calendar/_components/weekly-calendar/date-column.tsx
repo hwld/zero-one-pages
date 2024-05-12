@@ -49,13 +49,30 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   const columnRef = useRef<HTMLDivElement>(null);
   const displayedDateEvents = getDateEvents({
     date,
+    // 楽観的更新をUIレベルで実装する。
     events: events.map((event): Event => {
-      if (event.id === resizeEventPreview?.id) {
-        return resizeEventPreview;
+      const resizePreviewVisible = event.id === resizeEventPreview?.id;
+      const movePreviewVisible =
+        !isEventMoving && event.id === moveEventPreview?.id;
+
+      if (isEventMoving && event.id === moveEventPreview?.id) {
+        return event;
       }
 
-      if (!isEventMoving && event.id === moveEventPreview?.id) {
+      if (resizePreviewVisible && movePreviewVisible) {
+        if (resizeEventPreview.updatedAt > moveEventPreview.updatedAt) {
+          return resizeEventPreview;
+        } else {
+          return moveEventPreview;
+        }
+      }
+
+      if (movePreviewVisible) {
         return moveEventPreview;
+      }
+
+      if (resizePreviewVisible) {
+        return resizeEventPreview;
       }
 
       return event;

@@ -46,9 +46,12 @@ export const ResizeEventProvider: React.FC<
 > = ({ scrollableRef, children }) => {
   const updateEventMutation = useUpdateEvent();
 
-  const [resizeEventPreview, setResizeEventPreview] =
-    useState<ResizeEventPreview>();
-  const [isEventResizing, setIsEventResizing] = useState(false);
+  const [state, setState] = useState<{
+    isEventResizing: boolean;
+    resizeEventPreview: ResizeEventPreview | undefined;
+  }>({ isEventResizing: false, resizeEventPreview: undefined });
+
+  const { resizeEventPreview, isEventResizing } = state;
 
   const mouseHistoryRef = useRef<MouseHistory>();
 
@@ -61,8 +64,14 @@ export const ResizeEventProvider: React.FC<
         };
       }
 
-      setIsEventResizing(true);
-      setResizeEventPreview({ ...event, origin });
+      setState({
+        isEventResizing: true,
+        resizeEventPreview: {
+          ...event,
+          origin,
+          updatedAt: Date.now(),
+        },
+      });
     },
     [scrollableRef],
   );
@@ -89,17 +98,25 @@ export const ResizeEventProvider: React.FC<
           }
 
           if (isBefore(resizeDest, resizeEventPreview.start)) {
-            setResizeEventPreview({
-              ...resizeEventPreview,
-              origin: "eventEnd",
-              start: resizeDest,
-              end: resizeEventPreview.start,
-            });
+            setState((prev) => ({
+              ...prev,
+              resizeEventPreview: {
+                ...resizeEventPreview,
+                origin: "eventEnd",
+                start: resizeDest,
+                end: resizeEventPreview.start,
+                updatedAt: Date.now(),
+              },
+            }));
           } else {
-            setResizeEventPreview({
-              ...resizeEventPreview,
-              end: resizeDest,
-            });
+            setState((prev) => ({
+              ...prev,
+              resizeEventPreview: {
+                ...resizeEventPreview,
+                end: resizeDest,
+                updatedAt: Date.now(),
+              },
+            }));
           }
           return;
         }
@@ -109,17 +126,25 @@ export const ResizeEventProvider: React.FC<
           }
 
           if (isAfter(resizeDest, resizeEventPreview.end)) {
-            setResizeEventPreview({
-              ...resizeEventPreview,
-              origin: "eventStart",
-              start: resizeEventPreview.end,
-              end: resizeDest,
-            });
+            setState((prev) => ({
+              ...prev,
+              resizeEventPreview: {
+                ...resizeEventPreview,
+                origin: "eventStart",
+                start: resizeEventPreview.end,
+                end: resizeDest,
+                updatedAt: Date.now(),
+              },
+            }));
           } else {
-            setResizeEventPreview({
-              ...resizeEventPreview,
-              start: resizeDest,
-            });
+            setState((prev) => ({
+              ...prev,
+              resizeEventPreview: {
+                ...resizeEventPreview,
+                start: resizeDest,
+                updatedAt: Date.now(),
+              },
+            }));
           }
           return;
         }
@@ -157,10 +182,16 @@ export const ResizeEventProvider: React.FC<
 
     updateEventMutation.mutate(resizeEventPreview, {
       onSettled: () => {
-        setResizeEventPreview(undefined);
+        setState((prev) => {
+          if (prev.isEventResizing) {
+            return prev;
+          }
+
+          return { ...prev, resizeEventPreview: undefined };
+        });
       },
     });
-    setIsEventResizing(false);
+    setState((prev) => ({ ...prev, isEventResizing: false }));
   }, [resizeEventPreview, updateEventMutation]);
 
   useEffect(() => {

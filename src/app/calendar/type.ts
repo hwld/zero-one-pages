@@ -21,9 +21,10 @@ export type DateEvent = Event & {
 
 export type MoveEventPreview = DateEvent & {
   prevMouseOverDate: Date;
-  sourceDateEvent: DateEvent;
+  updatedAt: number;
 };
 
 export type ResizeEventPreview = DateEvent & {
   origin: "eventStart" | "eventEnd";
+  updatedAt: number;
 };

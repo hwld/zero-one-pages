@@ -42,8 +42,12 @@ export const MoveEventProvider: React.FC<
 > = ({ scrollableRef, children }) => {
   const updateEventMutation = useUpdateEvent();
 
-  const [moveEventPreview, setMoveEventPreview] = useState<MoveEventPreview>();
-  const [isEventMoving, setIsEventMoving] = useState(false);
+  const [state, setState] = useState<{
+    isEventMoving: boolean;
+    moveEventPreview: MoveEventPreview | undefined;
+  }>({ isEventMoving: false, moveEventPreview: undefined });
+
+  const { isEventMoving, moveEventPreview } = state;
 
   const mouseHistoryRef = useRef<MouseHistory>();
 
@@ -58,11 +62,13 @@ export const MoveEventProvider: React.FC<
 
       const moveStartDate = getDateFromY(date, y);
 
-      setIsEventMoving(true);
-      setMoveEventPreview({
-        ...event,
-        prevMouseOverDate: moveStartDate,
-        sourceDateEvent: event,
+      setState({
+        isEventMoving: true,
+        moveEventPreview: {
+          ...event,
+          prevMouseOverDate: moveStartDate,
+          updatedAt: Date.now(),
+        },
       });
     },
     [scrollableRef],
@@ -91,12 +97,16 @@ export const MoveEventProvider: React.FC<
         moveEventPreview.prevMouseOverDate,
       );
 
-      setMoveEventPreview({
-        ...moveEventPreview,
-        start: addMinutes(moveEventPreview.start, diffMinutes),
-        end: addMinutes(moveEventPreview.end, diffMinutes),
-        prevMouseOverDate: moveDest,
-      });
+      setState((prev) => ({
+        ...prev,
+        moveEventPreview: {
+          ...moveEventPreview,
+          start: addMinutes(moveEventPreview.start, diffMinutes),
+          end: addMinutes(moveEventPreview.end, diffMinutes),
+          prevMouseOverDate: moveDest,
+          updatedAt: Date.now(),
+        },
+      }));
     },
     [isEventMoving, moveEventPreview, scrollableRef],
   );
@@ -122,10 +132,16 @@ export const MoveEventProvider: React.FC<
 
     updateEventMutation.mutate(moveEventPreview, {
       onSettled: () => {
-        setMoveEventPreview(undefined);
+        setState((prev) => {
+          if (prev.isEventMoving) {
+            return prev;
+          }
+          return { ...prev, moveEventPreview: undefined };
+        });
       },
     });
-    setIsEventMoving(false);
+
+    setState((prev) => ({ ...prev, isEventMoving: false }));
   }, [moveEventPreview, updateEventMutation]);
 
   useEffect(() => {
