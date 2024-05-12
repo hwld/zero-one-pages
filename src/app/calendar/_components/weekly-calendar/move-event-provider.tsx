@@ -1,6 +1,9 @@
 import {
+  PropsWithChildren,
   RefObject,
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -11,16 +14,32 @@ import { DateEvent, MoveEventPreview } from "../../type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
 import { MouseHistory, getDateFromY } from "./utils";
 
-export type MoveEventActions = {
+type MoveEventActions = {
   startMove: (event: DateEvent, moveStart: { date: Date; y: number }) => void;
   updateMoveDest: (day: Date, y: number) => void;
   scroll: (scrollTop: number) => void;
   move: () => void;
 };
 
-type Params = { scrollableRef: RefObject<HTMLElement> };
+type MoveEventContext = {
+  isEventMoving: boolean;
+  moveEventPreview: MoveEventPreview | undefined;
+  moveEventActions: MoveEventActions;
+};
 
-export const useMoveEventEffect = ({ scrollableRef }: Params) => {
+const Context = createContext<MoveEventContext | undefined>(undefined);
+
+export const useMoveEvent = (): MoveEventContext => {
+  const ctx = useContext(Context);
+  if (!ctx) {
+    throw new Error("MoveEventProviderが存在しません");
+  }
+  return ctx;
+};
+
+export const MoveEventProvider: React.FC<
+  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
+> = ({ scrollableRef, children }) => {
   const updateEventMutation = useUpdateEvent();
 
   const [moveEventPreview, setMoveEventPreview] = useState<MoveEventPreview>();
@@ -109,10 +128,6 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
     setIsEventMoving(false);
   }, [moveEventPreview, updateEventMutation]);
 
-  const moveEventActions = useMemo((): MoveEventActions => {
-    return { startMove, updateMoveDest, scroll, move };
-  }, [startMove, updateMoveDest, scroll, move]);
-
   useEffect(() => {
     const moveEvent = (e: MouseEvent) => {
       if (e.button === 0) {
@@ -126,9 +141,20 @@ export const useMoveEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [move]);
 
-  return {
+  const value: MoveEventContext = useMemo(() => {
+    return {
+      isEventMoving,
+      moveEventPreview,
+      moveEventActions: { startMove, updateMoveDest, scroll, move },
+    };
+  }, [
     isEventMoving,
+    move,
     moveEventPreview,
-    moveEventActions,
-  };
+    scroll,
+    startMove,
+    updateMoveDest,
+  ]);
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };

@@ -8,7 +8,7 @@ import {
 import { NewEvent } from "./new-event";
 import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { DateEvent, MoveEventPreview, ResizeEventPreview } from "../../type";
+import { DateEvent } from "../../type";
 import { Event } from "../../_mocks/event-store";
 import {
   DateEventCard,
@@ -16,13 +16,10 @@ import {
 } from "./date-event-card/date-event-card";
 import { areDragDateRangeOverlapping } from "../utils";
 import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
-import { MoveEventActions } from "./use-move-event-effect";
-import { ResizeEventActions } from "./use-resize-event-effect";
-import {
-  PrepareCreateEventActions,
-  PrepareCreateEventState,
-} from "./use-prepare-create-event-effect";
+import { useMoveEvent } from "./move-event-provider";
+import { useResizeEvent } from "./resize-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePrepareCreateEvent } from "./prepare-create-event-provider";
 
 export type EventCreationDragData = {
   targetDate: Date;
@@ -34,35 +31,18 @@ type Props = {
   currentDate: Date;
   date: Date;
   events: Event[];
-
-  isEventMoving: boolean;
-  moveEventPreview: MoveEventPreview | undefined;
-  moveEventActions: MoveEventActions;
-
-  prepareCreateEventState: PrepareCreateEventState;
-  prepareCreateEventActions: PrepareCreateEventActions;
-
-  isEventResizing: boolean;
-  resizeEventPreview: ResizeEventPreview | undefined;
-  resizeEventActions: ResizeEventActions;
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
-  {
-    currentDate,
-    date,
-    events,
-    isEventMoving,
-    moveEventPreview,
-    moveEventActions,
-    prepareCreateEventState,
-    prepareCreateEventActions,
-    isEventResizing,
-    resizeEventPreview,
-    resizeEventActions,
-  },
+  { currentDate, date, events },
   ref,
 ) {
+  const { prepareCreateEventState, prepareCreateEventActions } =
+    usePrepareCreateEvent();
+  const { isEventResizing, resizeEventActions, resizeEventPreview } =
+    useResizeEvent();
+  const { isEventMoving, moveEventActions, moveEventPreview } = useMoveEvent();
+
   const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
   const isDraggingForCreate = dragDateRangeForCreate !== undefined;
 

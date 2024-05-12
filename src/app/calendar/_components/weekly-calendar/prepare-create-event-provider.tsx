@@ -7,6 +7,9 @@ import {
   RefObject,
   useRef,
   useEffect,
+  createContext,
+  useContext,
+  PropsWithChildren,
 } from "react";
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../../_mocks/api";
@@ -29,9 +32,24 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-type Params = { scrollableRef: RefObject<HTMLElement> };
+type PrepareCreateEventContext = {
+  prepareCreateEventState: PrepareCreateEventState;
+  prepareCreateEventActions: PrepareCreateEventActions;
+};
 
-export const usePrepareCreateEventEffect = ({ scrollableRef }: Params) => {
+const Context = createContext<PrepareCreateEventContext | undefined>(undefined);
+
+export const usePrepareCreateEvent = (): PrepareCreateEventContext => {
+  const ctx = useContext(Context);
+  if (!ctx) {
+    throw new Error("PrepareCreateEventProviderが存在しません");
+  }
+  return ctx;
+};
+
+export const PrepareCreateEventProvider: React.FC<
+  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
+> = ({ scrollableRef, children }) => {
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
@@ -129,17 +147,6 @@ export const usePrepareCreateEventEffect = ({ scrollableRef }: Params) => {
     return { dragDateRange, defaultCreateEventValues };
   }, [defaultCreateEventValues, dragDateRange]);
 
-  const prepareCreateEventActions: PrepareCreateEventActions = useMemo(() => {
-    return {
-      setDragDateRange,
-      startDrag,
-      updateDragEnd,
-      scroll,
-      setDefaultValues,
-      clearState,
-    };
-  }, [clearState, scroll, setDefaultValues, startDrag, updateDragEnd]);
-
   useEffect(() => {
     const openCreateEventDialog = (e: MouseEvent) => {
       if (e.button === 0) {
@@ -153,5 +160,27 @@ export const usePrepareCreateEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [setDefaultValues]);
 
-  return { prepareCreateEventState, prepareCreateEventActions };
+  const value: PrepareCreateEventContext = useMemo(
+    () => ({
+      prepareCreateEventState,
+      prepareCreateEventActions: {
+        setDragDateRange,
+        startDrag,
+        updateDragEnd,
+        scroll,
+        setDefaultValues,
+        clearState,
+      },
+    }),
+    [
+      clearState,
+      prepareCreateEventState,
+      scroll,
+      setDefaultValues,
+      startDrag,
+      updateDragEnd,
+    ],
+  );
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };

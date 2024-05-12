@@ -1,6 +1,9 @@
 import {
+  PropsWithChildren,
   RefObject,
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -11,7 +14,7 @@ import { useUpdateEvent } from "../../_queries/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import { MouseHistory, getDateFromY } from "./utils";
 
-export type ResizeEventActions = {
+type ResizeEventActions = {
   startResize: (params: {
     event: DateEvent;
     origin: ResizeEventPreview["origin"];
@@ -22,9 +25,25 @@ export type ResizeEventActions = {
   resize: () => void;
 };
 
-type Params = { scrollableRef: RefObject<HTMLElement> };
+type ResizeEventContext = {
+  isEventResizing: boolean;
+  resizeEventPreview: ResizeEventPreview | undefined;
+  resizeEventActions: ResizeEventActions;
+};
 
-export const useResizeEventEffect = ({ scrollableRef }: Params) => {
+const Context = createContext<ResizeEventContext | undefined>(undefined);
+
+export const useResizeEvent = (): ResizeEventContext => {
+  const ctx = useContext(Context);
+  if (!ctx) {
+    throw new Error("ResizeEventProviderが存在しません");
+  }
+  return ctx;
+};
+
+export const ResizeEventProvider: React.FC<
+  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
+> = ({ scrollableRef, children }) => {
   const updateEventMutation = useUpdateEvent();
 
   const [resizeEventPreview, setResizeEventPreview] =
@@ -144,10 +163,6 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
     setIsEventResizing(false);
   }, [resizeEventPreview, updateEventMutation]);
 
-  const resizeEventActions: ResizeEventActions = useMemo(() => {
-    return { startResize, updateResizeDest, scroll, resize };
-  }, [resize, scroll, startResize, updateResizeDest]);
-
   useEffect(() => {
     const endResizeEvent = (e: MouseEvent) => {
       if (e.button === 0) {
@@ -161,9 +176,20 @@ export const useResizeEventEffect = ({ scrollableRef }: Params) => {
     };
   }, [resize]);
 
-  return {
+  const value: ResizeEventContext = useMemo(() => {
+    return {
+      isEventResizing,
+      resizeEventPreview,
+      resizeEventActions: { startResize, updateResizeDest, scroll, resize },
+    };
+  }, [
     isEventResizing,
+    resize,
     resizeEventPreview,
-    resizeEventActions,
-  };
+    scroll,
+    startResize,
+    updateResizeDest,
+  ]);
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };

@@ -9,25 +9,33 @@ import {
   addDays,
   subDays,
 } from "date-fns";
-import { useMemo, useRef, useState } from "react";
+import { RefObject, useMemo, useRef, useState } from "react";
 import { Event } from "../../_mocks/event-store";
 import { EVENT_MIN_HEIGHT, splitEvent } from "./utils";
 import { NavigationButton } from "../navigation-button";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
-import { useMoveEventEffect } from "./use-move-event-effect";
-import { useResizeEventEffect } from "./use-resize-event-effect";
+import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
-import { usePrepareCreateEventEffect } from "./use-prepare-create-event-effect";
+import {
+  PrepareCreateEventProvider,
+  usePrepareCreateEvent,
+} from "./prepare-create-event-provider";
+import { ResizeEventProvider, useResizeEvent } from "./resize-event-provider";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
-type Props = {
-  currentDate: Date;
-  events: Event[];
-};
+type WeeklyCalendarProps = { currentDate: Date; events: Event[] };
 
-export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
+type WeeklyCalendarImplProps = {
+  scrollableRef: RefObject<HTMLDivElement>;
+} & WeeklyCalendarProps;
+
+export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
+  scrollableRef,
+  currentDate,
+  events,
+}) => {
   const [date, setDate] = useState(currentDate);
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
@@ -38,18 +46,10 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
     return eachDayOfInterval({ start, end });
   }, [date]);
 
-  const scrollableRef = useRef<HTMLDivElement>(null);
-
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEventEffect({ scrollableRef });
-  const { isEventMoving, moveEventPreview, moveEventActions } =
-    useMoveEventEffect({
-      scrollableRef,
-    });
-  const { isEventResizing, resizeEventPreview, resizeEventActions } =
-    useResizeEventEffect({
-      scrollableRef,
-    });
+    usePrepareCreateEvent();
+  const { isEventMoving, moveEventActions } = useMoveEvent();
+  const { isEventResizing, resizeEventActions } = useResizeEvent();
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop;
@@ -58,7 +58,7 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
       prepareCreateEventActions.scroll(scrollTop);
     }
 
-    if (moveEventPreview) {
+    if (isEventMoving) {
       moveEventActions.scroll(scrollTop);
     }
 
@@ -132,14 +132,6 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
                   currentDate={currentDate}
                   date={date}
                   events={defaultEvents}
-                  isEventMoving={isEventMoving}
-                  moveEventPreview={moveEventPreview}
-                  moveEventActions={moveEventActions}
-                  prepareCreateEventState={prepareCreateEventState}
-                  prepareCreateEventActions={prepareCreateEventActions}
-                  isEventResizing={isEventResizing}
-                  resizeEventPreview={resizeEventPreview}
-                  resizeEventActions={resizeEventActions}
                 />
               );
             })}
@@ -153,5 +145,18 @@ export const WeeklyCalendar: React.FC<Props> = ({ currentDate, events }) => {
         onChangeEventPeriodPreview={prepareCreateEventActions.setDragDateRange}
       />
     </>
+  );
+};
+
+export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
+  const scrollableRef = useRef<HTMLDivElement>(null);
+  return (
+    <PrepareCreateEventProvider scrollableRef={scrollableRef}>
+      <MoveEventProvider scrollableRef={scrollableRef}>
+        <ResizeEventProvider scrollableRef={scrollableRef}>
+          <WeeklyCalendarImpl scrollableRef={scrollableRef} {...props} />
+        </ResizeEventProvider>
+      </MoveEventProvider>
+    </PrepareCreateEventProvider>
   );
 };
