@@ -1,4 +1,5 @@
 import {
+  areIntervalsOverlapping,
   differenceInMinutes,
   eachHourOfInterval,
   endOfDay,
@@ -259,9 +260,14 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             );
           })}
         </AnimatePresence>
-        {isEventMoving && moveEventPreview && (
-          <DragPreviewDateEventCard date={date} event={moveEventPreview} />
-        )}
+        {isEventMoving &&
+          moveEventPreview &&
+          areIntervalsOverlapping(moveEventPreview, {
+            start: startOfDay(date),
+            end: endOfDay(date),
+          }) && (
+            <DragPreviewDateEventCard date={date} event={moveEventPreview} />
+          )}
       </div>
     </div>
   );

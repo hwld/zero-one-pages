@@ -108,8 +108,9 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
           onDragStart={handleDragStart}
           style={style}
           className={clsx(
-            isInteractive && "hover:z-10 hover:bg-neutral-800",
             isDragging && "opacity-50",
+            isInteractive && "hover:z-20 hover:bg-neutral-900",
+            isResizing && "z-30",
           )}
         >
           <div
