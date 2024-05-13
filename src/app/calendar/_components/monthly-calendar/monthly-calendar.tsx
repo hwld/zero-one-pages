@@ -8,8 +8,6 @@ import {
 import { Event } from "../../_mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "./week-event-row";
-import { addMonths, subMonths } from "date-fns";
-import { NavigationButton } from "../navigation-button";
 import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
 import {
@@ -20,15 +18,15 @@ import { getEventFromDraggingEvent } from "../utils";
 
 type Props = {
   currentDate: Date;
+  yearMonth: Date;
   events: Event[];
 };
 
 export const MonthlyCalendarImpl: React.FC<Props> = ({
   currentDate,
+  yearMonth,
   events,
 }) => {
-  const [yearMonth, setYearMonth] = useState(currentDate);
-
   const year = useMemo(() => {
     return yearMonth.getFullYear();
   }, [yearMonth]);
@@ -36,13 +34,6 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
   const month = useMemo(() => {
     return yearMonth.getMonth() + 1;
   }, [yearMonth]);
-
-  const handleGoPrevMonth = () => {
-    setYearMonth(subMonths(yearMonth, 1));
-  };
-  const handleGoNextMonth = () => {
-    setYearMonth(addMonths(yearMonth, 1));
-  };
 
   const calendar = useMemo(() => {
     return getCalendarDates({ year, month });
@@ -79,18 +70,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
 
   return (
     <>
-      <div className="grid h-full w-full grid-rows-[min-content,min-content,1fr] gap-2">
-        <div className="flex items-center gap-2">
-          <NavigationButton dir="prev" onClick={handleGoPrevMonth} />
-          <div className="flex select-none items-center">
-            <div className="mx-1 text-lg tabular-nums">{year}</div>年
-            <div className="mx-1 w-6 text-center text-lg tabular-nums">
-              {month}
-            </div>
-            月
-          </div>
-          <NavigationButton dir="next" onClick={handleGoNextMonth} />
-        </div>
+      <div className="grid h-full w-full grid-rows-[min-content,1fr] gap-2">
         <div className="grid w-full grid-cols-7">
           {WEEK_DAY_LABELS.map((weekDay) => {
             return (
@@ -134,7 +114,6 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
                       calendarYearMonth={yearMonth}
                       key={date.getTime()}
                       date={date}
-                      isLastWeek={calendar.length - 1 === i}
                       prepareCreateEventState={prepareCreateEventState}
                     />
                   );

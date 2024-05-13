@@ -195,7 +195,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
     <div className="flex flex-col gap-2" ref={ref}>
       <div
         ref={columnRef}
-        className="relative border-r border-neutral-300"
+        className="relative border-r border-neutral-200"
         style={{ height: EVENT_MIN_HEIGHT * 4 * 24 }}
         draggable={false}
         onMouseDown={handleColumnMouseDown}
@@ -208,7 +208,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           return (
             <div
               key={`${hour}`}
-              className="absolute h-[1px] w-full bg-neutral-300"
+              className="absolute h-[1px] w-full bg-neutral-200"
               style={{ top: EVENT_MIN_HEIGHT * 4 * i }}
             />
           );

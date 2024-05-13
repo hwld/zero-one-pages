@@ -6,13 +6,10 @@ import {
   startOfDay,
   startOfWeek,
   format,
-  addDays,
-  subDays,
 } from "date-fns";
-import { RefObject, useMemo, useRef, useState } from "react";
+import { RefObject, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
-import { EVENT_MIN_HEIGHT, splitEvent } from "./utils";
-import { NavigationButton } from "../navigation-button";
+import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, splitEvent } from "./utils";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
@@ -27,7 +24,7 @@ import { MoveEventProvider as MonthlyMoveEventProvider } from "../monthly-calend
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
-type WeeklyCalendarProps = { currentDate: Date; events: Event[] };
+type WeeklyCalendarProps = { currentDate: Date; date: Date; events: Event[] };
 
 type WeeklyCalendarImplProps = {
   scrollableRef: RefObject<HTMLDivElement>;
@@ -36,9 +33,9 @@ type WeeklyCalendarImplProps = {
 export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   scrollableRef,
   currentDate,
+  date,
   events,
 }) => {
-  const [date, setDate] = useState(currentDate);
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
   const week = useMemo(() => {
@@ -69,57 +66,35 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
     }
   };
 
-  const handleNextWeek = () => {
-    setDate(addDays(endOfWeek(date), 1));
-  };
-
-  const handlePrevWeek = () => {
-    setDate(subDays(startOfWeek(date), 1));
-  };
-
   return (
     <>
-      <div className="flex min-h-0 flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <NavigationButton dir="prev" onClick={handlePrevWeek} />
-          <div className="flex select-none items-center">
-            <div className="mx-1 text-lg tabular-nums">
-              {date.getFullYear()}
-            </div>
-            年
-            <div className="mx-1 w-6 text-center text-lg tabular-nums">
-              {date.getMonth() + 1}
-            </div>
-            月
-          </div>
-          <NavigationButton dir="next" onClick={handleNextWeek} />
-        </div>
-
+      <div className="flex min-h-0 flex-col">
+        <WeeklyCalendarDayHeader
+          currentDate={currentDate}
+          calendarYearMonth={date}
+          week={week}
+          longTermEvents={longTermEvents}
+        />
         <div
           className="flex w-full flex-col overflow-auto"
+          style={{ scrollbarWidth: "none" }}
           ref={scrollableRef}
           onScroll={handleScroll}
         >
-          <WeeklyCalendarDayHeader
-            currentDate={currentDate}
-            week={week}
-            longTermEvents={longTermEvents}
-          />
-
           <div className="grid grid-cols-[75px,repeat(7,1fr)]">
-            <div className="mr-2">
+            <div className="">
               {eachHourOfInterval({
                 start: startOfDay(date),
                 end: endOfDay(date),
               }).map((h, i) => {
                 return (
                   <div
-                    className="relative select-none whitespace-nowrap tabular-nums text-neutral-400"
+                    className="relative select-none whitespace-nowrap border-r border-neutral-200 pr-3 text-end tabular-nums text-neutral-400"
                     key={i}
                     style={{
-                      height: EVENT_MIN_HEIGHT * 4,
-                      top: i !== 0 ? "-6px" : undefined,
-                      fontSize: "12px",
+                      height: EVENT_MIN_HEIGHT * (60 / EVENT_MIN_MINUTES),
+                      top: i !== 0 ? "-5px" : undefined,
+                      fontSize: "10px",
                     }}
                   >
                     {format(h, "hh:mm a")}

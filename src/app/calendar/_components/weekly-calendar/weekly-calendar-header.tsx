@@ -4,7 +4,7 @@ import { WEEK_DAY_LABELS } from "../../consts";
 import { LongTermEventCell } from "./long-term-event-cell";
 import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
-import { isSameDay } from "date-fns";
+import { isSameDay, isSameMonth } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
 import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
@@ -17,12 +17,14 @@ export const DAY_TITLE_HEIGHT = 28;
 
 type Props = {
   currentDate: Date;
+  calendarYearMonth: Date;
   week: Date[];
   longTermEvents: Event[];
 };
 
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   currentDate,
+  calendarYearMonth,
   week,
   longTermEvents,
 }) => {
@@ -45,15 +47,13 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
 
   return (
     <>
-      <div
-        className={clsx(
-          "sticky top-0 z-40 grid bg-neutral-100",
-          WEEKLY_CALENDAR_GRID_COLS_CLASS,
-        )}
-      >
+      <div className={clsx("relative grid", WEEKLY_CALENDAR_GRID_COLS_CLASS)}>
         <div className="flex select-none flex-col">
           <div style={{ height: DAY_TITLE_HEIGHT }} />
-          <div className="flex grow items-start justify-center border-y border-r border-neutral-300 py-1 text-xs text-neutral-400">
+          <div
+            className="flex grow items-start justify-end border-y border-r border-neutral-200 py-1 pr-1 text-xs text-neutral-400"
+            style={{ fontSize: "10px" }}
+          >
             <div className="flex items-center gap-1">
               長期
               <button
@@ -75,7 +75,12 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
           return (
             <div className="flex flex-col" key={`${date}`}>
               <div
-                className="flex select-none items-center justify-center gap-1 pb-1 text-xs"
+                className={clsx(
+                  "flex select-none items-center justify-center gap-1 pb-1 text-xs",
+                  isSameMonth(date, calendarYearMonth)
+                    ? "opacity-100"
+                    : "opacity-50",
+                )}
                 style={{ height: DAY_TITLE_HEIGHT }}
               >
                 <div>{WEEK_DAY_LABELS[date.getDay()]}</div>
