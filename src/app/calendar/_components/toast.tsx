@@ -1,5 +1,4 @@
 import {
-  ComponentPropsWithoutRef,
   Dispatch,
   PropsWithChildren,
   SetStateAction,
@@ -11,6 +10,7 @@ import {
 import * as RxToast from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { TbInfoCircle, TbX } from "react-icons/tb";
+import { Button, IconButton } from "./button";
 
 type CloseFn = (option?: { withoutCallback: boolean }) => void;
 
@@ -74,7 +74,7 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
               >
                 <motion.div
                   layout
-                  className="relative flex w-[300px] flex-col gap-2 rounded border border-neutral-300 bg-neutral-100 p-2 text-neutral-700 shadow"
+                  className="relative flex min-h-[80px] w-[300px] flex-col justify-between gap-2 rounded border border-neutral-300 bg-neutral-50 p-2 text-neutral-700 shadow"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, y: 8, transition: { duration: 0.1 } }}
@@ -84,20 +84,20 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
                       <TbInfoCircle size={16} />
                       {toast.title}
                     </div>
-                    <button
-                      className="rounde grid size-6 place-items-center rounded transition-colors hover:bg-black/10"
-                      onClick={() => {
-                        handleClickClose(toast);
-                      }}
-                    >
-                      <TbX />
-                    </button>
+                    <IconButton
+                      size="sm"
+                      icon={TbX}
+                      onClick={() => handleClickClose(toast)}
+                    />
                   </div>
                   {toast.action && (
                     <div className="flex w-full justify-end">
-                      <ToastAction onClick={() => handleClickAction(toast)}>
+                      <Button
+                        size="sm"
+                        onClick={() => handleClickAction(toast)}
+                      >
                         {toast.actionText}
-                      </ToastAction>
+                      </Button>
                     </div>
                   )}
                 </motion.div>
@@ -117,20 +117,6 @@ const useToastContext = () => {
     throw new Error("ToastProviderが存在しません");
   }
   return ctx;
-};
-
-export const ToastAction: React.FC<ComponentPropsWithoutRef<"button">> = ({
-  children,
-  ...props
-}) => {
-  return (
-    <button
-      className="h-7 rounded border border-neutral-300 bg-neutral-100 px-2 text-xs transition-colors hover:bg-black/5"
-      {...props}
-    >
-      {children}
-    </button>
-  );
 };
 
 export const useToast = () => {

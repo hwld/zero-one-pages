@@ -7,11 +7,12 @@ import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../monthly-calendar/utils";
-import { TbArrowsDiagonal2, TbArrowsDiagonalMinimize } from "react-icons/tb";
 import { CreateEventFormDialog } from "../create-event-form-dialog";
 import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
 import { useMoveEvent } from "../monthly-calendar/move-event-provider";
 import { getEventFromDraggingEvent } from "../utils";
+import { IconButton } from "../button";
+import { CollapseIcon, ExpandIcon } from "./expand-icon";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -56,18 +57,12 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
           >
             <div className="flex items-center gap-1">
               長期
-              <button
-                className="grid size-6 place-items-center rounded text-[14px] text-neutral-500 transition-colors hover:bg-neutral-500/15"
-                onClick={() => {
-                  setExpanded(!expanded);
-                }}
-              >
-                {expanded ? (
-                  <TbArrowsDiagonalMinimize className="rotate-45" />
-                ) : (
-                  <TbArrowsDiagonal2 className="rotate-45" />
-                )}
-              </button>
+              <IconButton
+                size="sm"
+                variant="muted"
+                icon={expanded ? CollapseIcon : ExpandIcon}
+                onClick={() => setExpanded((s) => !s)}
+              />
             </div>
           </div>
         </div>

@@ -10,6 +10,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
 import { TbX } from "react-icons/tb";
+import { IconButton } from "./button";
 
 type Props = {
   children: ReactNode;
@@ -39,7 +40,7 @@ export const Dialog: React.FC<Props> = ({ children, isOpen, onChangeOpen }) => {
             <FloatingFocusManager context={context}>
               <div ref={refs.setFloating} {...getFloatingProps()}>
                 <motion.div
-                  className="fixed left-1/2 top-1/2 w-[470px] rounded-lg border border-neutral-300 bg-neutral-100 p-4 text-neutral-700 shadow-lg"
+                  className="fixed left-1/2 top-1/2 w-[470px] rounded-lg border border-neutral-300 bg-neutral-50 p-4 text-neutral-700 shadow-lg"
                   initial={{ x: "-50%", y: "-60%", opacity: 0 }}
                   animate={{ x: "-50%", y: "-50%", opacity: 1 }}
                   exit={{ x: "-50%", y: "-60%", opacity: 0 }}
@@ -69,12 +70,9 @@ export const DialogTitle: React.FC<{
   return (
     <div className="flex justify-between gap-2">
       <div className="select-none text-sm text-neutral-500">{children}</div>
-      <button
-        className="absolute right-2 top-2 grid size-6 place-items-center rounded transition-colors hover:bg-black/10"
-        onClick={onClose}
-      >
-        <TbX size={18} />
-      </button>
+      <div className="absolute right-2 top-2">
+        <IconButton icon={TbX} onClick={onClose} />
+      </div>
     </div>
   );
 };

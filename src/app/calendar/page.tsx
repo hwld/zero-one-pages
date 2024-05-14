@@ -5,7 +5,6 @@ import "./style.css";
 import { WeeklyCalendar } from "./_components/weekly-calendar/weekly-calendar";
 import { useMinuteClock } from "./_components/use-minute-clock";
 import { useEvents } from "./_queries/use-events";
-import { NavigationButton } from "./_components/navigation-button";
 import {
   addDays,
   endOfWeek,
@@ -15,6 +14,8 @@ import {
   subMonths,
 } from "date-fns";
 import { Sidebar } from "./_components/siderbar";
+import { Button, IconButton } from "./_components/button";
+import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 
 export type CalendarType = "month" | "week";
 const Page = () => {
@@ -107,7 +108,7 @@ const Page = () => {
       <div className="grid grid-rows-[60px,1fr] overflow-hidden">
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <NavigationButton dir="prev" onClick={handleNavigatePrev} />
+            <IconButton icon={TbChevronLeft} onClick={handleNavigatePrev} />
             <div className="flex select-none items-center">
               <div className="mx-1 text-lg tabular-nums">
                 {date.getFullYear()}
@@ -118,7 +119,7 @@ const Page = () => {
               </div>
               月
             </div>
-            <NavigationButton dir="next" onClick={handleNavigateNext} />
+            <IconButton icon={TbChevronRight} onClick={handleNavigateNext} />
           </div>
           <div className="flex w-full justify-end gap-2">
             <select
@@ -129,12 +130,7 @@ const Page = () => {
               <option value="month">月</option>
               <option value="week">週</option>
             </select>
-            <button
-              className="h-8 w-[50px] rounded border border-neutral-300 bg-neutral-100 px-2 text-sm transition-colors hover:bg-neutral-200"
-              onClick={() => changeDate(new Date())}
-            >
-              今日
-            </button>
+            <Button onClick={() => changeDate(new Date())}>今日</Button>
           </div>
         </div>
         {calendar}

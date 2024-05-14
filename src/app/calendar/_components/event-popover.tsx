@@ -11,14 +11,14 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { Slot } from "@radix-ui/react-slot";
-import { ComponentPropsWithoutRef, ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Event } from "../_mocks/event-store";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
-import { IconType } from "react-icons/lib";
 import { format, isSameDay, isSameYear } from "date-fns";
 import { useDeleteEvent } from "../_queries/use-delete-event";
 import { UpdateEventFormDialog } from "./update-event-form-dialog";
+import { IconButton } from "./button";
 
 type Props = {
   event: Event;
@@ -77,25 +77,22 @@ export const EventPopover: React.FC<Props> = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.1 }}
-                    className="w-[320px] space-y-2 rounded-lg border border-neutral-300 bg-neutral-100 text-neutral-700 shadow"
+                    className="w-[320px] space-y-2 rounded-lg border border-neutral-300 bg-neutral-50 text-neutral-700 shadow"
                   >
                     <div className="flex items-center justify-between px-2 pt-2">
                       <div className="text-xs text-neutral-400">
                         イベント詳細
                       </div>
                       <div className="flex">
-                        <EventPopoverButton
+                        <IconButton
                           icon={TbPencilMinus}
                           onClick={() => {
                             onChangeOpen(false);
                             setIsUpdateDialogOpen(true);
                           }}
                         />
-                        <EventPopoverButton
-                          icon={TbTrash}
-                          onClick={handleDelete}
-                        />
-                        <EventPopoverButton
+                        <IconButton icon={TbTrash} onClick={handleDelete} />
+                        <IconButton
                           autoFocus
                           icon={TbX}
                           onClick={() => onChangeOpen(false)}
@@ -179,17 +176,4 @@ const EventPeriod: React.FC<{ event: Event }> = ({ event }) => {
   }, [event]);
 
   return <div className="tabular-nums">{content}</div>;
-};
-
-const EventPopoverButton: React.FC<
-  { icon: IconType } & ComponentPropsWithoutRef<"button">
-> = ({ icon: Icon, ...props }) => {
-  return (
-    <button
-      className="grid size-7 place-items-center rounded text-neutral-600 ring-neutral-500 transition-colors hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2"
-      {...props}
-    >
-      <Icon size="60%" />
-    </button>
-  );
 };

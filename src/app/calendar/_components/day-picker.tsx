@@ -14,6 +14,7 @@ import {
 import { TbArrowBackUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import { CalendarType } from "../page";
 import { WEEK_DAY_LABELS } from "../consts";
+import { IconButton } from "./button";
 
 type Props = {
   type: CalendarType;
@@ -91,39 +92,30 @@ const Caption = ({ displayMonth }: CaptionProps) => {
     <div className="flex w-full items-center justify-between pl-2">
       <div className="text-xs">{format(displayMonth, "yyyy年MM月")}</div>
       <div className="flex">
-        <CaptionButton
+        <IconButton
+          size="sm"
+          icon={TbArrowBackUp}
           onClick={() => {
             goToDate(new Date());
           }}
-        >
-          <TbArrowBackUp />
-        </CaptionButton>
-        <CaptionButton
+        />
+        <IconButton
+          size="sm"
+          icon={TbChevronLeft}
           disabled={!previousMonth}
           onClick={() => {
             previousMonth && goToMonth(previousMonth);
           }}
-        >
-          <TbChevronLeft />
-        </CaptionButton>
-        <CaptionButton
+        />
+        <IconButton
+          size="sm"
           disabled={!nextMonth}
           onClick={() => {
             nextMonth && goToMonth(nextMonth);
           }}
-        >
-          <TbChevronRight />
-        </CaptionButton>
+          icon={TbChevronRight}
+        />
       </div>
     </div>
-  );
-};
-
-const CaptionButton: React.FC<ComponentPropsWithoutRef<"button">> = (props) => {
-  return (
-    <button
-      {...props}
-      className="grid size-6 place-items-center rounded text-neutral-700 transition-colors hover:bg-neutral-500/15"
-    />
   );
 };
