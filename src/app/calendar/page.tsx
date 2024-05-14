@@ -14,13 +14,56 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
+import { Sidebar } from "./_components/siderbar";
 
-type CalendarType = "month" | "week";
+export type CalendarType = "month" | "week";
 const Page = () => {
   const { events } = useEvents();
   const [type, setType] = useState<CalendarType>("week");
   const currentDate = useMinuteClock();
+
   const [date, setDate] = useState(currentDate);
+  const [dayPickerMonth, setDayPickerMonth] = useState(date);
+
+  const handleNavigateNext = () => {
+    switch (type) {
+      case "week": {
+        const newDate = addDays(endOfWeek(date), 1);
+        setDate(newDate);
+        setDayPickerMonth(newDate);
+        return;
+      }
+      case "month": {
+        const newDate = addMonths(date, 1);
+        setDate(newDate);
+        setDayPickerMonth(newDate);
+        return;
+      }
+      default: {
+        throw new Error(type satisfies never);
+      }
+    }
+  };
+
+  const handleNavigatePrev = () => {
+    switch (type) {
+      case "week": {
+        const newDate = subDays(startOfWeek(date), 1);
+        setDate(newDate);
+        setDayPickerMonth(newDate);
+        return;
+      }
+      case "month": {
+        const newDate = subMonths(date, 1);
+        setDate(newDate);
+        setDayPickerMonth(newDate);
+        return;
+      }
+      default: {
+        throw new Error(type satisfies never);
+      }
+    }
+  };
 
   const calendar = useMemo(() => {
     switch (type) {
@@ -48,44 +91,18 @@ const Page = () => {
     }
   }, [currentDate, date, events, type]);
 
-  const handleNavigateNext = () => {
-    switch (type) {
-      case "week": {
-        setDate(addDays(endOfWeek(date), 1));
-        return;
-      }
-      case "month": {
-        setDate(addMonths(date, 1));
-        return;
-      }
-      default: {
-        throw new Error(type satisfies never);
-      }
-    }
-  };
-
-  const handleNavigatePrev = () => {
-    switch (type) {
-      case "week": {
-        setDate(subDays(startOfWeek(date), 1));
-        return;
-      }
-      case "month": {
-        setDate(subMonths(date, 1));
-        return;
-      }
-      default: {
-        throw new Error(type satisfies never);
-      }
-    }
-  };
-
   return (
     <div
       className="grid h-[100dvh] w-[100dvw] grid-cols-[250px,1fr] overflow-hidden bg-neutral-50 text-neutral-700"
       style={{ colorScheme: "light" }}
     >
-      <div className="border-r border-neutral-300 bg-neutral-100"></div>
+      <Sidebar
+        month={dayPickerMonth}
+        onChangeMonth={setDayPickerMonth}
+        date={date}
+        onChangeDate={setDate}
+        type={type}
+      />
       <div className="grid grid-rows-[60px,1fr] overflow-hidden">
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-2">

@@ -1,0 +1,129 @@
+import { endOfWeek, format, startOfWeek } from "date-fns";
+import {
+  ComponentPropsWithoutRef,
+  Dispatch,
+  SetStateAction,
+  useMemo,
+} from "react";
+import {
+  CaptionProps,
+  DateRange,
+  useNavigation,
+  DayPicker as ReactDayPicker,
+} from "react-day-picker";
+import { TbArrowBackUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { CalendarType } from "../page";
+import { WEEK_DAY_LABELS } from "../consts";
+
+type Props = {
+  type: CalendarType;
+  date: Date;
+  onChangeDate: (d: Date) => void;
+  month: Date;
+  onChangeMonth: Dispatch<SetStateAction<Date>>;
+};
+
+export const DayPicker: React.FC<Props> = ({
+  type,
+  date,
+  onChangeDate,
+  month,
+  onChangeMonth,
+}) => {
+  const selected = useMemo((): Date | DateRange | undefined => {
+    switch (type) {
+      case "month": {
+        return undefined;
+      }
+      case "week": {
+        return { from: startOfWeek(date), to: endOfWeek(date) };
+      }
+      default: {
+        throw new Error(type satisfies never);
+      }
+    }
+  }, [date, type]);
+
+  const handleDayClick = (d: Date) => {
+    onChangeMonth(d);
+    onChangeDate(d);
+  };
+
+  return (
+    <ReactDayPicker
+      month={month}
+      onMonthChange={onChangeMonth}
+      selected={selected}
+      onDayClick={handleDayClick}
+      fixedWeeks
+      showOutsideDays
+      formatters={{
+        formatCaption: (e) => format(e, "yyyy年M月"),
+        formatWeekdayName: (d) => WEEK_DAY_LABELS[d.getDay()],
+      }}
+      className="w-fit"
+      classNames={{
+        month: "space-y-2",
+        table: "w-full border-collapse",
+        head_row: "flex mb-1",
+        head_cell: "text-neutral-500 rounded-md w-8 font-normal text-[0.6rem]",
+        row: "flex w-full",
+        cell: "relative p-[2px] text-center text-xs [&:has([aria-selected])]:first:rounded-l [&:has([aria-selected])]:last:rounded-r overflow-hidden [&:has([aria-selected])]:bg-neutral-500/15",
+        day: "size-7 p-0 font-normal aria-selected:opacity-100 hover:bg-neutral-500/15 rounded",
+        day_today: "!bg-blue-500 hover:!bg-blue-500 !text-neutral-100",
+        day_selected: "pointer-events-none",
+        day_outside:
+          "day-outside text-neutral-400 aria-selected:text-neutral-500",
+      }}
+      components={{
+        IconLeft: TbChevronLeft,
+        IconRight: TbChevronRight,
+        Caption,
+      }}
+    />
+  );
+};
+
+const Caption = ({ displayMonth }: CaptionProps) => {
+  const { goToMonth, goToDate, nextMonth, previousMonth } = useNavigation();
+
+  return (
+    <div className="flex w-full items-center justify-between pl-2">
+      <div className="text-xs">{format(displayMonth, "yyyy年MM月")}</div>
+      <div className="flex">
+        <CaptionButton
+          onClick={() => {
+            goToDate(new Date());
+          }}
+        >
+          <TbArrowBackUp />
+        </CaptionButton>
+        <CaptionButton
+          disabled={!previousMonth}
+          onClick={() => {
+            previousMonth && goToMonth(previousMonth);
+          }}
+        >
+          <TbChevronLeft />
+        </CaptionButton>
+        <CaptionButton
+          disabled={!nextMonth}
+          onClick={() => {
+            nextMonth && goToMonth(nextMonth);
+          }}
+        >
+          <TbChevronRight />
+        </CaptionButton>
+      </div>
+    </div>
+  );
+};
+
+const CaptionButton: React.FC<ComponentPropsWithoutRef<"button">> = (props) => {
+  return (
+    <button
+      {...props}
+      className="grid size-6 place-items-center rounded text-neutral-700 transition-colors hover:bg-neutral-500/15"
+    />
+  );
+};
