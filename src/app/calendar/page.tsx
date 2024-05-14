@@ -25,18 +25,21 @@ const Page = () => {
   const [date, setDate] = useState(currentDate);
   const [dayPickerMonth, setDayPickerMonth] = useState(date);
 
+  const changeDate = (date: Date) => {
+    setDate(date);
+    setDayPickerMonth(date);
+  };
+
   const handleNavigateNext = () => {
     switch (type) {
       case "week": {
         const newDate = addDays(endOfWeek(date), 1);
-        setDate(newDate);
-        setDayPickerMonth(newDate);
+        changeDate(newDate);
         return;
       }
       case "month": {
         const newDate = addMonths(date, 1);
-        setDate(newDate);
-        setDayPickerMonth(newDate);
+        changeDate(newDate);
         return;
       }
       default: {
@@ -49,14 +52,12 @@ const Page = () => {
     switch (type) {
       case "week": {
         const newDate = subDays(startOfWeek(date), 1);
-        setDate(newDate);
-        setDayPickerMonth(newDate);
+        changeDate(newDate);
         return;
       }
       case "month": {
         const newDate = subMonths(date, 1);
-        setDate(newDate);
-        setDayPickerMonth(newDate);
+        changeDate(newDate);
         return;
       }
       default: {
@@ -119,15 +120,21 @@ const Page = () => {
             </div>
             <NavigationButton dir="next" onClick={handleNavigateNext} />
           </div>
-          <div className="text-end">
+          <div className="flex w-full justify-end gap-2">
             <select
-              className="h-8 w-[100px] rounded border border-neutral-300 bg-neutral-100 px-2"
+              className="h-8 w-[80px] rounded border border-neutral-300 bg-neutral-100 px-2 text-sm transition-colors hover:bg-neutral-200"
               value={type}
               onChange={(e) => setType(e.target.value as CalendarType)}
             >
               <option value="month">月</option>
               <option value="week">週</option>
             </select>
+            <button
+              className="h-8 w-[50px] rounded border border-neutral-300 bg-neutral-100 px-2 text-sm transition-colors hover:bg-neutral-200"
+              onClick={() => changeDate(new Date())}
+            >
+              今日
+            </button>
           </div>
         </div>
         {calendar}
