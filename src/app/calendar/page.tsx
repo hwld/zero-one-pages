@@ -1,8 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
-import { MonthlyCalendar } from "./_components/monthly-calendar/monthly-calendar";
+import { MonthlyCalendar } from "./_features/monthly-calendar/monthly-calendar";
 import "./style.css";
-import { WeeklyCalendar } from "./_components/weekly-calendar/weekly-calendar";
+import { WeeklyCalendar } from "./_features/weekly-calendar/weekly-calendar";
 import { useMinuteClock } from "./_components/use-minute-clock";
 import { useEvents } from "./_queries/use-events";
 import {

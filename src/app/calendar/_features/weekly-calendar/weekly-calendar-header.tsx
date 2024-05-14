@@ -11,7 +11,7 @@ import { CreateEventFormDialog } from "../create-event-form-dialog";
 import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
 import { useMoveEvent } from "../monthly-calendar/move-event-provider";
 import { getEventFromDraggingEvent } from "../utils";
-import { IconButton } from "../button";
+import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "./expand-icon";
 
 export const DAY_TITLE_HEIGHT = 28;
