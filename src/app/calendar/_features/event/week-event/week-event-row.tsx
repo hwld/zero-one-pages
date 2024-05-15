@@ -15,7 +15,7 @@ type Props = {
   eventLimit?: number;
   eventHeight: number;
   eventTop?: number;
-  onClickMoreWeekEvents?: () => void;
+  onClickMoreWeekEvents?: (date: Date) => void;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -144,6 +144,10 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
             return null;
           }
 
+          const handleClick = () => {
+            onClickMoreWeekEvents?.(date);
+          };
+
           return (
             <MoreWeekEventsCard
               key={weekDay}
@@ -153,7 +157,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
               limit={eventLimit}
               disablePointerEvents={isDraggingForCreate || isEventMoving}
               height={eventHeight}
-              onClick={onClickMoreWeekEvents}
+              onClick={handleClick}
             />
           );
         })}

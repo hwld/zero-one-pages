@@ -26,7 +26,7 @@ type AppStateContext = {
   setDayPickerMonth: Dispatch<SetStateAction<Date>>;
 
   viewDate: Date;
-  setViewDate: Dispatch<SetStateAction<Date>>;
+  changeViewDate: (date: Date) => void;
 
   nextCalendarPage: () => void;
   prevCalendarPage: () => void;
@@ -50,50 +50,50 @@ export const AppStateProvider: React.FC<{
   const [viewDate, setViewDate] = useState(new Date());
   const [dayPickerMonth, setDayPickerMonth] = useState(viewDate);
 
-  const changeDate = (date: Date) => {
-    setViewDate(date);
+  const changeViewDate = useCallback((date: Date) => {
     setDayPickerMonth(date);
-  };
+    setViewDate(date);
+  }, []);
 
   const nextCalendarPage = useCallback(() => {
     switch (calendarType) {
       case "week": {
         const newDate = addDays(endOfWeek(viewDate), 1);
-        changeDate(newDate);
+        changeViewDate(newDate);
         return;
       }
       case "month": {
         const newDate = addMonths(viewDate, 1);
-        changeDate(newDate);
+        changeViewDate(newDate);
         return;
       }
       default: {
         throw new Error(calendarType satisfies never);
       }
     }
-  }, [calendarType, viewDate]);
+  }, [calendarType, changeViewDate, viewDate]);
 
   const prevCalendarPage = useCallback(() => {
     switch (calendarType) {
       case "week": {
         const newDate = subDays(startOfWeek(viewDate), 1);
-        changeDate(newDate);
+        changeViewDate(newDate);
         return;
       }
       case "month": {
         const newDate = subMonths(viewDate, 1);
-        changeDate(newDate);
+        changeViewDate(newDate);
         return;
       }
       default: {
         throw new Error(calendarType satisfies never);
       }
     }
-  }, [calendarType, viewDate]);
+  }, [calendarType, changeViewDate, viewDate]);
 
   const goTodayCalendarPage = useCallback(() => {
-    changeDate(new Date());
-  }, []);
+    changeViewDate(new Date());
+  }, [changeViewDate]);
 
   const value: AppStateContext = useMemo(
     () => ({
@@ -101,7 +101,7 @@ export const AppStateProvider: React.FC<{
       setCalendarType,
 
       viewDate,
-      setViewDate,
+      changeViewDate,
 
       dayPickerMonth,
       setDayPickerMonth,
@@ -112,6 +112,7 @@ export const AppStateProvider: React.FC<{
     }),
     [
       calendarType,
+      changeViewDate,
       dayPickerMonth,
       goTodayCalendarPage,
       nextCalendarPage,

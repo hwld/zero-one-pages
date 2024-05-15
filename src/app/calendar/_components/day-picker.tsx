@@ -14,17 +14,17 @@ import { IconButton } from "./button";
 type Props = {
   type: CalendarType;
   viewDate: Date;
-  onChangeViewDate: (d: Date) => void;
   month: Date;
   onChangeMonth: Dispatch<SetStateAction<Date>>;
+  onClickDay: (d: Date) => void;
 };
 
 export const DayPicker: React.FC<Props> = ({
   type,
   viewDate,
-  onChangeViewDate,
   month,
   onChangeMonth,
+  onClickDay,
 }) => {
   const selected = useMemo((): Date | DateRange | undefined => {
     switch (type) {
@@ -40,17 +40,12 @@ export const DayPicker: React.FC<Props> = ({
     }
   }, [viewDate, type]);
 
-  const handleDayClick = (d: Date) => {
-    onChangeMonth(d);
-    onChangeViewDate(d);
-  };
-
   return (
     <ReactDayPicker
       month={month}
       onMonthChange={onChangeMonth}
       selected={selected}
-      onDayClick={handleDayClick}
+      onDayClick={onClickDay}
       fixedWeeks
       showOutsideDays
       formatters={{

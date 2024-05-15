@@ -6,10 +6,10 @@ type Props = {};
 export const Sidebar: React.FC<Props> = () => {
   const {
     calendarType,
-    viewDate,
-    setViewDate,
     dayPickerMonth,
     setDayPickerMonth,
+    viewDate,
+    changeViewDate,
   } = useAppState();
 
   return (
@@ -18,8 +18,8 @@ export const Sidebar: React.FC<Props> = () => {
         viewDate={viewDate}
         month={dayPickerMonth}
         type={calendarType}
-        onChangeViewDate={setViewDate}
         onChangeMonth={setDayPickerMonth}
+        onClickDay={changeViewDate}
       />
     </div>
   );
