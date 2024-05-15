@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ResizeEventPreview } from "../../../../type";
+import { ResizeDateEventPreview } from "../type";
 import { DateEvent } from "../type";
 import { calcDateEventCardStyle } from "../utils";
 import clsx from "clsx";
@@ -26,7 +26,7 @@ export type DateEventCardProps = {
   isOtherEventResizing: boolean;
   onStartResize: (
     e: React.MouseEvent,
-    params: { event: DateEvent; origin: ResizeEventPreview["origin"] },
+    params: { event: DateEvent; origin: ResizeDateEventPreview["origin"] },
   ) => void;
 };
 

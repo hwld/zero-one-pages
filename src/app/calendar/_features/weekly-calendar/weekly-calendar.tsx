@@ -16,15 +16,21 @@ import {
 } from "../event/date-event/utils";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
-import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
+import {
+  MoveDateEventProvider,
+  useMoveDateEvent,
+} from "../event/date-event/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
-  PrepareCreateEventProvider,
-  usePrepareCreateEvent,
-} from "./prepare-create-event-provider";
-import { ResizeEventProvider, useResizeEvent } from "./resize-event-provider";
-import { PrepareCreateWeekEventProvider as MonthlyPrepareCreateEventProvider } from "../event/week-event/prepare-create-event-provider";
-import { MoveWekEventProvider as MonthlyMoveEventProvider } from "../event/week-event/move-event-provider";
+  PrepareCreateDateEventProvider,
+  usePrepareCreateDateEvent,
+} from "../event/date-event/prepare-create-event-provider";
+import {
+  ResizeDateEventProvider,
+  useResizeDateEvent,
+} from "../event/date-event/resize-event-provider";
+import { MoveWeekEventProvider } from "../event/week-event/move-event-provider";
+import { PrepareCreateWeekEventProvider } from "../event/week-event/prepare-create-event-provider";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
@@ -50,9 +56,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   }, [date]);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
-  const { isEventMoving, moveEventActions } = useMoveEvent();
-  const { isEventResizing, resizeEventActions } = useResizeEvent();
+    usePrepareCreateDateEvent();
+  const { isEventMoving, moveEventActions } = useMoveDateEvent();
+  const { isEventResizing, resizeEventActions } = useResizeDateEvent();
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop;
@@ -133,16 +139,16 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
 export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
-    <MonthlyPrepareCreateEventProvider>
-      <MonthlyMoveEventProvider>
-        <PrepareCreateEventProvider scrollableRef={scrollableRef}>
-          <MoveEventProvider scrollableRef={scrollableRef}>
-            <ResizeEventProvider scrollableRef={scrollableRef}>
+    <PrepareCreateWeekEventProvider>
+      <MoveWeekEventProvider>
+        <PrepareCreateDateEventProvider scrollableRef={scrollableRef}>
+          <MoveDateEventProvider scrollableRef={scrollableRef}>
+            <ResizeDateEventProvider scrollableRef={scrollableRef}>
               <WeeklyCalendarImpl scrollableRef={scrollableRef} {...props} />
-            </ResizeEventProvider>
-          </MoveEventProvider>
-        </PrepareCreateEventProvider>
-      </MonthlyMoveEventProvider>
-    </MonthlyPrepareCreateEventProvider>
+            </ResizeDateEventProvider>
+          </MoveDateEventProvider>
+        </PrepareCreateDateEventProvider>
+      </MoveWeekEventProvider>
+    </PrepareCreateWeekEventProvider>
   );
 };

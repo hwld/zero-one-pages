@@ -9,7 +9,7 @@ import {
   createContext,
   PropsWithChildren,
 } from "react";
-import { DragDateRange } from "../../utils";
+import { DragDateRange } from "../../../utils";
 import { CreateEventInput } from "../../../_mocks/api";
 import { max, min } from "date-fns";
 
@@ -40,7 +40,7 @@ const Context = createContext<PrepareCreateWeekEventContext | undefined>(
 export const usePrepareCreateWeekEvent = (): PrepareCreateWeekEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("PrepareCreateEventProviderが存在しません");
+    throw new Error("PrepareCreateWeekEventProviderが存在しません");
   }
   return ctx;
 };

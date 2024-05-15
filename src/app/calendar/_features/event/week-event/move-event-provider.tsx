@@ -29,12 +29,12 @@ const Context = createContext<MoveWeekEventContext | undefined>(undefined);
 export const useMoveWeekEvent = (): MoveWeekEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("PrepareCreateEventProviderが存在しません");
+    throw new Error("PrepareCreateWeekEventProviderが存在しません");
   }
   return ctx;
 };
 
-export const MoveWekEventProvider: React.FC<PropsWithChildren> = ({
+export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const updateEventMutation = useUpdateEvent();

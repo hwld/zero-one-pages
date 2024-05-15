@@ -20,7 +20,7 @@ import {
   parse,
   startOfDay,
 } from "date-fns";
-import { DragDateRange } from "../utils";
+import { DragDateRange } from "../../utils";
 
 export const EVENT_FORM_ID = "event-form-id";
 

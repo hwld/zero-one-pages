@@ -11,21 +11,20 @@ import {
   useContext,
   PropsWithChildren,
 } from "react";
-import { DragDateRange } from "../utils";
-import { CreateEventInput } from "../../_mocks/api";
+import { DragDateRange, MouseHistory } from "../../../utils";
+import { CreateEventInput } from "../../../_mocks/api";
 import { addMinutes, max, min, startOfDay } from "date-fns";
-import { DATE_EVENT_MIN_MINUTES } from "../event/date-event/utils";
-import { MouseHistory } from "../utils";
-import { getDateFromY } from "../event/date-event/utils";
+import { DATE_EVENT_MIN_MINUTES } from "./utils";
+import { getDateFromY } from "./utils";
 
-export type PrepareCreateEventState = {
+export type PrepareCreateDateEventState = {
   dragDateRange: DragDateRange | undefined;
   defaultCreateEventValues: Omit<CreateEventInput, "title"> | undefined;
 };
 
-export type PrepareCreateEventActions = {
+export type PrepareCreateDateEventActions = {
   setDragDateRange: Dispatch<
-    SetStateAction<PrepareCreateEventState["dragDateRange"]>
+    SetStateAction<PrepareCreateDateEventState["dragDateRange"]>
   >;
   startDrag: (day: Date, y: number) => void;
   updateDragEnd: (day: Date, y: number) => void;
@@ -34,32 +33,34 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-type PrepareCreateEventContext = {
-  prepareCreateEventState: PrepareCreateEventState;
-  prepareCreateEventActions: PrepareCreateEventActions;
+type PrepareCreateDateEventContext = {
+  prepareCreateEventState: PrepareCreateDateEventState;
+  prepareCreateEventActions: PrepareCreateDateEventActions;
 };
 
-const Context = createContext<PrepareCreateEventContext | undefined>(undefined);
+const Context = createContext<PrepareCreateDateEventContext | undefined>(
+  undefined,
+);
 
-export const usePrepareCreateEvent = (): PrepareCreateEventContext => {
+export const usePrepareCreateDateEvent = (): PrepareCreateDateEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("PrepareCreateEventProviderが存在しません");
+    throw new Error("PrepareCreateDateEventProviderが存在しません");
   }
   return ctx;
 };
 
-export const PrepareCreateEventProvider: React.FC<
+export const PrepareCreateDateEventProvider: React.FC<
   { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
 > = ({ scrollableRef, children }) => {
   const [dragDateRange, setDragDateRange] =
-    useState<PrepareCreateEventState["dragDateRange"]>();
+    useState<PrepareCreateDateEventState["dragDateRange"]>();
 
   // マウスイベントが発生したときのyとscrollableのscrollTopを保存して、スクロールされたときに
   // これを使用してdragDateRangeを更新する
   const mouseHistoryRef = useRef<MouseHistory>();
 
-  const startDrag: PrepareCreateEventActions["startDrag"] = useCallback(
+  const startDrag: PrepareCreateDateEventActions["startDrag"] = useCallback(
     (day, y) => {
       if (scrollableRef.current) {
         mouseHistoryRef.current = {
@@ -79,27 +80,28 @@ export const PrepareCreateEventProvider: React.FC<
     [scrollableRef],
   );
 
-  const updateDragEnd: PrepareCreateEventActions["updateDragEnd"] = useCallback(
-    (day, y) => {
-      if (!dragDateRange) {
-        return;
-      }
+  const updateDragEnd: PrepareCreateDateEventActions["updateDragEnd"] =
+    useCallback(
+      (day, y) => {
+        if (!dragDateRange) {
+          return;
+        }
 
-      if (scrollableRef.current) {
-        mouseHistoryRef.current = {
-          prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
-        };
-      }
+        if (scrollableRef.current) {
+          mouseHistoryRef.current = {
+            prevY: y,
+            prevScrollTop: scrollableRef.current.scrollTop,
+          };
+        }
 
-      const targetDate = startOfDay(day);
-      const dragEndDate = getDateFromY(targetDate, y);
-      setDragDateRange({ ...dragDateRange, dragEndDate });
-    },
-    [dragDateRange, scrollableRef],
-  );
+        const targetDate = startOfDay(day);
+        const dragEndDate = getDateFromY(targetDate, y);
+        setDragDateRange({ ...dragDateRange, dragEndDate });
+      },
+      [dragDateRange, scrollableRef],
+    );
 
-  const scroll: PrepareCreateEventActions["scroll"] = useCallback(
+  const scroll: PrepareCreateDateEventActions["scroll"] = useCallback(
     (scrollTop) => {
       if (!dragDateRange || !mouseHistoryRef.current) {
         return;
@@ -113,7 +115,7 @@ export const PrepareCreateEventProvider: React.FC<
     [dragDateRange, updateDragEnd],
   );
 
-  const clearState: PrepareCreateEventActions["clearState"] =
+  const clearState: PrepareCreateDateEventActions["clearState"] =
     useCallback(() => {
       setDragDateRange(undefined);
       setDefaultCreateEventValues(undefined);
@@ -121,9 +123,9 @@ export const PrepareCreateEventProvider: React.FC<
     }, []);
 
   const [defaultCreateEventValues, setDefaultCreateEventValues] =
-    useState<PrepareCreateEventState["defaultCreateEventValues"]>();
+    useState<PrepareCreateDateEventState["defaultCreateEventValues"]>();
 
-  const setDefaultValues: PrepareCreateEventActions["setDefaultValues"] =
+  const setDefaultValues: PrepareCreateDateEventActions["setDefaultValues"] =
     useCallback(() => {
       if (!dragDateRange) {
         return;
@@ -145,7 +147,7 @@ export const PrepareCreateEventProvider: React.FC<
       }
     }, [clearState, dragDateRange]);
 
-  const prepareCreateEventState: PrepareCreateEventState = useMemo(() => {
+  const prepareCreateEventState: PrepareCreateDateEventState = useMemo(() => {
     return { dragDateRange, defaultCreateEventValues };
   }, [defaultCreateEventValues, dragDateRange]);
 
@@ -162,7 +164,7 @@ export const PrepareCreateEventProvider: React.FC<
     };
   }, [setDefaultValues]);
 
-  const value: PrepareCreateEventContext = useMemo(
+  const value: PrepareCreateDateEventContext = useMemo(
     () => ({
       prepareCreateEventState,
       prepareCreateEventActions: {

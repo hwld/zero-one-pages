@@ -10,7 +10,7 @@ import {
 } from "date-fns";
 import { MoveWeekEventPreview, WeekEvent } from "./type";
 import { Event } from "../../../_mocks/event-store";
-import { getOverlappingDates } from "../../utils";
+import { getOverlappingDates } from "../../../utils";
 
 export const getWeekEvents = ({
   week,

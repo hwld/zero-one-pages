@@ -7,3 +7,13 @@ export type DateEvent = Event & {
   prevOverlappings: number;
   totalOverlappings: number;
 };
+
+export type MoveDateEventPreview = DateEvent & {
+  prevMouseOverDate: Date;
+  updatedAt: number;
+};
+
+export type ResizeDateEventPreview = DateEvent & {
+  origin: "eventStart" | "eventEnd";
+  updatedAt: number;
+};

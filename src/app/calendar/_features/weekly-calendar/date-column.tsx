@@ -19,12 +19,12 @@ import {
   DateEventCard,
   DateEventCardProps,
 } from "../event/date-event/card/date-event-card";
-import { areDragDateRangeOverlapping } from "../utils";
+import { areDragDateRangeOverlapping } from "../../utils";
 import { DragPreviewDateEventCard } from "../event/date-event/card/drag-preview";
-import { useMoveEvent } from "./move-event-provider";
-import { useResizeEvent } from "./resize-event-provider";
+import { useMoveDateEvent } from "../event/date-event/move-event-provider";
+import { useResizeDateEvent } from "../event/date-event/resize-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePrepareCreateEvent } from "./prepare-create-event-provider";
+import { usePrepareCreateDateEvent } from "../event/date-event/prepare-create-event-provider";
 
 export type EventCreationDragData = {
   targetDate: Date;
@@ -43,10 +43,11 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   ref,
 ) {
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
+    usePrepareCreateDateEvent();
   const { isEventResizing, resizeEventActions, resizeEventPreview } =
-    useResizeEvent();
-  const { isEventMoving, moveEventActions, moveEventPreview } = useMoveEvent();
+    useResizeDateEvent();
+  const { isEventMoving, moveEventActions, moveEventPreview } =
+    useMoveDateEvent();
 
   const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
   const isDraggingForCreate = dragDateRangeForCreate !== undefined;

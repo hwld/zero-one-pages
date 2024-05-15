@@ -1,5 +1,5 @@
 import { Event } from "@/app/calendar/_mocks/event-store";
-import { DragDateRange } from "../../utils";
+import { DragDateRange } from "../../../utils";
 
 /**
  * イベントを含む特定の週において、イベントの開始曜日と終了曜日を含めたイベント
