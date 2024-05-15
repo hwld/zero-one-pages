@@ -1,12 +1,13 @@
 import { forwardRef, useMemo } from "react";
 import { convertEventToWeekEvent } from "../utils";
-import { DraggingEvent, getEventFromDraggingEvent } from "../../../utils";
+import { getEventFromMoveEventPreview } from "../utils";
+import { MoveWeekEventPreview } from "../type";
 import { WeekEvent } from "../type";
 import { WeekEventCardBase, WeekEventCardContent } from "./base";
 
 type Props = {
   week: Date[];
-  draggingEvent: DraggingEvent;
+  draggingEvent: MoveWeekEventPreview;
   topMargin?: number;
   height: number;
 };
@@ -14,7 +15,7 @@ type Props = {
 export const DragPreviewWeekEventsCard = forwardRef<HTMLButtonElement, Props>(
   function WeekEventCard({ week, draggingEvent, topMargin = 0, height }, ref) {
     const weekEvent: WeekEvent | undefined = useMemo(() => {
-      const newEvent = getEventFromDraggingEvent(draggingEvent);
+      const newEvent = getEventFromMoveEventPreview(draggingEvent);
       return convertEventToWeekEvent(newEvent, { top: 0, week });
     }, [draggingEvent, week]);
 

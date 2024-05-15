@@ -6,13 +6,16 @@ import { getWeekEvents } from "../event/week-event/utils";
 import { Event } from "../../_mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { WeekEventRow } from "../event/week-event/week-event-row";
-import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
+import {
+  MoveWekEventProvider,
+  useMoveWeekEvent,
+} from "../event/week-event/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
-  PrepareCreateEventProvider,
-  usePrepareCreateEvent,
-} from "./prepare-create-event-provider";
-import { getEventFromDraggingEvent } from "../utils";
+  PrepareCreateWeekEventProvider,
+  usePrepareCreateWeekEvent,
+} from "../event/week-event/prepare-create-event-provider";
+import { getEventFromMoveEventPreview } from "../event/week-event/utils";
 
 type Props = {
   currentDate: Date;
@@ -62,9 +65,10 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
     };
   }, [yearMonth]);
 
-  const { isEventMoving, moveEventPreview } = useMoveEvent();
+  const { isEventMoving, moveEventPreview: moveEventPreview } =
+    useMoveWeekEvent();
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
+    usePrepareCreateWeekEvent();
 
   return (
     <>
@@ -84,7 +88,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
               week,
               events: events.map((event): Event => {
                 if (!isEventMoving && moveEventPreview?.event.id === event.id) {
-                  return getEventFromDraggingEvent(moveEventPreview);
+                  return getEventFromMoveEventPreview(moveEventPreview);
                 }
 
                 return event;
@@ -144,10 +148,10 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
 
 export const MonthlyCalendar: React.FC<Props> = (props) => {
   return (
-    <PrepareCreateEventProvider>
-      <MoveEventProvider>
+    <PrepareCreateWeekEventProvider>
+      <MoveWekEventProvider>
         <MonthlyCalendarImpl {...props} />
-      </MoveEventProvider>
-    </PrepareCreateEventProvider>
+      </MoveWekEventProvider>
+    </PrepareCreateWeekEventProvider>
   );
 };

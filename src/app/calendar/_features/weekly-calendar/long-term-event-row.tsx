@@ -8,9 +8,8 @@ import { getExceededEventCountByDayOfWeek } from "../event/week-event/utils";
 import { CELL_Y_MARGIN } from "./long-term-event-cell";
 import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
 import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
-import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
-import { Event } from "../../_mocks/event-store";
-import { useMoveEvent } from "../monthly-calendar/move-event-provider";
+import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
+import { useMoveWeekEvent } from "../event/week-event/move-event-provider";
 
 export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 
@@ -28,9 +27,13 @@ export const LongTermEventRow: React.FC<Props> = ({
   expanded,
   onChangeExpand,
 }) => {
-  const { isEventMoving, moveEventPreview, moveEventActions } = useMoveEvent();
+  const {
+    isEventMoving,
+    moveEventPreview: moveEventPreview,
+    moveEventActions: moveEventActions,
+  } = useMoveWeekEvent();
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
+    usePrepareCreateWeekEvent();
 
   const isDraggingForCreate =
     prepareCreateEventState.dragDateRange !== undefined;
@@ -77,7 +80,7 @@ export const LongTermEventRow: React.FC<Props> = ({
     }
   };
 
-  const handleEventDragStart = (e: React.DragEvent, event: Event) => {
+  const handleEventDragStart = (e: React.DragEvent, event: WeekEvent) => {
     e.preventDefault();
 
     const date = getDateFromX(e.clientX);

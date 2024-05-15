@@ -8,9 +8,9 @@ import { isSameDay, isSameMonth } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../event/week-event/utils";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
-import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
-import { useMoveEvent } from "../monthly-calendar/move-event-provider";
-import { getEventFromDraggingEvent } from "../utils";
+import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
+import { useMoveWeekEvent } from "../event/week-event/move-event-provider";
+import { getEventFromMoveEventPreview } from "../event/week-event/utils";
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
 
@@ -29,14 +29,15 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   week,
   longTermEvents,
 }) => {
-  const { isEventMoving, moveEventPreview } = useMoveEvent();
+  const { isEventMoving, moveEventPreview: moveEventPreview } =
+    useMoveWeekEvent();
 
   const [expanded, setExpanded] = useState(false);
   const weekLongTermEvents = getWeekEvents({
     week,
     events: longTermEvents.map((event) => {
       if (!isEventMoving && moveEventPreview?.event.id === event.id) {
-        return getEventFromDraggingEvent(moveEventPreview);
+        return getEventFromMoveEventPreview(moveEventPreview);
       }
 
       return event;
@@ -44,7 +45,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   });
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateEvent();
+    usePrepareCreateWeekEvent();
 
   return (
     <>

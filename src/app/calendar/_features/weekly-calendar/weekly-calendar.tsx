@@ -23,8 +23,8 @@ import {
   usePrepareCreateEvent,
 } from "./prepare-create-event-provider";
 import { ResizeEventProvider, useResizeEvent } from "./resize-event-provider";
-import { PrepareCreateEventProvider as MonthlyPrepareCreateEventProvider } from "../monthly-calendar/prepare-create-event-provider";
-import { MoveEventProvider as MonthlyMoveEventProvider } from "../monthly-calendar/move-event-provider";
+import { PrepareCreateWeekEventProvider as MonthlyPrepareCreateEventProvider } from "../event/week-event/prepare-create-event-provider";
+import { MoveWekEventProvider as MonthlyMoveEventProvider } from "../event/week-event/move-event-provider";
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 

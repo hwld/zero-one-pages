@@ -1,10 +1,9 @@
 import { forwardRef, useRef } from "react";
-import { Event } from "../../../_mocks/event-store";
 import { MONTHLY_EVENT_ROW_SIZE } from "../../../consts";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "../../monthly-calendar/calendar-date";
 import { useMergedRef } from "@mantine/hooks";
-import { useMoveEvent } from "../../monthly-calendar/move-event-provider";
-import { PrepareCreateEventActions } from "../../monthly-calendar/prepare-create-event-provider";
+import { useMoveWeekEvent } from "./move-event-provider";
+import { PrepareCreateWeekEventActions } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { WeekEventCard } from "./card/week-event-card";
 import { MoreWeekEventsCard } from "./card/more-week-even";
@@ -17,7 +16,7 @@ type Props = {
   eventLimit: number;
   exceededEventCountMap: Map<number, number>;
   isDraggingForCreate: boolean;
-  prepareCreateEventActions: PrepareCreateEventActions;
+  prepareCreateEventActions: PrepareCreateWeekEventActions;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
@@ -32,8 +31,11 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
     },
     _ref,
   ) {
-    const { isEventMoving, moveEventPreview, moveEventActions } =
-      useMoveEvent();
+    const {
+      isEventMoving,
+      moveEventPreview: moveEventPreview,
+      moveEventActions: moveEventActions,
+    } = useMoveWeekEvent();
 
     const rowRef = useRef<HTMLDivElement>(null);
     const ref = useMergedRef(_ref, rowRef);
@@ -72,7 +74,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
 
     const handleEventDragStart = (
       e: React.DragEvent<HTMLButtonElement>,
-      event: Event,
+      event: WeekEvent,
     ) => {
       // dragの開始をハンドリングしたいだけなので他の挙動は抑制する
       e.preventDefault();

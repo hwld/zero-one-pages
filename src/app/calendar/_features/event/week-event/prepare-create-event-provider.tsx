@@ -9,18 +9,18 @@ import {
   createContext,
   PropsWithChildren,
 } from "react";
-import { DragDateRange } from "../utils";
-import { CreateEventInput } from "../../_mocks/api";
+import { DragDateRange } from "../../utils";
+import { CreateEventInput } from "../../../_mocks/api";
 import { max, min } from "date-fns";
 
-export type PrepareCreateEventState = {
+export type PrepareCreateWeekEventState = {
   dragDateRange: DragDateRange | undefined;
   defaultCreateEventValues: Omit<CreateEventInput, "title"> | undefined;
 };
 
-export type PrepareCreateEventActions = {
+export type PrepareCreateWeekEventActions = {
   setDragDateRange: Dispatch<
-    SetStateAction<PrepareCreateEventState["dragDateRange"]>
+    SetStateAction<PrepareCreateWeekEventState["dragDateRange"]>
   >;
   startDrag: (dragStart: Date) => void;
   updateDragEnd: (dragEnd: Date) => void;
@@ -28,14 +28,16 @@ export type PrepareCreateEventActions = {
   clearState: () => void;
 };
 
-type PrepareCreateEventContext = {
-  prepareCreateEventState: PrepareCreateEventState;
-  prepareCreateEventActions: PrepareCreateEventActions;
+type PrepareCreateWeekEventContext = {
+  prepareCreateEventState: PrepareCreateWeekEventState;
+  prepareCreateEventActions: PrepareCreateWeekEventActions;
 };
 
-const Context = createContext<PrepareCreateEventContext | undefined>(undefined);
+const Context = createContext<PrepareCreateWeekEventContext | undefined>(
+  undefined,
+);
 
-export const usePrepareCreateEvent = (): PrepareCreateEventContext => {
+export const usePrepareCreateWeekEvent = (): PrepareCreateWeekEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
     throw new Error("PrepareCreateEventProviderが存在しません");
@@ -43,35 +45,34 @@ export const usePrepareCreateEvent = (): PrepareCreateEventContext => {
   return ctx;
 };
 
-// TODO:　各操作のProviderがweekly-calendarとmonthly-calendar毎に存在しているが、weekly-calendarのlong-term-event-rowではmonthly-calendarのProviderを使用したいので、カレンダー単位ではなくイベントの型で分けたい
-// DateEventとWeekEventで分けられる？
-export const PrepareCreateEventProvider: React.FC<PropsWithChildren> = ({
+export const PrepareCreateWeekEventProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const [dragDateRange, setDragDateRange] =
-    useState<PrepareCreateEventState["dragDateRange"]>();
+    useState<PrepareCreateWeekEventState["dragDateRange"]>();
 
-  const startDrag: PrepareCreateEventActions["startDrag"] = useCallback(
+  const startDrag: PrepareCreateWeekEventActions["startDrag"] = useCallback(
     (dragStart) => {
       setDragDateRange({ dragStartDate: dragStart, dragEndDate: dragStart });
     },
     [],
   );
 
-  const updateDragEnd: PrepareCreateEventActions["updateDragEnd"] = useCallback(
-    (dragEnd) => {
-      if (!dragDateRange) {
-        return;
-      }
-      setDragDateRange({ ...dragDateRange, dragEndDate: dragEnd });
-    },
-    [dragDateRange],
-  );
+  const updateDragEnd: PrepareCreateWeekEventActions["updateDragEnd"] =
+    useCallback(
+      (dragEnd) => {
+        if (!dragDateRange) {
+          return;
+        }
+        setDragDateRange({ ...dragDateRange, dragEndDate: dragEnd });
+      },
+      [dragDateRange],
+    );
 
   const [defaultCreateEventValues, setDefaultCreateEventValues] =
-    useState<PrepareCreateEventState["defaultCreateEventValues"]>();
+    useState<PrepareCreateWeekEventState["defaultCreateEventValues"]>();
 
-  const setDefaultValues: PrepareCreateEventActions["setDefaultValues"] =
+  const setDefaultValues: PrepareCreateWeekEventActions["setDefaultValues"] =
     useCallback(() => {
       if (!dragDateRange) {
         return;
@@ -89,13 +90,13 @@ export const PrepareCreateEventProvider: React.FC<PropsWithChildren> = ({
       });
     }, [dragDateRange]);
 
-  const clearState: PrepareCreateEventActions["clearState"] =
+  const clearState: PrepareCreateWeekEventActions["clearState"] =
     useCallback(() => {
       setDragDateRange(undefined);
       setDefaultCreateEventValues(undefined);
     }, []);
 
-  const prepareCreateEventState: PrepareCreateEventState = useMemo(() => {
+  const prepareCreateEventState: PrepareCreateWeekEventState = useMemo(() => {
     return { dragDateRange, defaultCreateEventValues };
   }, [defaultCreateEventValues, dragDateRange]);
 
@@ -112,7 +113,7 @@ export const PrepareCreateEventProvider: React.FC<PropsWithChildren> = ({
     };
   }, [setDefaultValues]);
 
-  const value: PrepareCreateEventContext = useMemo(
+  const value: PrepareCreateWeekEventContext = useMemo(
     () => ({
       prepareCreateEventState,
       prepareCreateEventActions: {

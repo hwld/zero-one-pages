@@ -3,8 +3,6 @@ import {
   isWithinInterval,
   min,
   max,
-  differenceInDays,
-  addDays,
   areIntervalsOverlapping,
   startOfDay,
   endOfDay,
@@ -16,7 +14,6 @@ import {
   lastDayOfMonth,
   startOfWeek,
 } from "date-fns";
-import { Event } from "../_mocks/event-store";
 
 export type DragDateRange = {
   dragStartDate: Date;
@@ -44,23 +41,6 @@ export const areDragDateRangeOverlapping = (
     { start: startOfDay(date), end: endOfDay(date) },
     { start: range.dragStartDate, end: range.dragEndDate },
   );
-};
-
-// TODO: rename
-export type DraggingEvent = {
-  event: Event;
-} & DragDateRange;
-
-export const getEventFromDraggingEvent = (
-  draggingEvent: DraggingEvent,
-): Event => {
-  const { event, dragStartDate, dragEndDate } = draggingEvent;
-  const diffDay = differenceInDays(dragEndDate, dragStartDate);
-
-  const newStart = addDays(event.start, diffDay);
-  const newEnd = addDays(event.end, diffDay);
-
-  return { ...event, start: newStart, end: newEnd };
 };
 
 export const getOverlappingDates = (

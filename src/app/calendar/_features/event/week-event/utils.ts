@@ -5,8 +5,10 @@ import {
   differenceInCalendarDays,
   eachDayOfInterval,
   isWithinInterval,
+  addDays,
+  differenceInDays,
 } from "date-fns";
-import { WeekEvent } from "./type";
+import { MoveWeekEventPreview, WeekEvent } from "./type";
 import { Event } from "../../../_mocks/event-store";
 import { getOverlappingDates } from "../../utils";
 
@@ -175,4 +177,16 @@ export const getExceededEventCountByDayOfWeek = ({
       }
       return map;
     }, new Map<WeekDay, ExceededEventCount>());
+};
+
+export const getEventFromMoveEventPreview = (
+  draggingEvent: MoveWeekEventPreview,
+): Event => {
+  const { event, dragStartDate, dragEndDate } = draggingEvent;
+  const diffDay = differenceInDays(dragEndDate, dragStartDate);
+
+  const newStart = addDays(event.start, diffDay);
+  const newEnd = addDays(event.end, diffDay);
+
+  return { ...event, start: newStart, end: newEnd };
 };

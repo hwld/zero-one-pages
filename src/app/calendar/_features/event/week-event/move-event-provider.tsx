@@ -7,25 +7,26 @@ import {
   useMemo,
   useState,
 } from "react";
-import { DraggingEvent, getEventFromDraggingEvent } from "../utils";
-import { useUpdateEvent } from "../../_queries/use-update-event";
-import { Event } from "../../_mocks/event-store";
+import { getEventFromMoveEventPreview } from "./utils";
+import { MoveWeekEventPreview } from "./type";
+import { useUpdateEvent } from "../../../_queries/use-update-event";
+import { WeekEvent } from "./type";
 
-export type MoveEventActions = {
-  startMove: (event: Event, moveStartDate: Date) => void;
+export type MoveWeekEventActions = {
+  startMove: (event: WeekEvent, moveStartDate: Date) => void;
   updateMoveEnd: (moveEndDate: Date) => void;
   move: () => void;
 };
 
-type MoveEventContext = {
+type MoveWeekEventContext = {
   isEventMoving: boolean;
-  moveEventPreview: DraggingEvent | undefined;
-  moveEventActions: MoveEventActions;
+  moveEventPreview: MoveWeekEventPreview | undefined;
+  moveEventActions: MoveWeekEventActions;
 };
 
-const Context = createContext<MoveEventContext | undefined>(undefined);
+const Context = createContext<MoveWeekEventContext | undefined>(undefined);
 
-export const useMoveEvent = (): MoveEventContext => {
+export const useMoveWeekEvent = (): MoveWeekEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
     throw new Error("PrepareCreateEventProviderが存在しません");
@@ -33,19 +34,19 @@ export const useMoveEvent = (): MoveEventContext => {
   return ctx;
 };
 
-export const MoveEventProvider: React.FC<PropsWithChildren> = ({
+export const MoveWekEventProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{
     isEventMoving: boolean;
-    moveEventPreview: DraggingEvent | undefined;
+    moveEventPreview: MoveWeekEventPreview | undefined;
   }>({ isEventMoving: false, moveEventPreview: undefined });
 
   const { moveEventPreview, isEventMoving } = state;
 
-  const startMove: MoveEventActions["startMove"] = useCallback(
+  const startMove: MoveWeekEventActions["startMove"] = useCallback(
     (event, moveStartDate) => {
       setState({
         isEventMoving: true,
@@ -59,7 +60,7 @@ export const MoveEventProvider: React.FC<PropsWithChildren> = ({
     [],
   );
 
-  const updateMoveEnd: MoveEventActions["updateMoveEnd"] = useCallback(
+  const updateMoveEnd: MoveWeekEventActions["updateMoveEnd"] = useCallback(
     (moveEndDate: Date) => {
       if (!isEventMoving || !moveEventPreview) {
         return;
@@ -73,12 +74,12 @@ export const MoveEventProvider: React.FC<PropsWithChildren> = ({
     [isEventMoving, moveEventPreview],
   );
 
-  const move: MoveEventActions["move"] = useCallback(() => {
+  const move: MoveWeekEventActions["move"] = useCallback(() => {
     if (!moveEventPreview) {
       return;
     }
 
-    const updatedEvent = getEventFromDraggingEvent(moveEventPreview);
+    const updatedEvent = getEventFromMoveEventPreview(moveEventPreview);
     updateEventMutation.mutate(updatedEvent, {
       onSettled: () => {
         setState((prev) => {
@@ -106,7 +107,7 @@ export const MoveEventProvider: React.FC<PropsWithChildren> = ({
     };
   }, [move]);
 
-  const value: MoveEventContext = useMemo(
+  const value: MoveWeekEventContext = useMemo(
     () => ({
       isEventMoving,
       moveEventPreview,
