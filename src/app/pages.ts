@@ -101,7 +101,7 @@ export const pages: Page[] = [
     href: "/calendar",
     title: "Calendar",
     description:
-      "Google Calendarみたいなカレンダー。日付操作ライブラリだけ使った。",
-    tags: ["PC", "PART", "WIP"],
+      "Google Calendarみたいなカレンダー。メインのカレンダーには日付操作ライブラリだけ使った。",
+    tags: ["PC", "LAYOUT", "PRIME"],
   },
 ];
