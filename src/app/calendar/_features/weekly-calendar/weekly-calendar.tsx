@@ -6,6 +6,7 @@ import {
   startOfDay,
   startOfWeek,
   format,
+  differenceInMinutes,
 } from "date-fns";
 import { RefObject, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
@@ -31,8 +32,11 @@ import {
 } from "../event/date-event/resize-event-provider";
 import { MoveWeekEventProvider } from "../event/week-event/move-event-provider";
 import { PrepareCreateWeekEventProvider } from "../event/week-event/prepare-create-event-provider";
+import { useMinuteClock } from "../../_components/use-minute-clock";
+import clsx from "clsx";
 
-export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
+export const WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE = 75;
+export const WEEKLY_CALENDAR_GRID_COLS_CLASS = `grid-cols-[${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px,repeat(7,1fr)]`;
 
 type WeeklyCalendarProps = { date: Date; events: Event[] };
 
@@ -45,6 +49,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   date,
   events,
 }) => {
+  const { currentDate } = useMinuteClock();
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
   const week = useMemo(() => {
@@ -89,7 +94,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
           ref={scrollableRef}
           onScroll={handleScroll}
         >
-          <div className="grid grid-cols-[75px,repeat(7,1fr)]">
+          <div
+            className={clsx("relative grid", WEEKLY_CALENDAR_GRID_COLS_CLASS)}
+          >
             <div className="">
               {eachHourOfInterval({
                 start: startOfDay(date),
@@ -120,6 +127,26 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
                 />
               );
             })}
+            <div
+              className="absolute grid h-[1px] w-full"
+              style={{
+                gridTemplateColumns: `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px 1fr`,
+                top:
+                  (DATE_EVENT_MIN_HEIGHT / DATE_EVENT_MIN_MINUTES) *
+                  differenceInMinutes(currentDate, startOfDay(currentDate)),
+              }}
+            >
+              <div
+                className="relative -translate-y-1/2 pr-3 text-end text-xs font-bold"
+                style={{
+                  width: WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE,
+                  fontSize: "10px",
+                }}
+              >
+                {format(currentDate, "hh:mm a")}
+              </div>
+              <div className="h-[1px] w-full bg-blue-300" />
+            </div>
           </div>
         </div>
       </div>

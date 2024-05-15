@@ -73,7 +73,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           {isSameDay(currentDate, displayedDay) ? (
             <div
               ref={currentTimeRef}
-              className="absolute z-30 h-[1px] w-full border-y-[1px] border-blue-500 bg-blue-500"
+              className="absolute z-30 h-[1px] w-full bg-blue-500 shadow-[0_0_0_1px] shadow-blue-500"
               style={{
                 top:
                   (DATE_EVENT_MIN_HEIGHT / DATE_EVENT_MIN_MINUTES) *
