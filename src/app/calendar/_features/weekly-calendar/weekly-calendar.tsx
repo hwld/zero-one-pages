@@ -118,7 +118,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
                 <DateColumn
                   key={`${date}`}
                   currentDate={currentDate}
-                  date={date}
+                  displayedDay={date}
                   events={defaultEvents}
                 />
               );
