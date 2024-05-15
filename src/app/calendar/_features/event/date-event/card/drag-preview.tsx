@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { forwardRef, useMemo } from "react";
-import { DateEvent } from "../../../type";
+import { DateEvent } from "../type";
 import { getTopFromDate, getHeightFromInterval } from "../utils";
 import { DateEventCardBase, DateEventCardContent } from "./base";
 

@@ -1,10 +1,5 @@
 import { endOfWeek, format, startOfWeek } from "date-fns";
-import {
-  ComponentPropsWithoutRef,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import {
   CaptionProps,
   DateRange,

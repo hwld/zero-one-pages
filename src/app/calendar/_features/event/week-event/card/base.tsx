@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { format } from "date-fns";
-import { WeekEvent } from "../../../type";
+import { WeekEvent } from "../type";
 
 type Props = {
   disablePointerEvents: boolean;

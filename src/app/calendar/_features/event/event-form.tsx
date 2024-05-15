@@ -10,7 +10,7 @@ import {
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
-import { EventInput, eventInputSchema } from "../_mocks/api";
+import { EventInput, eventInputSchema } from "../../_mocks/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,7 +20,7 @@ import {
   parse,
   startOfDay,
 } from "date-fns";
-import { DragDateRange } from "./utils";
+import { DragDateRange } from "../utils";
 
 export const EVENT_FORM_ID = "event-form-id";
 

@@ -10,9 +10,11 @@ import {
   useState,
 } from "react";
 import { useUpdateEvent } from "../../_queries/use-update-event";
-import { DateEvent, MoveEventPreview } from "../../type";
+import { MoveEventPreview } from "../../type";
+import { DateEvent } from "../event/date-event/type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
-import { MouseHistory, getDateFromY } from "./utils";
+import { MouseHistory } from "../utils";
+import { getDateFromY } from "../event/date-event/utils";
 
 type MoveEventActions = {
   startMove: (event: DateEvent, moveStart: { date: Date; y: number }) => void;

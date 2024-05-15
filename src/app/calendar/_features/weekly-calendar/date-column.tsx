@@ -6,17 +6,21 @@ import {
   isSameDay,
   startOfDay,
 } from "date-fns";
-import { NewEvent } from "./new-event";
-import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, getDateEvents } from "./utils";
+import { DateEventPreview } from "../event/date-event/date-event-preview";
+import {
+  DATE_EVENT_MIN_HEIGHT,
+  DATE_EVENT_MIN_MINUTES,
+} from "../event/date-event/utils";
+import { getDateEvents } from "../event/date-event/utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { DateEvent } from "../../type";
+import { DateEvent } from "../event/date-event/type";
 import { Event } from "../../_mocks/event-store";
 import {
   DateEventCard,
   DateEventCardProps,
-} from "./date-event-card/date-event-card";
+} from "../event/date-event/card/date-event-card";
 import { areDragDateRangeOverlapping } from "../utils";
-import { DragPreviewDateEventCard } from "./date-event-card/drag-preview";
+import { DragPreviewDateEventCard } from "../event/date-event/card/drag-preview";
 import { useMoveEvent } from "./move-event-provider";
 import { useResizeEvent } from "./resize-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
@@ -197,7 +201,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
       <div
         ref={columnRef}
         className="relative border-r border-neutral-200"
-        style={{ height: EVENT_MIN_HEIGHT * 4 * 24 }}
+        style={{ height: DATE_EVENT_MIN_HEIGHT * 4 * 24 }}
         draggable={false}
         onMouseDown={handleColumnMouseDown}
         onMouseMove={handleColumnMouseMove}
@@ -210,7 +214,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             <div
               key={`${hour}`}
               className="absolute h-[1px] w-full bg-neutral-200"
-              style={{ top: EVENT_MIN_HEIGHT * 4 * i }}
+              style={{ top: DATE_EVENT_MIN_HEIGHT * 4 * i }}
             />
           );
         })}
@@ -220,7 +224,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
             className="absolute z-30 h-[1px] w-full border-y-[1px] border-blue-500 bg-blue-500"
             style={{
               top:
-                (EVENT_MIN_HEIGHT / EVENT_MIN_MINUTES) *
+                (DATE_EVENT_MIN_HEIGHT / DATE_EVENT_MIN_MINUTES) *
                 differenceInMinutes(currentDate, startOfDay(currentDate)),
             }}
           >
@@ -228,7 +232,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
           </div>
         ) : null}
         {isEventPreviewVisible && (
-          <NewEvent
+          <DateEventPreview
             date={date}
             eventCreationDragData={dragDateRangeForCreate}
           />

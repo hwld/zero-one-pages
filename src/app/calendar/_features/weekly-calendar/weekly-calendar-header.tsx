@@ -6,13 +6,13 @@ import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
 import { LongTermEventRow } from "./long-term-event-row";
-import { getWeekEvents } from "../monthly-calendar/utils";
-import { CreateEventFormDialog } from "../create-event-form-dialog";
+import { getWeekEvents } from "../event/week-event/utils";
+import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
 import { useMoveEvent } from "../monthly-calendar/move-event-provider";
 import { getEventFromDraggingEvent } from "../utils";
 import { IconButton } from "../../_components/button";
-import { CollapseIcon, ExpandIcon } from "./expand-icon";
+import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
 
 export const DAY_TITLE_HEIGHT = 28;
 

@@ -1,15 +1,15 @@
 import { forwardRef, useRef } from "react";
-import { WeekEvent } from "../../type";
-import { Event } from "../../_mocks/event-store";
-import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
-import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
+import { Event } from "../../../_mocks/event-store";
+import { MONTHLY_EVENT_ROW_SIZE } from "../../../consts";
+import { MONTHLY_DATE_HEADER_HEIGHT } from "../../monthly-calendar/calendar-date";
 import { useMergedRef } from "@mantine/hooks";
-import { useMoveEvent } from "./move-event-provider";
-import { PrepareCreateEventActions } from "./prepare-create-event-provider";
+import { useMoveEvent } from "../../monthly-calendar/move-event-provider";
+import { PrepareCreateEventActions } from "../../monthly-calendar/prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { WeekEventCard } from "./week-event-card/week-event-card";
-import { DragPreviewWeekEventsCard } from "./week-event-card/drag-preview";
-import { MoreWeekEventsCard } from "./week-event-card/more-week-even";
+import { WeekEventCard } from "./card/week-event-card";
+import { MoreWeekEventsCard } from "./card/more-week-even";
+import { DragPreviewWeekEventsCard } from "./card/drag-preview";
+import { WeekEvent } from "./type";
 
 type Props = {
   week: Date[];

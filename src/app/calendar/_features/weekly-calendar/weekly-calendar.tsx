@@ -9,11 +9,15 @@ import {
 } from "date-fns";
 import { RefObject, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
-import { EVENT_MIN_HEIGHT, EVENT_MIN_MINUTES, splitEvent } from "./utils";
+import { splitEvent } from "./utils";
+import {
+  DATE_EVENT_MIN_HEIGHT,
+  DATE_EVENT_MIN_MINUTES,
+} from "../event/date-event/utils";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
-import { CreateEventFormDialog } from "../create-event-form-dialog";
+import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
   PrepareCreateEventProvider,
   usePrepareCreateEvent,
@@ -92,7 +96,8 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
                     className="relative select-none whitespace-nowrap border-r border-neutral-200 pr-3 text-end tabular-nums text-neutral-400"
                     key={i}
                     style={{
-                      height: EVENT_MIN_HEIGHT * (60 / EVENT_MIN_MINUTES),
+                      height:
+                        DATE_EVENT_MIN_HEIGHT * (60 / DATE_EVENT_MIN_MINUTES),
                       top: i !== 0 ? "-5px" : undefined,
                       fontSize: "10px",
                     }}

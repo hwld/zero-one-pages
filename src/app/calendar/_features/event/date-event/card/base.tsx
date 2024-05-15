@@ -1,6 +1,7 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { DateEvent } from "../../../type";
-import { EVENT_MIN_HEIGHT, formatEventDateSpan } from "../utils";
+import { DateEvent } from "../type";
+import { DATE_EVENT_MIN_HEIGHT } from "../utils";
+import { formatEventDateSpan } from "../utils";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
 
 export const DateEventCardBase = forwardRef<HTMLButtonElement, Props>(
   function DateEventCardBase({ className, children, style, ...props }, ref) {
-    const thin = style.height < EVENT_MIN_HEIGHT * 3;
+    const thin = style.height < DATE_EVENT_MIN_HEIGHT * 3;
 
     return (
       <button

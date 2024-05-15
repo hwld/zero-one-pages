@@ -14,7 +14,9 @@ import {
 import { DragDateRange } from "../utils";
 import { CreateEventInput } from "../../_mocks/api";
 import { addMinutes, max, min, startOfDay } from "date-fns";
-import { EVENT_MIN_MINUTES, MouseHistory, getDateFromY } from "./utils";
+import { DATE_EVENT_MIN_MINUTES } from "../event/date-event/utils";
+import { MouseHistory } from "../utils";
+import { getDateFromY } from "../event/date-event/utils";
 
 export type PrepareCreateEventState = {
   dragDateRange: DragDateRange | undefined;
@@ -70,7 +72,7 @@ export const PrepareCreateEventProvider: React.FC<
 
       // ドラッグ開始の時点では常にクリックした最小領域が期間として設定されるようにする
       const dragStartDate = getDateFromY(targetDate, y, "floor");
-      const dragEndDate = addMinutes(dragStartDate, EVENT_MIN_MINUTES);
+      const dragEndDate = addMinutes(dragStartDate, DATE_EVENT_MIN_MINUTES);
 
       setDragDateRange({ dragStartDate, dragEndDate });
     },

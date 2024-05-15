@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, forwardRef, useState, useRef } from "react";
-import { EventPopover } from "../../event-popover";
-import { WeekEvent } from "../../../type";
 import { WeekEventCardBase, WeekEventCardContent } from "./base";
+import { WeekEvent } from "../type";
+import { EventPopover } from "../../event-popover";
 
 type Props = {
   height: number;

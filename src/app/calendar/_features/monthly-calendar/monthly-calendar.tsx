@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
-import {
-  getCalendarDates,
-  getExceededEventCountByDayOfWeek,
-  getWeekEvents,
-} from "./utils";
+import { getExceededEventCountByDayOfWeek } from "../event/week-event/utils";
+import { getCalendarDates } from "../utils";
+import { getWeekEvents } from "../event/week-event/utils";
 import { Event } from "../../_mocks/event-store";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { WeekEventRow } from "./week-event-row";
+import { WeekEventRow } from "../event/week-event/week-event-row";
 import { MoveEventProvider, useMoveEvent } from "./move-event-provider";
-import { CreateEventFormDialog } from "../create-event-form-dialog";
+import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
   PrepareCreateEventProvider,
   usePrepareCreateEvent,

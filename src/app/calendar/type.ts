@@ -1,30 +1,4 @@
-import { z } from "zod";
-import { eventSchema, Event } from "./_mocks/event-store";
-
-export const weekEventSchema = eventSchema.merge(
-  z.object({
-    top: z.number(),
-    startWeekDay: z.number(),
-    endWeekDay: z.number(),
-  }),
-);
-
-/**
- * 週単位で表示するイベント
- */
-export type WeekEvent = Event & {
-  top: number;
-  startWeekDay: number;
-  endWeekDay: number;
-};
-
-/**
- * 日単位で表示するイベント
- */
-export type DateEvent = Event & {
-  prevOverlappings: number;
-  totalOverlappings: number;
-};
+import { DateEvent } from "./_features/event/date-event/type";
 
 // TODO: weekly-calendarでしかつかってない。
 export type MoveEventPreview = DateEvent & {

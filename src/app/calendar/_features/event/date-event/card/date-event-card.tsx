@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { DateEvent, ResizeEventPreview } from "../../../type";
+import { ResizeEventPreview } from "../../../../type";
+import { DateEvent } from "../type";
 import { calcDateEventCardStyle } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";

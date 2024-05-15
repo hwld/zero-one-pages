@@ -1,16 +1,16 @@
-import { getExceededEventCountByDayOfWeek } from "../monthly-calendar/utils";
-import { WeekEvent } from "../../type";
-import { Event } from "../../_mocks/event-store";
-import { CELL_Y_MARGIN } from "./long-term-event-cell";
-import { EVENT_MIN_HEIGHT } from "./utils";
-import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
-import { useRef } from "react";
-import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
-import { useMoveEvent } from "../monthly-calendar/move-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { WeekEventCard } from "../monthly-calendar/week-event-card/week-event-card";
-import { MoreWeekEventsCard } from "../monthly-calendar/week-event-card/more-week-even";
-import { DragPreviewWeekEventsCard } from "../monthly-calendar/week-event-card/drag-preview";
+import { useRef } from "react";
+import { DragPreviewWeekEventsCard } from "../event/week-event/card/drag-preview";
+import { MoreWeekEventsCard } from "../event/week-event/card/more-week-even";
+import { WeekEventCard } from "../event/week-event/card/week-event-card";
+import { WeekEvent } from "../event/week-event/type";
+import { getExceededEventCountByDayOfWeek } from "../event/week-event/utils";
+import { CELL_Y_MARGIN } from "./long-term-event-cell";
+import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
+import { DAY_TITLE_HEIGHT } from "./weekly-calendar-header";
+import { usePrepareCreateEvent } from "../monthly-calendar/prepare-create-event-provider";
+import { Event } from "../../_mocks/event-store";
+import { useMoveEvent } from "../monthly-calendar/move-event-provider";
 
 export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 
@@ -105,7 +105,7 @@ export const LongTermEventRow: React.FC<Props> = ({
               <WeekEventCard
                 weekEvent={event}
                 isDragging={isDragging}
-                height={EVENT_MIN_HEIGHT}
+                height={DATE_EVENT_MIN_HEIGHT}
                 disablePointerEvents={isDraggingForCreate || isEventMoving}
                 onMouseDown={(e) => e.stopPropagation()}
                 draggable
@@ -130,7 +130,7 @@ export const LongTermEventRow: React.FC<Props> = ({
                 key={weekDay}
                 count={count}
                 limit={LONG_TERM_EVENT_DISPLAY_LIMIT}
-                height={EVENT_MIN_HEIGHT}
+                height={DATE_EVENT_MIN_HEIGHT}
                 disablePointerEvents={isDraggingForCreate || isEventMoving}
                 weekDay={weekDay}
                 onClick={() => onChangeExpand(true)}
@@ -141,7 +141,7 @@ export const LongTermEventRow: React.FC<Props> = ({
         <DragPreviewWeekEventsCard
           week={week}
           draggingEvent={moveEventPreview}
-          height={EVENT_MIN_HEIGHT}
+          height={DATE_EVENT_MIN_HEIGHT}
         />
       )}
     </div>

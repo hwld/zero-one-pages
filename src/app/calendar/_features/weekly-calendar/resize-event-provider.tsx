@@ -9,10 +9,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { DateEvent, ResizeEventPreview } from "../../type";
+import { ResizeEventPreview } from "../../type";
+import { DateEvent } from "../event/date-event/type";
 import { useUpdateEvent } from "../../_queries/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
-import { MouseHistory, getDateFromY } from "./utils";
+import { MouseHistory } from "../utils";
+import { getDateFromY } from "../event/date-event/utils";
 
 type ResizeEventActions = {
   startResize: (params: {

@@ -1,60 +1,14 @@
-// TODO:
 import {
-  lastDayOfMonth,
-  eachWeekOfInterval,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  Interval,
-  AreIntervalsOverlappingOptions,
   areIntervalsOverlapping,
-  differenceInCalendarDays,
-  isWithinInterval,
   startOfDay,
   endOfDay,
+  differenceInCalendarDays,
+  eachDayOfInterval,
+  isWithinInterval,
 } from "date-fns";
-import { WeekEvent } from "../../type";
-import { Event } from "../../_mocks/event-store";
-
-export const getCalendarDates = ({
-  year,
-  month: _month,
-}: {
-  year: number;
-  month: number;
-}): Date[][] => {
-  const month = _month - 1;
-  const firstDay = new Date(year, month, 1);
-  const lastDay = lastDayOfMonth(new Date(year, month));
-
-  // 7日ごとに日付をまとめる
-  const calendarWeekStarts = eachWeekOfInterval({
-    start: startOfWeek(firstDay),
-    end: endOfWeek(lastDay),
-  });
-  const calendar = calendarWeekStarts.map((weekStart) => {
-    return eachDayOfInterval({
-      start: weekStart,
-      end: endOfWeek(weekStart),
-    });
-  });
-
-  return calendar;
-};
-
-export const getOverlappingDates = (
-  a: Interval,
-  b: Interval,
-  options?: AreIntervalsOverlappingOptions,
-) => {
-  if (areIntervalsOverlapping(a, b, options)) {
-    const start = a.start > b.start ? a.start : b.start;
-    const end = a.end < b.end ? a.end : b.end;
-    return eachDayOfInterval({ start, end });
-  } else {
-    return [];
-  }
-};
+import { WeekEvent } from "./type";
+import { Event } from "../../../_mocks/event-store";
+import { getOverlappingDates } from "../../utils";
 
 export const getWeekEvents = ({
   week,
