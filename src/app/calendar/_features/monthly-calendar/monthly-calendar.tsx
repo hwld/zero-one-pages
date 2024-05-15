@@ -1,20 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
 import { getCalendarDates } from "../../utils";
-import { getWeekEvents } from "../event/week-event/utils";
 import { Event } from "../../_mocks/event-store";
-import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { WeekEventRow } from "../event/week-event/week-event-row";
-import {
-  MoveWeekEventProvider,
-  useMoveWeekEvent,
-} from "../event/week-event/move-event-provider";
+import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
+import { MoveWeekEventProvider } from "../event/week-event/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
   PrepareCreateWeekEventProvider,
   usePrepareCreateWeekEvent,
 } from "../event/week-event/prepare-create-event-provider";
-import { getEventFromMoveEventPreview } from "../event/week-event/utils";
+import { WeekRow } from "./week-row";
 
 type Props = {
   currentDate: Date;
@@ -64,8 +59,6 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
     };
   }, [yearMonth]);
 
-  const { isEventMoving, moveEventPreview: moveEventPreview } =
-    useMoveWeekEvent();
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateWeekEvent();
 
@@ -83,45 +76,16 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
         </div>
         <div className="grid">
           {calendar.map((week, i) => {
-            // TODO:
-            const weekEvents = getWeekEvents({
-              week,
-              events: events.map((event): Event => {
-                if (!isEventMoving && moveEventPreview?.id === event.id) {
-                  return getEventFromMoveEventPreview(moveEventPreview);
-                }
-
-                return event;
-              }),
-            });
-
             return (
-              <div
-                key={`${week[0]}`}
-                className="relative grid min-h-[80px] min-w-[560px] select-none grid-cols-7"
-              >
-                {week.map((date) => {
-                  return (
-                    <CalendarDate
-                      currentDate={currentDate}
-                      calendarYearMonth={yearMonth}
-                      key={date.getTime()}
-                      date={date}
-                      prepareCreateEventState={prepareCreateEventState}
-                    />
-                  );
-                })}
-                <div className="absolute inset-0">
-                  <WeekEventRow
-                    ref={i === 0 ? firstWeekEventRowRef : undefined}
-                    week={week}
-                    allWeekEvents={weekEvents}
-                    eventLimit={eventLimit}
-                    eventHeight={MONTHLY_EVENT_ROW_SIZE}
-                    eventTop={MONTHLY_DATE_HEADER_HEIGHT}
-                  />
-                </div>
-              </div>
+              <WeekRow
+                key={`${week[i]}`}
+                rowRef={i === 0 ? firstWeekEventRowRef : undefined}
+                week={week}
+                events={events}
+                currentDate={currentDate}
+                calendarYearMonth={yearMonth}
+                eventLimit={eventLimit}
+              />
             );
           })}
         </div>

@@ -9,15 +9,13 @@ import {
 import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
-import { getWeekEvents } from "../event/week-event/utils";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
-import { useMoveWeekEvent } from "../event/week-event/move-event-provider";
-import { getEventFromMoveEventPreview } from "../event/week-event/utils";
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
 import { WeekEventRow } from "../event/week-event/week-event-row";
 import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
+import { useOptimisticWeekEvents } from "../event/week-event/use-optimistic-week-events";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -34,19 +32,10 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   week,
   longTermEvents,
 }) => {
-  const { isEventMoving, moveEventPreview: moveEventPreview } =
-    useMoveWeekEvent();
-
   const [expanded, setExpanded] = useState(false);
-  const weekLongTermEvents = getWeekEvents({
+  const weekLongTermEvents = useOptimisticWeekEvents({
     week,
-    events: longTermEvents.map((event) => {
-      if (!isEventMoving && moveEventPreview?.id === event.id) {
-        return getEventFromMoveEventPreview(moveEventPreview);
-      }
-
-      return event;
-    }),
+    events: longTermEvents,
   });
 
   const { prepareCreateEventState, prepareCreateEventActions } =

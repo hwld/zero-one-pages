@@ -1,7 +1,7 @@
 import { isSameDay, isSameMonth, isWeekend } from "date-fns";
 import { isDayWithinDragDateRange } from "../../utils";
 import clsx from "clsx";
-import { PrepareCreateWeekEventState } from "../event/week-event/prepare-create-event-provider";
+import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
 
 export const MONTHLY_DATE_HEADER_HEIGHT = 32;
 
@@ -9,15 +9,14 @@ type Props = {
   currentDate: Date;
   calendarYearMonth: Date;
   date: Date;
-  prepareCreateEventState: PrepareCreateWeekEventState;
 };
 
 export const CalendarDate: React.FC<Props> = ({
   currentDate,
   calendarYearMonth,
   date,
-  prepareCreateEventState,
 }) => {
+  const { prepareCreateEventState } = usePrepareCreateWeekEvent();
   const isDraggedDate =
     prepareCreateEventState.dragDateRange &&
     isDayWithinDragDateRange(date, prepareCreateEventState.dragDateRange);
