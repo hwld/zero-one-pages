@@ -13,16 +13,16 @@ import { IconButton } from "./button";
 
 type Props = {
   type: CalendarType;
-  date: Date;
-  onChangeDate: (d: Date) => void;
+  viewDate: Date;
+  onChangeViewDate: (d: Date) => void;
   month: Date;
   onChangeMonth: Dispatch<SetStateAction<Date>>;
 };
 
 export const DayPicker: React.FC<Props> = ({
   type,
-  date,
-  onChangeDate,
+  viewDate,
+  onChangeViewDate,
   month,
   onChangeMonth,
 }) => {
@@ -32,17 +32,17 @@ export const DayPicker: React.FC<Props> = ({
         return undefined;
       }
       case "week": {
-        return { from: startOfWeek(date), to: endOfWeek(date) };
+        return { from: startOfWeek(viewDate), to: endOfWeek(viewDate) };
       }
       default: {
         throw new Error(type satisfies never);
       }
     }
-  }, [date, type]);
+  }, [viewDate, type]);
 
   const handleDayClick = (d: Date) => {
     onChangeMonth(d);
-    onChangeDate(d);
+    onChangeViewDate(d);
   };
 
   return (

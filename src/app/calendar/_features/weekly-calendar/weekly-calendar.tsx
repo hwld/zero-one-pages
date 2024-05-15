@@ -34,7 +34,7 @@ import { PrepareCreateWeekEventProvider } from "../event/week-event/prepare-crea
 
 export const WEEKLY_CALENDAR_GRID_COLS_CLASS = "grid-cols-[75px,repeat(7,1fr)]";
 
-type WeeklyCalendarProps = { currentDate: Date; date: Date; events: Event[] };
+type WeeklyCalendarProps = { date: Date; events: Event[] };
 
 type WeeklyCalendarImplProps = {
   scrollableRef: RefObject<HTMLDivElement>;
@@ -42,7 +42,6 @@ type WeeklyCalendarImplProps = {
 
 export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   scrollableRef,
-  currentDate,
   date,
   events,
 }) => {
@@ -80,7 +79,6 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
     <>
       <div className="flex min-h-0 flex-col">
         <WeeklyCalendarDayHeader
-          currentDate={currentDate}
           calendarYearMonth={date}
           week={week}
           longTermEvents={longTermEvents}
@@ -117,7 +115,6 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
               return (
                 <DateColumn
                   key={`${date}`}
-                  currentDate={currentDate}
                   displayedDay={date}
                   events={defaultEvents}
                 />

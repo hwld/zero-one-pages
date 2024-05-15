@@ -32,7 +32,7 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
         ref={ref}
         {...props}
         className={clsx(
-          "group absolute select-none pb-[1px] text-sm text-neutral-100 focus-visible:outline-none",
+          "group absolute select-none pb-[1px] pl-[2px] text-sm text-neutral-100 focus-visible:outline-none",
           disablePointerEvents ? "pointer-events-none" : "pointer-events-auto",
           className,
         )}

@@ -1,30 +1,25 @@
-import { Dispatch, SetStateAction } from "react";
-import { CalendarType } from "../page";
 import { DayPicker } from "./day-picker";
+import { useAppState } from "./use-app-state";
 
-type Props = {
-  type: CalendarType;
-  date: Date;
-  onChangeDate: (d: Date) => void;
-  month: Date;
-  onChangeMonth: Dispatch<SetStateAction<Date>>;
-};
+type Props = {};
 
-export const Sidebar: React.FC<Props> = ({
-  type,
-  date,
-  onChangeDate,
-  month,
-  onChangeMonth,
-}) => {
+export const Sidebar: React.FC<Props> = () => {
+  const {
+    calendarType,
+    viewDate,
+    setViewDate,
+    dayPickerMonth,
+    setDayPickerMonth,
+  } = useAppState();
+
   return (
     <div className="flex flex-col items-center border-r border-neutral-300 bg-neutral-100 p-2">
       <DayPicker
-        date={date}
-        month={month}
-        type={type}
-        onChangeDate={onChangeDate}
-        onChangeMonth={onChangeMonth}
+        viewDate={viewDate}
+        month={dayPickerMonth}
+        type={calendarType}
+        onChangeViewDate={setViewDate}
+        onChangeMonth={setDayPickerMonth}
       />
     </div>
   );

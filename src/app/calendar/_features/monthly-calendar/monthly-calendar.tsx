@@ -12,16 +12,11 @@ import {
 import { WeekRow } from "./week-row";
 
 type Props = {
-  currentDate: Date;
   yearMonth: Date;
   events: Event[];
 };
 
-export const MonthlyCalendarImpl: React.FC<Props> = ({
-  currentDate,
-  yearMonth,
-  events,
-}) => {
+export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
   const year = useMemo(() => {
     return yearMonth.getFullYear();
   }, [yearMonth]);
@@ -82,7 +77,6 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
                 rowRef={i === 0 ? firstWeekEventRowRef : undefined}
                 week={week}
                 events={events}
-                currentDate={currentDate}
                 calendarYearMonth={yearMonth}
                 eventLimit={eventLimit}
               />

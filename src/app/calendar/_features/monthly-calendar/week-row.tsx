@@ -9,7 +9,6 @@ type Props = {
   week: Date[];
   events: Event[];
   rowRef?: RefObject<HTMLDivElement>;
-  currentDate: Date;
   calendarYearMonth: Date;
   eventLimit: number;
 };
@@ -18,7 +17,6 @@ export const WeekRow: React.FC<Props> = ({
   week,
   events,
   rowRef,
-  currentDate,
   calendarYearMonth,
   eventLimit,
 }) => {
@@ -29,7 +27,6 @@ export const WeekRow: React.FC<Props> = ({
       {week.map((date) => {
         return (
           <CalendarDate
-            currentDate={currentDate}
             calendarYearMonth={calendarYearMonth}
             key={date.getTime()}
             date={date}

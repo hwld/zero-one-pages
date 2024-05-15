@@ -1,14 +1,36 @@
-import { useEffect, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+type MinuteClockContext = Date;
+
+const Context = createContext<MinuteClockContext | undefined>(undefined);
 
 /**
  * 1分ごとに更新される日付を返す
  */
 export const useMinuteClock = () => {
+  const currentDate = useContext(Context);
+  if (!currentDate) {
+    throw new Error("MinuteClockproviderが存在しません");
+  }
+
+  return { currentDate };
+};
+
+export const MinuteClockProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
+    let timer: number;
     const triggerMinuteUpdate = () => {
-      window.setTimeout(
+      timer = window.setTimeout(
         () => {
           setCurrentDate(new Date());
           triggerMinuteUpdate();
@@ -18,7 +40,10 @@ export const useMinuteClock = () => {
     };
 
     triggerMinuteUpdate();
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
-  return currentDate;
+  return <Context.Provider value={currentDate}>{children}</Context.Provider>;
 };

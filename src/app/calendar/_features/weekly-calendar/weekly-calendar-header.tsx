@@ -16,22 +16,22 @@ import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
 import { WeekEventRow } from "../event/week-event/week-event-row";
 import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
 import { useOptimisticWeekEvents } from "../event/week-event/use-optimistic-week-events";
+import { useMinuteClock } from "../../_components/use-minute-clock";
 
 export const DAY_TITLE_HEIGHT = 28;
 
 type Props = {
-  currentDate: Date;
   calendarYearMonth: Date;
   week: Date[];
   longTermEvents: Event[];
 };
 
 export const WeeklyCalendarDayHeader: React.FC<Props> = ({
-  currentDate,
   calendarYearMonth,
   week,
   longTermEvents,
 }) => {
+  const { currentDate } = useMinuteClock();
   const [expanded, setExpanded] = useState(false);
   const weekLongTermEvents = useOptimisticWeekEvents({
     week,

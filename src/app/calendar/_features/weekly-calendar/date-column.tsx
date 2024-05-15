@@ -13,17 +13,18 @@ import { forwardRef, useEffect, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
 import { DateEventsColumn } from "../event/date-event/date-events-column";
 import { useOptimisticDateEvents } from "../event/date-event/use-optimistic-date-events";
+import { useMinuteClock } from "../../_components/use-minute-clock";
 
 type Props = {
-  currentDate: Date;
   displayedDay: Date;
   events: Event[];
 };
 
 export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
-  { currentDate, displayedDay, events },
+  { displayedDay, events },
   ref,
 ) {
+  const { currentDate } = useMinuteClock();
   const displayedDateEvents = useOptimisticDateEvents({
     day: displayedDay,
     events,
