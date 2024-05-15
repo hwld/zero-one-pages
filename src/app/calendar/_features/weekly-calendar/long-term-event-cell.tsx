@@ -3,8 +3,8 @@ import { Event } from "../../_mocks/event-store";
 import { DragDateRange, isDayWithinDragDateRange } from "../../utils";
 import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
 import { endOfDay, isWithinInterval, startOfDay } from "date-fns";
-import { LONG_TERM_EVENT_DISPLAY_LIMIT } from "./long-term-event-row";
 
+export const LONG_TERM_EVENT_DISPLAY_LIMIT = 2;
 export const CELL_Y_MARGIN = 4;
 
 const calcCellHeight = (

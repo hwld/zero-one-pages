@@ -1,11 +1,14 @@
 import clsx from "clsx";
 import { WEEKLY_CALENDAR_GRID_COLS_CLASS } from "./weekly-calendar";
 import { WEEK_DAY_LABELS } from "../../consts";
-import { LongTermEventCell } from "./long-term-event-cell";
+import {
+  CELL_Y_MARGIN,
+  LONG_TERM_EVENT_DISPLAY_LIMIT,
+  LongTermEventCell,
+} from "./long-term-event-cell";
 import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
-import { LongTermEventRow } from "./long-term-event-row";
 import { getWeekEvents } from "../event/week-event/utils";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
@@ -13,6 +16,8 @@ import { useMoveWeekEvent } from "../event/week-event/move-event-provider";
 import { getEventFromMoveEventPreview } from "../event/week-event/utils";
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
+import { WeekEventRow } from "../event/week-event/week-event-row";
+import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
 
 export const DAY_TITLE_HEIGHT = 28;
 
@@ -99,12 +104,18 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
             </div>
           );
         })}
-        <LongTermEventRow
-          week={week}
-          weekLongTermEvents={weekLongTermEvents}
-          expanded={expanded}
-          onChangeExpand={setExpanded}
-        />
+        <div
+          className="absolute inset-0 col-start-2"
+          style={{ top: DAY_TITLE_HEIGHT + CELL_Y_MARGIN }}
+        >
+          <WeekEventRow
+            week={week}
+            allWeekEvents={weekLongTermEvents}
+            eventHeight={DATE_EVENT_MIN_HEIGHT}
+            eventLimit={expanded ? undefined : LONG_TERM_EVENT_DISPLAY_LIMIT}
+            onClickMoreWeekEvents={() => setExpanded(true)}
+          />
+        </div>
       </div>
       <CreateEventFormDialog
         isOpen={prepareCreateEventState.defaultCreateEventValues !== undefined}

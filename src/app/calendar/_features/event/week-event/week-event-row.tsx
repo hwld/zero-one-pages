@@ -1,44 +1,62 @@
 import { forwardRef, useRef } from "react";
-import { MONTHLY_EVENT_ROW_SIZE } from "../../../consts";
-import { MONTHLY_DATE_HEADER_HEIGHT } from "../../monthly-calendar/calendar-date";
 import { useMergedRef } from "@mantine/hooks";
 import { useMoveWeekEvent } from "./move-event-provider";
-import { PrepareCreateWeekEventActions } from "./prepare-create-event-provider";
+import { usePrepareCreateWeekEvent } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { WeekEventCard } from "./card/week-event-card";
 import { MoreWeekEventsCard } from "./card/more-week-even";
 import { DragPreviewWeekEventsCard } from "./card/drag-preview";
 import { WeekEvent } from "./type";
+import { getExceededEventCountByDayOfWeek } from "./utils";
 
 type Props = {
   week: Date[];
-  weekEvents: WeekEvent[];
-  eventLimit: number;
-  exceededEventCountMap: Map<number, number>;
-  isDraggingForCreate: boolean;
-  prepareCreateEventActions: PrepareCreateWeekEventActions;
+  allWeekEvents: WeekEvent[];
+  eventLimit?: number;
+  eventHeight: number;
+  eventTop?: number;
+  onClickMoreWeekEvents?: () => void;
 };
 
 export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
   function WeekEventRow(
     {
       week,
-      weekEvents,
+      allWeekEvents,
       eventLimit,
-      exceededEventCountMap,
-      isDraggingForCreate,
-      prepareCreateEventActions,
+      eventHeight,
+      eventTop,
+      onClickMoreWeekEvents,
     },
     _ref,
   ) {
-    const {
-      isEventMoving,
-      moveEventPreview: moveEventPreview,
-      moveEventActions: moveEventActions,
-    } = useMoveWeekEvent();
+    const { isEventMoving, moveEventPreview, moveEventActions } =
+      useMoveWeekEvent();
+
+    const { prepareCreateEventState, prepareCreateEventActions } =
+      usePrepareCreateWeekEvent();
+    const isDraggingForCreate =
+      prepareCreateEventState.dragDateRange !== undefined;
 
     const rowRef = useRef<HTMLDivElement>(null);
     const ref = useMergedRef(_ref, rowRef);
+
+    const visibleWeekEvents = allWeekEvents.filter((e) => {
+      if (eventLimit === undefined) {
+        return true;
+      }
+      return e.top < eventLimit;
+    });
+
+    // TODO:
+    const exceededEventCountMap =
+      eventLimit !== undefined
+        ? getExceededEventCountByDayOfWeek({
+            week,
+            weekEvents: allWeekEvents,
+            limit: eventLimit,
+          })
+        : undefined;
 
     const getDateFromX = (x: number) => {
       if (!rowRef.current) {
@@ -86,15 +104,14 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
     return (
       <div
         ref={ref}
-        className="absolute bottom-0 left-0 top-0 w-full gap-1"
+        className="relative h-full w-full"
         onMouseDown={handleRowMouseDown}
         onMouseMove={handleRowMouseMove}
       >
         <AnimatePresence>
-          {weekEvents.map((event) => {
-            const isDragPreview = moveEventPreview?.id === event.id;
-
-            const isDragging = isEventMoving && isDragPreview;
+          {visibleWeekEvents.map((event) => {
+            const isDragging =
+              isEventMoving && moveEventPreview?.id === event.id;
 
             return (
               <motion.div
@@ -102,13 +119,13 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
                 <WeekEventCard
-                  isDragging={isDragging}
-                  topMargin={MONTHLY_DATE_HEADER_HEIGHT}
-                  height={MONTHLY_EVENT_ROW_SIZE}
-                  disablePointerEvents={isDraggingForCreate || isEventMoving}
                   weekEvent={event}
-                  onMouseDown={(e) => e.stopPropagation()}
+                  isDragging={isDragging}
+                  topMargin={eventTop}
+                  height={eventHeight}
+                  disablePointerEvents={isDraggingForCreate || isEventMoving}
                   draggable
+                  onMouseDown={(e) => e.stopPropagation()}
                   onDragStart={(e) => handleEventDragStart(e, event)}
                 />
               </motion.div>
@@ -117,9 +134,12 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
         </AnimatePresence>
         {/* 表示上限を超えたイベントの数 */}
         {week.map((date) => {
+          if (!exceededEventCountMap || eventLimit === undefined) {
+            return null;
+          }
+
           const weekDay = date.getDay();
           const count = exceededEventCountMap.get(weekDay);
-
           if (!count) {
             return null;
           }
@@ -127,12 +147,13 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           return (
             <MoreWeekEventsCard
               key={weekDay}
-              topMargin={MONTHLY_DATE_HEADER_HEIGHT}
+              topMargin={eventTop}
               weekDay={weekDay}
               count={count}
               limit={eventLimit}
               disablePointerEvents={isDraggingForCreate || isEventMoving}
-              height={MONTHLY_EVENT_ROW_SIZE}
+              height={eventHeight}
+              onClick={onClickMoreWeekEvents}
             />
           );
         })}
@@ -140,8 +161,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           <DragPreviewWeekEventsCard
             week={week}
             draggingEvent={moveEventPreview}
-            topMargin={MONTHLY_DATE_HEADER_HEIGHT}
-            height={MONTHLY_EVENT_ROW_SIZE}
+            topMargin={eventTop}
+            height={eventHeight}
           />
         )}
       </div>

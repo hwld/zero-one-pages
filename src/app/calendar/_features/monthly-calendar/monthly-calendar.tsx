@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
-import { getExceededEventCountByDayOfWeek } from "../event/week-event/utils";
 import { getCalendarDates } from "../../utils";
 import { getWeekEvents } from "../event/week-event/utils";
 import { Event } from "../../_mocks/event-store";
@@ -84,6 +83,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
         </div>
         <div className="grid">
           {calendar.map((week, i) => {
+            // TODO:
             const weekEvents = getWeekEvents({
               week,
               events: events.map((event): Event => {
@@ -93,15 +93,6 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
 
                 return event;
               }),
-            });
-
-            const filteredWeekEvents = weekEvents.filter(
-              (event) => event.top < eventLimit,
-            );
-            const exceededEventCountMap = getExceededEventCountByDayOfWeek({
-              week,
-              weekEvents,
-              limit: eventLimit,
             });
 
             return (
@@ -120,17 +111,16 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
                     />
                   );
                 })}
-                <WeekEventRow
-                  ref={i === 0 ? firstWeekEventRowRef : undefined}
-                  week={week}
-                  weekEvents={filteredWeekEvents}
-                  eventLimit={eventLimit}
-                  exceededEventCountMap={exceededEventCountMap}
-                  isDraggingForCreate={
-                    prepareCreateEventState.dragDateRange !== undefined
-                  }
-                  prepareCreateEventActions={prepareCreateEventActions}
-                />
+                <div className="absolute inset-0">
+                  <WeekEventRow
+                    ref={i === 0 ? firstWeekEventRowRef : undefined}
+                    week={week}
+                    allWeekEvents={weekEvents}
+                    eventLimit={eventLimit}
+                    eventHeight={MONTHLY_EVENT_ROW_SIZE}
+                    eventTop={MONTHLY_DATE_HEADER_HEIGHT}
+                  />
+                </div>
               </div>
             );
           })}
