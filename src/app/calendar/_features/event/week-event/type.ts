@@ -10,7 +10,4 @@ export type WeekEvent = Event & {
   endWeekDay: number;
 };
 
-// TODO: eventをフラットにする
-export type MoveWeekEventPreview = {
-  event: WeekEvent;
-} & DragDateRange;
+export type MoveWeekEventPreview = WeekEvent & DragDateRange;

@@ -97,8 +97,7 @@ export const LongTermEventRow: React.FC<Props> = ({
     >
       <AnimatePresence>
         {visibleWeekLongTermEvents.map((event) => {
-          const isDragging =
-            isEventMoving && moveEventPreview?.event.id === event.id;
+          const isDragging = isEventMoving && moveEventPreview?.id === event.id;
 
           return (
             <motion.div

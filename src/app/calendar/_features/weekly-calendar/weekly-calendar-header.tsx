@@ -36,7 +36,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   const weekLongTermEvents = getWeekEvents({
     week,
     events: longTermEvents.map((event) => {
-      if (!isEventMoving && moveEventPreview?.event.id === event.id) {
+      if (!isEventMoving && moveEventPreview?.id === event.id) {
         return getEventFromMoveEventPreview(moveEventPreview);
       }
 

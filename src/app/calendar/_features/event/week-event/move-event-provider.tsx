@@ -51,7 +51,7 @@ export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
       setState({
         isEventMoving: true,
         moveEventPreview: {
-          event,
+          ...event,
           dragStartDate: moveStartDate,
           dragEndDate: moveStartDate,
         },

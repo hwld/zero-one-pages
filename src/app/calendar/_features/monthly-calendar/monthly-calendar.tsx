@@ -87,7 +87,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({
             const weekEvents = getWeekEvents({
               week,
               events: events.map((event): Event => {
-                if (!isEventMoving && moveEventPreview?.event.id === event.id) {
+                if (!isEventMoving && moveEventPreview?.id === event.id) {
                   return getEventFromMoveEventPreview(moveEventPreview);
                 }
 

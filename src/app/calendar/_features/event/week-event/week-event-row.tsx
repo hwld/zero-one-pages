@@ -92,7 +92,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       >
         <AnimatePresence>
           {weekEvents.map((event) => {
-            const isDragPreview = moveEventPreview?.event.id === event.id;
+            const isDragPreview = moveEventPreview?.id === event.id;
 
             const isDragging = isEventMoving && isDragPreview;
 

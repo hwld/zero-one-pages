@@ -182,7 +182,7 @@ export const getExceededEventCountByDayOfWeek = ({
 export const getEventFromMoveEventPreview = (
   draggingEvent: MoveWeekEventPreview,
 ): Event => {
-  const { event, dragStartDate, dragEndDate } = draggingEvent;
+  const { dragStartDate, dragEndDate, ...event } = draggingEvent;
   const diffDay = differenceInDays(dragEndDate, dragStartDate);
 
   const newStart = addDays(event.start, diffDay);
