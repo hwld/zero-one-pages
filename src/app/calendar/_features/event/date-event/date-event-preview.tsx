@@ -19,7 +19,7 @@ export const DateEventPreview: React.FC<Props> = ({
 
   return (
     <div
-      className="absolute z-10 w-full bg-neutral-500/15"
+      className="absolute z-10 w-full bg-neutral-700/5"
       style={{ top, height }}
     />
   );

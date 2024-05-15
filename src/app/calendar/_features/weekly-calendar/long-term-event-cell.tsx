@@ -49,7 +49,7 @@ export const LongTermEventCell: React.FC<Props> = ({
       className={clsx(
         "grow border-y border-r border-neutral-200",
         isDragging && isDayWithinDragDateRange(date, dragDateRangeForCreate)
-          ? "bg-neutral-500/15"
+          ? "bg-neutral-700/5"
           : "",
       )}
       style={{
