@@ -1,7 +1,14 @@
 "use client";
 
 import clsx from "clsx";
-import { ReactNode, Suspense, useEffect, useMemo, useRef } from "react";
+import {
+  PropsWithChildren,
+  ReactNode,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { SideBar } from "./_components/side-bar/side-bar";
 import { HomeIcon } from "lucide-react";
 import { EmptyTask } from "./_components/empty-task";
@@ -14,12 +21,13 @@ import { useTasks } from "./_queries/use-tasks";
 import "./style.css";
 import { ErrorTasks } from "./_components/error-tasks";
 import { LoadingTasks } from "./_components/loading-tasks";
+import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする
 
 type Props = { children: ReactNode };
-const Layout: React.FC<Props> = ({ children }) => {
+const LayoutInner: React.FC<Props> = ({ children }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { data: tasks = [], status: tasksStatus } = useTasks();
 
@@ -117,6 +125,14 @@ const Layout: React.FC<Props> = ({ children }) => {
       </div>
       <Suspense>{children}</Suspense>
     </div>
+  );
+};
+
+const Layout: React.FC<PropsWithChildren> = ({ children }) => {
+  return (
+    <DefaultQueryClientProvider>
+      <LayoutInner>{children}</LayoutInner>
+    </DefaultQueryClientProvider>
   );
 };
 

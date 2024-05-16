@@ -5,6 +5,7 @@ import { TasksProvider, useTasksData } from "./_contexts/tasks-provider";
 import "./style.css";
 import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
+import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
@@ -32,9 +33,11 @@ const LayoutWithProviders: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   return (
-    <TasksProvider>
-      <Layout>{children}</Layout>
-    </TasksProvider>
+    <DefaultQueryClientProvider>
+      <TasksProvider>
+        <Layout>{children}</Layout>
+      </TasksProvider>
+    </DefaultQueryClientProvider>
   );
 };
 
