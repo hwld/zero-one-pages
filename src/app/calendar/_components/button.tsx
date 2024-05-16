@@ -17,7 +17,7 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
       <button
         ref={ref}
         className={cn(
-          "relative flex select-none items-center rounded transition-colors",
+          "relative flex select-none items-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-400",
           isPending && "pointer-events-none !text-transparent",
           className,
         )}
@@ -37,11 +37,12 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
 export type ButtonProps = {
   variant?: "default" | "ghost";
   size?: "md" | "sm";
-} & ButtonBaseProps;
+  active?: boolean;
+} & Omit<ButtonBaseProps, "className">;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
-    { variant = "default", size = "md", children, ...props },
+    { variant = "default", size = "md", children, active, ...props },
     ref,
   ) {
     const sizeClass = {
@@ -59,7 +60,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <ButtonBase
         ref={ref}
         {...props}
-        className={clsx(variantClass[variant], sizeClass[size])}
+        className={cn(
+          variantClass[variant],
+          sizeClass[size],
+          active && "bg-neutral-200",
+        )}
       >
         {children}
       </ButtonBase>

@@ -9,6 +9,7 @@ import { Button, IconButton } from "./_components/button";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import { useAppState } from "./_components/use-app-state";
 import { useCalendarCommands } from "./command";
+import { Select } from "./_components/select";
 
 export type CalendarType = "month" | "week";
 const Page = () => {
@@ -69,14 +70,14 @@ const Page = () => {
             <IconButton icon={TbChevronRight} onClick={handleNavigateNext} />
           </div>
           <div className="flex w-full justify-end gap-2">
-            <select
-              className="h-8 w-[80px] rounded border border-neutral-300 bg-neutral-100 px-2 text-sm transition-colors hover:bg-neutral-200"
+            <Select
+              items={[
+                { value: "week", label: "週", option: "W" },
+                { value: "month", label: "月", option: "M" },
+              ]}
               value={calendarType}
-              onChange={(e) => setCalendarType(e.target.value as CalendarType)}
-            >
-              <option value="month">月</option>
-              <option value="week">週</option>
-            </select>
+              onSelect={setCalendarType}
+            />
             <Button onClick={goTodayCalendarPage}>今日</Button>
           </div>
         </div>
