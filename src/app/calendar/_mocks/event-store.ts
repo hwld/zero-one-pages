@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CreateEventInput, UpdateEventInput } from "./api";
+import { addHours } from "date-fns";
 
 export const eventSchema = z.object({
   id: z.string(),
@@ -11,7 +12,15 @@ export const eventSchema = z.object({
 export type Event = z.infer<typeof eventSchema>;
 
 class EventStore {
-  private events: Event[] = [];
+  private events: Event[] = [
+    {
+      id: crypto.randomUUID(),
+      title: "Event",
+      allDay: false,
+      start: new Date(),
+      end: addHours(new Date(), 3),
+    },
+  ];
 
   public getAll(): Event[] {
     return this.events;
