@@ -57,10 +57,9 @@ export const useGitHubProjectCommands = () => {
   );
 
   useEffect(() => {
-    setErrorSimulationScope({ query: false, mutation: false });
-
+    taskStore.stopErrorSimulation();
     return () => {
-      setErrorSimulationScope({ query: false, mutation: false });
+      taskStore.stopErrorSimulation();
     };
   }, []);
 };

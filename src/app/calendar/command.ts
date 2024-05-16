@@ -58,9 +58,9 @@ export const useCalendarCommands = () => {
   );
 
   useEffect(() => {
-    setErrorSimulationScope({ query: false, mutation: false });
+    eventStore.stopErrorSimulation();
     return () => {
-      setErrorSimulationScope({ query: false, mutation: false });
+      eventStore.stopErrorSimulation();
     };
   }, []);
 };

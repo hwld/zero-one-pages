@@ -94,6 +94,10 @@ class EventStore {
       this.errorSimuationScopes.delete(scope);
     }
   }
+
+  public stopErrorSimulation() {
+    this.errorSimuationScopes.clear();
+  }
 }
 
 export const eventStore = new EventStore();
