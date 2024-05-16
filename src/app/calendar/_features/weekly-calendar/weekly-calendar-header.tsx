@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { WEEKLY_CALENDAR_GRID_COLS_CLASS } from "./weekly-calendar";
+import { WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS } from "./weekly-calendar";
 import { WEEK_DAY_LABELS } from "../../consts";
 import {
   CELL_Y_MARGIN,
@@ -43,7 +43,10 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
 
   return (
     <>
-      <div className={clsx("relative grid", WEEKLY_CALENDAR_GRID_COLS_CLASS)}>
+      <div
+        className={clsx("relative grid")}
+        style={{ gridTemplateColumns: WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS }}
+      >
         <div className="flex select-none flex-col">
           <div style={{ height: DAY_TITLE_HEIGHT }} />
           <div

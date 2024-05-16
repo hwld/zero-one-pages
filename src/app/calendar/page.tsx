@@ -45,7 +45,7 @@ const Page = () => {
 
   return (
     <div
-      className="grid h-[100dvh] w-[100dvw] grid-cols-[250px,1fr] overflow-hidden bg-neutral-50 text-neutral-700"
+      className="grid h-[100dvh] w-[100dvw] grid-cols-[250px_1fr] overflow-hidden bg-neutral-50 text-neutral-700"
       style={{ colorScheme: "light" }}
     >
       <Sidebar />

@@ -36,7 +36,7 @@ import { useMinuteClock } from "../../_components/use-minute-clock";
 import clsx from "clsx";
 
 export const WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE = 75;
-export const WEEKLY_CALENDAR_GRID_COLS_CLASS = `grid-cols-[${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px,repeat(7,1fr)]`;
+export const WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS = `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(7,1fr)`;
 
 type WeeklyCalendarProps = { date: Date; events: Event[] };
 
@@ -95,7 +95,10 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
           onScroll={handleScroll}
         >
           <div
-            className={clsx("relative grid", WEEKLY_CALENDAR_GRID_COLS_CLASS)}
+            className={clsx("relative grid")}
+            style={{
+              gridTemplateColumns: WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS,
+            }}
           >
             <div className="">
               {eachHourOfInterval({
