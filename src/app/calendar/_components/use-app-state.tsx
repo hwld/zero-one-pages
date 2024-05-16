@@ -13,6 +13,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -94,6 +95,28 @@ export const AppStateProvider: React.FC<{
   const goTodayCalendarPage = useCallback(() => {
     changeViewDate(new Date());
   }, [changeViewDate]);
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return false;
+      }
+
+      if (event.key === "W" || event.key === "w") {
+        setCalendarType("week");
+      } else if (event.key === "M" || event.key === "m") {
+        setCalendarType("month");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
 
   const value: AppStateContext = useMemo(
     () => ({
