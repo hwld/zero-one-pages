@@ -16,7 +16,7 @@ import { Event } from "../../_mocks/event-store";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
 import { format, isSameDay, isSameYear } from "date-fns";
-import { useDeleteEvent } from "../../_queries/use-delete-event";
+import { useDeleteEvent } from "./use-delete-event";
 import { UpdateEventFormDialog } from "./update-event-form-dialog";
 import { IconButton } from "../../_components/button";
 

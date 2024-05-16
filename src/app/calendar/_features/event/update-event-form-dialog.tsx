@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "../../_components/dialog";
-import { useUpdateEvent } from "../../_queries/use-update-event";
+import { useUpdateEvent } from "./use-update-event";
 import { UpdateEventInput } from "../../_mocks/api";
 import { EVENT_FORM_ID, EventForm } from "./event-form";
 import { Button } from "../../_components/button";

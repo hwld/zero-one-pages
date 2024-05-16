@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UpdateEventInput, updateEvent } from "../_mocks/api";
+import { UpdateEventInput, updateEvent } from "../../_mocks/api";
 import { eventsQueryOption } from "./use-events";
 
 export const useUpdateEvent = () => {

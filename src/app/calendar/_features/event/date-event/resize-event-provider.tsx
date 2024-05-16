@@ -11,7 +11,7 @@ import {
 } from "react";
 import { ResizeDateEventPreview } from "./type";
 import { DateEvent } from "./type";
-import { useUpdateEvent } from "../../../_queries/use-update-event";
+import { useUpdateEvent } from "../use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import { MouseHistory } from "../../../utils";
 import { getDateFromY } from "./utils";

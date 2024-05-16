@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "../../_components/dialog";
 import { CreateEventInput } from "../../_mocks/api";
-import { useCreateEvent } from "../../_queries/use-create-event";
+import { useCreateEvent } from "./use-create-event";
 import { EVENT_FORM_ID, EventForm } from "./event-form";
 import { DragDateRange } from "../../utils";
 import { Dispatch, SetStateAction } from "react";

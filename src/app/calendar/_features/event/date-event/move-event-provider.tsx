@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useUpdateEvent } from "../../../_queries/use-update-event";
+import { useUpdateEvent } from "../use-update-event";
 import { MoveDateEventPreview } from "./type";
 import { DateEvent } from "./type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";

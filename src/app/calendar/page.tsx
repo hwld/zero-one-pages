@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { MonthlyCalendar } from "./_features/monthly-calendar/monthly-calendar";
 import "./style.css";
 import { WeeklyCalendar } from "./_features/weekly-calendar/weekly-calendar";
-import { useEvents } from "./_queries/use-events";
+import { useEvents } from "./_features/event/use-events";
 import { Sidebar } from "./_components/siderbar";
 import { Button, IconButton } from "./_components/button";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";

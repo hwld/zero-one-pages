@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eventsQueryOption } from "./use-events";
-import { useToast } from "../_components/toast";
+import { useToast } from "../../_components/toast";
 import {
   Dispatch,
   PropsWithChildren,
@@ -10,7 +10,7 @@ import {
   useState,
   useContext,
 } from "react";
-import { deleteEvent } from "../_mocks/api";
+import { deleteEvent } from "../../_mocks/api";
 
 type _Context = [
   pendingDeleteEventIds: string[],
@@ -71,7 +71,7 @@ export const useDeleteEvent = () => {
         deletedEvent.id,
       ]);
 
-      toast({
+      toast.info({
         title: "イベントを削除しました",
         actionText: "元に戻す",
         action: ({ close }) => {

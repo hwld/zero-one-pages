@@ -9,7 +9,7 @@ import {
 } from "react";
 import { getEventFromMoveEventPreview } from "./utils";
 import { MoveWeekEventPreview } from "./type";
-import { useUpdateEvent } from "../../../_queries/use-update-event";
+import { useUpdateEvent } from "../use-update-event";
 import { WeekEvent } from "./type";
 
 export type MoveWeekEventActions = {
