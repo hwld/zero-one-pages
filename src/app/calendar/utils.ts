@@ -14,6 +14,10 @@ import {
   startOfWeek,
 } from "date-fns";
 
+export type OmitDistributive<T, K extends keyof any> = T extends any
+  ? Omit<T, K>
+  : never;
+
 export type DragDateRange = {
   dragStartDate: Date;
   dragEndDate: Date;

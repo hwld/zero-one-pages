@@ -24,7 +24,14 @@ export const Dialog: React.FC<Props> = ({ children, isOpen, onChangeOpen }) => {
   });
 
   const click = useClick(context);
-  const dismiss = useDismiss(context);
+  const dismiss = useDismiss(context, {
+    outsidePress: (event) => {
+      if (!(event.target instanceof Element)) {
+        return true;
+      }
+      return !event.target.closest(".toast");
+    },
+  });
 
   const { getFloatingProps } = useInteractions([click, dismiss]);
 

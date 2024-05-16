@@ -9,17 +9,27 @@ import {
 } from "react";
 import * as RxToast from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
-import { TbInfoCircle, TbX } from "react-icons/tb";
+import { TbAlertCircle, TbInfoCircle, TbX } from "react-icons/tb";
 import { Button, IconButton } from "./button";
+import { OmitDistributive } from "../utils";
+import clsx from "clsx";
 
 type CloseFn = (option?: { withoutCallback: boolean }) => void;
 
-type Toast = { id: string; title: string; onClose?: () => void } & (
+type ToastType = "info" | "error";
+
+type Toast = {
+  id: string;
+  type: ToastType;
+  title: string;
+  description?: string;
+  onClose?: () => void;
+} & (
   | { action?: undefined }
   | { action: (params: { close: CloseFn }) => void; actionText: string }
 );
-// 普通にOmitを使うとkeyofで共有のプロパティしか返さないのでunion distributionを使ってすべてのkeyをリストアップできるようにする
-type CreateToastInput<T = Toast> = T extends unknown ? Omit<T, "id"> : never;
+
+type CreateToastInput = OmitDistributive<Toast, "id">;
 
 type ToastContext = [Toast[], Dispatch<SetStateAction<Toast[]>>];
 const ToastContext = createContext<ToastContext | undefined>(undefined);
@@ -61,10 +71,18 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
         {children}
         <AnimatePresence>
           {toasts.map((toast) => {
+            const icon = {
+              info: <TbInfoCircle size={16} />,
+              error: <TbAlertCircle size={16} className="text-red-500" />,
+            } satisfies Record<ToastType, unknown>;
+
             return (
               <RxToast.Root
                 key={toast.id}
                 asChild
+                onPointerDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 onOpenChange={(o) => handleOpenChange(o, toast)}
                 onSwipeStart={(e) => e.preventDefault()}
                 onSwipeMove={(e) => e.preventDefault()}
@@ -74,32 +92,40 @@ export const ToastProvider: React.FC<PropsWithChildren> = ({ children }) => {
               >
                 <motion.div
                   layout
-                  className="relative flex min-h-[80px] w-[300px] flex-col justify-between gap-2 rounded border border-neutral-300 bg-neutral-50 p-2 text-neutral-700 shadow"
+                  className={clsx(
+                    // dialogのoutside clickの判定から除外するためにtoastクラスをつけている
+                    "toast relative flex min-h-[80px] w-[320px] gap-2 rounded border border-neutral-300 bg-neutral-50 p-2 text-neutral-700 shadow",
+                  )}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, y: 8, transition: { duration: 0.1 } }}
                 >
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-2 text-sm">
-                      <TbInfoCircle size={16} />
-                      {toast.title}
+                  <div className="mt-1 shrink-0">{icon[toast.type]}</div>
+                  <div className="flex grow flex-col justify-between gap-1">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm">{toast.title}</div>
+                      <div className="shrink-0">
+                        <IconButton
+                          size="sm"
+                          icon={TbX}
+                          onClick={() => handleClickClose(toast)}
+                        />
+                      </div>
                     </div>
-                    <IconButton
-                      size="sm"
-                      icon={TbX}
-                      onClick={() => handleClickClose(toast)}
-                    />
+                    {toast.description && (
+                      <div className="text-xs">{toast.description}</div>
+                    )}
+                    {toast.action && (
+                      <div className="flex w-full justify-end">
+                        <Button
+                          size="sm"
+                          onClick={() => handleClickAction(toast)}
+                        >
+                          {toast.actionText}
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                  {toast.action && (
-                    <div className="flex w-full justify-end">
-                      <Button
-                        size="sm"
-                        onClick={() => handleClickAction(toast)}
-                      >
-                        {toast.actionText}
-                      </Button>
-                    </div>
-                  )}
                 </motion.div>
               </RxToast.Root>
             );
@@ -136,5 +162,19 @@ export const useToast = () => {
     [setToasts],
   );
 
-  return { toast };
+  const infoToast = useCallback(
+    (input: OmitDistributive<CreateToastInput, "type">) => {
+      toast({ ...input, type: "info" });
+    },
+    [toast],
+  );
+
+  const errorToast = useCallback(
+    (input: OmitDistributive<CreateToastInput, "type">) => {
+      toast({ ...input, type: "error" });
+    },
+    [toast],
+  );
+
+  return { toast: { info: infoToast, error: errorToast } };
 };
