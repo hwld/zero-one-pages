@@ -8,9 +8,12 @@ import { Sidebar } from "./_components/siderbar";
 import { Button, IconButton } from "./_components/button";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import { useAppState } from "./_components/use-app-state";
+import { useCalendarCommands } from "./command";
 
 export type CalendarType = "month" | "week";
 const Page = () => {
+  useCalendarCommands();
+
   const { events } = useEvents();
   const {
     prevCalendarPage,

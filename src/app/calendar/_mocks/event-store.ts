@@ -11,6 +11,8 @@ export const eventSchema = z.object({
 });
 export type Event = z.infer<typeof eventSchema>;
 
+export type EventStoreErrorSimulationScope = "query" | "mutation";
+
 class EventStore {
   private events: Event[] = [
     {
@@ -21,16 +23,29 @@ class EventStore {
       end: addHours(new Date(), 3),
     },
   ];
+  private errorSimuationScopes: Set<EventStoreErrorSimulationScope> = new Set();
+
+  private throwErrorForScopes(scope: EventStoreErrorSimulationScope) {
+    if (this.errorSimuationScopes.has(scope)) {
+      throw new Error("simulated error");
+    }
+  }
 
   public getAll(): Event[] {
+    this.throwErrorForScopes("query");
+
     return this.events;
   }
 
   public get(id: string): Event | undefined {
+    this.throwErrorForScopes("query");
+
     return this.events.find((e) => e.id === id);
   }
 
   public add(input: CreateEventInput): Event {
+    this.throwErrorForScopes("mutation");
+
     const addedEvent: Event = {
       id: crypto.randomUUID(),
       title: input.title,
@@ -44,6 +59,8 @@ class EventStore {
   }
 
   public update(input: UpdateEventInput & { id: string }): Event | undefined {
+    this.throwErrorForScopes("mutation");
+
     this.events = this.events.map((event) => {
       if (event.id === input.id) {
         return {
@@ -62,7 +79,20 @@ class EventStore {
   }
 
   public remove(id: string) {
+    this.throwErrorForScopes("mutation");
+
     this.events = this.events.filter((e) => e.id !== id);
+  }
+
+  public setErrorSimulationScope(
+    scope: EventStoreErrorSimulationScope,
+    enable: boolean,
+  ) {
+    if (enable) {
+      this.errorSimuationScopes.add(scope);
+    } else {
+      this.errorSimuationScopes.delete(scope);
+    }
   }
 }
 
