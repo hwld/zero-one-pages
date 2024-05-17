@@ -32,31 +32,14 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
   ) {
     const { isEventMoving, moveEventPreview, moveEventActions } =
       useMoveWeekEvent();
-
     const { prepareCreateEventState, prepareCreateEventActions } =
       usePrepareCreateWeekEvent();
-    const isDraggingForCreate =
-      prepareCreateEventState.dragDateRange !== undefined;
+
+    const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
+    const isDraggingForCreate = dragDateRangeForCreate !== undefined;
 
     const rowRef = useRef<HTMLDivElement>(null);
     const ref = useMergedRef(_ref, rowRef);
-
-    const visibleWeekEvents = allWeekEvents.filter((e) => {
-      if (eventLimit === undefined) {
-        return true;
-      }
-      return e.top < eventLimit;
-    });
-
-    // TODO:
-    const exceededEventCountMap =
-      eventLimit !== undefined
-        ? getExceededEventCountByDayOfWeek({
-            week,
-            weekEvents: allWeekEvents,
-            limit: eventLimit,
-          })
-        : undefined;
 
     const getDateFromX = (x: number) => {
       if (!rowRef.current) {
@@ -101,6 +84,20 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       moveEventActions.startMove(event, date);
     };
 
+    const visibleWeekEvents =
+      eventLimit === undefined
+        ? allWeekEvents
+        : allWeekEvents.filter((e) => e.top < eventLimit);
+
+    const exceededEventCountMap =
+      eventLimit !== undefined
+        ? getExceededEventCountByDayOfWeek({
+            week,
+            weekEvents: allWeekEvents,
+            limit: eventLimit,
+          })
+        : undefined;
+
     return (
       <div
         ref={ref}
@@ -133,34 +130,32 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           })}
         </AnimatePresence>
         {/* 表示上限を超えたイベントの数 */}
-        {week.map((date) => {
-          if (!exceededEventCountMap || eventLimit === undefined) {
-            return null;
-          }
+        {eventLimit !== undefined &&
+          exceededEventCountMap !== undefined &&
+          week.map((date) => {
+            const weekDay = date.getDay();
+            const count = exceededEventCountMap.get(weekDay);
+            if (!count) {
+              return null;
+            }
 
-          const weekDay = date.getDay();
-          const count = exceededEventCountMap.get(weekDay);
-          if (!count) {
-            return null;
-          }
+            const handleClick = () => {
+              onClickMoreWeekEvents?.(date);
+            };
 
-          const handleClick = () => {
-            onClickMoreWeekEvents?.(date);
-          };
-
-          return (
-            <MoreWeekEventsCard
-              key={weekDay}
-              topMargin={eventTop}
-              weekDay={weekDay}
-              count={count}
-              limit={eventLimit}
-              disablePointerEvents={isDraggingForCreate || isEventMoving}
-              height={eventHeight}
-              onClick={handleClick}
-            />
-          );
-        })}
+            return (
+              <MoreWeekEventsCard
+                key={weekDay}
+                topMargin={eventTop}
+                weekDay={weekDay}
+                count={count}
+                limit={eventLimit}
+                disablePointerEvents={isDraggingForCreate || isEventMoving}
+                height={eventHeight}
+                onClick={handleClick}
+              />
+            );
+          })}
         {isEventMoving && moveEventPreview && (
           <DragPreviewWeekEventsCard
             week={week}

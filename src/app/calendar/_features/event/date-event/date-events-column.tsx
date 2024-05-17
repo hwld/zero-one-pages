@@ -33,52 +33,54 @@ export const DateEventsColumn: React.FC<Props> = ({
 
   const columnRef = useRef<HTMLDivElement>(null);
 
-  const handleColumnMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!columnRef.current || e.button !== 0) {
-      return;
+  const getColumnBasedY = (y: number) => {
+    if (!columnRef.current) {
+      throw new Error("columnRefがセットされていません");
     }
 
     const columnY = columnRef.current.getBoundingClientRect().y;
-    const y = e.clientY - columnY;
+    return y - columnY;
+  };
 
-    prepareCreateEventActions.startDrag(displayedDay, y);
+  const handleColumnMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (e.button !== 0) {
+      return;
+    }
+
+    const columnBasedY = getColumnBasedY(e.clientY);
+    prepareCreateEventActions.startDrag(displayedDay, columnBasedY);
   };
 
   const updateDragDateRangeForCreate = (mouseY: number) => {
-    if (!isDraggingForCreate || !columnRef.current) {
+    if (!isDraggingForCreate) {
       return;
     }
 
-    const columnY = columnRef.current.getBoundingClientRect().y;
-    const y = mouseY - columnY;
-
-    prepareCreateEventActions.updateDragEnd(displayedDay, y);
+    const columnBasedY = getColumnBasedY(mouseY);
+    prepareCreateEventActions.updateDragEnd(displayedDay, columnBasedY);
   };
 
   const updateMoveDest = (mouseY: number) => {
-    if (!moveEventPreview || !columnRef.current) {
+    if (!moveEventPreview) {
       return;
     }
 
-    const columnRect = columnRef.current.getBoundingClientRect();
-    const y = mouseY - columnRect.y;
-
-    moveEventActions.updateMoveDest(displayedDay, y);
+    const columnBasedY = getColumnBasedY(mouseY);
+    moveEventActions.updateMoveDest(displayedDay, columnBasedY);
   };
 
   const updateResizeDest = (mouseY: number) => {
-    if (!columnRef.current || !isEventResizing) {
+    if (!isEventResizing) {
       return;
     }
 
-    const y = mouseY - columnRef.current.getBoundingClientRect().y;
-    if (y < 0) {
+    const columnBasedY = getColumnBasedY(mouseY);
+    if (columnBasedY < 0) {
       return;
     }
 
-    resizeEventActions.updateResizeDest(displayedDay, y);
+    resizeEventActions.updateResizeDest(displayedDay, columnBasedY);
   };
 
   const handleColumnMouseMove = (e: React.MouseEvent) => {
@@ -103,24 +105,19 @@ export const DateEventsColumn: React.FC<Props> = ({
   ) => {
     event.preventDefault();
 
-    if (!columnRef.current) {
-      return;
-    }
-
-    const y = event.clientY - columnRef.current?.getBoundingClientRect().y;
-    moveEventActions.startMove(dateEvent, { date: displayedDay, y });
+    const columnBasedY = getColumnBasedY(event.clientY);
+    moveEventActions.startMove(dateEvent, {
+      date: displayedDay,
+      y: columnBasedY,
+    });
   };
 
   const handleStartResizeEvent: DateEventCardProps["onStartResize"] = (
     e,
     { event, origin },
   ) => {
-    if (!columnRef.current) {
-      return;
-    }
-
-    const y = e.clientY - columnRef.current.getBoundingClientRect().y;
-    resizeEventActions.startResize({ event, origin, y });
+    const columnBasedY = getColumnBasedY(e.clientY);
+    resizeEventActions.startResize({ event, origin, y: columnBasedY });
   };
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
