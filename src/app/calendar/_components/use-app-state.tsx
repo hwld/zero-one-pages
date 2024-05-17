@@ -17,6 +17,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useMinuteClock } from "./use-minute-clock";
 
 type CalendarType = "month" | "week";
 type AppStateContext = {
@@ -47,8 +48,9 @@ export const useAppState = () => {
 export const AppStateProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
+  const { currentDate } = useMinuteClock();
   const [calendarType, setCalendarType] = useState<CalendarType>("week");
-  const [viewDate, setViewDate] = useState(new Date());
+  const [viewDate, setViewDate] = useState(currentDate);
   const [dayPickerMonth, setDayPickerMonth] = useState(viewDate);
 
   const changeViewDate = useCallback((date: Date) => {
