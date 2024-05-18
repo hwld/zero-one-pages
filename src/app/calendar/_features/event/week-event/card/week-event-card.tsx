@@ -1,17 +1,21 @@
 import { ComponentPropsWithoutRef, forwardRef, useState, useRef } from "react";
 import { WeekEventCardBase, WeekEventCardContent } from "./base";
-import { WeekEvent } from "../type";
+import { ResizeWeekEventPreview, WeekEvent } from "../type";
 import { EventPopover } from "../../event-popover";
 
-type Props = {
+export type WeekEventCardProps = {
   height: number;
   disablePointerEvents: boolean;
   weekEvent: WeekEvent;
   topMargin?: number;
   isDragging: boolean;
+  onStartResize?: (
+    e: React.MouseEvent,
+    params: { event: WeekEvent; origin: ResizeWeekEventPreview["origin"] },
+  ) => void;
 } & Omit<ComponentPropsWithoutRef<"button">, "className">;
 
-export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
+export const WeekEventCard = forwardRef<HTMLButtonElement, WeekEventCardProps>(
   function WeekEventCard(
     {
       height,
@@ -22,6 +26,7 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
       onMouseMove,
       onClick,
       isDragging,
+      onStartResize,
       ...props
     },
     ref,
@@ -46,6 +51,20 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
       }
     };
 
+    const handleResizeStartFromEventStart = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      onStartResize?.(e, { event: weekEvent, origin: "eventEnd" });
+    };
+
+    const handleResizeStartFromEventEnd = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      onStartResize?.(e, { event: weekEvent, origin: "eventStart" });
+    };
+
     return (
       <EventPopover
         event={weekEvent}
@@ -66,7 +85,19 @@ export const WeekEventCard = forwardRef<HTMLButtonElement, Props>(
           {...props}
           className={isDragging ? "opacity-50" : ""}
         >
+          {weekEvent.allDay && (
+            <div
+              className="absolute inset-y-0 left-0 w-1 cursor-ew-resize"
+              onMouseDown={handleResizeStartFromEventStart}
+            />
+          )}
           <WeekEventCardContent weekEvent={weekEvent} isDragging={false} />
+          {weekEvent.allDay && (
+            <div
+              className="absolute inset-y-0 right-0 w-1 cursor-ew-resize rounded-r-full"
+              onMouseDown={handleResizeStartFromEventEnd}
+            />
+          )}
         </WeekEventCardBase>
       </EventPopover>
     );

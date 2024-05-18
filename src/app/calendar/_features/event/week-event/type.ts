@@ -11,3 +11,8 @@ export type WeekEvent = Event & {
 };
 
 export type MoveWeekEventPreview = WeekEvent & DragDateRange;
+
+export type ResizeWeekEventPreview = WeekEvent & {
+  origin: "eventStart" | "eventEnd";
+  updatedAt: number;
+};

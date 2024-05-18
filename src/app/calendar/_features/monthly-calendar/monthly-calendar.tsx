@@ -10,6 +10,7 @@ import {
   usePrepareCreateWeekEvent,
 } from "../event/week-event/prepare-create-event-provider";
 import { WeekRow } from "./week-row";
+import { ResizeWeekEventProvider } from "../event/week-event/resize-event-provider";
 
 type Props = {
   yearMonth: Date;
@@ -98,7 +99,9 @@ export const MonthlyCalendar: React.FC<Props> = (props) => {
   return (
     <PrepareCreateWeekEventProvider>
       <MoveWeekEventProvider>
-        <MonthlyCalendarImpl {...props} />
+        <ResizeWeekEventProvider>
+          <MonthlyCalendarImpl {...props} />
+        </ResizeWeekEventProvider>
       </MoveWeekEventProvider>
     </PrepareCreateWeekEventProvider>
   );

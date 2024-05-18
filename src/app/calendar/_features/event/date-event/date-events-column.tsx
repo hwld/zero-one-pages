@@ -62,7 +62,7 @@ export const DateEventsColumn: React.FC<Props> = ({
   };
 
   const updateMoveDest = (mouseY: number) => {
-    if (!moveEventPreview) {
+    if (!isEventMoving) {
       return;
     }
 
@@ -90,7 +90,7 @@ export const DateEventsColumn: React.FC<Props> = ({
       updateDragDateRangeForCreate(e.clientY);
     }
 
-    if (moveEventPreview) {
+    if (isEventMoving) {
       updateMoveDest(e.clientY);
     }
 

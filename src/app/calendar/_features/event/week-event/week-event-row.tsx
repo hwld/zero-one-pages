@@ -3,11 +3,12 @@ import { useMergedRef } from "@mantine/hooks";
 import { useMoveWeekEvent } from "./move-event-provider";
 import { usePrepareCreateWeekEvent } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { WeekEventCard } from "./card/week-event-card";
+import { WeekEventCard, WeekEventCardProps } from "./card/week-event-card";
 import { MoreWeekEventsCard } from "./card/more-week-even";
 import { DragPreviewWeekEventsCard } from "./card/drag-preview";
 import { WeekEvent } from "./type";
 import { getExceededEventCountByDayOfWeek } from "./utils";
+import { useResizeWeekEvent } from "./resize-event-provider";
 
 type Props = {
   week: Date[];
@@ -34,6 +35,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       useMoveWeekEvent();
     const { prepareCreateEventState, prepareCreateEventActions } =
       usePrepareCreateWeekEvent();
+    const { isEventResizing, resizeEventPreview, resizeEventActions } =
+      useResizeWeekEvent();
 
     const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
     const isDraggingForCreate = dragDateRangeForCreate !== undefined;
@@ -71,6 +74,10 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
       if (moveEventPreview) {
         moveEventActions.updateMoveEnd(date);
       }
+
+      if (isEventResizing) {
+        resizeEventActions.updateResizeDest(date);
+      }
     };
 
     const handleEventDragStart = (
@@ -82,6 +89,13 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
 
       const date = getDateFromX(e.clientX);
       moveEventActions.startMove(event, date);
+    };
+
+    const handleStartResizeEvent: WeekEventCardProps["onStartResize"] = (
+      _,
+      { event, origin },
+    ) => {
+      resizeEventActions.startResize({ event, origin });
     };
 
     const visibleWeekEvents =
@@ -109,6 +123,8 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
           {visibleWeekEvents.map((event) => {
             const isDragging =
               isEventMoving && moveEventPreview?.id === event.id;
+            const isResizing =
+              isEventResizing && resizeEventPreview?.id === event.id;
 
             return (
               <motion.div
@@ -120,10 +136,13 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
                   isDragging={isDragging}
                   topMargin={eventTop}
                   height={eventHeight}
-                  disablePointerEvents={isDraggingForCreate || isEventMoving}
+                  disablePointerEvents={
+                    isDraggingForCreate || isEventMoving || isResizing
+                  }
                   draggable
                   onMouseDown={(e) => e.stopPropagation()}
                   onDragStart={(e) => handleEventDragStart(e, event)}
+                  onStartResize={handleStartResizeEvent}
                 />
               </motion.div>
             );
