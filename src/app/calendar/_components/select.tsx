@@ -47,7 +47,7 @@ export const Select = <T extends string>({
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.1 }}
                   anchor={{ to: "bottom start", gap: "4px", padding: "4px" }}
-                  className="min-w-[150px] origin-top rounded border border-neutral-300 bg-neutral-50 p-[2px] text-sm text-neutral-700 shadow focus:outline-none"
+                  className="z-30 min-w-[150px] origin-top rounded border border-neutral-300 bg-neutral-50 p-[2px] text-sm text-neutral-700 shadow focus:outline-none"
                 >
                   {items.map((item) => {
                     return (

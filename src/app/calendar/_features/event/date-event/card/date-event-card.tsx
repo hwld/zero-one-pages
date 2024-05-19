@@ -12,6 +12,7 @@ import { calcDateEventCardStyle } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
 import { EventPopover } from "../../event-popover";
+import { Placement } from "@floating-ui/react";
 
 export type DateEventCardProps = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
@@ -28,6 +29,8 @@ export type DateEventCardProps = {
     e: React.MouseEvent,
     params: { event: DateEvent; origin: ResizeDateEventPreview["origin"] },
   ) => void;
+
+  popoverPlace?: Placement;
 };
 
 export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
@@ -41,6 +44,7 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
       isOtherEventResizing,
       isResizing,
       onStartResize,
+      popoverPlace = "right-start",
     },
     ref,
   ) {
@@ -98,7 +102,7 @@ export const DateEventCard = forwardRef<HTMLButtonElement, DateEventCardProps>(
         event={event}
         isOpen={isPopoverOpen}
         onChangeOpen={setIsPopoverOpen}
-        placement="right-start"
+        placement={popoverPlace}
       >
         <DateEventCardBase
           ref={ref}

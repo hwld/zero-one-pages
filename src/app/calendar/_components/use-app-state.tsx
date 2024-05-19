@@ -19,7 +19,7 @@ import {
 } from "react";
 import { useMinuteClock } from "./use-minute-clock";
 
-type CalendarType = "month" | "week";
+export type CalendarType = "month" | "week" | "day";
 type AppStateContext = {
   calendarType: CalendarType;
   setCalendarType: Dispatch<SetStateAction<CalendarType>>;
@@ -70,6 +70,11 @@ export const AppStateProvider: React.FC<{
         changeViewDate(newDate);
         return;
       }
+      case "day": {
+        const newDate = addDays(viewDate, 1);
+        changeViewDate(newDate);
+        return;
+      }
       default: {
         throw new Error(calendarType satisfies never);
       }
@@ -85,6 +90,11 @@ export const AppStateProvider: React.FC<{
       }
       case "month": {
         const newDate = subMonths(viewDate, 1);
+        changeViewDate(newDate);
+        return;
+      }
+      case "day": {
+        const newDate = subDays(viewDate, 1);
         changeViewDate(newDate);
         return;
       }
@@ -111,6 +121,8 @@ export const AppStateProvider: React.FC<{
         setCalendarType("week");
       } else if (event.key === "M" || event.key === "m") {
         setCalendarType("month");
+      } else if (event.key === "D" || event.key === "d") {
+        setCalendarType("day");
       }
     };
 

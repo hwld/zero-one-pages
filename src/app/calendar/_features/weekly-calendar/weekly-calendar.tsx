@@ -101,7 +101,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
               gridTemplateColumns: WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS,
             }}
           >
-            <div className="">
+            <div>
               {eachHourOfInterval({
                 start: startOfDay(date),
                 end: endOfDay(date),

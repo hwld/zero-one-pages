@@ -10,16 +10,19 @@ import { DateEventPreview } from "./date-event-preview";
 import { useMoveDateEvent } from "./move-event-provider";
 import { usePrepareCreateDateEvent } from "./prepare-create-event-provider";
 import { useResizeDateEvent } from "./resize-event-provider";
+import { Placement } from "@floating-ui/react";
 
 type Props = {
   dateEvents: DateEvent[];
   displayedDay: Date;
+  eventPopoverPlace?: Placement;
 } & PropsWithChildren;
 
 export const DateEventsColumn: React.FC<Props> = ({
   children,
   displayedDay,
   dateEvents,
+  eventPopoverPlace,
 }) => {
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateDateEvent();
@@ -163,6 +166,7 @@ export const DateEventsColumn: React.FC<Props> = ({
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <DateEventCard
+                popoverPlace={eventPopoverPlace}
                 displayedDate={displayedDay}
                 event={event}
                 isDragging={isDragging}
