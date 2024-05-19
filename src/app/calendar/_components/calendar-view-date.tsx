@@ -16,10 +16,20 @@ export const CalendarViewDate: React.FC = () => {
         return null;
       }
       case "day": {
-        return null;
+        return (
+          <>
+            <div className="mx-1 w-6 text-center text-lg tabular-nums">
+              {viewDate.getDate()}
+            </div>
+            日
+          </>
+        );
+      }
+      default: {
+        throw new Error(calendarType satisfies never);
       }
     }
-  }, []);
+  }, [calendarType, viewDate]);
 
   return (
     <div className="flex items-center gap-2">
@@ -32,7 +42,7 @@ export const CalendarViewDate: React.FC = () => {
         <div className="mx-1 w-6 text-center text-lg tabular-nums">
           {viewDate.getMonth() + 1}
         </div>
-        月
+        月{option}
       </div>
       <IconButton icon={TbChevronRight} onClick={nextCalendarPage} />
     </div>

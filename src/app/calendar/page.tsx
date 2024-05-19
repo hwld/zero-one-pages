@@ -5,33 +5,19 @@ import "./style.css";
 import { WeeklyCalendar } from "./_features/weekly-calendar/weekly-calendar";
 import { useEvents } from "./_features/event/use-events";
 import { Sidebar } from "./_components/siderbar";
-import { Button, IconButton } from "./_components/button";
-import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { Button } from "./_components/button";
 import { useAppState } from "./_components/use-app-state";
 import { useCalendarCommands } from "./command";
 import { Select } from "./_components/select";
+import { DailyCalendar } from "./_features/daily-calendar/daily-calendar";
+import { CalendarViewDate } from "./_components/calendar-view-date";
 
-export type CalendarType = "month" | "week";
 const Page = () => {
   useCalendarCommands();
 
   const { events } = useEvents();
-  const {
-    prevCalendarPage,
-    nextCalendarPage,
-    calendarType,
-    setCalendarType,
-    viewDate,
-    goTodayCalendarPage,
-  } = useAppState();
-
-  const handleNavigateNext = () => {
-    nextCalendarPage();
-  };
-
-  const handleNavigatePrev = () => {
-    prevCalendarPage();
-  };
+  const { calendarType, setCalendarType, viewDate, goTodayCalendarPage } =
+    useAppState();
 
   const calendar = useMemo(() => {
     switch (calendarType) {
@@ -40,6 +26,9 @@ const Page = () => {
       }
       case "week": {
         return <WeeklyCalendar date={viewDate} events={events} />;
+      }
+      case "day": {
+        return <DailyCalendar date={viewDate} events={events} />;
       }
       default: {
         throw new Error(calendarType satisfies never);
@@ -55,25 +44,13 @@ const Page = () => {
       <Sidebar />
       <div className="grid grid-rows-[60px,1fr] overflow-hidden">
         <div className="flex items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <IconButton icon={TbChevronLeft} onClick={handleNavigatePrev} />
-            <div className="flex select-none items-center">
-              <div className="mx-1 text-lg tabular-nums">
-                {viewDate.getFullYear()}
-              </div>
-              年
-              <div className="mx-1 w-6 text-center text-lg tabular-nums">
-                {viewDate.getMonth() + 1}
-              </div>
-              月
-            </div>
-            <IconButton icon={TbChevronRight} onClick={handleNavigateNext} />
-          </div>
+          <CalendarViewDate />
           <div className="flex w-full justify-end gap-2">
             <Select
               items={[
                 { value: "week", label: "週", option: "W" },
                 { value: "month", label: "月", option: "M" },
+                { value: "day", label: "日", option: "D" },
               ]}
               value={calendarType}
               onSelect={setCalendarType}
