@@ -21,7 +21,10 @@ export const WeekRow: React.FC<Props> = ({
   calendarYearMonth,
   eventLimit,
 }) => {
-  const weekEvents = useOptimisticWeekEvents({ week, events });
+  const weekEvents = useOptimisticWeekEvents({
+    displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
+    events,
+  });
   const { changeViewDate, setCalendarType } = useAppState();
 
   const handleClickMoreWeekEvents = (date: Date) => {

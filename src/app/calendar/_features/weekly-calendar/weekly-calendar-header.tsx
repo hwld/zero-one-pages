@@ -34,7 +34,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
   const { currentDate } = useMinuteClock();
   const [expanded, setExpanded] = useState(false);
   const weekLongTermEvents = useOptimisticWeekEvents({
-    week,
+    displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
     events: longTermEvents,
   });
 

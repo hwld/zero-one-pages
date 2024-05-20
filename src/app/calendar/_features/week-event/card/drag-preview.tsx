@@ -16,7 +16,10 @@ export const DragPreviewWeekEventsCard = forwardRef<HTMLButtonElement, Props>(
   function WeekEventCard({ week, draggingEvent, topMargin = 0, height }, ref) {
     const weekEvent: WeekEvent | undefined = useMemo(() => {
       const newEvent = getEventFromMoveEventPreview(draggingEvent);
-      return convertEventToWeekEvent(newEvent, { top: 0, week });
+      return convertEventToWeekEvent(newEvent, {
+        top: 0,
+        displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
+      });
     }, [draggingEvent, week]);
 
     if (!weekEvent) {
@@ -30,8 +33,9 @@ export const DragPreviewWeekEventsCard = forwardRef<HTMLButtonElement, Props>(
           height={height}
           topMargin={topMargin}
           disablePointerEvents={true}
-          startWeekDay={weekEvent.startWeekDay}
-          range={weekEvent.endWeekDay - weekEvent.startWeekDay + 1}
+          eventsRowCols={weekEvent.eventsRowCols}
+          displayStartCol={weekEvent.displayStartCol}
+          eventCols={weekEvent.displayEndCol - weekEvent.displayStartCol + 1}
           top={weekEvent.top}
         >
           <WeekEventCardContent weekEvent={weekEvent} isDragging={true} />

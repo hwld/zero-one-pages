@@ -169,6 +169,7 @@ export const WeekEventRow = forwardRef<HTMLDivElement, Props>(
                 weekDay={weekDay}
                 count={count}
                 limit={eventLimit}
+                eventsRowCols={week.length}
                 disablePointerEvents={isDraggingForCreate || isEventMoving}
                 height={eventHeight}
                 onClick={handleClick}

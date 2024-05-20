@@ -7,22 +7,27 @@ import {
   isWithinInterval,
   addDays,
   differenceInDays,
+  Interval,
+  isSameDay,
 } from "date-fns";
 import { MoveWeekEventPreview, WeekEvent } from "./type";
 import { Event } from "../../_mocks/event-store";
 import { getOverlappingDates } from "../../utils";
 
 export const getWeekEvents = ({
-  week,
+  displayDateRange,
   events,
 }: {
-  week: Date[];
+  displayDateRange: Interval;
   events: Event[];
 }): WeekEvent[] => {
   const sortedEvents = events
     .filter((event) => {
       const overlapping = areIntervalsOverlapping(
-        { start: startOfDay(week[0]), end: endOfDay(week[week.length - 1]) },
+        {
+          start: startOfDay(displayDateRange.start),
+          end: endOfDay(displayDateRange.end),
+        },
         event,
         { inclusive: true },
       );
@@ -95,7 +100,10 @@ export const getWeekEvents = ({
       }
     }
 
-    const weekEvent = convertEventToWeekEvent(event, { top, week });
+    const weekEvent = convertEventToWeekEvent(event, {
+      top,
+      displayDateRange,
+    });
     if (weekEvent) {
       weekEvents.push(weekEvent);
     }
@@ -106,30 +114,33 @@ export const getWeekEvents = ({
 
 export const convertEventToWeekEvent = (
   event: Event,
-  { top, week }: { top: number; week: Date[] },
+  { top, displayDateRange }: { top: number; displayDateRange: Interval },
 ): WeekEvent | undefined => {
-  if (!week.length) {
-    return undefined;
-  }
+  const displayDates = eachDayOfInterval(displayDateRange);
 
-  const eventDatesInWeek = getOverlappingDates(
+  const eventDatesInDisplayDateRange = getOverlappingDates(
     {
-      start: startOfDay(week.at(0)!),
-      end: endOfDay(week.at(-1)!),
+      start: startOfDay(displayDates.at(0)!),
+      end: endOfDay(displayDates.at(-1)!),
     },
     event,
     { inclusive: true },
   );
 
-  if (!eventDatesInWeek.length) {
+  if (!eventDatesInDisplayDateRange.length) {
     return undefined;
   }
 
   const weekEvent: WeekEvent = {
     ...event,
     top,
-    startWeekDay: eventDatesInWeek.at(0)!.getDay(),
-    endWeekDay: eventDatesInWeek.at(-1)!.getDay(),
+    eventsRowCols: displayDates.length,
+    displayStartCol: displayDates.findIndex((d) =>
+      isSameDay(d, eventDatesInDisplayDateRange.at(0)!),
+    ),
+    displayEndCol: displayDates.findIndex((d) =>
+      isSameDay(d, eventDatesInDisplayDateRange.at(-1)!),
+    ),
   };
 
   return weekEvent;

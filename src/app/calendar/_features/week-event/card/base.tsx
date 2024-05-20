@@ -6,9 +6,11 @@ import { WeekEvent } from "../type";
 type Props = {
   disablePointerEvents: boolean;
   height: number;
-  range?: number;
+  // このイベントカードを表示するEventsRowの日数
+  eventsRowCols: number;
+  eventCols?: number;
+  displayStartCol: number;
   top: number;
-  startWeekDay: number;
   topMargin?: number;
 } & ComponentPropsWithoutRef<"button">;
 
@@ -17,9 +19,10 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
     {
       disablePointerEvents,
       height,
-      range = 1,
+      eventsRowCols,
+      eventCols = 1,
       top,
-      startWeekDay,
+      displayStartCol,
       children,
       topMargin = 0,
       className,
@@ -38,9 +41,9 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
         )}
         style={{
           height: `${height}px`,
-          width: `calc(100% / 7  * ${range} - 10px)`,
+          width: `calc(100% / ${eventsRowCols}  * ${eventCols} - 10px)`,
           top: `calc(${topMargin}px + ${height}px * ${top})`,
-          left: `calc(100% / 7 * ${startWeekDay})`,
+          left: `calc(100% / ${eventsRowCols} * ${displayStartCol})`,
         }}
       >
         {children}

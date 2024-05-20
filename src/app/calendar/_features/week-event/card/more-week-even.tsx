@@ -4,6 +4,7 @@ type Props = {
   count: number;
   limit: number;
   height: number;
+  eventsRowCols: number;
   disablePointerEvents: boolean;
   weekDay: number;
   topMargin?: number;
@@ -14,6 +15,7 @@ export const MoreWeekEventsCard: React.FC<Props> = ({
   count,
   limit,
   height,
+  eventsRowCols,
   disablePointerEvents,
   weekDay,
   topMargin,
@@ -24,8 +26,9 @@ export const MoreWeekEventsCard: React.FC<Props> = ({
       height={height}
       disablePointerEvents={disablePointerEvents}
       top={limit}
-      startWeekDay={weekDay}
-      range={1}
+      displayStartCol={weekDay}
+      eventsRowCols={eventsRowCols}
+      eventCols={1}
       onMouseDown={(e) => e.stopPropagation()}
       onClick={onClick}
       topMargin={topMargin}
