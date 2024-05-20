@@ -10,12 +10,12 @@ import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
-import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
+import { usePrepareCreateWeekEvent } from "../week-event/prepare-create-event-provider";
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
-import { WeekEventRow } from "../event/week-event/week-event-row";
-import { DATE_EVENT_MIN_HEIGHT } from "../event/date-event/utils";
-import { useOptimisticWeekEvents } from "../event/week-event/use-optimistic-week-events";
+import { WeekEventRow } from "../week-event/week-event-row";
+import { DATE_EVENT_MIN_HEIGHT } from "../date-event/utils";
+import { useOptimisticWeekEvents } from "../week-event/use-optimistic-week-events";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
 export const DAY_TITLE_HEIGHT = 28;

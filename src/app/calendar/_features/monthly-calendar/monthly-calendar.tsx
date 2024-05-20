@@ -3,14 +3,14 @@ import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
 import { getCalendarDates } from "../../utils";
 import { Event } from "../../_mocks/event-store";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { MoveWeekEventProvider } from "../event/week-event/move-event-provider";
+import { MoveWeekEventProvider } from "../week-event/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
   PrepareCreateWeekEventProvider,
   usePrepareCreateWeekEvent,
-} from "../event/week-event/prepare-create-event-provider";
+} from "../week-event/prepare-create-event-provider";
 import { WeekRow } from "./week-row";
-import { ResizeWeekEventProvider } from "../event/week-event/resize-event-provider";
+import { ResizeWeekEventProvider } from "../week-event/resize-event-provider";
 
 type Props = {
   yearMonth: Date;

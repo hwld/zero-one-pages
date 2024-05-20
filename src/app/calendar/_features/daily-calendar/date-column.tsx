@@ -8,11 +8,11 @@ import {
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../event/date-event/utils";
+} from "../date-event/utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
-import { DateEventsColumn } from "../event/date-event/date-events-column";
-import { useOptimisticDateEvents } from "../event/date-event/use-optimistic-date-events";
+import { DateEventsColumn } from "../date-event/date-events-column";
+import { useOptimisticDateEvents } from "../date-event/use-optimistic-date-events";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
 type Props = {

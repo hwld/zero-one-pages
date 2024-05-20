@@ -11,7 +11,7 @@ import { DateEvent } from "../type";
 import { calcDateEventCardStyle } from "../utils";
 import clsx from "clsx";
 import { DateEventCardBase, DateEventCardContent } from "./base";
-import { EventPopover } from "../../event-popover";
+import { EventPopover } from "../../event/event-popover";
 import { Placement } from "@floating-ui/react";
 
 export type DateEventCardProps = {

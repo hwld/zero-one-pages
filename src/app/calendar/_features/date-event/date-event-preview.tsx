@@ -1,6 +1,6 @@
 import { max, min } from "date-fns";
 import { getHeightFromInterval, getTopFromDate } from "./utils";
-import { DragDateRange } from "../../../utils";
+import { DragDateRange } from "../../utils";
 
 type Props = { eventCreationDragData: DragDateRange; date: Date };
 export const DateEventPreview: React.FC<Props> = ({

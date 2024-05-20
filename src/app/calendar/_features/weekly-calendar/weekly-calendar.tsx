@@ -14,27 +14,27 @@ import { splitEvent } from "./utils";
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../event/date-event/utils";
+} from "../date-event/utils";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import {
   MoveDateEventProvider,
   useMoveDateEvent,
-} from "../event/date-event/move-event-provider";
+} from "../date-event/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
   PrepareCreateDateEventProvider,
   usePrepareCreateDateEvent,
-} from "../event/date-event/prepare-create-event-provider";
+} from "../date-event/prepare-create-event-provider";
 import {
   ResizeDateEventProvider,
   useResizeDateEvent,
-} from "../event/date-event/resize-event-provider";
-import { MoveWeekEventProvider } from "../event/week-event/move-event-provider";
-import { PrepareCreateWeekEventProvider } from "../event/week-event/prepare-create-event-provider";
+} from "../date-event/resize-event-provider";
+import { MoveWeekEventProvider } from "../week-event/move-event-provider";
+import { PrepareCreateWeekEventProvider } from "../week-event/prepare-create-event-provider";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 import clsx from "clsx";
-import { ResizeWeekEventProvider } from "../event/week-event/resize-event-provider";
+import { ResizeWeekEventProvider } from "../week-event/resize-event-provider";
 
 export const WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE = 75;
 export const WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS = `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(7,1fr)`;

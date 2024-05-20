@@ -1,7 +1,7 @@
 import { isSameDay, isSameMonth, isWeekend } from "date-fns";
 import { isDayWithinDragDateRange } from "../../utils";
 import clsx from "clsx";
-import { usePrepareCreateWeekEvent } from "../event/week-event/prepare-create-event-provider";
+import { usePrepareCreateWeekEvent } from "../week-event/prepare-create-event-provider";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
 export const MONTHLY_DATE_HEADER_HEIGHT = 32;

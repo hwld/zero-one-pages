@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { ResizeWeekEventPreview, WeekEvent } from "./type";
-import { useUpdateEvent } from "../use-update-event";
+import { useUpdateEvent } from "../event/use-update-event";
 import { endOfDay, isAfter, isBefore, startOfDay, subDays } from "date-fns";
 
 type ResizeWeekEventActions = {

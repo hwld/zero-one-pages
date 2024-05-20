@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, forwardRef, useState, useRef } from "react";
 import { WeekEventCardBase, WeekEventCardContent } from "./base";
 import { ResizeWeekEventPreview, WeekEvent } from "../type";
-import { EventPopover } from "../../event-popover";
+import { EventPopover } from "../../event/event-popover";
 
 export type WeekEventCardProps = {
   height: number;

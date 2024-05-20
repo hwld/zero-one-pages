@@ -9,8 +9,8 @@ import {
   createContext,
   PropsWithChildren,
 } from "react";
-import { DragDateRange } from "../../../utils";
-import { CreateEventInput } from "../../../_mocks/api";
+import { DragDateRange } from "../../utils";
+import { CreateEventInput } from "../../_mocks/api";
 import { max, min } from "date-fns";
 
 export type PrepareCreateWeekEventState = {

@@ -11,8 +11,8 @@ import {
   useContext,
   PropsWithChildren,
 } from "react";
-import { DragDateRange, MouseHistory } from "../../../utils";
-import { CreateEventInput } from "../../../_mocks/api";
+import { DragDateRange, MouseHistory } from "../../utils";
+import { CreateEventInput } from "../../_mocks/api";
 import { addMinutes, max, min, startOfDay } from "date-fns";
 import { DATE_EVENT_MIN_MINUTES } from "./utils";
 import { getDateFromY } from "./utils";

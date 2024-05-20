@@ -1,7 +1,7 @@
 import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
-import { WeekEventRow } from "../event/week-event/week-event-row";
+import { WeekEventRow } from "../week-event/week-event-row";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { useOptimisticWeekEvents } from "../event/week-event/use-optimistic-week-events";
+import { useOptimisticWeekEvents } from "../week-event/use-optimistic-week-events";
 import { Event } from "../../_mocks/event-store";
 import { RefObject } from "react";
 import { useAppState } from "../../_components/use-app-state";

@@ -2,22 +2,22 @@ import { RefObject, useRef } from "react";
 import {
   MoveDateEventProvider,
   useMoveDateEvent,
-} from "../event/date-event/move-event-provider";
+} from "../date-event/move-event-provider";
 import {
   PrepareCreateDateEventProvider,
   usePrepareCreateDateEvent,
-} from "../event/date-event/prepare-create-event-provider";
+} from "../date-event/prepare-create-event-provider";
 import {
   ResizeDateEventProvider,
   useResizeDateEvent,
-} from "../event/date-event/resize-event-provider";
+} from "../date-event/resize-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import { Event } from "../../_mocks/event-store";
 import { eachHourOfInterval, endOfDay, format, startOfDay } from "date-fns";
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../event/date-event/utils";
+} from "../date-event/utils";
 import { DateColumn } from "./date-column";
 
 type DailyCalendarImplProps = DailyCalendarProps & {
