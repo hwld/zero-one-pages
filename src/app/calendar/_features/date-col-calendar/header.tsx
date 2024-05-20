@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS } from "./weekly-calendar";
+import { DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS } from "./calendar";
 import { WEEK_DAY_LABELS } from "../../consts";
 import {
   CELL_Y_MARGIN,
@@ -22,19 +22,19 @@ export const DAY_TITLE_HEIGHT = 28;
 
 type Props = {
   calendarYearMonth: Date;
-  week: Date[];
+  dates: Date[];
   longTermEvents: Event[];
 };
 
-export const WeeklyCalendarDayHeader: React.FC<Props> = ({
+export const DateColCalendarDayHeader: React.FC<Props> = ({
   calendarYearMonth,
-  week,
+  dates,
   longTermEvents,
 }) => {
   const { currentDate } = useMinuteClock();
   const [expanded, setExpanded] = useState(false);
-  const weekLongTermEvents = useOptimisticEventsInRow({
-    displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
+  const longTermEventsInRow = useOptimisticEventsInRow({
+    displayDateRange: { start: dates.at(0)!, end: dates.at(-1)! },
     events: longTermEvents,
   });
 
@@ -45,7 +45,11 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
     <>
       <div
         className={clsx("relative grid")}
-        style={{ gridTemplateColumns: WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS }}
+        style={{
+          gridTemplateColumns: DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS(
+            dates.length,
+          ),
+        }}
       >
         <div className="flex select-none flex-col">
           <div style={{ height: DAY_TITLE_HEIGHT }} />
@@ -64,7 +68,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
             </div>
           </div>
         </div>
-        {week.map((date) => {
+        {dates.map((date) => {
           return (
             <div className="flex flex-col" key={`${date}`}>
               <div
@@ -89,7 +93,7 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
               </div>
               <LongTermEventCell
                 date={date}
-                events={weekLongTermEvents}
+                events={longTermEventsInRow}
                 dragDateRangeForCreate={prepareCreateEventState.dragDateRange}
                 expanded={expanded}
               />
@@ -101,8 +105,8 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
           style={{ top: DAY_TITLE_HEIGHT + CELL_Y_MARGIN }}
         >
           <EventsRow
-            eventsRowDates={week}
-            allEventsInRow={weekLongTermEvents}
+            eventsRowDates={dates}
+            allEventsInRow={longTermEventsInRow}
             eventHeight={DATE_EVENT_MIN_HEIGHT}
             eventLimit={expanded ? undefined : LONG_TERM_EVENT_DISPLAY_LIMIT}
             onClickMoreEvents={() => setExpanded(true)}

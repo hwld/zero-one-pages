@@ -169,12 +169,12 @@ export const getExceededEventCountByIndex = ({
     })
     .reduce((map, date) => {
       // 複数の行にまたがるイベントでは、指定した行以外の日付も含まれるので、それを取り除く
-      const isOutsideWeek = !isWithinInterval(date, {
+      const isOutsideRow = !isWithinInterval(date, {
         start: startOfDay(eventsRowDates[0]),
         end: endOfDay(eventsRowDates[eventsRowDates.length - 1]),
       });
 
-      if (isOutsideWeek) {
+      if (isOutsideRow) {
         return map;
       }
 

@@ -2,14 +2,13 @@
 import { useMemo } from "react";
 import { MonthlyCalendar } from "./_features/monthly-calendar/monthly-calendar";
 import "./style.css";
-import { WeeklyCalendar } from "./_features/weekly-calendar/weekly-calendar";
+import { DateColCalendar } from "./_features/date-col-calendar/calendar";
 import { useEvents } from "./_features/event/use-events";
 import { Sidebar } from "./_components/siderbar";
 import { Button } from "./_components/button";
 import { useAppState } from "./_components/use-app-state";
 import { useCalendarCommands } from "./command";
 import { Select } from "./_components/select";
-import { DailyCalendar } from "./_features/daily-calendar/daily-calendar";
 import { CalendarViewDate } from "./_components/calendar-view-date";
 
 const Page = () => {
@@ -25,10 +24,10 @@ const Page = () => {
         return <MonthlyCalendar yearMonth={viewDate} events={events} />;
       }
       case "week": {
-        return <WeeklyCalendar date={viewDate} events={events} />;
+        return <DateColCalendar cols={7} viewDate={viewDate} events={events} />;
       }
       case "day": {
-        return <DailyCalendar date={viewDate} events={events} />;
+        return <DateColCalendar cols={1} viewDate={viewDate} events={events} />;
       }
       default: {
         throw new Error(calendarType satisfies never);
@@ -48,8 +47,8 @@ const Page = () => {
           <div className="flex w-full justify-end gap-2">
             <Select
               items={[
-                { value: "week", label: "週", option: "W" },
                 { value: "month", label: "月", option: "M" },
+                { value: "week", label: "週", option: "W" },
                 { value: "day", label: "日", option: "D" },
               ]}
               value={calendarType}

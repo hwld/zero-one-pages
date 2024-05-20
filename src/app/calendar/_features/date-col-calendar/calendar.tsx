@@ -2,11 +2,11 @@ import {
   eachDayOfInterval,
   eachHourOfInterval,
   endOfDay,
-  endOfWeek,
   startOfDay,
   startOfWeek,
   format,
   differenceInMinutes,
+  addDays,
 } from "date-fns";
 import { RefObject, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
@@ -16,7 +16,7 @@ import {
   DATE_EVENT_MIN_MINUTES,
 } from "../event-in-col/utils";
 import { DateColumn } from "./date-column";
-import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
+import { DateColCalendarDayHeader } from "./header";
 import {
   MoveEventInColProvider,
   useMoveEventInCol,
@@ -36,29 +36,40 @@ import { useMinuteClock } from "../../_components/use-minute-clock";
 import clsx from "clsx";
 import { ResizeEventInRowProvider } from "../event-in-row/resize-event-provider";
 
-export const WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE = 75;
-export const WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS = `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(7,1fr)`;
+export const DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE = 75;
+export const DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS = (cols: number) =>
+  `${DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(${cols},1fr)`;
 
-type WeeklyCalendarProps = { date: Date; events: Event[] };
+type DateColCalendarProps = {
+  viewDate: Date;
+  events: Event[];
+  cols: number;
+};
 
-type WeeklyCalendarImplProps = {
+type DateColCalendarImplProps = {
   scrollableRef: RefObject<HTMLDivElement>;
-} & WeeklyCalendarProps;
+} & DateColCalendarProps;
 
-export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
+export const DateColCalendarImpl: React.FC<DateColCalendarImplProps> = ({
   scrollableRef,
-  date,
+  cols,
+  viewDate,
   events,
 }) => {
   const { currentDate } = useMinuteClock();
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
-  const week = useMemo(() => {
-    const start = startOfDay(startOfWeek(date));
-    const end = startOfDay(endOfWeek(date));
+  const calendarViewDates = useMemo(() => {
+    let start: Date;
+    if (cols >= 7) {
+      start = startOfDay(startOfWeek(viewDate));
+    } else {
+      start = startOfDay(viewDate);
+    }
+    const end = addDays(start, cols - 1);
 
     return eachDayOfInterval({ start, end });
-  }, [date]);
+  }, [cols, viewDate]);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateEventInCol();
@@ -84,9 +95,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   return (
     <>
       <div className="flex min-h-0 flex-col">
-        <WeeklyCalendarDayHeader
-          calendarYearMonth={date}
-          week={week}
+        <DateColCalendarDayHeader
+          dates={calendarViewDates}
+          calendarYearMonth={viewDate}
           longTermEvents={longTermEvents}
         />
         <div
@@ -98,13 +109,14 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
           <div
             className={clsx("relative grid")}
             style={{
-              gridTemplateColumns: WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS,
+              gridTemplateColumns:
+                DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS(cols),
             }}
           >
             <div>
               {eachHourOfInterval({
-                start: startOfDay(date),
-                end: endOfDay(date),
+                start: startOfDay(viewDate),
+                end: endOfDay(viewDate),
               }).map((h, i) => {
                 return (
                   <div
@@ -122,7 +134,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
                 );
               })}
             </div>
-            {week.map((date) => {
+            {calendarViewDates.map((date) => {
               return (
                 <DateColumn
                   key={`${date}`}
@@ -134,7 +146,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
             <div
               className="absolute grid h-[1px] w-full"
               style={{
-                gridTemplateColumns: `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px 1fr`,
+                gridTemplateColumns: `${DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE}px 1fr`,
                 top:
                   (DATE_EVENT_MIN_HEIGHT / DATE_EVENT_MIN_MINUTES) *
                   differenceInMinutes(currentDate, startOfDay(currentDate)),
@@ -143,7 +155,7 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
               <div
                 className="relative -translate-y-1/2 pr-3 text-end text-xs font-bold"
                 style={{
-                  width: WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE,
+                  width: DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE,
                   fontSize: "10px",
                 }}
               >
@@ -164,7 +176,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   );
 };
 
-export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
+export const DateColCalendar: React.FC<DateColCalendarProps> = ({
+  ...props
+}) => {
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
     <PrepareCreateEventInRowProvider>
@@ -173,7 +187,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
           <PrepareCreateEventInColProvider scrollableRef={scrollableRef}>
             <MoveEventInColProvider scrollableRef={scrollableRef}>
               <ResizeEventInColProvider scrollableRef={scrollableRef}>
-                <WeeklyCalendarImpl scrollableRef={scrollableRef} {...props} />
+                <DateColCalendarImpl scrollableRef={scrollableRef} {...props} />
               </ResizeEventInColProvider>
             </MoveEventInColProvider>
           </PrepareCreateEventInColProvider>
