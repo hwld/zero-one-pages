@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { format } from "date-fns";
-import { WeekEvent } from "../type";
+import { EventInRow } from "../type";
 
 type Props = {
   disablePointerEvents: boolean;
@@ -14,8 +14,8 @@ type Props = {
   topMargin?: number;
 } & ComponentPropsWithoutRef<"button">;
 
-export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
-  function WeekEventCardBase(
+export const EventInRowCardBase = forwardRef<HTMLButtonElement, Props>(
+  function EventInRowCardBase(
     {
       disablePointerEvents,
       height,
@@ -52,9 +52,9 @@ export const WeekEventCardBase = forwardRef<HTMLButtonElement, Props>(
   },
 );
 
-type ContentProps = { weekEvent: WeekEvent; isDragging: boolean };
-export const WeekEventCardContent: React.FC<ContentProps> = ({
-  weekEvent,
+type ContentProps = { eventInRow: EventInRow; isDragging: boolean };
+export const EventInRowCardContent: React.FC<ContentProps> = ({
+  eventInRow,
   isDragging,
 }) => {
   return (
@@ -64,12 +64,12 @@ export const WeekEventCardContent: React.FC<ContentProps> = ({
         isDragging && "bg-neutral-800 ring",
       )}
     >
-      {!weekEvent.allDay ? (
+      {!eventInRow.allDay ? (
         <span className="mr-1 text-nowrap text-neutral-300">
-          {format(weekEvent.start, "aa hh:mm")}
+          {format(eventInRow.start, "aa hh:mm")}
         </span>
       ) : null}
-      <span className="truncate">{weekEvent.title}</span>
+      <span className="truncate">{eventInRow.title}</span>
     </div>
   );
 };

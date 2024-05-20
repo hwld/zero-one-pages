@@ -8,45 +8,45 @@ import {
   useState,
 } from "react";
 import { getEventFromMoveEventPreview } from "./utils";
-import { MoveWeekEventPreview } from "./type";
+import { MoveEventInRowPreview } from "./type";
 import { useUpdateEvent } from "../event/use-update-event";
-import { WeekEvent } from "./type";
+import { EventInRow } from "./type";
 
-export type MoveWeekEventActions = {
-  startMove: (event: WeekEvent, moveStartDate: Date) => void;
+type MoveEventActions = {
+  startMove: (event: EventInRow, moveStartDate: Date) => void;
   updateMoveEnd: (moveEndDate: Date) => void;
   move: () => void;
 };
 
-type MoveWeekEventContext = {
+type MoveEventContext = {
   isEventMoving: boolean;
-  moveEventPreview: MoveWeekEventPreview | undefined;
-  moveEventActions: MoveWeekEventActions;
+  moveEventPreview: MoveEventInRowPreview | undefined;
+  moveEventActions: MoveEventActions;
 };
 
-const Context = createContext<MoveWeekEventContext | undefined>(undefined);
+const Context = createContext<MoveEventContext | undefined>(undefined);
 
-export const useMoveWeekEvent = (): MoveWeekEventContext => {
+export const useMoveEventInRow = (): MoveEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("PrepareCreateWeekEventProviderが存在しません");
+    throw new Error(`${MoveEventInRowProvider.name}が存在しません`);
   }
   return ctx;
 };
 
-export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
+export const MoveEventInRowProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{
     isEventMoving: boolean;
-    moveEventPreview: MoveWeekEventPreview | undefined;
+    moveEventPreview: MoveEventInRowPreview | undefined;
   }>({ isEventMoving: false, moveEventPreview: undefined });
 
   const { moveEventPreview, isEventMoving } = state;
 
-  const startMove: MoveWeekEventActions["startMove"] = useCallback(
+  const startMove: MoveEventActions["startMove"] = useCallback(
     (event, moveStartDate) => {
       setState({
         isEventMoving: true,
@@ -60,7 +60,7 @@ export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
     [],
   );
 
-  const updateMoveEnd: MoveWeekEventActions["updateMoveEnd"] = useCallback(
+  const updateMoveEnd: MoveEventActions["updateMoveEnd"] = useCallback(
     (moveEndDate: Date) => {
       if (!isEventMoving || !moveEventPreview) {
         return;
@@ -74,7 +74,7 @@ export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
     [isEventMoving, moveEventPreview],
   );
 
-  const move: MoveWeekEventActions["move"] = useCallback(() => {
+  const move: MoveEventActions["move"] = useCallback(() => {
     if (!moveEventPreview) {
       return;
     }
@@ -107,7 +107,7 @@ export const MoveWeekEventProvider: React.FC<PropsWithChildren> = ({
     };
   }, [move]);
 
-  const value: MoveWeekEventContext = useMemo(
+  const value: MoveEventContext = useMemo(
     () => ({
       isEventMoving,
       moveEventPreview,

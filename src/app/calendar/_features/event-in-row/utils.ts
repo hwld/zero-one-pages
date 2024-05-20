@@ -10,23 +10,23 @@ import {
   Interval,
   isSameDay,
 } from "date-fns";
-import { MoveWeekEventPreview, WeekEvent } from "./type";
+import { MoveEventInRowPreview, EventInRow } from "./type";
 import { Event } from "../../_mocks/event-store";
 import { getOverlappingDates } from "../../utils";
 
-export const getWeekEvents = ({
-  displayDateRange,
+export const getEventsInRow = ({
+  rowDateRange,
   events,
 }: {
-  displayDateRange: Interval;
+  rowDateRange: Interval;
   events: Event[];
-}): WeekEvent[] => {
+}): EventInRow[] => {
   const sortedEvents = events
     .filter((event) => {
       const overlapping = areIntervalsOverlapping(
         {
-          start: startOfDay(displayDateRange.start),
-          end: endOfDay(displayDateRange.end),
+          start: startOfDay(rowDateRange.start),
+          end: endOfDay(rowDateRange.end),
         },
         event,
         { inclusive: true },
@@ -56,12 +56,12 @@ export const getWeekEvents = ({
       return 0;
     });
 
-  const weekEvents: WeekEvent[] = [];
+  const eventsInRow: EventInRow[] = [];
   for (let i = 0; i < sortedEvents.length; i++) {
     const event = sortedEvents[i];
 
     // イベントよりも前に存在している重複したイベントを取得する
-    const prevOverlappingEvents = weekEvents.filter((prevEvent, index) => {
+    const prevOverlappingEvents = eventsInRow.filter((prevEvent, index) => {
       const overlapping = areIntervalsOverlapping(
         { start: startOfDay(event.start), end: startOfDay(event.end) },
         { start: startOfDay(prevEvent.start), end: startOfDay(prevEvent.end) },
@@ -100,53 +100,54 @@ export const getWeekEvents = ({
       }
     }
 
-    const weekEvent = convertEventToWeekEvent(event, {
+    const eventInRow = convertEventToEventInRow(event, {
       top,
-      displayDateRange,
+      rowDateRange: rowDateRange,
     });
-    if (weekEvent) {
-      weekEvents.push(weekEvent);
+    if (eventInRow) {
+      eventsInRow.push(eventInRow);
     }
   }
 
-  return weekEvents;
+  return eventsInRow;
 };
 
-export const convertEventToWeekEvent = (
+export const convertEventToEventInRow = (
   event: Event,
-  { top, displayDateRange }: { top: number; displayDateRange: Interval },
-): WeekEvent | undefined => {
-  const displayDates = eachDayOfInterval(displayDateRange);
+  { top, rowDateRange }: { top: number; rowDateRange: Interval },
+): EventInRow | undefined => {
+  const rowDates = eachDayOfInterval(rowDateRange);
 
-  const eventDatesInDisplayDateRange = getOverlappingDates(
+  const eventDatesInRow = getOverlappingDates(
     {
-      start: startOfDay(displayDates.at(0)!),
-      end: endOfDay(displayDates.at(-1)!),
+      start: startOfDay(rowDates.at(0)!),
+      end: endOfDay(rowDates.at(-1)!),
     },
     event,
     { inclusive: true },
   );
 
-  if (!eventDatesInDisplayDateRange.length) {
+  if (!eventDatesInRow.length) {
     return undefined;
   }
 
-  const weekEvent: WeekEvent = {
+  const eventsInRow: EventInRow = {
     ...event,
     top,
-    eventsRowCols: displayDates.length,
-    displayStartCol: displayDates.findIndex((d) =>
-      isSameDay(d, eventDatesInDisplayDateRange.at(0)!),
+    eventsRowCols: rowDates.length,
+    displayStartCol: rowDates.findIndex((d) =>
+      isSameDay(d, eventDatesInRow.at(0)!),
     ),
-    displayEndCol: displayDates.findIndex((d) =>
-      isSameDay(d, eventDatesInDisplayDateRange.at(-1)!),
+    displayEndCol: rowDates.findIndex((d) =>
+      isSameDay(d, eventDatesInRow.at(-1)!),
     ),
   };
 
-  return weekEvent;
+  return eventsInRow;
 };
 
 /**
+ * TODO: 修正する
  * 特定の週で、表示できるイベントの上限数を超えているイベント数を数え、
  * 曜日をキー、超えているイベント数を値とするMapとして返す関数
  */
@@ -156,7 +157,7 @@ export const getExceededEventCountByDayOfWeek = ({
   limit,
 }: {
   week: Date[];
-  weekEvents: WeekEvent[];
+  weekEvents: EventInRow[];
   limit: number;
 }) => {
   type WeekDay = number;
@@ -191,7 +192,7 @@ export const getExceededEventCountByDayOfWeek = ({
 };
 
 export const getEventFromMoveEventPreview = (
-  draggingEvent: MoveWeekEventPreview,
+  draggingEvent: MoveEventInRowPreview,
 ): Event => {
   const { dragStartDate, dragEndDate, ...event } = draggingEvent;
   const diffDay = differenceInDays(dragEndDate, dragStartDate);

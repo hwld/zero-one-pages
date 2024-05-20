@@ -1,5 +1,6 @@
-import { WeekEventCardBase } from "./base";
+import { EventInRowCardBase } from "./base";
 
+// TODO: fix
 type Props = {
   count: number;
   limit: number;
@@ -11,7 +12,7 @@ type Props = {
   onClick?: () => void;
 };
 
-export const MoreWeekEventsCard: React.FC<Props> = ({
+export const MoreEventInrowCard: React.FC<Props> = ({
   count,
   limit,
   height,
@@ -22,7 +23,7 @@ export const MoreWeekEventsCard: React.FC<Props> = ({
   onClick,
 }) => {
   return (
-    <WeekEventCardBase
+    <EventInRowCardBase
       height={height}
       disablePointerEvents={disablePointerEvents}
       top={limit}
@@ -36,6 +37,6 @@ export const MoreWeekEventsCard: React.FC<Props> = ({
       <div className="flex h-full w-full items-center rounded px-1 text-xs text-neutral-700 ring-blue-500 transition-colors hover:bg-neutral-900/10">
         他<span className="mx-1">{count}</span>件
       </div>
-    </WeekEventCardBase>
+    </EventInRowCardBase>
   );
 };

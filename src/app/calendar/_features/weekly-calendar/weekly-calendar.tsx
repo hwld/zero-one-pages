@@ -30,11 +30,11 @@ import {
   ResizeDateEventProvider,
   useResizeDateEvent,
 } from "../date-event/resize-event-provider";
-import { MoveWeekEventProvider } from "../week-event/move-event-provider";
-import { PrepareCreateWeekEventProvider } from "../week-event/prepare-create-event-provider";
+import { MoveEventInRowProvider } from "../event-in-row/move-event-provider";
+import { PrepareCreateEventInRowProvider } from "../event-in-row/prepare-create-event-provider";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 import clsx from "clsx";
-import { ResizeWeekEventProvider } from "../week-event/resize-event-provider";
+import { ResizeEventInRowProvider } from "../event-in-row/resize-event-provider";
 
 export const WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE = 75;
 export const WEEKLY_CALENDAR_GRID_TEMPLATE_COLUMNS = `${WEEKLY_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(7,1fr)`;
@@ -167,9 +167,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
 export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
   const scrollableRef = useRef<HTMLDivElement>(null);
   return (
-    <PrepareCreateWeekEventProvider>
-      <MoveWeekEventProvider>
-        <ResizeWeekEventProvider>
+    <PrepareCreateEventInRowProvider>
+      <MoveEventInRowProvider>
+        <ResizeEventInRowProvider>
           <PrepareCreateDateEventProvider scrollableRef={scrollableRef}>
             <MoveDateEventProvider scrollableRef={scrollableRef}>
               <ResizeDateEventProvider scrollableRef={scrollableRef}>
@@ -177,8 +177,8 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
               </ResizeDateEventProvider>
             </MoveDateEventProvider>
           </PrepareCreateDateEventProvider>
-        </ResizeWeekEventProvider>
-      </MoveWeekEventProvider>
-    </PrepareCreateWeekEventProvider>
+        </ResizeEventInRowProvider>
+      </MoveEventInRowProvider>
+    </PrepareCreateEventInRowProvider>
   );
 };

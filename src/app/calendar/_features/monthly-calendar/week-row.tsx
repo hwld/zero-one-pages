@@ -1,7 +1,7 @@
 import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
-import { WeekEventRow } from "../week-event/week-event-row";
+import { EventsRow } from "../event-in-row/events-row";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { useOptimisticWeekEvents } from "../week-event/use-optimistic-week-events";
+import { useOptimisticEventsInRow } from "../event-in-row/use-optimistic-events-in-row";
 import { Event } from "../../_mocks/event-store";
 import { RefObject } from "react";
 import { useAppState } from "../../_components/use-app-state";
@@ -21,7 +21,7 @@ export const WeekRow: React.FC<Props> = ({
   calendarYearMonth,
   eventLimit,
 }) => {
-  const weekEvents = useOptimisticWeekEvents({
+  const weekEvents = useOptimisticEventsInRow({
     displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
     events,
   });
@@ -44,14 +44,14 @@ export const WeekRow: React.FC<Props> = ({
         );
       })}
       <div className="absolute inset-0">
-        <WeekEventRow
+        <EventsRow
           ref={rowRef}
-          week={week}
-          allWeekEvents={weekEvents}
+          eventsRowDates={week}
+          allEventsInRow={weekEvents}
           eventLimit={eventLimit}
           eventHeight={MONTHLY_EVENT_ROW_SIZE}
           eventTop={MONTHLY_DATE_HEADER_HEIGHT}
-          onClickMoreWeekEvents={handleClickMoreWeekEvents}
+          onClickMoreEvents={handleClickMoreWeekEvents}
         />
       </div>
     </div>

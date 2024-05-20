@@ -3,14 +3,14 @@ import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
 import { getCalendarDates } from "../../utils";
 import { Event } from "../../_mocks/event-store";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
-import { MoveWeekEventProvider } from "../week-event/move-event-provider";
+import { MoveEventInRowProvider } from "../event-in-row/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
-  PrepareCreateWeekEventProvider,
-  usePrepareCreateWeekEvent,
-} from "../week-event/prepare-create-event-provider";
+  PrepareCreateEventInRowProvider,
+  usePrepareCreateEventInRow,
+} from "../event-in-row/prepare-create-event-provider";
 import { WeekRow } from "./week-row";
-import { ResizeWeekEventProvider } from "../week-event/resize-event-provider";
+import { ResizeEventInRowProvider } from "../event-in-row/resize-event-provider";
 
 type Props = {
   yearMonth: Date;
@@ -30,11 +30,11 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
     return getCalendarDates({ year, month });
   }, [month, year]);
 
-  const firstWeekEventRowRef = useRef<HTMLDivElement>(null);
+  const firstEventsRowRef = useRef<HTMLDivElement>(null);
   const [eventLimit, setEventLimit] = useState(0);
 
   useEffect(() => {
-    const eventSpace = firstWeekEventRowRef.current;
+    const eventSpace = firstEventsRowRef.current;
     const measure = () => {
       if (!eventSpace) {
         return;
@@ -56,7 +56,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
   }, [yearMonth]);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateWeekEvent();
+    usePrepareCreateEventInRow();
 
   return (
     <>
@@ -75,7 +75,7 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
             return (
               <WeekRow
                 key={`${week[i]}`}
-                rowRef={i === 0 ? firstWeekEventRowRef : undefined}
+                rowRef={i === 0 ? firstEventsRowRef : undefined}
                 week={week}
                 events={events}
                 calendarYearMonth={yearMonth}
@@ -97,12 +97,12 @@ export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
 
 export const MonthlyCalendar: React.FC<Props> = (props) => {
   return (
-    <PrepareCreateWeekEventProvider>
-      <MoveWeekEventProvider>
-        <ResizeWeekEventProvider>
+    <PrepareCreateEventInRowProvider>
+      <MoveEventInRowProvider>
+        <ResizeEventInRowProvider>
           <MonthlyCalendarImpl {...props} />
-        </ResizeWeekEventProvider>
-      </MoveWeekEventProvider>
-    </PrepareCreateWeekEventProvider>
+        </ResizeEventInRowProvider>
+      </MoveEventInRowProvider>
+    </PrepareCreateEventInRowProvider>
   );
 };

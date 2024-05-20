@@ -10,12 +10,12 @@ import { Event } from "../../_mocks/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
-import { usePrepareCreateWeekEvent } from "../week-event/prepare-create-event-provider";
+import { usePrepareCreateEventInRow } from "../event-in-row/prepare-create-event-provider";
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
-import { WeekEventRow } from "../week-event/week-event-row";
+import { EventsRow } from "../event-in-row/events-row";
 import { DATE_EVENT_MIN_HEIGHT } from "../date-event/utils";
-import { useOptimisticWeekEvents } from "../week-event/use-optimistic-week-events";
+import { useOptimisticEventsInRow } from "../event-in-row/use-optimistic-events-in-row";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
 export const DAY_TITLE_HEIGHT = 28;
@@ -33,13 +33,13 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
 }) => {
   const { currentDate } = useMinuteClock();
   const [expanded, setExpanded] = useState(false);
-  const weekLongTermEvents = useOptimisticWeekEvents({
+  const weekLongTermEvents = useOptimisticEventsInRow({
     displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
     events: longTermEvents,
   });
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateWeekEvent();
+    usePrepareCreateEventInRow();
 
   return (
     <>
@@ -100,12 +100,12 @@ export const WeeklyCalendarDayHeader: React.FC<Props> = ({
           className="absolute inset-0 col-start-2"
           style={{ top: DAY_TITLE_HEIGHT + CELL_Y_MARGIN }}
         >
-          <WeekEventRow
-            week={week}
-            allWeekEvents={weekLongTermEvents}
+          <EventsRow
+            eventsRowDates={week}
+            allEventsInRow={weekLongTermEvents}
             eventHeight={DATE_EVENT_MIN_HEIGHT}
             eventLimit={expanded ? undefined : LONG_TERM_EVENT_DISPLAY_LIMIT}
-            onClickMoreWeekEvents={() => setExpanded(true)}
+            onClickMoreEvents={() => setExpanded(true)}
           />
         </div>
       </div>

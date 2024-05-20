@@ -13,14 +13,14 @@ import { DragDateRange } from "../../utils";
 import { CreateEventInput } from "../../_mocks/api";
 import { max, min } from "date-fns";
 
-export type PrepareCreateWeekEventState = {
+type PrepareCreateEventState = {
   dragDateRange: DragDateRange | undefined;
   defaultCreateEventValues: Omit<CreateEventInput, "title"> | undefined;
 };
 
-export type PrepareCreateWeekEventActions = {
+type PrepareCreateEventActions = {
   setDragDateRange: Dispatch<
-    SetStateAction<PrepareCreateWeekEventState["dragDateRange"]>
+    SetStateAction<PrepareCreateEventState["dragDateRange"]>
   >;
   startDrag: (dragStart: Date) => void;
   updateDragEnd: (dragEnd: Date) => void;
@@ -28,51 +28,48 @@ export type PrepareCreateWeekEventActions = {
   clearState: () => void;
 };
 
-type PrepareCreateWeekEventContext = {
-  prepareCreateEventState: PrepareCreateWeekEventState;
-  prepareCreateEventActions: PrepareCreateWeekEventActions;
+type PrepareCreateEventContext = {
+  prepareCreateEventState: PrepareCreateEventState;
+  prepareCreateEventActions: PrepareCreateEventActions;
 };
 
-const Context = createContext<PrepareCreateWeekEventContext | undefined>(
-  undefined,
-);
+const Context = createContext<PrepareCreateEventContext | undefined>(undefined);
 
-export const usePrepareCreateWeekEvent = (): PrepareCreateWeekEventContext => {
+export const usePrepareCreateEventInRow = (): PrepareCreateEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("PrepareCreateWeekEventProviderが存在しません");
+    throw new Error(`${PrepareCreateEventInRowProvider.name}}が存在しません`);
   }
   return ctx;
 };
 
-export const PrepareCreateWeekEventProvider: React.FC<PropsWithChildren> = ({
+export const PrepareCreateEventInRowProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const [dragDateRange, setDragDateRange] =
-    useState<PrepareCreateWeekEventState["dragDateRange"]>();
+    useState<PrepareCreateEventState["dragDateRange"]>();
 
-  const startDrag: PrepareCreateWeekEventActions["startDrag"] = useCallback(
+  const startDrag: PrepareCreateEventActions["startDrag"] = useCallback(
     (dragStart) => {
       setDragDateRange({ dragStartDate: dragStart, dragEndDate: dragStart });
     },
     [],
   );
 
-  const updateDragEnd: PrepareCreateWeekEventActions["updateDragEnd"] =
-    useCallback(
-      (dragEnd) => {
-        if (!dragDateRange) {
-          return;
-        }
-        setDragDateRange({ ...dragDateRange, dragEndDate: dragEnd });
-      },
-      [dragDateRange],
-    );
+  const updateDragEnd: PrepareCreateEventActions["updateDragEnd"] = useCallback(
+    (dragEnd) => {
+      if (!dragDateRange) {
+        return;
+      }
+      setDragDateRange({ ...dragDateRange, dragEndDate: dragEnd });
+    },
+    [dragDateRange],
+  );
 
   const [defaultCreateEventValues, setDefaultCreateEventValues] =
-    useState<PrepareCreateWeekEventState["defaultCreateEventValues"]>();
+    useState<PrepareCreateEventState["defaultCreateEventValues"]>();
 
-  const setDefaultValues: PrepareCreateWeekEventActions["setDefaultValues"] =
+  const setDefaultValues: PrepareCreateEventActions["setDefaultValues"] =
     useCallback(() => {
       if (!dragDateRange) {
         return;
@@ -90,13 +87,13 @@ export const PrepareCreateWeekEventProvider: React.FC<PropsWithChildren> = ({
       });
     }, [dragDateRange]);
 
-  const clearState: PrepareCreateWeekEventActions["clearState"] =
+  const clearState: PrepareCreateEventActions["clearState"] =
     useCallback(() => {
       setDragDateRange(undefined);
       setDefaultCreateEventValues(undefined);
     }, []);
 
-  const prepareCreateEventState: PrepareCreateWeekEventState = useMemo(() => {
+  const prepareCreateEventState: PrepareCreateEventState = useMemo(() => {
     return { dragDateRange, defaultCreateEventValues };
   }, [defaultCreateEventValues, dragDateRange]);
 
@@ -113,7 +110,7 @@ export const PrepareCreateWeekEventProvider: React.FC<PropsWithChildren> = ({
     };
   }, [setDefaultValues]);
 
-  const value: PrepareCreateWeekEventContext = useMemo(
+  const value: PrepareCreateEventContext = useMemo(
     () => ({
       prepareCreateEventState,
       prepareCreateEventActions: {
