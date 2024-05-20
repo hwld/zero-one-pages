@@ -1,35 +1,35 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
 import { DATE_EVENT_MIN_HEIGHT } from "./utils";
-import { DateEvent } from "./type";
+import { EventInCol } from "./type";
 import { areDragDateRangeOverlapping } from "@/app/calendar/utils";
 import { startOfDay, endOfDay, areIntervalsOverlapping } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { DateEventCardProps, DateEventCard } from "./card/date-event-card";
-import { DragPreviewDateEventCard } from "./card/drag-preview";
-import { DateEventPreview } from "./date-event-preview";
-import { useMoveDateEvent } from "./move-event-provider";
-import { usePrepareCreateDateEvent } from "./prepare-create-event-provider";
-import { useResizeDateEvent } from "./resize-event-provider";
+import { EventInColCardProps, EventInColCard } from "./card/event-in-col-card";
+import { DragPreviewEventInColCard } from "./card/drag-preview";
+import { EventInColPreview } from "./event-in-col-preview";
+import { useMoveEventInCol } from "./move-event-provider";
+import { usePrepareCreateEventInCol } from "./prepare-create-event-provider";
+import { useResizeEventInCol } from "./resize-event-provider";
 import { Placement } from "@floating-ui/react";
 
 type Props = {
-  dateEvents: DateEvent[];
+  eventsInCol: EventInCol[];
   displayedDay: Date;
   eventPopoverPlace?: Placement;
 } & PropsWithChildren;
 
-export const DateEventsColumn: React.FC<Props> = ({
+export const EventsColumn: React.FC<Props> = ({
   children,
   displayedDay,
-  dateEvents,
+  eventsInCol,
   eventPopoverPlace,
 }) => {
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateDateEvent();
+    usePrepareCreateEventInCol();
   const { isEventResizing, resizeEventActions, resizeEventPreview } =
-    useResizeDateEvent();
+    useResizeEventInCol();
   const { isEventMoving, moveEventActions, moveEventPreview } =
-    useMoveDateEvent();
+    useMoveEventInCol();
 
   const dragDateRangeForCreate = prepareCreateEventState.dragDateRange;
   const isDraggingForCreate = dragDateRangeForCreate !== undefined;
@@ -104,18 +104,18 @@ export const DateEventsColumn: React.FC<Props> = ({
 
   const handleEventDragStart = (
     event: React.DragEvent,
-    dateEvent: DateEvent,
+    eventInCol: EventInCol,
   ) => {
     event.preventDefault();
 
     const columnBasedY = getColumnBasedY(event.clientY);
-    moveEventActions.startMove(dateEvent, {
+    moveEventActions.startMove(eventInCol, {
       date: displayedDay,
       y: columnBasedY,
     });
   };
 
-  const handleStartResizeEvent: DateEventCardProps["onStartResize"] = (
+  const handleStartResizeEvent: EventInColCardProps["onStartResize"] = (
     e,
     { event, origin },
   ) => {
@@ -147,13 +147,13 @@ export const DateEventsColumn: React.FC<Props> = ({
     >
       {children}
       {isEventPreviewVisible && (
-        <DateEventPreview
+        <EventInColPreview
           date={displayedDay}
           eventCreationDragData={dragDateRangeForCreate}
         />
       )}
       <AnimatePresence>
-        {dateEvents.map((event) => {
+        {eventsInCol.map((event) => {
           const isDragPreview = moveEventPreview?.id === event.id;
           const isResizePreview = resizeEventPreview?.id === event.id;
 
@@ -165,7 +165,7 @@ export const DateEventsColumn: React.FC<Props> = ({
               key={event.id}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
-              <DateEventCard
+              <EventInColCard
                 popoverPlace={eventPopoverPlace}
                 displayedDate={displayedDay}
                 event={event}
@@ -186,7 +186,7 @@ export const DateEventsColumn: React.FC<Props> = ({
           start: startOfDay(displayedDay),
           end: endOfDay(displayedDay),
         }) && (
-          <DragPreviewDateEventCard
+          <DragPreviewEventInColCard
             date={displayedDay}
             event={moveEventPreview}
           />

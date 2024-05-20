@@ -2,7 +2,7 @@ import { Event } from "@/app/calendar/_mocks/event-store";
 import { DragDateRange } from "../../utils";
 
 /**
- * 行内で表示されるイベント
+ * 行内に表示されるイベント
  */
 export type EventInRow = Event & {
   top: number;

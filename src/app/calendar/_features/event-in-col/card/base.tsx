@@ -1,5 +1,5 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { DateEvent } from "../type";
+import { EventInCol } from "../type";
 import { DATE_EVENT_MIN_HEIGHT } from "../utils";
 import { formatEventDateSpan } from "../utils";
 import { cn } from "@/lib/utils";
@@ -13,8 +13,8 @@ type Props = {
   };
 } & Omit<ComponentPropsWithoutRef<"button">, "style">;
 
-export const DateEventCardBase = forwardRef<HTMLButtonElement, Props>(
-  function DateEventCardBase({ className, children, style, ...props }, ref) {
+export const EventInColCardBase = forwardRef<HTMLButtonElement, Props>(
+  function EventInColCardBase({ className, children, style, ...props }, ref) {
     const thin = style.height < DATE_EVENT_MIN_HEIGHT * 3;
 
     return (
@@ -44,7 +44,7 @@ export const DateEventCardBase = forwardRef<HTMLButtonElement, Props>(
   },
 );
 
-export const DateEventCardContent: React.FC<{ event: DateEvent }> = ({
+export const EventInColCardContent: React.FC<{ event: EventInCol }> = ({
   event,
 }) => {
   return (

@@ -14,7 +14,7 @@ import { usePrepareCreateEventInRow } from "../event-in-row/prepare-create-event
 import { IconButton } from "../../_components/button";
 import { CollapseIcon, ExpandIcon } from "../../_components/expand-icon";
 import { EventsRow } from "../event-in-row/events-row";
-import { DATE_EVENT_MIN_HEIGHT } from "../date-event/utils";
+import { DATE_EVENT_MIN_HEIGHT } from "../event-in-col/utils";
 import { useOptimisticEventsInRow } from "../event-in-row/use-optimistic-events-in-row";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 

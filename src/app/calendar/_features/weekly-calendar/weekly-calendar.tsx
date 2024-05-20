@@ -14,22 +14,22 @@ import { splitEvent } from "./utils";
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../date-event/utils";
+} from "../event-in-col/utils";
 import { DateColumn } from "./date-column";
 import { WeeklyCalendarDayHeader } from "./weekly-calendar-header";
 import {
-  MoveDateEventProvider,
-  useMoveDateEvent,
-} from "../date-event/move-event-provider";
+  MoveEventInColProvider,
+  useMoveEventInCol,
+} from "../event-in-col/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import {
-  PrepareCreateDateEventProvider,
-  usePrepareCreateDateEvent,
-} from "../date-event/prepare-create-event-provider";
+  PrepareCreateEventInColProvider,
+  usePrepareCreateEventInCol,
+} from "../event-in-col/prepare-create-event-provider";
 import {
-  ResizeDateEventProvider,
-  useResizeDateEvent,
-} from "../date-event/resize-event-provider";
+  ResizeEventInColProvider,
+  useResizeEventInCol,
+} from "../event-in-col/resize-event-provider";
 import { MoveEventInRowProvider } from "../event-in-row/move-event-provider";
 import { PrepareCreateEventInRowProvider } from "../event-in-row/prepare-create-event-provider";
 import { useMinuteClock } from "../../_components/use-minute-clock";
@@ -61,9 +61,9 @@ export const WeeklyCalendarImpl: React.FC<WeeklyCalendarImplProps> = ({
   }, [date]);
 
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateDateEvent();
-  const { isEventMoving, moveEventActions } = useMoveDateEvent();
-  const { isEventResizing, resizeEventActions } = useResizeDateEvent();
+    usePrepareCreateEventInCol();
+  const { isEventMoving, moveEventActions } = useMoveEventInCol();
+  const { isEventResizing, resizeEventActions } = useResizeEventInCol();
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop;
@@ -170,13 +170,13 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ ...props }) => {
     <PrepareCreateEventInRowProvider>
       <MoveEventInRowProvider>
         <ResizeEventInRowProvider>
-          <PrepareCreateDateEventProvider scrollableRef={scrollableRef}>
-            <MoveDateEventProvider scrollableRef={scrollableRef}>
-              <ResizeDateEventProvider scrollableRef={scrollableRef}>
+          <PrepareCreateEventInColProvider scrollableRef={scrollableRef}>
+            <MoveEventInColProvider scrollableRef={scrollableRef}>
+              <ResizeEventInColProvider scrollableRef={scrollableRef}>
                 <WeeklyCalendarImpl scrollableRef={scrollableRef} {...props} />
-              </ResizeDateEventProvider>
-            </MoveDateEventProvider>
-          </PrepareCreateDateEventProvider>
+              </ResizeEventInColProvider>
+            </MoveEventInColProvider>
+          </PrepareCreateEventInColProvider>
         </ResizeEventInRowProvider>
       </MoveEventInRowProvider>
     </PrepareCreateEventInRowProvider>

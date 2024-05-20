@@ -1,19 +1,19 @@
 import { Event } from "@/app/calendar/_mocks/event-store";
 
 /**
- * 日単位で表示するイベント
+ * 列内に表示されるイベント
  */
-export type DateEvent = Event & {
+export type EventInCol = Event & {
   prevOverlappings: number;
   totalOverlappings: number;
 };
 
-export type MoveDateEventPreview = DateEvent & {
+export type MoveEventInColPreview = EventInCol & {
   prevMouseOverDate: Date;
   updatedAt: number;
 };
 
-export type ResizeDateEventPreview = DateEvent & {
+export type ResizeEventInColPreview = EventInCol & {
   origin: "eventStart" | "eventEnd";
   updatedAt: number;
 };

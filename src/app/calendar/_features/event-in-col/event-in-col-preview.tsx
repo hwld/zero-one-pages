@@ -3,7 +3,7 @@ import { getHeightFromInterval, getTopFromDate } from "./utils";
 import { DragDateRange } from "../../utils";
 
 type Props = { eventCreationDragData: DragDateRange; date: Date };
-export const DateEventPreview: React.FC<Props> = ({
+export const EventInColPreview: React.FC<Props> = ({
   eventCreationDragData,
   date,
 }) => {

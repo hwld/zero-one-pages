@@ -10,50 +10,50 @@ import {
   useState,
 } from "react";
 import { useUpdateEvent } from "../event/use-update-event";
-import { MoveDateEventPreview } from "./type";
-import { DateEvent } from "./type";
+import { MoveEventInColPreview } from "./type";
+import { EventInCol } from "./type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
 import { MouseHistory } from "../../utils";
 import { getDateFromY } from "./utils";
 
-type MoveDateEventActions = {
-  startMove: (event: DateEvent, moveStart: { date: Date; y: number }) => void;
+type MoveEventActions = {
+  startMove: (event: EventInCol, moveStart: { date: Date; y: number }) => void;
   updateMoveDest: (day: Date, y: number) => void;
   scroll: (scrollTop: number) => void;
   move: () => void;
 };
 
-type MoveDateEventContext = {
+type MoveEventContext = {
   isEventMoving: boolean;
-  moveEventPreview: MoveDateEventPreview | undefined;
-  moveEventActions: MoveDateEventActions;
+  moveEventPreview: MoveEventInColPreview | undefined;
+  moveEventActions: MoveEventActions;
 };
 
-const Context = createContext<MoveDateEventContext | undefined>(undefined);
+const Context = createContext<MoveEventContext | undefined>(undefined);
 
-export const useMoveDateEvent = (): MoveDateEventContext => {
+export const useMoveEventInCol = (): MoveEventContext => {
   const ctx = useContext(Context);
   if (!ctx) {
-    throw new Error("MoveDateEventProviderが存在しません");
+    throw new Error(`${MoveEventInColProvider.name}が存在しません`);
   }
   return ctx;
 };
 
-export const MoveDateEventProvider: React.FC<
+export const MoveEventInColProvider: React.FC<
   { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
 > = ({ scrollableRef, children }) => {
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{
     isEventMoving: boolean;
-    moveEventPreview: MoveDateEventPreview | undefined;
+    moveEventPreview: MoveEventInColPreview | undefined;
   }>({ isEventMoving: false, moveEventPreview: undefined });
 
   const { isEventMoving, moveEventPreview } = state;
 
   const mouseHistoryRef = useRef<MouseHistory>();
 
-  const startMove: MoveDateEventActions["startMove"] = useCallback(
+  const startMove: MoveEventActions["startMove"] = useCallback(
     (event, { date, y }) => {
       if (scrollableRef.current) {
         mouseHistoryRef.current = {
@@ -76,7 +76,7 @@ export const MoveDateEventProvider: React.FC<
     [scrollableRef],
   );
 
-  const updateMoveDest: MoveDateEventActions["updateMoveDest"] = useCallback(
+  const updateMoveDest: MoveEventActions["updateMoveDest"] = useCallback(
     (day: Date, y: number) => {
       const moveDest = getDateFromY(day, y);
       if (
@@ -113,7 +113,7 @@ export const MoveDateEventProvider: React.FC<
     [isEventMoving, moveEventPreview, scrollableRef],
   );
 
-  const scroll: MoveDateEventActions["scroll"] = useCallback(
+  const scroll: MoveEventActions["scroll"] = useCallback(
     (scrollTop) => {
       if (!isEventMoving || !moveEventPreview || !mouseHistoryRef.current) {
         return;
@@ -127,7 +127,7 @@ export const MoveDateEventProvider: React.FC<
     [isEventMoving, moveEventPreview, updateMoveDest],
   );
 
-  const move: MoveDateEventActions["move"] = useCallback(() => {
+  const move: MoveEventActions["move"] = useCallback(() => {
     if (!moveEventPreview) {
       return;
     }
@@ -159,7 +159,7 @@ export const MoveDateEventProvider: React.FC<
     };
   }, [move]);
 
-  const value: MoveDateEventContext = useMemo(() => {
+  const value: MoveEventContext = useMemo(() => {
     return {
       isEventMoving,
       moveEventPreview,

@@ -1,23 +1,23 @@
 import { RefObject, useRef } from "react";
 import {
-  MoveDateEventProvider,
-  useMoveDateEvent,
-} from "../date-event/move-event-provider";
+  MoveEventInColProvider,
+  useMoveEventInCol,
+} from "../event-in-col/move-event-provider";
 import {
-  PrepareCreateDateEventProvider,
-  usePrepareCreateDateEvent,
-} from "../date-event/prepare-create-event-provider";
+  PrepareCreateEventInColProvider,
+  usePrepareCreateEventInCol,
+} from "../event-in-col/prepare-create-event-provider";
 import {
-  ResizeDateEventProvider,
-  useResizeDateEvent,
-} from "../date-event/resize-event-provider";
+  ResizeEventInColProvider,
+  useResizeEventInCol,
+} from "../event-in-col/resize-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";
 import { Event } from "../../_mocks/event-store";
 import { eachHourOfInterval, endOfDay, format, startOfDay } from "date-fns";
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../date-event/utils";
+} from "../event-in-col/utils";
 import { DateColumn } from "./date-column";
 
 type DailyCalendarImplProps = DailyCalendarProps & {
@@ -30,9 +30,9 @@ const DailyCalendarImpl: React.FC<DailyCalendarImplProps> = ({
   events,
 }) => {
   const { prepareCreateEventState, prepareCreateEventActions } =
-    usePrepareCreateDateEvent();
-  const { isEventMoving, moveEventActions } = useMoveDateEvent();
-  const { isEventResizing, resizeEventActions } = useResizeDateEvent();
+    usePrepareCreateEventInCol();
+  const { isEventMoving, moveEventActions } = useMoveEventInCol();
+  const { isEventResizing, resizeEventActions } = useResizeEventInCol();
 
   const handleScroll = (e: React.UIEvent) => {
     const scrollTop = e.currentTarget.scrollTop;
@@ -101,12 +101,12 @@ export const DailyCalendar: React.FC<DailyCalendarProps> = (props) => {
   const scrollableRef = useRef<HTMLDivElement>(null);
 
   return (
-    <PrepareCreateDateEventProvider scrollableRef={scrollableRef}>
-      <MoveDateEventProvider scrollableRef={scrollableRef}>
-        <ResizeDateEventProvider scrollableRef={scrollableRef}>
+    <PrepareCreateEventInColProvider scrollableRef={scrollableRef}>
+      <MoveEventInColProvider scrollableRef={scrollableRef}>
+        <ResizeEventInColProvider scrollableRef={scrollableRef}>
           <DailyCalendarImpl {...props} scrollableRef={scrollableRef} />
-        </ResizeDateEventProvider>
-      </MoveDateEventProvider>
-    </PrepareCreateDateEventProvider>
+        </ResizeEventInColProvider>
+      </MoveEventInColProvider>
+    </PrepareCreateEventInColProvider>
   );
 };

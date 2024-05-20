@@ -8,11 +8,11 @@ import {
 import {
   DATE_EVENT_MIN_HEIGHT,
   DATE_EVENT_MIN_MINUTES,
-} from "../date-event/utils";
+} from "../event-in-col/utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
 import { Event } from "../../_mocks/event-store";
-import { DateEventsColumn } from "../date-event/date-events-column";
-import { useOptimisticDateEvents } from "../date-event/use-optimistic-date-events";
+import { EventsColumn } from "../event-in-col/events-column";
+import { useOptimisticEventsInCol } from "../event-in-col/use-optimistic-events-in-col";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
 type Props = {
@@ -25,7 +25,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   ref,
 ) {
   const { currentDate } = useMinuteClock();
-  const displayedDateEvents = useOptimisticDateEvents({
+  const displayedEventsInCol = useOptimisticEventsInCol({
     day: displayedDay,
     events,
   });
@@ -51,8 +51,8 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
   return (
     <div className="flex flex-col gap-2" ref={ref}>
       <div className="border-r border-neutral-200">
-        <DateEventsColumn
-          dateEvents={displayedDateEvents}
+        <EventsColumn
+          eventsInCol={displayedEventsInCol}
           displayedDay={displayedDay}
           eventPopoverPlace="bottom"
         >
@@ -84,7 +84,7 @@ export const DateColumn = forwardRef<HTMLDivElement, Props>(function DateColumn(
               <div className="absolute left-0 size-3 -translate-x-[50%] -translate-y-[50%] rounded-full bg-blue-500" />
             </div>
           ) : null}
-        </DateEventsColumn>
+        </EventsColumn>
       </div>
     </div>
   );

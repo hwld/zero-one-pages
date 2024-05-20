@@ -1,22 +1,22 @@
-import { useMoveDateEvent } from "./move-event-provider";
-import { useResizeDateEvent } from "./resize-event-provider";
-import { getDateEvents } from "./utils";
+import { useMoveEventInCol } from "./move-event-provider";
+import { useResizeEventInCol } from "./resize-event-provider";
+import { getEventsInCol } from "./utils";
 import { Event } from "@/app/calendar/_mocks/event-store";
 
 /**
- *  日付を指定して、DateEventのMoveやResizeの状態から更新後のdate-eventsを返す
+ *  日付を指定して、EventのMoveやResizeの状態から更新後のeventsを返す
  */
-export const useOptimisticDateEvents = ({
+export const useOptimisticEventsInCol = ({
   day,
   events,
 }: {
   day: Date;
   events: Event[];
 }) => {
-  const { resizeEventPreview } = useResizeDateEvent();
-  const { isEventMoving, moveEventPreview } = useMoveDateEvent();
+  const { resizeEventPreview } = useResizeEventInCol();
+  const { isEventMoving, moveEventPreview } = useMoveEventInCol();
 
-  return getDateEvents({
+  return getEventsInCol({
     date: day,
     // tanstack-queryのキャッシュレベルで実装すると、他の更新があったときに壊れてしまうので
     // 楽観的更新をここで実装する

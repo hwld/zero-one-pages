@@ -11,18 +11,18 @@ import {
   max,
   min,
 } from "date-fns";
-import { DateEvent } from "./type";
+import { EventInCol } from "./type";
 
 export const DATE_EVENT_MIN_HEIGHT = 17;
 export const DATE_EVENT_MIN_MINUTES = 15;
 
-export const getDateEvents = ({
+export const getEventsInCol = ({
   date,
   events,
 }: {
   date: Date;
   events: Event[];
-}): DateEvent[] => {
+}): EventInCol[] => {
   const sortedEvents = events
     .filter((event) =>
       areIntervalsOverlapping(
@@ -43,13 +43,13 @@ export const getDateEvents = ({
       );
     });
 
-  const dateEvents: (Omit<DateEvent, "totalOverlappings"> & {
+  const eventsInCol: (Omit<EventInCol, "totalOverlappings"> & {
     totalOverlappingsList: number[];
   })[] = [];
 
   for (let i = 0; i < sortedEvents.length; i++) {
     const event = sortedEvents[i];
-    const prevEvents = dateEvents.filter((_, index) => index < i);
+    const prevEvents = eventsInCol.filter((_, index) => index < i);
 
     const overlappingEvents = [];
     let prevOverlappings = 0;
@@ -67,25 +67,25 @@ export const getDateEvents = ({
       e.totalOverlappingsList.push(prevOverlappings),
     );
 
-    dateEvents.push({
+    eventsInCol.push({
       ...event,
       prevOverlappings,
       totalOverlappingsList: [prevOverlappings],
     });
   }
 
-  return dateEvents.map((event) => ({
+  return eventsInCol.map((event) => ({
     ...event,
     totalOverlappings: Math.max(...event.totalOverlappingsList),
   }));
 };
 
-export const calcDateEventCardStyle = ({
+export const calcEventInColCardStyle = ({
   event,
   displayedDate,
 }: {
   displayedDate: Date;
-  event: DateEvent;
+  event: EventInCol;
 }) => {
   const top = getTopFromDate(event, displayedDate);
 
@@ -117,7 +117,7 @@ export const isSameAmPm = (date1: Date, date2: Date) => {
   return isAm1 === isAm2;
 };
 
-export const formatEventDateSpan = (event: DateEvent) => {
+export const formatEventDateSpan = (event: EventInCol) => {
   if (isSameAmPm(event.start, event.end)) {
     return `${format(event.start, "h:mm")}~${format(event.end, "h:mm a")}`;
   }
