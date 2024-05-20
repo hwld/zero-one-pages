@@ -4,7 +4,7 @@ import { useMoveEventInRow } from "./move-event-provider";
 import { usePrepareCreateEventInRow } from "./prepare-create-event-provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { EventInRowCard, EventInRowCardProps } from "./card/event-in-row-card";
-import { MoreEventInrowCard } from "./card/more-week-even";
+import { MoreEventInrowCard } from "./card/more-event-in-row";
 import { DragPreviewEventInRowCard } from "./card/drag-preview";
 import { EventInRow } from "./type";
 import { getExceededEventCountByIndex } from "./utils";
