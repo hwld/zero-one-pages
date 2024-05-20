@@ -7,7 +7,7 @@ import { EventInRowCard, EventInRowCardProps } from "./card/event-in-row-card";
 import { MoreEventInrowCard } from "./card/more-week-even";
 import { DragPreviewEventInRowCard } from "./card/drag-preview";
 import { EventInRow } from "./type";
-import { getExceededEventCountByDayOfWeek } from "./utils";
+import { getExceededEventCountByIndex } from "./utils";
 import { useResizeEventInRow } from "./resize-event-provider";
 
 type Props = {
@@ -106,9 +106,9 @@ export const EventsRow = forwardRef<HTMLDivElement, Props>(function EventRow(
 
   const exceededEventCountMap =
     eventLimit !== undefined
-      ? getExceededEventCountByDayOfWeek({
-          week: eventsRowDates,
-          weekEvents: allEventsInRow,
+      ? getExceededEventCountByIndex({
+          eventsRowDates: eventsRowDates,
+          eventInRows: allEventsInRow,
           limit: eventLimit,
         })
       : undefined;
@@ -149,12 +149,10 @@ export const EventsRow = forwardRef<HTMLDivElement, Props>(function EventRow(
         })}
       </AnimatePresence>
       {/* 表示上限を超えたイベントの数 */}
-      {/* TODO: */}
       {eventLimit !== undefined &&
         exceededEventCountMap !== undefined &&
-        eventsRowDates.map((date) => {
-          const weekDay = date.getDay();
-          const count = exceededEventCountMap.get(weekDay);
+        eventsRowDates.map((date, index) => {
+          const count = exceededEventCountMap.get(index);
           if (!count) {
             return null;
           }
@@ -165,9 +163,9 @@ export const EventsRow = forwardRef<HTMLDivElement, Props>(function EventRow(
 
           return (
             <MoreEventInrowCard
-              key={weekDay}
+              key={index}
               topMargin={eventTop}
-              weekDay={weekDay}
+              displayStartCol={index}
               count={count}
               limit={eventLimit}
               eventsRowCols={eventsRowDates.length}

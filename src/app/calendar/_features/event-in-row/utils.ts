@@ -147,48 +147,47 @@ export const convertEventToEventInRow = (
 };
 
 /**
- * TODO: 修正する
- * 特定の週で、表示できるイベントの上限数を超えているイベント数を数え、
- * 曜日をキー、超えているイベント数を値とするMapとして返す関数
+ * 指定された範囲で、表示できるイベントの上限数を超えているイベント数を数え、
+ * indexをキー、超えているイベント数を値とするMapとして返す関数
  */
-export const getExceededEventCountByDayOfWeek = ({
-  week,
-  weekEvents,
+export const getExceededEventCountByIndex = ({
+  eventsRowDates,
+  eventInRows,
   limit,
 }: {
-  week: Date[];
-  weekEvents: EventInRow[];
+  eventsRowDates: Date[];
+  eventInRows: EventInRow[];
   limit: number;
 }) => {
-  type WeekDay = number;
+  type Index = number;
   type ExceededEventCount = number;
 
-  return weekEvents
+  return eventInRows
     .filter((event) => event.top >= limit)
     .flatMap((event) => {
       return eachDayOfInterval(event);
     })
     .reduce((map, date) => {
-      // 複数の週にまたがるイベントでは、指定した週以外の日付も含まれるので、それを取り除く
+      // 複数の行にまたがるイベントでは、指定した行以外の日付も含まれるので、それを取り除く
       const isOutsideWeek = !isWithinInterval(date, {
-        start: startOfDay(week[0]),
-        end: endOfDay(week[week.length - 1]),
+        start: startOfDay(eventsRowDates[0]),
+        end: endOfDay(eventsRowDates[eventsRowDates.length - 1]),
       });
 
       if (isOutsideWeek) {
         return map;
       }
 
-      const weekDay = date.getDay();
-      const overLimitEventCount = map.get(weekDay);
+      const index = eventsRowDates.findIndex((d) => isSameDay(d, date));
+      const overLimitEventCount = map.get(index);
 
       if (overLimitEventCount !== undefined) {
-        map.set(weekDay, overLimitEventCount + 1);
+        map.set(index, overLimitEventCount + 1);
       } else {
-        map.set(weekDay, 1);
+        map.set(index, 1);
       }
       return map;
-    }, new Map<WeekDay, ExceededEventCount>());
+    }, new Map<Index, ExceededEventCount>());
 };
 
 export const getEventFromMoveEventPreview = (

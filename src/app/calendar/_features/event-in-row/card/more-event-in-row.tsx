@@ -1,13 +1,12 @@
 import { EventInRowCardBase } from "./base";
 
-// TODO: fix
 type Props = {
   count: number;
   limit: number;
   height: number;
   eventsRowCols: number;
   disablePointerEvents: boolean;
-  weekDay: number;
+  displayStartCol: number;
   topMargin?: number;
   onClick?: () => void;
 };
@@ -18,7 +17,7 @@ export const MoreEventInrowCard: React.FC<Props> = ({
   height,
   eventsRowCols,
   disablePointerEvents,
-  weekDay,
+  displayStartCol,
   topMargin,
   onClick,
 }) => {
@@ -27,7 +26,7 @@ export const MoreEventInrowCard: React.FC<Props> = ({
       height={height}
       disablePointerEvents={disablePointerEvents}
       top={limit}
-      displayStartCol={weekDay}
+      displayStartCol={displayStartCol}
       eventsRowCols={eventsRowCols}
       eventCols={1}
       onMouseDown={(e) => e.stopPropagation()}
