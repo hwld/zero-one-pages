@@ -12,7 +12,6 @@ import { calcEventInColCardStyle } from "../utils";
 import clsx from "clsx";
 import { EventInColCardBase, EventInColCardContent } from "./base";
 import { EventPopover } from "../../event/event-popover";
-import { Placement } from "@floating-ui/react";
 
 export type EventInColCardProps = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
@@ -29,8 +28,6 @@ export type EventInColCardProps = {
     e: React.MouseEvent,
     params: { event: EventInCol; origin: ResizeEventInColPreview["origin"] },
   ) => void;
-
-  popoverPlace?: Placement;
 };
 
 export const EventInColCard = forwardRef<
@@ -46,7 +43,6 @@ export const EventInColCard = forwardRef<
     isOtherEventResizing,
     isResizing,
     onStartResize,
-    popoverPlace = "right-start",
   },
   ref,
 ) {
@@ -104,7 +100,7 @@ export const EventInColCard = forwardRef<
       event={event}
       isOpen={isPopoverOpen}
       onChangeOpen={setIsPopoverOpen}
-      placement={popoverPlace}
+      placement="right-start"
     >
       <EventInColCardBase
         ref={ref}

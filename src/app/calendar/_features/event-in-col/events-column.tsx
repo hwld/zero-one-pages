@@ -10,19 +10,16 @@ import { EventInColPreview } from "./event-in-col-preview";
 import { useMoveEventInCol } from "./move-event-provider";
 import { usePrepareCreateEventInCol } from "./prepare-create-event-provider";
 import { useResizeEventInCol } from "./resize-event-provider";
-import { Placement } from "@floating-ui/react";
 
 type Props = {
   eventsInCol: EventInCol[];
   displayedDay: Date;
-  eventPopoverPlace?: Placement;
 } & PropsWithChildren;
 
 export const EventsColumn: React.FC<Props> = ({
   children,
   displayedDay,
   eventsInCol,
-  eventPopoverPlace,
 }) => {
   const { prepareCreateEventState, prepareCreateEventActions } =
     usePrepareCreateEventInCol();
@@ -166,7 +163,6 @@ export const EventsColumn: React.FC<Props> = ({
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <EventInColCard
-                popoverPlace={eventPopoverPlace}
                 displayedDate={displayedDay}
                 event={event}
                 isDragging={isDragging}

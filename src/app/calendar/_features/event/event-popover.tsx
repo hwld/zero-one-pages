@@ -26,6 +26,7 @@ type Props = {
   isOpen: boolean;
   onChangeOpen: (open: boolean) => void;
   placement?: Placement;
+  fallbackPlacements?: Placement[];
 };
 
 export const EventPopover: React.FC<Props> = ({
@@ -34,6 +35,7 @@ export const EventPopover: React.FC<Props> = ({
   isOpen,
   onChangeOpen,
   placement = "bottom",
+  fallbackPlacements,
 }) => {
   const isPresent = useIsPresent();
 
@@ -41,7 +43,11 @@ export const EventPopover: React.FC<Props> = ({
     open: isOpen,
     onOpenChange: onChangeOpen,
     placement,
-    middleware: [offset(8), flip(), shift({ padding: 8 })],
+    middleware: [
+      offset(8),
+      flip({ fallbackPlacements }),
+      shift({ padding: 8 }),
+    ],
   });
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
@@ -65,6 +71,7 @@ export const EventPopover: React.FC<Props> = ({
               lockScroll
               className="z-[100]"
               onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <FloatingFocusManager context={context}>
                 <div
