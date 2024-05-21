@@ -1,6 +1,5 @@
 import {
   PropsWithChildren,
-  RefObject,
   createContext,
   useCallback,
   useContext,
@@ -15,6 +14,7 @@ import { EventInCol } from "./type";
 import { addMinutes, differenceInMinutes, isSameMinute } from "date-fns";
 import { MouseHistory } from "../../utils";
 import { getDateFromY } from "./utils";
+import { useScrollableElement } from "./scrollable-provider";
 
 type MoveEventActions = {
   startMove: (event: EventInCol, moveStart: { date: Date; y: number }) => void;
@@ -39,9 +39,10 @@ export const useMoveEventInCol = (): MoveEventContext => {
   return ctx;
 };
 
-export const MoveEventInColProvider: React.FC<
-  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
-> = ({ scrollableRef, children }) => {
+export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const scrollableRef = useScrollableElement();
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{

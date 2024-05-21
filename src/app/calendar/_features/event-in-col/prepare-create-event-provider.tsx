@@ -4,7 +4,6 @@ import {
   useMemo,
   useState,
   Dispatch,
-  RefObject,
   useRef,
   useEffect,
   createContext,
@@ -16,6 +15,7 @@ import { CreateEventInput } from "../../_mocks/api";
 import { addMinutes, max, min, startOfDay } from "date-fns";
 import { DATE_EVENT_MIN_MINUTES } from "./utils";
 import { getDateFromY } from "./utils";
+import { useScrollableElement } from "./scrollable-provider";
 
 type PrepareCreateEventState = {
   dragDateRange: DragDateRange | undefined;
@@ -48,9 +48,10 @@ export const usePrepareCreateEventInCol = (): PrepareCreateEventContext => {
   return ctx;
 };
 
-export const PrepareCreateEventInColProvider: React.FC<
-  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
-> = ({ scrollableRef, children }) => {
+export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const scrollableRef = useScrollableElement();
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 

@@ -1,6 +1,5 @@
 import {
   PropsWithChildren,
-  RefObject,
   createContext,
   useCallback,
   useContext,
@@ -15,6 +14,7 @@ import { useUpdateEvent } from "../event/use-update-event";
 import { isAfter, isBefore, isSameMinute } from "date-fns";
 import { MouseHistory } from "../../utils";
 import { getDateFromY } from "./utils";
+import { useScrollableElement } from "./scrollable-provider";
 
 type ResizeEventActions = {
   startResize: (params: {
@@ -43,9 +43,10 @@ export const useResizeEventInCol = (): ResizeEventContext => {
   return ctx;
 };
 
-export const ResizeEventInColProvider: React.FC<
-  { scrollableRef: RefObject<HTMLElement> } & PropsWithChildren
-> = ({ scrollableRef, children }) => {
+export const ResizeEventInColProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const scrollableRef = useScrollableElement();
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{

@@ -8,7 +8,7 @@ import {
   differenceInMinutes,
   addDays,
 } from "date-fns";
-import { RefObject, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { Event } from "../../_mocks/event-store";
 import { splitEvent } from "./utils";
 import {
@@ -35,6 +35,10 @@ import { PrepareCreateEventInRowProvider } from "../event-in-row/prepare-create-
 import { useMinuteClock } from "../../_components/use-minute-clock";
 import clsx from "clsx";
 import { ResizeEventInRowProvider } from "../event-in-row/resize-event-provider";
+import {
+  ScrollableProvider,
+  useScrollableElement,
+} from "../event-in-col/scrollable-provider";
 
 export const DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE = 75;
 export const DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS = (cols: number) =>
@@ -46,16 +50,12 @@ type DateColCalendarProps = {
   cols: number;
 };
 
-type DateColCalendarImplProps = {
-  scrollableRef: RefObject<HTMLDivElement>;
-} & DateColCalendarProps;
-
-export const DateColCalendarImpl: React.FC<DateColCalendarImplProps> = ({
-  scrollableRef,
+export const DateColCalendarImpl: React.FC<DateColCalendarProps> = ({
   cols,
   viewDate,
   events,
 }) => {
+  const scrollableRef = useScrollableElement();
   const { currentDate } = useMinuteClock();
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
@@ -179,20 +179,21 @@ export const DateColCalendarImpl: React.FC<DateColCalendarImplProps> = ({
 export const DateColCalendar: React.FC<DateColCalendarProps> = ({
   ...props
 }) => {
-  const scrollableRef = useRef<HTMLDivElement>(null);
   return (
-    <PrepareCreateEventInRowProvider>
-      <MoveEventInRowProvider>
-        <ResizeEventInRowProvider>
-          <PrepareCreateEventInColProvider scrollableRef={scrollableRef}>
-            <MoveEventInColProvider scrollableRef={scrollableRef}>
-              <ResizeEventInColProvider scrollableRef={scrollableRef}>
-                <DateColCalendarImpl scrollableRef={scrollableRef} {...props} />
-              </ResizeEventInColProvider>
-            </MoveEventInColProvider>
-          </PrepareCreateEventInColProvider>
-        </ResizeEventInRowProvider>
-      </MoveEventInRowProvider>
-    </PrepareCreateEventInRowProvider>
+    <ScrollableProvider>
+      <PrepareCreateEventInRowProvider>
+        <MoveEventInRowProvider>
+          <ResizeEventInRowProvider>
+            <PrepareCreateEventInColProvider>
+              <MoveEventInColProvider>
+                <ResizeEventInColProvider>
+                  <DateColCalendarImpl {...props} />
+                </ResizeEventInColProvider>
+              </MoveEventInColProvider>
+            </PrepareCreateEventInColProvider>
+          </ResizeEventInRowProvider>
+        </MoveEventInRowProvider>
+      </PrepareCreateEventInRowProvider>
+    </ScrollableProvider>
   );
 };
