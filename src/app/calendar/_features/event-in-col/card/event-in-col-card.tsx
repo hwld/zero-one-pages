@@ -12,6 +12,7 @@ import { calcEventInColCardStyle } from "../utils";
 import clsx from "clsx";
 import { EventInColCardBase, EventInColCardContent } from "./base";
 import { EventPopover } from "../../event/event-popover";
+import { useScrollableElement } from "../scrollable-provider";
 
 export type EventInColCardProps = {
   // 一つのイベントが複数の日にまたがる可能性があるので、どの日のイベントを表示するのかを指定する
@@ -46,6 +47,7 @@ export const EventInColCard = forwardRef<
   },
   ref,
 ) {
+  const { scrollableElement } = useScrollableElement();
   const isInteractive = !isOtherEventDragging && !isOtherEventResizing;
 
   const style = useMemo(() => {
@@ -101,6 +103,8 @@ export const EventInColCard = forwardRef<
       isOpen={isPopoverOpen}
       onChangeOpen={setIsPopoverOpen}
       placement="right-start"
+      fallbackPlacements={["left-start", "top"]}
+      floatingBoundary={scrollableElement}
     >
       <EventInColCardBase
         ref={ref}

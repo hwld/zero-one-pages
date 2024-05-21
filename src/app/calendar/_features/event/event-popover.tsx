@@ -27,6 +27,7 @@ type Props = {
   onChangeOpen: (open: boolean) => void;
   placement?: Placement;
   fallbackPlacements?: Placement[];
+  floatingBoundary?: Element | null;
 };
 
 export const EventPopover: React.FC<Props> = ({
@@ -36,6 +37,7 @@ export const EventPopover: React.FC<Props> = ({
   onChangeOpen,
   placement = "bottom",
   fallbackPlacements,
+  floatingBoundary,
 }) => {
   const isPresent = useIsPresent();
 
@@ -45,8 +47,12 @@ export const EventPopover: React.FC<Props> = ({
     placement,
     middleware: [
       offset(8),
-      flip({ fallbackPlacements }),
-      shift({ padding: 8 }),
+      flip({ fallbackPlacements, boundary: floatingBoundary ?? undefined }),
+      shift({
+        padding: 8,
+        crossAxis: true,
+        boundary: floatingBoundary ?? undefined,
+      }),
     ],
   });
   const dismiss = useDismiss(context);
