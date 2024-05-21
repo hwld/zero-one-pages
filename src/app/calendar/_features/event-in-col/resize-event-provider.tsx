@@ -46,7 +46,7 @@ export const useResizeEventInCol = (): ResizeEventContext => {
 export const ResizeEventInColProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const scrollableRef = useScrollableElement();
+  const { scrollableElement } = useScrollableElement();
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{
@@ -60,10 +60,10 @@ export const ResizeEventInColProvider: React.FC<PropsWithChildren> = ({
 
   const startResize: ResizeEventActions["startResize"] = useCallback(
     ({ event, origin, y }) => {
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -76,15 +76,15 @@ export const ResizeEventInColProvider: React.FC<PropsWithChildren> = ({
         },
       });
     },
-    [scrollableRef],
+    [scrollableElement],
   );
 
   const updateResizeDest: ResizeEventActions["updateResizeDest"] = useCallback(
     (day, y) => {
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -156,7 +156,7 @@ export const ResizeEventInColProvider: React.FC<PropsWithChildren> = ({
         }
       }
     },
-    [isEventResizing, resizeEventPreview, scrollableRef],
+    [isEventResizing, resizeEventPreview, scrollableElement],
   );
 
   const scroll: ResizeEventActions["scroll"] = useCallback(

@@ -1,12 +1,18 @@
 import {
+  Dispatch,
   PropsWithChildren,
-  RefObject,
+  SetStateAction,
   createContext,
   useContext,
-  useRef,
+  useMemo,
+  useState,
 } from "react";
 
-const Context = createContext<RefObject<HTMLDivElement> | undefined>(undefined);
+type Context = {
+  scrollableElement: HTMLDivElement | null;
+  setScrollableElement: Dispatch<SetStateAction<HTMLDivElement | null>>;
+};
+const Context = createContext<Context | undefined>(undefined);
 
 export const useScrollableElement = () => {
   const ctx = useContext(Context);
@@ -19,6 +25,17 @@ export const useScrollableElement = () => {
 export const ScrollableProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const scrollableRef = useRef<HTMLDivElement>(null);
-  return <Context.Provider value={scrollableRef}>{children}</Context.Provider>;
+  const [scrollableElement, setScrollableElement] =
+    useState<HTMLDivElement | null>(null);
+
+  return (
+    <Context.Provider
+      value={useMemo(
+        () => ({ scrollableElement, setScrollableElement }),
+        [scrollableElement],
+      )}
+    >
+      {children}
+    </Context.Provider>
+  );
 };

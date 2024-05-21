@@ -42,7 +42,7 @@ export const useMoveEventInCol = (): MoveEventContext => {
 export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const scrollableRef = useScrollableElement();
+  const { scrollableElement } = useScrollableElement();
   const updateEventMutation = useUpdateEvent();
 
   const [state, setState] = useState<{
@@ -56,10 +56,10 @@ export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
 
   const startMove: MoveEventActions["startMove"] = useCallback(
     (event, { date, y }) => {
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -74,7 +74,7 @@ export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
         },
       });
     },
-    [scrollableRef],
+    [scrollableElement],
   );
 
   const updateMoveDest: MoveEventActions["updateMoveDest"] = useCallback(
@@ -88,10 +88,10 @@ export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
         return;
       }
 
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -111,7 +111,7 @@ export const MoveEventInColProvider: React.FC<PropsWithChildren> = ({
         },
       }));
     },
-    [isEventMoving, moveEventPreview, scrollableRef],
+    [isEventMoving, moveEventPreview, scrollableElement],
   );
 
   const scroll: MoveEventActions["scroll"] = useCallback(

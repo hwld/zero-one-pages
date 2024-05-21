@@ -51,7 +51,7 @@ export const usePrepareCreateEventInCol = (): PrepareCreateEventContext => {
 export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const scrollableRef = useScrollableElement();
+  const { scrollableElement } = useScrollableElement();
   const [dragDateRange, setDragDateRange] =
     useState<PrepareCreateEventState["dragDateRange"]>();
 
@@ -61,10 +61,10 @@ export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
 
   const startDrag: PrepareCreateEventActions["startDrag"] = useCallback(
     (day, y) => {
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -76,7 +76,7 @@ export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
 
       setDragDateRange({ dragStartDate, dragEndDate });
     },
-    [scrollableRef],
+    [scrollableElement],
   );
 
   const updateDragEnd: PrepareCreateEventActions["updateDragEnd"] = useCallback(
@@ -85,10 +85,10 @@ export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
         return;
       }
 
-      if (scrollableRef.current) {
+      if (scrollableElement) {
         mouseHistoryRef.current = {
           prevY: y,
-          prevScrollTop: scrollableRef.current.scrollTop,
+          prevScrollTop: scrollableElement.scrollTop,
         };
       }
 
@@ -96,7 +96,7 @@ export const PrepareCreateEventInColProvider: React.FC<PropsWithChildren> = ({
       const dragEndDate = getDateFromY(targetDate, y);
       setDragDateRange({ ...dragDateRange, dragEndDate });
     },
-    [dragDateRange, scrollableRef],
+    [dragDateRange, scrollableElement],
   );
 
   const scroll: PrepareCreateEventActions["scroll"] = useCallback(

@@ -55,7 +55,7 @@ export const DateColCalendarImpl: React.FC<DateColCalendarProps> = ({
   viewDate,
   events,
 }) => {
-  const scrollableRef = useScrollableElement();
+  const { setScrollableElement } = useScrollableElement();
   const { currentDate } = useMinuteClock();
   const { longTermEvents, defaultEvents } = splitEvent(events);
 
@@ -103,7 +103,7 @@ export const DateColCalendarImpl: React.FC<DateColCalendarProps> = ({
         <div
           className="flex w-full flex-col overflow-auto"
           style={{ scrollbarWidth: "none" }}
-          ref={scrollableRef}
+          ref={setScrollableElement}
           onScroll={handleScroll}
         >
           <div
