@@ -56,7 +56,7 @@ export const ViewTaskCardMenu = forwardRef<HTMLDivElement, Props>(
           />
           <DropdownItem
             icon={MoveHorizontalIcon}
-            leftIcon={ChevronRightIcon}
+            rightIcon={ChevronRightIcon}
             title="Move to column"
             onClick={onOpenMoveToColumnMenu}
           />

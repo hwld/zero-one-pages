@@ -16,10 +16,10 @@ import {
   DropdownItem,
   DropdownItemGroup,
   DropdownItemList,
-  ViewConfigMenuItem,
 } from "../dropdown/item";
 import { ViewOptionMenuMode } from "./trigger";
 import { Divider } from "../divider";
+import { ViewConfigMenuItem } from "./item";
 
 type Props = {
   onChangeMode: (mode: ViewOptionMenuMode) => void;

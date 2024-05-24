@@ -1,6 +1,11 @@
 import clsx from "clsx";
-import { ChevronRightIcon, LucideIcon } from "lucide-react";
-import { ComponentPropsWithoutRef, ReactNode, forwardRef } from "react";
+import { LucideIcon } from "lucide-react";
+import {
+  ComponentPropsWithoutRef,
+  PropsWithChildren,
+  ReactNode,
+  forwardRef,
+} from "react";
 import { useDropdown } from "./provider";
 import { useListItem, useMergeRefs } from "@floating-ui/react";
 
@@ -24,60 +29,15 @@ export const DropdownItemList: React.FC<DropdownItemListProps> = ({
   return <div className="px-2">{children}</div>;
 };
 
-type DropdownItemProps = {
-  icon: LucideIcon;
-  title: string;
+type DropdownItemBaseProps = {
   red?: boolean;
-  leftIcon?: LucideIcon;
-} & ComponentPropsWithoutRef<"button">;
-export const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(
-  function DropdownItem(
-    { icon: Icon, title, red, leftIcon: LeftIcon, ...props },
-    outerRef,
-  ) {
-    const { activeIndex } = useDropdown();
-    const { ref, index } = useListItem();
-    const isActive = activeIndex === index;
+} & PropsWithChildren &
+  ComponentPropsWithoutRef<"button">;
 
-    const mergedRef = useMergeRefs([outerRef, ref]);
-
-    return (
-      <button
-        {...props}
-        ref={mergedRef}
-        tabIndex={isActive ? 0 : -1}
-        className={clsx(
-          "flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-          red
-            ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
-            : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
-        )}
-      >
-        <div className="flex items-center gap-2">
-          <Icon
-            size={16}
-            className={clsx("text-neutral-400", red && "text-red-500")}
-          />
-          <div className="text-sm">{title}</div>
-        </div>
-        {LeftIcon && <LeftIcon size={16} className="text-neutral-400" />}
-      </button>
-    );
-  },
-);
-
-//TODO:
-export const ViewConfigMenuItem = forwardRef<
+export const DropdownItemBase = forwardRef<
   HTMLButtonElement,
-  {
-    icon: LucideIcon;
-    title: string;
-    value: string;
-  } & ComponentPropsWithoutRef<"button">
->(function ViewConfigMenuItem(
-  { icon: Icon, title, value, ...props },
-  outerRef,
-) {
+  DropdownItemBaseProps
+>(function DropdownItemBase({ red, children, ...props }, outerRef) {
   const { activeIndex } = useDropdown();
   const { ref, index } = useListItem();
   const isActive = activeIndex === index;
@@ -86,21 +46,45 @@ export const ViewConfigMenuItem = forwardRef<
 
   return (
     <button
-      {...props}
       ref={mergedRef}
+      {...props}
       tabIndex={isActive ? 0 : -1}
       className={clsx(
-        "flex h-8 w-full cursor-pointer items-center justify-between gap-4 rounded-md px-2 text-neutral-100 transition-colors hover:bg-white/15 focus-visible:bg-white/15 focus-visible:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "h-8 w-full cursor-pointer rounded-md px-2 transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+        red
+          ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
+          : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
       )}
     >
-      <div className="flex items-center gap-2 text-neutral-400">
-        <Icon size={16} />
-        <div className="text-sm">{title}:</div>
-      </div>
-      <div className="flex min-w-0 items-center gap-1">
-        <div className="truncate text-nowrap text-sm">{value}</div>
-        <ChevronRightIcon size={16} className="text-neutral-400" />
-      </div>
+      {children}
     </button>
   );
 });
+
+type DropdownItemProps = {
+  icon: LucideIcon;
+  title: string;
+  red?: boolean;
+  rightIcon?: LucideIcon;
+} & ComponentPropsWithoutRef<"button">;
+export const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(
+  function DropdownItem(
+    { icon: Icon, title, red, rightIcon: RightIcon, ...props },
+    ref,
+  ) {
+    return (
+      <DropdownItemBase ref={ref} {...props} red={red}>
+        <div className="flex size-full items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon
+              size={16}
+              className={clsx("text-neutral-400", red && "text-red-500")}
+            />
+            <div className="text-sm">{title}</div>
+          </div>
+          {RightIcon && <RightIcon size={16} className="text-neutral-400" />}
+        </div>
+      </DropdownItemBase>
+    );
+  },
+);
