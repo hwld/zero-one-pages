@@ -8,13 +8,8 @@ import { TbLoader2 } from "react-icons/tb";
 type Props = {};
 
 export const Sidebar: React.FC<Props> = () => {
-  const {
-    calendarInfo,
-    selectDate,
-    viewDates,
-    dayPickerMonth,
-    setDayPickerMonth,
-  } = useAppState();
+  const { calendarInfo, selectDate, dayPickerMonth, setDayPickerMonth } =
+    useAppState();
 
   const isFetchingEvents =
     useIsFetching({
@@ -39,8 +34,8 @@ export const Sidebar: React.FC<Props> = () => {
         </AnimatePresence>
       </div>
       <DayPicker
-        hideSelectedDates={calendarInfo.type === "month"}
-        selectedDates={viewDates}
+        hideSelectedDates={calendarInfo.type.kind === "month"}
+        selectedDates={calendarInfo.viewDates}
         month={dayPickerMonth}
         onChangeMonth={setDayPickerMonth}
         onClickDay={selectDate}

@@ -28,7 +28,7 @@ export const WeekRow: React.FC<Props> = ({
   const { selectDate, changeCalendarType } = useAppState();
 
   const handleClickMoreWeekEvents = (date: Date) => {
-    changeCalendarType({ type: "range", days: 7 });
+    changeCalendarType({ kind: "range", days: 7 });
     selectDate(date);
   };
 

@@ -7,12 +7,12 @@ export const CalendarViewDate: React.FC = () => {
   const { prevCalendarPage, nextCalendarPage, calendarInfo } = useAppState();
 
   const option = useMemo(() => {
-    switch (calendarInfo.type) {
+    switch (calendarInfo.type.kind) {
       case "month": {
         return null;
       }
       case "range": {
-        if (calendarInfo.days !== 1) {
+        if (calendarInfo.type.days !== 1) {
           return null;
         }
         return (
@@ -25,7 +25,7 @@ export const CalendarViewDate: React.FC = () => {
         );
       }
       default: {
-        throw new Error(calendarInfo satisfies never);
+        throw new Error(calendarInfo.type satisfies never);
       }
     }
   }, [calendarInfo]);

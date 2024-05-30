@@ -23,7 +23,7 @@ const Page = () => {
     useAppState();
 
   const calendar = useMemo(() => {
-    switch (calendarInfo.type) {
+    switch (calendarInfo.type.kind) {
       case "month": {
         return (
           <MonthlyCalendar
@@ -35,14 +35,14 @@ const Page = () => {
       case "range": {
         return (
           <DateColCalendar
-            cols={calendarInfo.days}
+            cols={calendarInfo.type.days}
             viewDate={calendarInfo.selectedDate}
             events={events}
           />
         );
       }
       default: {
-        throw new Error(calendarInfo satisfies never);
+        throw new Error(calendarInfo.type satisfies never);
       }
     }
   }, [calendarInfo, events]);
@@ -73,17 +73,17 @@ const Page = () => {
             ]}
             // TODO: なんとかしたい・・・
             selectedValue={useMemo(() => {
-              if (calendarInfo.type === "month") {
+              if (calendarInfo.type.kind === "month") {
                 return "month";
-              } else if (calendarInfo.days === DAILY_CALENDAR_TYPE.days) {
+              } else if (calendarInfo.type.days === DAILY_CALENDAR_TYPE.days) {
                 return "day";
-              } else if (calendarInfo.days === WEEKLY_CALENDAR_TYPE.days) {
+              } else if (calendarInfo.type.days === WEEKLY_CALENDAR_TYPE.days) {
                 return "week";
-              } else if (calendarInfo.days === 2) {
+              } else if (calendarInfo.type.days === 2) {
                 return "2days";
-              } else if (calendarInfo.days === 3) {
+              } else if (calendarInfo.type.days === 3) {
                 return "3days";
-              } else if (calendarInfo.days === 4) {
+              } else if (calendarInfo.type.days === 4) {
                 return "4days";
               }
               throw new Error("対応していない日数");
@@ -91,7 +91,7 @@ const Page = () => {
             onSelect={(value) => {
               switch (value) {
                 case "month": {
-                  changeCalendarType({ type: "month" });
+                  changeCalendarType({ kind: "month" });
                   return;
                 }
                 case "week": {
@@ -103,15 +103,15 @@ const Page = () => {
                   return;
                 }
                 case "2days": {
-                  changeCalendarType({ type: "range", days: 2 });
+                  changeCalendarType({ kind: "range", days: 2 });
                   return;
                 }
                 case "3days": {
-                  changeCalendarType({ type: "range", days: 3 });
+                  changeCalendarType({ kind: "range", days: 3 });
                   return;
                 }
                 case "4days": {
-                  changeCalendarType({ type: "range", days: 4 });
+                  changeCalendarType({ kind: "range", days: 4 });
                   return;
                 }
                 default: {
