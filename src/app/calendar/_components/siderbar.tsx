@@ -9,11 +9,11 @@ type Props = {};
 
 export const Sidebar: React.FC<Props> = () => {
   const {
-    calendarType,
+    calendarInfo,
+    selectDate,
+    viewDates,
     dayPickerMonth,
     setDayPickerMonth,
-    viewDate,
-    changeViewDate,
   } = useAppState();
 
   const isFetchingEvents =
@@ -39,11 +39,11 @@ export const Sidebar: React.FC<Props> = () => {
         </AnimatePresence>
       </div>
       <DayPicker
-        viewDate={viewDate}
+        hideSelectedDates={calendarInfo.type === "month"}
+        selectedDates={viewDates}
         month={dayPickerMonth}
-        type={calendarType}
         onChangeMonth={setDayPickerMonth}
-        onClickDay={changeViewDate}
+        onClickDay={selectDate}
       />
     </div>
   );

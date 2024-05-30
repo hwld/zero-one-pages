@@ -1,4 +1,4 @@
-import { endOfWeek, format, isSameDay, startOfWeek } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import {
   CaptionProps,
@@ -8,39 +8,28 @@ import {
 import { TbArrowBackUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import { WEEK_DAY_LABELS } from "../consts";
 import { IconButton } from "./button";
-import { CalendarType } from "./use-app-state";
 
 type Props = {
-  type: CalendarType;
-  viewDate: Date;
+  hideSelectedDates?: boolean;
+  selectedDates: Date[];
   month: Date;
   onChangeMonth: Dispatch<SetStateAction<Date>>;
   onClickDay: (d: Date) => void;
 };
 
 export const DayPicker: React.FC<Props> = ({
-  type,
-  viewDate,
+  hideSelectedDates,
+  selectedDates,
   month,
   onChangeMonth,
   onClickDay,
 }) => {
   const selected = useMemo((): Date | { from: Date; to: Date } | undefined => {
-    switch (type) {
-      case "month": {
-        return undefined;
-      }
-      case "week": {
-        return { from: startOfWeek(viewDate), to: endOfWeek(viewDate) };
-      }
-      case "day": {
-        return { from: viewDate, to: viewDate };
-      }
-      default: {
-        throw new Error(type satisfies never);
-      }
+    if (hideSelectedDates) {
+      return undefined;
     }
-  }, [viewDate, type]);
+    return { from: selectedDates.at(0)!, to: selectedDates.at(-1)! };
+  }, [hideSelectedDates, selectedDates]);
 
   const isFirstSelectedDay = (day: Date) => {
     if (!selected) {

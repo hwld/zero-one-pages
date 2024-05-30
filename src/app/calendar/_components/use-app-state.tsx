@@ -1,10 +1,14 @@
 import {
   addDays,
-  endOfWeek,
   addMonths,
-  startOfWeek,
   subDays,
   subMonths,
+  eachDayOfInterval,
+  startOfMonth,
+  endOfMonth,
+  isWithinInterval,
+  previousSunday,
+  isSunday,
 } from "date-fns";
 import {
   Dispatch,
@@ -19,16 +23,18 @@ import {
 } from "react";
 import { useMinuteClock } from "./use-minute-clock";
 
-export type CalendarType = "month" | "week" | "day";
+type CalendarType = { type: "month" } | { type: "range"; days: number };
+export type CalendarInfo = { selectedDate: Date } & CalendarType;
+
 type AppStateContext = {
-  calendarType: CalendarType;
-  setCalendarType: Dispatch<SetStateAction<CalendarType>>;
+  calendarInfo: CalendarInfo;
+  changeCalendarType: (type: CalendarType) => void;
 
   dayPickerMonth: Date;
   setDayPickerMonth: Dispatch<SetStateAction<Date>>;
 
-  viewDate: Date;
-  changeViewDate: (date: Date) => void;
+  selectDate: (date: Date) => void;
+  viewDates: Date[];
 
   nextCalendarPage: () => void;
   prevCalendarPage: () => void;
@@ -49,64 +55,100 @@ export const AppStateProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
   const { currentDate } = useMinuteClock();
-  const [calendarType, setCalendarType] = useState<CalendarType>("week");
-  const [viewDate, setViewDate] = useState(currentDate);
-  const [dayPickerMonth, setDayPickerMonth] = useState(viewDate);
+  const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
+    selectedDate: currentDate,
+    type: "range",
+    days: 7,
+  });
+  const [dayPickerMonth, setDayPickerMonth] = useState(
+    calendarInfo.selectedDate,
+  );
 
-  const changeViewDate = useCallback((date: Date) => {
-    setDayPickerMonth(date);
-    setViewDate(date);
+  const changeCalendarType = useCallback((type: CalendarType) => {
+    setCalendarInfo((info) => ({ ...info, ...type }));
   }, []);
 
-  const nextCalendarPage = useCallback(() => {
-    switch (calendarType) {
-      case "week": {
-        const newDate = addDays(endOfWeek(viewDate), 1);
-        changeViewDate(newDate);
-        return;
-      }
+  const selectDate = useCallback((date: Date) => {
+    setDayPickerMonth(date);
+    setCalendarInfo((info) => ({ ...info, selectedDate: date }));
+  }, []);
+
+  const viewDates = useMemo((): Date[] => {
+    switch (calendarInfo.type) {
       case "month": {
-        const newDate = addMonths(viewDate, 1);
-        changeViewDate(newDate);
+        return eachDayOfInterval({
+          start: startOfMonth(calendarInfo.selectedDate),
+          end: endOfMonth(calendarInfo.selectedDate),
+        });
+      }
+      case "range": {
+        // 選択している日付を範囲の最後だと仮定したときに、指定された範囲に日曜日が含まれているか判定する。
+        const tempRange = {
+          start: subDays(calendarInfo.selectedDate, calendarInfo.days - 1),
+          end: calendarInfo.selectedDate,
+        };
+        // selectedDateが日曜日の場合にも日曜日が含まれていると判定させる
+        const nearestSunday = isSunday(calendarInfo.selectedDate)
+          ? calendarInfo.selectedDate
+          : previousSunday(calendarInfo.selectedDate);
+        const includesSundayInRange = isWithinInterval(
+          nearestSunday,
+          tempRange,
+        );
+
+        if (includesSundayInRange) {
+          // 日曜日が含まれている場合には日曜日から始める
+          return eachDayOfInterval({
+            start: nearestSunday,
+            end: addDays(nearestSunday, calendarInfo.days - 1),
+          });
+        } else {
+          return eachDayOfInterval(tempRange);
+        }
+      }
+      default: {
+        throw new Error(calendarInfo satisfies never);
+      }
+    }
+  }, [calendarInfo]);
+
+  const nextCalendarPage = useCallback(() => {
+    switch (calendarInfo.type) {
+      case "month": {
+        const newDate = addMonths(calendarInfo.selectedDate, 1);
+        selectDate(newDate);
         return;
       }
-      case "day": {
-        const newDate = addDays(viewDate, 1);
-        changeViewDate(newDate);
+      case "range": {
+        selectDate(addDays(viewDates.at(-1)!, calendarInfo.days));
         return;
       }
       default: {
-        throw new Error(calendarType satisfies never);
+        throw new Error(calendarInfo satisfies never);
       }
     }
-  }, [calendarType, changeViewDate, viewDate]);
+  }, [calendarInfo, selectDate, viewDates]);
 
   const prevCalendarPage = useCallback(() => {
-    switch (calendarType) {
-      case "week": {
-        const newDate = subDays(startOfWeek(viewDate), 1);
-        changeViewDate(newDate);
-        return;
-      }
+    switch (calendarInfo.type) {
       case "month": {
-        const newDate = subMonths(viewDate, 1);
-        changeViewDate(newDate);
+        const newDate = subMonths(calendarInfo.selectedDate, 1);
+        selectDate(newDate);
         return;
       }
-      case "day": {
-        const newDate = subDays(viewDate, 1);
-        changeViewDate(newDate);
+      case "range": {
+        selectDate(subDays(viewDates.at(0)!, calendarInfo.days));
         return;
       }
       default: {
-        throw new Error(calendarType satisfies never);
+        throw new Error(calendarInfo satisfies never);
       }
     }
-  }, [calendarType, changeViewDate, viewDate]);
+  }, [calendarInfo, selectDate, viewDates]);
 
   const goTodayCalendarPage = useCallback(() => {
-    changeViewDate(new Date());
-  }, [changeViewDate]);
+    selectDate(new Date());
+  }, [selectDate]);
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -118,11 +160,11 @@ export const AppStateProvider: React.FC<{
       }
 
       if (event.key === "W" || event.key === "w") {
-        setCalendarType("week");
+        setCalendarInfo((info) => ({ ...info, type: "range", days: 7 }));
       } else if (event.key === "M" || event.key === "m") {
-        setCalendarType("month");
+        setCalendarInfo((info) => ({ ...info, type: "month" }));
       } else if (event.key === "D" || event.key === "d") {
-        setCalendarType("day");
+        setCalendarInfo((info) => ({ ...info, type: "range", days: 1 }));
       }
     };
 
@@ -134,11 +176,11 @@ export const AppStateProvider: React.FC<{
 
   const value: AppStateContext = useMemo(
     () => ({
-      calendarType,
-      setCalendarType,
+      calendarInfo,
+      changeCalendarType,
 
-      viewDate,
-      changeViewDate,
+      selectDate,
+      viewDates,
 
       dayPickerMonth,
       setDayPickerMonth,
@@ -148,13 +190,14 @@ export const AppStateProvider: React.FC<{
       goTodayCalendarPage,
     }),
     [
-      calendarType,
-      changeViewDate,
+      calendarInfo,
+      changeCalendarType,
+      selectDate,
+      viewDates,
       dayPickerMonth,
-      goTodayCalendarPage,
       nextCalendarPage,
       prevCalendarPage,
-      viewDate,
+      goTodayCalendarPage,
     ],
   );
 

@@ -25,11 +25,11 @@ export const WeekRow: React.FC<Props> = ({
     displayDateRange: { start: week.at(0)!, end: week.at(-1)! },
     events,
   });
-  const { changeViewDate, setCalendarType } = useAppState();
+  const { selectDate, changeCalendarType } = useAppState();
 
   const handleClickMoreWeekEvents = (date: Date) => {
-    setCalendarType("week");
-    changeViewDate(date);
+    changeCalendarType({ type: "range", days: 7 });
+    selectDate(date);
   };
 
   return (

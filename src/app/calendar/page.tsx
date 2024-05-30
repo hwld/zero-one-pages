@@ -15,25 +15,33 @@ const Page = () => {
   useCalendarCommands();
 
   const { events } = useEvents();
-  const { calendarType, setCalendarType, viewDate, goTodayCalendarPage } =
+  const { calendarInfo, goTodayCalendarPage, changeCalendarType } =
     useAppState();
 
   const calendar = useMemo(() => {
-    switch (calendarType) {
+    switch (calendarInfo.type) {
       case "month": {
-        return <MonthlyCalendar yearMonth={viewDate} events={events} />;
+        return (
+          <MonthlyCalendar
+            yearMonth={calendarInfo.selectedDate}
+            events={events}
+          />
+        );
       }
-      case "week": {
-        return <DateColCalendar cols={7} viewDate={viewDate} events={events} />;
-      }
-      case "day": {
-        return <DateColCalendar cols={1} viewDate={viewDate} events={events} />;
+      case "range": {
+        return (
+          <DateColCalendar
+            cols={calendarInfo.days}
+            viewDate={calendarInfo.selectedDate}
+            events={events}
+          />
+        );
       }
       default: {
-        throw new Error(calendarType satisfies never);
+        throw new Error(calendarInfo satisfies never);
       }
     }
-  }, [calendarType, events, viewDate]);
+  }, [calendarInfo, events]);
 
   return (
     <div
@@ -51,8 +59,38 @@ const Page = () => {
                 { value: "week", label: "週", option: "W" },
                 { value: "day", label: "日", option: "D" },
               ]}
-              value={calendarType}
-              onSelect={setCalendarType}
+              value={useMemo(() => {
+                if (calendarInfo.type === "month") {
+                  return "month";
+                } else if (calendarInfo.days === 1) {
+                  return "day";
+                } else if (calendarInfo.days === 7) {
+                  return "week";
+                }
+                throw new Error("TODO:");
+              }, [calendarInfo])}
+              onSelect={(item) => {
+                switch (item) {
+                  case "month": {
+                    changeCalendarType({ type: "month" });
+                    return;
+                  }
+                  case "week": {
+                    changeCalendarType({
+                      type: "range",
+                      days: 7,
+                    });
+                    return;
+                  }
+                  case "day": {
+                    changeCalendarType({
+                      type: "range",
+                      days: 1,
+                    });
+                    return;
+                  }
+                }
+              }}
             />
             <Button onClick={goTodayCalendarPage}>今日</Button>
           </div>
