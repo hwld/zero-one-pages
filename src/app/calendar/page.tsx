@@ -6,7 +6,11 @@ import { DateColCalendar } from "./_features/date-col-calendar/calendar";
 import { useEvents } from "./_features/event/use-events";
 import { Sidebar } from "./_components/siderbar";
 import { Button } from "./_components/button";
-import { useAppState } from "./_components/use-app-state";
+import {
+  DAILY_CALENDAR_TYPE,
+  WEEKLY_CALENDAR_TYPE,
+  useAppState,
+} from "./_components/use-app-state";
 import { useCalendarCommands } from "./command";
 import { Select } from "./_components/select";
 import { CalendarViewDate } from "./_components/calendar-view-date";
@@ -62,9 +66,9 @@ const Page = () => {
               value={useMemo(() => {
                 if (calendarInfo.type === "month") {
                   return "month";
-                } else if (calendarInfo.days === 1) {
+                } else if (calendarInfo.days === DAILY_CALENDAR_TYPE.days) {
                   return "day";
-                } else if (calendarInfo.days === 7) {
+                } else if (calendarInfo.days === WEEKLY_CALENDAR_TYPE.days) {
                   return "week";
                 }
                 throw new Error("TODO:");
@@ -76,17 +80,11 @@ const Page = () => {
                     return;
                   }
                   case "week": {
-                    changeCalendarType({
-                      type: "range",
-                      days: 7,
-                    });
+                    changeCalendarType(WEEKLY_CALENDAR_TYPE);
                     return;
                   }
                   case "day": {
-                    changeCalendarType({
-                      type: "range",
-                      days: 1,
-                    });
+                    changeCalendarType(DAILY_CALENDAR_TYPE);
                     return;
                   }
                 }

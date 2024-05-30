@@ -24,6 +24,17 @@ import {
 import { useMinuteClock } from "./use-minute-clock";
 
 type CalendarType = { type: "month" } | { type: "range"; days: number };
+
+export const WEEKLY_CALENDAR_TYPE = {
+  type: "range",
+  days: 7,
+} satisfies CalendarType;
+
+export const DAILY_CALENDAR_TYPE = {
+  type: "range",
+  days: 1,
+} satisfies CalendarType;
+
 export type CalendarInfo = { selectedDate: Date } & CalendarType;
 
 type AppStateContext = {
@@ -160,11 +171,11 @@ export const AppStateProvider: React.FC<{
       }
 
       if (event.key === "W" || event.key === "w") {
-        setCalendarInfo((info) => ({ ...info, type: "range", days: 7 }));
+        setCalendarInfo((info) => ({ ...info, ...WEEKLY_CALENDAR_TYPE }));
       } else if (event.key === "M" || event.key === "m") {
         setCalendarInfo((info) => ({ ...info, type: "month" }));
       } else if (event.key === "D" || event.key === "d") {
-        setCalendarInfo((info) => ({ ...info, type: "range", days: 1 }));
+        setCalendarInfo((info) => ({ ...info, ...DAILY_CALENDAR_TYPE }));
       }
     };
 
