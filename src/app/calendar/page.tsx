@@ -54,44 +54,73 @@ const Page = () => {
     >
       <Sidebar />
       <div className="grid grid-rows-[60px,1fr] overflow-hidden">
-        <div className="flex items-center justify-between px-4">
+        <div className="flex items-center gap-2 px-4">
           <CalendarViewDate />
-          <div className="flex w-full justify-end gap-2">
-            <Select
-              items={[
-                { value: "month", label: "月", option: "M" },
-                { value: "week", label: "週", option: "W" },
-                { value: "day", label: "日", option: "D" },
-              ]}
-              value={useMemo(() => {
-                if (calendarInfo.type === "month") {
-                  return "month";
-                } else if (calendarInfo.days === DAILY_CALENDAR_TYPE.days) {
-                  return "day";
-                } else if (calendarInfo.days === WEEKLY_CALENDAR_TYPE.days) {
-                  return "week";
+          <Select
+            items={[
+              { type: "root", value: "month", label: "月", shortcut: "M" },
+              { type: "root", value: "week", label: "週", shortcut: "W" },
+              { type: "root", value: "day", label: "日", shortcut: "D" },
+              {
+                type: "nest",
+                label: "日数",
+                items: [
+                  { type: "root", value: "2days", label: "2日間" },
+                  { type: "root", value: "3days", label: "3日間" },
+                  { type: "root", value: "4days", label: "4日間" },
+                ],
+              },
+            ]}
+            // TODO: なんとかしたい・・・
+            selectedValue={useMemo(() => {
+              if (calendarInfo.type === "month") {
+                return "month";
+              } else if (calendarInfo.days === DAILY_CALENDAR_TYPE.days) {
+                return "day";
+              } else if (calendarInfo.days === WEEKLY_CALENDAR_TYPE.days) {
+                return "week";
+              } else if (calendarInfo.days === 2) {
+                return "2days";
+              } else if (calendarInfo.days === 3) {
+                return "3days";
+              } else if (calendarInfo.days === 4) {
+                return "4days";
+              }
+              throw new Error("対応していない日数");
+            }, [calendarInfo])}
+            onSelect={(value) => {
+              switch (value) {
+                case "month": {
+                  changeCalendarType({ type: "month" });
+                  return;
                 }
-                throw new Error("TODO:");
-              }, [calendarInfo])}
-              onSelect={(item) => {
-                switch (item) {
-                  case "month": {
-                    changeCalendarType({ type: "month" });
-                    return;
-                  }
-                  case "week": {
-                    changeCalendarType(WEEKLY_CALENDAR_TYPE);
-                    return;
-                  }
-                  case "day": {
-                    changeCalendarType(DAILY_CALENDAR_TYPE);
-                    return;
-                  }
+                case "week": {
+                  changeCalendarType(WEEKLY_CALENDAR_TYPE);
+                  return;
                 }
-              }}
-            />
-            <Button onClick={goTodayCalendarPage}>今日</Button>
-          </div>
+                case "day": {
+                  changeCalendarType(DAILY_CALENDAR_TYPE);
+                  return;
+                }
+                case "2days": {
+                  changeCalendarType({ type: "range", days: 2 });
+                  return;
+                }
+                case "3days": {
+                  changeCalendarType({ type: "range", days: 3 });
+                  return;
+                }
+                case "4days": {
+                  changeCalendarType({ type: "range", days: 4 });
+                  return;
+                }
+                default: {
+                  throw new Error(value satisfies never);
+                }
+              }
+            }}
+          />
+          <Button onClick={goTodayCalendarPage}>今日</Button>
         </div>
         {calendar}
       </div>
