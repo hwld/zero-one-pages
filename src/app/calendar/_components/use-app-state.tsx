@@ -94,18 +94,14 @@ export const AppStateProvider: React.FC<{
       }
       case "range": {
         // 選択している日付を範囲の最後だと仮定したときに、指定された範囲に日曜日が含まれているか判定する。
-        const tempRange = {
-          start: subDays(calendarInfo.selectedDate, calendarInfo.days - 1),
-          end: calendarInfo.selectedDate,
-        };
         // selectedDateが日曜日の場合にも日曜日が含まれていると判定させる
         const nearestSunday = isSunday(calendarInfo.selectedDate)
           ? calendarInfo.selectedDate
           : previousSunday(calendarInfo.selectedDate);
-        const includesSundayInRange = isWithinInterval(
-          nearestSunday,
-          tempRange,
-        );
+        const includesSundayInRange = isWithinInterval(nearestSunday, {
+          start: subDays(calendarInfo.selectedDate, calendarInfo.days - 1),
+          end: calendarInfo.selectedDate,
+        });
 
         if (includesSundayInRange) {
           // 日曜日が含まれている場合には日曜日から始める
@@ -114,7 +110,10 @@ export const AppStateProvider: React.FC<{
             end: addDays(nearestSunday, calendarInfo.days - 1),
           });
         } else {
-          return eachDayOfInterval(tempRange);
+          return eachDayOfInterval({
+            start: calendarInfo.selectedDate,
+            end: addDays(calendarInfo.selectedDate, calendarInfo.days - 1),
+          });
         }
       }
       default: {
