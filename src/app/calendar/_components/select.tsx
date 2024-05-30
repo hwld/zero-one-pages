@@ -248,18 +248,20 @@ type SelectNestItem<T> = {
   label: string;
   items: SelectValueItem<T>[];
 };
-type SelectItem<T> = SelectValueItem<T> | SelectNestItem<T>;
+export type SelectItem<T> = SelectValueItem<T> | SelectNestItem<T>;
 
 type SelectProps<T> = {
   selectedValue: T;
   items: SelectItem<T>[];
   onSelect: (value: T) => void;
+  isEqual: (a: T, b: T) => boolean;
 };
 
-export const Select = <T extends string>({
+export const Select = <T,>({
   items,
   selectedValue,
   onSelect,
+  isEqual,
 }: SelectProps<T>) => {
   const selectedItem = items
     .flatMap((item) => {
@@ -271,7 +273,7 @@ export const Select = <T extends string>({
       throw new Error(item satisfies never);
     })
     .find((item) => {
-      return item.value === selectedValue;
+      return isEqual(item.value, selectedValue);
     });
 
   if (!selectedItem) {
@@ -296,9 +298,9 @@ export const Select = <T extends string>({
           if (item.type === "root") {
             return (
               <SelectItem
-                key={item.value}
+                key={i}
                 valueItem={item}
-                selected={selectedValue === item.value}
+                selected={isEqual(selectedValue, item.value)}
                 onClick={() => {
                   onSelect(item.value);
                 }}
@@ -312,6 +314,7 @@ export const Select = <T extends string>({
                 items={item.items}
                 label={item.label}
                 onSelect={onSelect}
+                isEqual={isEqual}
               />
             );
           }
@@ -321,11 +324,12 @@ export const Select = <T extends string>({
   );
 };
 
-const SubSelect = <T extends string>({
+const SubSelect = <T,>({
   label,
   items,
   selectedValue,
   onSelect,
+  isEqual,
 }: SelectProps<T> & { label: string }) => {
   return (
     <SelectComponent
@@ -342,9 +346,9 @@ const SubSelect = <T extends string>({
         if (item.type === "root") {
           return (
             <SelectItem
-              key={item.value}
+              key={i}
               valueItem={item}
-              selected={selectedValue === item.value}
+              selected={isEqual(selectedValue, item.value)}
               onClick={() => {
                 onSelect(item.value);
               }}
@@ -358,6 +362,7 @@ const SubSelect = <T extends string>({
               selectedValue={selectedValue}
               onSelect={onSelect}
               label={item.label}
+              isEqual={isEqual}
             />
           );
         }

@@ -25,7 +25,7 @@ import {
 } from "react";
 import { useMinuteClock } from "./use-minute-clock";
 
-type CalendarType = { kind: "month" } | { kind: "range"; days: number };
+export type CalendarType = { kind: "month" } | { kind: "range"; days: number };
 
 export const WEEKLY_CALENDAR_TYPE = {
   kind: "range",
