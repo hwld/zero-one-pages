@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useGlobalCommandConfig } from "../_providers/global-command-provider";
+import { useGlobalCommandConfig } from "../_providers/global-command/global-command-provider";
 import {
   BoxSelectIcon,
   RefreshCcwIcon,

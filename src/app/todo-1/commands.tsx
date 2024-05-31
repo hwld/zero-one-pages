@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useGlobalCommandConfig } from "../_providers/global-command-provider";
+import { useGlobalCommandConfig } from "../_providers/global-command/global-command-provider";
 import { useEffect, useMemo, useState } from "react";
 import {
   BoxSelectIcon,

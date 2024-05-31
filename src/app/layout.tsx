@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GlobalCommand } from "./_providers/global-command-provider";
+import { GlobalCommandDialog } from "./_providers/global-command/global-command-provider";
 import { Providers } from "./_providers/providers";
 import { Inter } from "next/font/google";
 import clsx from "clsx";
@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={clsx(inter.className, "bg-[var(--body-bg)]")}>
         <Providers>
           {children}
-          <GlobalCommand />
+          <GlobalCommandDialog />
         </Providers>
       </body>
     </html>

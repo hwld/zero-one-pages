@@ -4,7 +4,7 @@ import {
   EventStoreErrorSimulationScope,
   eventStore,
 } from "./_mocks/event-store";
-import { useGlobalCommandConfig } from "../_providers/global-command-provider";
+import { useGlobalCommandConfig } from "../_providers/global-command/global-command-provider";
 import { TriangleAlertIcon, TriangleIcon } from "lucide-react";
 
 export const useCalendarCommands = () => {
