@@ -1,9 +1,20 @@
+"use client";
+
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { GlobalCommand } from "./_providers/global-command/global-command";
-import "./home.css";
+import clsx from "clsx";
 
 const NotFoundPage: React.FC = () => {
+  const bgClass = "bg-neutral-900";
+  useBodyBgColor(bgClass);
+
   return (
-    <div className="flex h-[100dvh] w-full flex-col items-center justify-center gap-14 bg-neutral-900 text-zinc-200">
+    <div
+      className={clsx(
+        "flex h-[100dvh] w-full flex-col items-center justify-center gap-14 text-zinc-200",
+        bgClass,
+      )}
+    >
       <div className="flex flex-col items-center gap-2 text-sm">
         <h1 className="text-7xl font-bold">404</h1>
         <p className="text-center">

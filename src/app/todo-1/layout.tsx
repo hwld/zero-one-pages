@@ -18,10 +18,10 @@ import { TaskForm } from "./_components/task-form";
 import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
 import { useTasks } from "./_queries/use-tasks";
-import "./style.css";
 import { ErrorTasks } from "./_components/error-tasks";
 import { LoadingTasks } from "./_components/loading-tasks";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする
@@ -96,8 +96,11 @@ const LayoutInner: React.FC<Props> = ({ children }) => {
     });
   }, [tasks, tasksStatus]);
 
+  const bgColor = "bg-neutral-100";
+  useBodyBgColor(bgColor);
+
   return (
-    <div className={clsx("flex h-[100dvh] bg-neutral-100 text-neutral-700")}>
+    <div className={clsx("flex h-[100dvh] text-neutral-700", bgColor)}>
       <SideBar />
       <div
         className="flex grow flex-col items-center overflow-auto px-2 pt-10"

@@ -1,7 +1,6 @@
 "use client";
 import { useMemo } from "react";
 import { MonthlyCalendar } from "./_features/monthly-calendar/monthly-calendar";
-import "./style.css";
 import { DateColCalendar } from "./_features/date-col-calendar/calendar";
 import { useEvents } from "./_features/event/use-events";
 import { Sidebar } from "./_components/siderbar";
@@ -15,6 +14,8 @@ import {
 import { useCalendarCommands } from "./command";
 import { Select, SelectItem } from "./_components/select";
 import { CalendarViewDate } from "./_components/calendar-view-date";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 const Page = () => {
   useCalendarCommands();
@@ -48,9 +49,15 @@ const Page = () => {
     }
   }, [calendarInfo, events]);
 
+  const bgClass = "bg-neutral-50";
+  useBodyBgColor(bgClass);
+
   return (
     <div
-      className="grid h-[100dvh] w-[100dvw] grid-cols-[250px_1fr] overflow-hidden bg-neutral-50 text-neutral-700"
+      className={clsx(
+        "grid h-[100dvh] w-[100dvw] grid-cols-[250px_1fr] overflow-hidden text-neutral-700",
+        bgClass,
+      )}
       style={{ colorScheme: "light" }}
     >
       <Sidebar />

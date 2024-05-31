@@ -2,11 +2,15 @@
 
 import { NextPage } from "next";
 import { AppControl } from "./_components/app-control/app-control";
-import "./style.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 const Page: NextPage = () => {
+  const bgClass = "bg-neutral-200";
+  useBodyBgColor(bgClass);
+
   return (
-    <div className="h-dvh w-dvw bg-neutral-200 pt-5">
+    <div className={clsx("h-dvh w-dvw pt-5", bgClass)}>
       <div className="m-auto w-min">
         <AppControl />
       </div>

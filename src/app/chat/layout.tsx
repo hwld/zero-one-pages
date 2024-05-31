@@ -4,12 +4,19 @@ import { ReactNode } from "react";
 import { ChatPanel } from "./_components/chat-panel/chat-panel";
 import { ServerSidebar } from "./_components/server-sidebar/server-sidebar";
 import { SideBar } from "./_components/sidebar/sidebar";
-import "./style.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 const ChatPage: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const bgClass = "bg-neutral-800";
+  useBodyBgColor(bgClass);
+
   return (
     <div
-      className="grid h-dvh grid-cols-[70px_250px_1fr] bg-neutral-100 text-neutral-100"
+      className={clsx(
+        "grid h-dvh grid-cols-[70px_250px_1fr] text-neutral-100",
+        bgClass,
+      )}
       style={{ colorScheme: "dark" }}
     >
       <ServerSidebar />

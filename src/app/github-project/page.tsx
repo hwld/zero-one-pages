@@ -12,15 +12,22 @@ import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { Toaster } from "./_components/toast/toaster";
 import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
-import "./style.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 const GitHubProjectPage: React.FC = () => {
+  const bgColor = "bg-neutral-900";
+  useBodyBgColor(bgColor);
+
   useGitHubProjectCommands();
 
   return (
     <>
       <div
-        className="grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden bg-neutral-900 text-neutral-100"
+        className={clsx(
+          "grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden text-neutral-100",
+          bgColor,
+        )}
         style={{ colorScheme: "dark" }}
       >
         <AppHeader />

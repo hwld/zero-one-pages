@@ -1,18 +1,24 @@
+"use client";
+
 import clsx from "clsx";
 import Link from "next/link";
 import { Page, pages } from "./pages";
 import { ReactNode } from "react";
 import { SparklesIcon } from "lucide-react";
 import { IoLogoGithub } from "react-icons/io";
-import "./home.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
 
 export default function Home() {
+  const bgClass = "bg-zinc-900";
+  useBodyBgColor(bgClass);
+
   return (
     <div
       className={clsx(
-        "flex h-[100dvh] flex-col items-center overflow-auto bg-zinc-900 pb-6 pt-[200px]",
+        "flex h-[100dvh] flex-col items-center overflow-auto pb-6 pt-[200px]",
         // chromeでキーボードを操作しているとなぜかfocus-visibleがあたることがあるので
         "focus-visible:outline-none",
+        bgClass,
       )}
       style={{ colorScheme: "dark" }}
     >

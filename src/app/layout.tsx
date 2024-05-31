@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       {/* page毎にbodyのbg-colorを設定できるようにする */}
-      <body className={clsx(inter.className, "bg-[var(--body-bg)]")}>
+      <body className={clsx(inter.className)}>
         <Providers>
           {children}
           <GlobalCommandDialog />

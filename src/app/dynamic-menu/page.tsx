@@ -2,11 +2,20 @@
 
 import { NextPage } from "next";
 import { Menu } from "./_components/menu/menu";
-import "./style.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 const Page: NextPage = () => {
+  const bgClass = "bg-neutral-900";
+  useBodyBgColor(bgClass);
+
   return (
-    <div className="flex h-[100dvh] justify-center bg-neutral-900 pt-[50px] text-neutral-900">
+    <div
+      className={clsx(
+        "flex h-[100dvh] justify-center pt-[50px] text-neutral-900",
+        bgClass,
+      )}
+    >
       <div className="mt-[500px]">
         <Menu />
       </div>

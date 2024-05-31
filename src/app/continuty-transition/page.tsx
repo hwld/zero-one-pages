@@ -1,4 +1,5 @@
 "use client";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { useClickOutside } from "@mantine/hooks";
 import clsx from "clsx";
 import { motion } from "framer-motion";
@@ -32,9 +33,14 @@ const Page: React.FC = () => {
     router.replace(`${pathname}`, { scroll: false });
   };
 
+  const bgClass = "bg-neutral-100";
+  useBodyBgColor(bgClass);
+
   return (
     <>
-      <div className="grid h-full min-h-screen place-items-center bg-neutral-100">
+      <div
+        className={clsx("grid h-full min-h-screen place-items-center", bgClass)}
+      >
         <div className="relative flex min-h-screen w-full max-w-screen-lg flex-wrap justify-center gap-4 px-2 pt-10">
           {[...new Array(30)].map((_, i) => {
             return (

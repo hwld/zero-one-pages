@@ -4,7 +4,8 @@ import { AudioPlayerCard, MusicChangeParam } from "./audio-player-card";
 import { Music } from "lucide-react";
 import { AudioProvider } from "./audio/audio-provider";
 import { MusicListCard } from "./music-list-card";
-import "./style.css";
+import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import clsx from "clsx";
 
 export type Music = {
   fileName: string;
@@ -117,10 +118,16 @@ const Page: React.FC = () => {
     });
   };
 
+  const bgClass = "bg-neutral-900";
+  useBodyBgColor(bgClass);
+
   return (
     <AudioProvider src={currentMusic?.url}>
       <div
-        className="grid h-[100dvh] w-full place-items-center bg-neutral-900 text-neutral-100"
+        className={clsx(
+          "grid h-[100dvh] w-full place-items-center  text-neutral-100",
+          bgClass,
+        )}
         style={{ colorScheme: "dark" }}
       >
         <div className="grid h-full min-h-0 w-full grid-cols-[1fr] grid-rows-[1fr_300px] place-content-center gap-4 lg:grid-cols-[400px_400px] lg:grid-rows-[500px]">
