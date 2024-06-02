@@ -9,6 +9,16 @@ class Fetcher {
     resource: Resource,
     options?: FetchOptions,
   ): Promise<Response> {
+    // MSWを使っているのだが、長時間立ち上げっぱなしにしていると404が出てしまうので、
+    // fetchの前にactivateし直す
+    //(参考:https://github.com/mswjs/msw/issues/2115)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.controller?.postMessage("MOCK_ACTIVATE");
+    }
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
     const body = options?.body && JSON.stringify(options.body);
 
     const res = await fetch(resource, {
