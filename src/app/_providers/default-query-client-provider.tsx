@@ -10,7 +10,9 @@ export const DefaultQueryClientProvider: React.FC<Props> = ({ children }) => {
         queries: { retry: 1 },
         mutations: {
           onSettled: async () => {
-            await queryClient.invalidateQueries();
+            if (queryClient.isMutating() === 1) {
+              await queryClient.invalidateQueries();
+            }
           },
           onError: (e) => {
             console.error(e);

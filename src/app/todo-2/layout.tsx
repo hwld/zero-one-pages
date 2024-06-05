@@ -19,6 +19,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         "flex h-screen gap-6 overflow-hidden text-zinc-200",
         bgClass,
       )}
+      style={{ colorScheme: "dark" }}
     >
       <div className="sticky top-0 py-6 pl-6">
         <Sidebar />

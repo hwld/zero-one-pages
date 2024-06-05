@@ -63,7 +63,6 @@ const Page = () => {
       <Sidebar />
       <div className="grid grid-rows-[60px,1fr] overflow-hidden">
         <div className="flex items-center gap-2 px-4">
-          <CalendarViewDate />
           <Select
             items={CALENDAR_TYPE_LIST}
             selectedValue={calendarInfo.type}
@@ -82,6 +81,7 @@ const Page = () => {
             }}
           />
           <Button onClick={goTodayCalendarPage}>今日</Button>
+          <CalendarViewDate />
         </div>
         {calendar}
       </div>
