@@ -56,3 +56,13 @@ export const MswProvider: React.FC<{ children: ReactNode }> = ({
 
   return <MswContext.Provider value={mswStae}>{children}</MswContext.Provider>;
 };
+
+export const SetupCompletedMswProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <MswContext.Provider value={{ isMockserverUp: true }}>
+      {children}
+    </MswContext.Provider>
+  );
+};

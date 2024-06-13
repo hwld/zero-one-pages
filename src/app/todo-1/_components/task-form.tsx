@@ -65,6 +65,7 @@ export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(
               side="top"
               sideOffset={4}
               asChild
+              role="alert"
             >
               <motion.div
                 className="flex items-center gap-1 rounded bg-neutral-900 p-2 text-xs text-red-200"
