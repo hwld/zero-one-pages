@@ -74,6 +74,7 @@ export const TaskCard: React.FC<{
         </div>
         <div className="flex gap-1">
           <TaskCardButton
+            aria-label="edit-title"
             icon={<PencilIcon />}
             onClick={() => {
               setEditable((s) => !s);
@@ -87,6 +88,7 @@ export const TaskCard: React.FC<{
             icon={<PanelRightOpenIcon />}
           />
           <TaskCardButton
+            aria-label="open-delete-dialog"
             onClick={() => setIsConfirmDeleteOpen(true)}
             icon={<TrashIcon />}
           />

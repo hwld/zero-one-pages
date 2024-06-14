@@ -38,7 +38,7 @@ export const Dialog: React.FC<{
                 animate={{ opacity: 1, translateX: "-50%", translateY: "-40%" }}
                 exit={{ opacity: 0, translateX: "-50%", translateY: "-50%" }}
               >
-                <RadixDialog.Close asChild>
+                <RadixDialog.Close asChild aria-label="close-dialog">
                   <button className="absolute right-2 top-2 rounded p-1 text-neutral-100 transition-colors hover:bg-white/20">
                     <XIcon />
                   </button>
@@ -55,6 +55,7 @@ export const Dialog: React.FC<{
                     {cancelText}
                   </button>
                   <button
+                    aria-label="action"
                     className="rounded bg-neutral-900 px-3 py-2 text-sm text-neutral-100 hover:bg-neutral-700"
                     onClick={onAction}
                   >

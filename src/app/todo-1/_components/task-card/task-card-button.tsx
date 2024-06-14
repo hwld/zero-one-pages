@@ -6,9 +6,9 @@ export const taskCardItemClass =
 export const TaskCardButton: React.FC<{
   icon: ReactNode;
   onClick?: () => void;
-}> = ({ icon, onClick }) => {
+}> = ({ icon, onClick, ...props }) => {
   return (
-    <button onClick={onClick} className={taskCardItemClass}>
+    <button {...props} onClick={onClick} className={taskCardItemClass}>
       {icon}
     </button>
   );
