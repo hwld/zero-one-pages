@@ -18,8 +18,26 @@ export const Default: Story = {
 
 export const Empty: Story = {
   args: { tasks: [], status: "success" },
+  decorators: [
+    (Story) => {
+      return (
+        <div className="relative">
+          <Story />
+        </div>
+      );
+    },
+  ],
 };
 
 export const Error: Story = {
   args: { tasks: [], status: "error" },
+  decorators: [
+    (Story) => {
+      return (
+        <div className="relative">
+          <Story />
+        </div>
+      );
+    },
+  ],
 };

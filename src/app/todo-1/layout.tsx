@@ -10,7 +10,7 @@ import {
 } from "react";
 import { SideBar } from "./_components/side-bar/side-bar";
 import { HomeIcon } from "lucide-react";
-import { TaskForm } from "./_components/task-form";
+import { TaskCreateInput } from "./_components/task-create-input";
 import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
@@ -71,7 +71,7 @@ const LayoutInner: React.FC<Props> = ({ children }) => {
           </div>
         </div>
         <div className="absolute bottom-0 flex max-w-[95%] items-start gap-2 py-5">
-          <TaskForm ref={inputRef} />
+          <TaskCreateInput ref={inputRef} />
           <div className="shrink-0">
             <Menu />
           </div>

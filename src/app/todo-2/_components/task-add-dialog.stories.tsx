@@ -45,9 +45,7 @@ export const Default: Story = {
     const title = "タスク";
 
     await step("デフォルトでは、作成したあとにダイアログが閉じる", async () => {
-      const titleInput = await waitFor(() =>
-        canvas.findByPlaceholderText("タスクのタイトル"),
-      );
+      const titleInput = await canvas.findByPlaceholderText("タスクのタイトル");
       await userEvent.type(titleInput, `${title}{enter}`, { delay: 50 });
 
       await waitFor(async () => {
@@ -68,12 +66,9 @@ export const Default: Story = {
     await step(
       "トグルを切り替えると、作成したあとにダイアログが閉じない",
       async () => {
-        const [titleInput, checkbox] = await waitFor(() =>
-          Promise.all([
-            canvas.findByPlaceholderText("タスクのタイトル"),
-            canvas.findByLabelText("続けて作成する"),
-          ]),
-        );
+        const titleInput =
+          await canvas.findByPlaceholderText("タスクのタイトル");
+        const checkbox = await canvas.findByLabelText("続けて作成する");
 
         await userEvent.click(checkbox);
         await userEvent.type(titleInput, `${title}{enter}`, { delay: 50 });
@@ -98,9 +93,7 @@ export const Default: Story = {
 export const NoTitleError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.parentElement!);
-    const titleInput = await waitFor(() =>
-      canvas.findByPlaceholderText("タスクのタイトル"),
-    );
+    const titleInput = await canvas.findByPlaceholderText("タスクのタイトル");
 
     await userEvent.type(titleInput, "{enter}", { delay: 50 });
 

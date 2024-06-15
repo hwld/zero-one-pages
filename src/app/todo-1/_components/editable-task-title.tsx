@@ -52,6 +52,7 @@ export const EditableTaskTitle = forwardRef<
             ref={ref}
             className="w-full bg-transparent"
             onBlur={handleBlur}
+            aria-label="タイトル"
             aria-invalid={!!errors.title}
             aria-errormessage={errorMessageId}
             {...registers}

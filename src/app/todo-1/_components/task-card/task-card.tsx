@@ -45,6 +45,7 @@ export const TaskCard: React.FC<{
             </AnimatePresence>
             <input
               id={task.id}
+              aria-label="完了状態を変更"
               type="checkbox"
               className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
               checked={task.done}
@@ -74,7 +75,7 @@ export const TaskCard: React.FC<{
         </div>
         <div className="flex gap-1">
           <TaskCardButton
-            aria-label="edit-title"
+            aria-label="タイトルを編集"
             icon={<PencilIcon />}
             onClick={() => {
               setEditable((s) => !s);
@@ -88,7 +89,7 @@ export const TaskCard: React.FC<{
             icon={<PanelRightOpenIcon />}
           />
           <TaskCardButton
-            aria-label="open-delete-dialog"
+            aria-label="削除ダイアログを開く"
             onClick={() => setIsConfirmDeleteOpen(true)}
             icon={<TrashIcon />}
           />

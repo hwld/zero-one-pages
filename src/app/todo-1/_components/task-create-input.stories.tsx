@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import { TaskForm } from "./task-form";
+import { TaskCreateInput } from "./task-create-input";
 import { defaultStoryMeta } from "../story-meta";
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test";
 import { Todo1API, createTaskInputSchema } from "../_mocks/api";
@@ -19,9 +19,9 @@ const meta = {
       ],
     },
   },
-  title: "Todo1/TaskForm",
-  component: TaskForm,
-} satisfies Meta<typeof TaskForm>;
+  title: "Todo1/TaskCreateInput",
+  component: TaskCreateInput,
+} satisfies Meta<typeof TaskCreateInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

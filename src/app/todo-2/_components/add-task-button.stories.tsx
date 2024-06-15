@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { defaultStoryMeta } from "../story-meta";
-import { expect, fn, userEvent, waitFor, within } from "@storybook/test";
+import { expect, fn, userEvent, within } from "@storybook/test";
 import { AddTaskButton } from "./add-task-button";
 import { Todo2API } from "../_mocks/api";
 import { http } from "msw";
@@ -26,9 +26,7 @@ export const Default: Story = {
 
       await userEvent.keyboard("{meta>}k");
 
-      const titleInput = await waitFor(() =>
-        canvas.findByPlaceholderText("タスクのタイトル"),
-      );
+      const titleInput = await canvas.findByPlaceholderText("タスクのタイトル");
       await userEvent.type(titleInput, "title{enter}", { delay: 50 });
 
       await expect(createTaskMock).toHaveBeenCalledTimes(1);
