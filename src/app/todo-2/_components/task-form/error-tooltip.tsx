@@ -15,6 +15,7 @@ type Props = {
   children: ReactNode;
   error?: string;
   placement?: "top-start" | "bottom-start";
+  id: string;
 };
 
 const ARROW_HEIGHT = 10;
@@ -24,6 +25,7 @@ export const TaskFormErrorTooltip: React.FC<Props> = ({
   children,
   error,
   placement = "top-start",
+  id,
 }) => {
   // 祖先コンポーネントのexitアニメーション中にtooltipが表示されないようにする。
   const isPresent = useIsPresent();
@@ -46,6 +48,7 @@ export const TaskFormErrorTooltip: React.FC<Props> = ({
           <FloatingPortal>
             <div ref={refs.setFloating} style={floatingStyles}>
               <motion.div
+                id={id}
                 className="flex gap-1 rounded bg-zinc-950 p-2 text-xs text-red-400 shadow"
                 initial={{ opacity: 0, y: initialY }}
                 animate={{ opacity: 1, y: 0 }}

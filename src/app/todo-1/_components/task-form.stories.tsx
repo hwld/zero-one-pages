@@ -53,7 +53,9 @@ export const NoTitleError: Story = {
 
     await waitFor(async () => {
       await expect(createTaskMock).not.toHaveBeenCalled();
-      await expect(canvas.getByRole("alert")).toBeInTheDocument();
+      await expect(titleInput).toHaveAccessibleErrorMessage(
+        "タスクのタイトルを入力してください",
+      );
     });
   },
 };
@@ -69,7 +71,9 @@ export const MaxLengthError: Story = {
 
     await waitFor(async () => {
       await expect(createTaskMock).not.toHaveBeenCalled();
-      await expect(canvas.getByRole("alert")).toBeInTheDocument();
+      await expect(titleInput).toHaveAccessibleErrorMessage(
+        "タスクのタイトルは100文字以内で入力してください",
+      );
     });
   },
 };

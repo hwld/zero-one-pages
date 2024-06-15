@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMergeRefs } from "@floating-ui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { TaskFormErrorTooltip } from "./error-tooltip";
 import clsx from "clsx";
 import { CreateTaskInput, createTaskInputSchema } from "../../_mocks/api";
@@ -29,16 +29,25 @@ export const TaskCreateForm: React.FC<Props> = ({ onAddTask, id }) => {
     innerTitleRef.current?.focus();
   }, []);
 
+  const componentId = useId();
+  const titleErrorMessageId = `${componentId}-title-errormessage`;
+  const descErrorMessageId = `${componentId}-desc-errormessage`;
+
   return (
     <form
       id={id}
       onSubmit={handleSubmit(onAddTask)}
       className="flex flex-col gap-2 px-4"
     >
-      <TaskFormErrorTooltip error={errors.title?.message}>
+      <TaskFormErrorTooltip
+        id={titleErrorMessageId}
+        error={errors.title?.message}
+      >
         <input
           ref={titleRef}
           placeholder="タスクのタイトル"
+          aria-invalid={!!errors.title}
+          aria-errormessage={titleErrorMessageId}
           className={clsx(
             "w-full rounded bg-transparent text-lg font-bold placeholder:text-zinc-500 focus-visible:outline-none",
             errors.title && "text-red-400",
@@ -47,12 +56,15 @@ export const TaskCreateForm: React.FC<Props> = ({ onAddTask, id }) => {
         />
       </TaskFormErrorTooltip>
       <TaskFormErrorTooltip
+        id={descErrorMessageId}
         error={errors.description?.message}
         placement="bottom-start"
       >
         <textarea
           placeholder="タスクの説明"
           rows={6}
+          aria-invalid={!!errors.description}
+          aria-errormessage={descErrorMessageId}
           className={clsx(
             "w-full resize-none bg-transparent text-sm placeholder:text-zinc-500 focus-visible:outline-none",
             errors.description && "text-red-400",

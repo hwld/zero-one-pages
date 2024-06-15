@@ -2,7 +2,14 @@ import { Meta, StoryObj } from "@storybook/react";
 import { TaskCard } from "./task-card";
 import { defaultStoryMeta } from "../../story-meta";
 import { initialTasks } from "../../_mocks/data";
-import { expect, fn, userEvent, waitFor, within } from "@storybook/test";
+import {
+  clearAllMocks,
+  expect,
+  fn,
+  userEvent,
+  waitFor,
+  within,
+} from "@storybook/test";
 import { http } from "msw";
 import { Todo1API, updateTaskInputSchema } from "../../_mocks/api";
 
@@ -34,7 +41,8 @@ export const Default: Story = {
     },
   },
   args: { task },
-  play: async ({ canvasElement, step }) => {
+  play: async ({ canvasElement, step, args }) => {
+    const task = args.task;
     const canvas = within(canvasElement.parentElement!);
     const checkbox = canvas.getByRole("checkbox");
     const editTrigger = canvas.getByLabelText("edit-title");
@@ -55,7 +63,7 @@ export const Default: Story = {
         ]),
       );
 
-      updateTaskMock.mockClear();
+      clearAllMocks();
     });
 
     await step("タイトル更新APIが呼ばれる", async () => {
@@ -76,7 +84,7 @@ export const Default: Story = {
         ]),
       );
 
-      updateTaskMock.mockClear();
+      clearAllMocks();
     });
 
     await step("削除APIが呼ばれる", async () => {

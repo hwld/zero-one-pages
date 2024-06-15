@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircleIcon, CommandIcon } from "lucide-react";
-import { FocusEventHandler, forwardRef } from "react";
+import { FocusEventHandler, forwardRef, useId } from "react";
 import { useForm } from "react-hook-form";
 import { useAddTask } from "../_queries/use-add-task";
 import { CreateTaskInput, createTaskInputSchema } from "../_mocks/api";
@@ -36,6 +36,8 @@ export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(
     reset({ title: "" });
   });
 
+  const errorMessageId = useId();
+
   return (
     <Popover.Root open={!!errors.title}>
       <Popover.Anchor asChild>
@@ -46,6 +48,8 @@ export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(
               className="h-full w-full bg-transparent pl-5  pr-2 text-neutral-200 placeholder:text-neutral-400 focus:outline-none"
               placeholder="タスクを入力してください..."
               onBlur={handleBlur}
+              aria-invalid={!!errors.title}
+              aria-errormessage={errorMessageId}
               {...otherRegister}
             />
           </form>
@@ -65,7 +69,7 @@ export const TaskForm = forwardRef<HTMLInputElement, {}>(function TaskForm(
               side="top"
               sideOffset={4}
               asChild
-              role="alert"
+              id={errorMessageId}
             >
               <motion.div
                 className="flex items-center gap-1 rounded bg-neutral-900 p-2 text-xs text-red-200"

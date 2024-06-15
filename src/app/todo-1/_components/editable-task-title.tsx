@@ -1,4 +1,4 @@
-import { FocusEventHandler, forwardRef } from "react";
+import { FocusEventHandler, forwardRef, useId } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMergeRefs } from "@floating-ui/react";
@@ -42,6 +42,8 @@ export const EditableTaskTitle = forwardRef<
     onChangeEditable(false);
   });
 
+  const errorMessageId = useId();
+
   return editable ? (
     <Popover.Root open={!!errors.title}>
       <Popover.Anchor asChild>
@@ -50,6 +52,8 @@ export const EditableTaskTitle = forwardRef<
             ref={ref}
             className="w-full bg-transparent"
             onBlur={handleBlur}
+            aria-invalid={!!errors.title}
+            aria-errormessage={errorMessageId}
             {...registers}
           />
         </form>
@@ -58,6 +62,7 @@ export const EditableTaskTitle = forwardRef<
         {errors.title && (
           <Popover.Portal forceMount>
             <Popover.Content
+              id={errorMessageId}
               side="bottom"
               align="start"
               sideOffset={4}

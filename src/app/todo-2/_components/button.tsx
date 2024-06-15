@@ -4,7 +4,8 @@ import { ComponentPropsWithoutRef, ReactNode, forwardRef } from "react";
 export const buttonBaseClass =
   "flex h-7 items-center gap-1 text-nowrap rounded px-2 text-xs transition-colors";
 export const buttonClass = {
-  default: "border border-zinc-600 bg-zinc-700 hover:bg-zinc-600 ",
+  default:
+    "border text-zinc-200 border-zinc-600 bg-zinc-700 hover:bg-zinc-600 ",
   ghost: "hover:bg-white/10",
 };
 
