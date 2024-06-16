@@ -9,15 +9,17 @@ import {
   within,
 } from "@storybook/test";
 import { TaskAddDialog } from "./task-add-dialog";
-import { http } from "msw";
+import { HttpResponse, http } from "msw";
 import {
   CreateTaskInput,
   Todo2API,
   createTaskInputSchema,
 } from "../_mocks/api";
+import { initialTasks } from "../_mocks/data";
 
 const createTaskMock = fn();
 const handleOpenChangeMock = fn();
+const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
@@ -29,6 +31,8 @@ const meta = {
         http.post(Todo2API.createTask(), async ({ request }) => {
           const input = createTaskInputSchema.parse(await request.json());
           createTaskMock(input);
+
+          return HttpResponse.json(dummyTask);
         }),
       ],
     },

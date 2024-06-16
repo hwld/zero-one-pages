@@ -10,12 +10,12 @@ import {
   waitFor,
   within,
 } from "@storybook/test";
-import { http } from "msw";
+import { HttpResponse, http } from "msw";
 import { Todo1API, updateTaskInputSchema } from "../../_mocks/api";
 
 const updateTaskMock = fn();
 const deleteTaskMock = fn();
-const task = initialTasks[0];
+const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
@@ -33,14 +33,18 @@ export const Default: Story = {
         http.put(Todo1API.task(), async ({ params, request }) => {
           const input = updateTaskInputSchema.parse(await request.json());
           updateTaskMock({ id: params.id as string, ...input });
+
+          return HttpResponse.json(dummyTask);
         }),
         http.delete(Todo1API.task(), async ({ params }) => {
           deleteTaskMock(params.id);
+
+          return HttpResponse.json({});
         }),
       ],
     },
   },
-  args: { task },
+  args: { task: dummyTask },
   play: async ({ canvasElement, step, args }) => {
     const task = args.task;
     const canvas = within(canvasElement.parentElement!);
@@ -111,5 +115,5 @@ export const Default: Story = {
 };
 
 export const Done: Story = {
-  args: { task: { ...task, done: true } },
+  args: { task: { ...dummyTask, done: true } },
 };

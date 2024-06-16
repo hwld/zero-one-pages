@@ -3,9 +3,11 @@ import { TaskCreateInput } from "./task-create-input";
 import { defaultStoryMeta } from "../story-meta";
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test";
 import { Todo1API, createTaskInputSchema } from "../_mocks/api";
-import { http } from "msw";
+import { HttpResponse, http } from "msw";
+import { initialTasks } from "../_mocks/data";
 
 const createTaskMock = fn();
+const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
@@ -15,6 +17,8 @@ const meta = {
         http.post(Todo1API.tasks(), async ({ request }) => {
           const input = createTaskInputSchema.parse(await request.json());
           createTaskMock(input.title);
+
+          return HttpResponse.json(dummyTask);
         }),
       ],
     },

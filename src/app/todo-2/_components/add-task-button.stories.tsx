@@ -3,9 +3,11 @@ import { defaultStoryMeta } from "../story-meta";
 import { expect, fn, userEvent, within } from "@storybook/test";
 import { AddTaskButton } from "./add-task-button";
 import { Todo2API } from "../_mocks/api";
-import { http } from "msw";
+import { HttpResponse, http } from "msw";
+import { initialTasks } from "../_mocks/data";
 
 const createTaskMock = fn();
+const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
@@ -18,7 +20,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   parameters: {
-    msw: { handlers: [http.post(Todo2API.createTask(), createTaskMock)] },
+    msw: {
+      handlers: [
+        http.post(Todo2API.createTask(), () => {
+          createTaskMock();
+
+          return HttpResponse.json(dummyTask);
+        }),
+      ],
+    },
   },
   play: async ({ canvasElement, step }) => {
     await step("タイトルのみのタスクをキーボードだけで作成できる", async () => {

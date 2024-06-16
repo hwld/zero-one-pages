@@ -10,13 +10,13 @@ import {
   waitFor,
   within,
 } from "@storybook/test";
-import { http } from "msw";
+import { HttpResponse, http } from "msw";
 import { Todo1API, updateTaskInputSchema } from "../../_mocks/api";
 import { waitForAnimation } from "@/app/_test/utils";
 
 const updateTaskMock = fn();
 const handleOpenChangeMock = fn();
-const task = initialTasks[0];
+const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
@@ -34,11 +34,13 @@ export const Default: Story = {
         http.put(Todo1API.task(), async ({ params, request }) => {
           const input = updateTaskInputSchema.parse(await request.json());
           updateTaskMock({ id: params.id, ...input });
+
+          return HttpResponse.json(dummyTask);
         }),
       ],
     },
   },
-  args: { isOpen: true, onOpenChange: handleOpenChangeMock, task },
+  args: { isOpen: true, onOpenChange: handleOpenChangeMock, task: dummyTask },
   play: async ({ canvasElement, step, args }) => {
     const task = args.task;
     const statusText = task.done ? "完了" : "未完了";
