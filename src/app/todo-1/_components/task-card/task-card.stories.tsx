@@ -45,6 +45,10 @@ export const Default: Story = {
     const task = args.task;
     const canvas = within(canvasElement.parentElement!);
 
+    await step("タイトルが正しく表示されている", async () => {
+      await expect(canvas.getByLabelText(task.title)).toBeInTheDocument();
+    });
+
     await step("完了状態の更新APIが呼ばれる", async () => {
       const doneChangeCheckbox = canvas.getByRole("checkbox", {
         name: "完了状態を変更",

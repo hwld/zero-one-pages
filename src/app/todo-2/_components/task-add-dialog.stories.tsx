@@ -17,7 +17,7 @@ import {
 } from "../_mocks/api";
 
 const createTaskMock = fn();
-const onOpenChangeMock = fn();
+const handleOpenChangeMock = fn();
 
 const meta = {
   ...defaultStoryMeta,
@@ -33,7 +33,7 @@ const meta = {
       ],
     },
   },
-  args: { isOpen: true, onOpenChange: onOpenChangeMock },
+  args: { isOpen: true, onOpenChange: handleOpenChangeMock },
 } satisfies Meta<typeof TaskAddDialog>;
 
 export default meta;
@@ -56,8 +56,8 @@ export const Default: Story = {
             description: "",
           } satisfies CreateTaskInput),
         );
-        await expect(onOpenChangeMock).toHaveBeenCalledTimes(1);
-        await expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+        await expect(handleOpenChangeMock).toHaveBeenCalledTimes(1);
+        await expect(handleOpenChangeMock).toHaveBeenCalledWith(false);
       });
 
       clearAllMocks();
@@ -81,7 +81,7 @@ export const Default: Story = {
               description: "",
             } satisfies CreateTaskInput),
           );
-          await expect(onOpenChangeMock).not.toHaveBeenCalled();
+          await expect(handleOpenChangeMock).not.toHaveBeenCalled();
         });
 
         clearAllMocks();
@@ -99,7 +99,7 @@ export const NoTitleError: Story = {
 
     await waitFor(async () => {
       await expect(createTaskMock).not.toHaveBeenCalled();
-      await expect(onOpenChangeMock).not.toHaveBeenCalled();
+      await expect(handleOpenChangeMock).not.toHaveBeenCalled();
       await expect(titleInput).toHaveAccessibleErrorMessage(
         "タイトルの入力は必須です。",
       );

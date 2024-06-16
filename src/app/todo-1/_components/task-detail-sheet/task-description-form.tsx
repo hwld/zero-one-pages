@@ -3,15 +3,17 @@ import { AlertCircleIcon } from "lucide-react";
 import { useState } from "react";
 
 export const TaskDescriptionForm: React.FC<{
+  id: string;
   defaultDescription: string;
   onChangeDescription: (desc: string) => void;
-}> = ({ defaultDescription, onChangeDescription }) => {
+}> = ({ id, defaultDescription, onChangeDescription }) => {
   const [desc, setDesc] = useState(defaultDescription);
   const isDirty = desc !== defaultDescription;
 
   return (
     <div className="space-y-1">
       <textarea
+        id={id}
         className="h-[300px] w-full resize-none rounded border border-neutral-300 bg-transparent p-3 focus-visible:border-neutral-400 focus-visible:outline-neutral-900"
         value={desc}
         onChange={(e) => setDesc(e.target.value)}

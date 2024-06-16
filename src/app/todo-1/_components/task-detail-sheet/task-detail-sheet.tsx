@@ -37,7 +37,10 @@ export const TaskDetailSheet: React.FC<{
               >
                 <div className="relative flex h-full w-full flex-col gap-6 overflow-auto rounded-lg border-neutral-300 bg-neutral-100 p-6 text-neutral-700 [&_*]:outline-neutral-900">
                   <RadixDialog.Close asChild>
-                    <button className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5">
+                    <button
+                      className="absolute right-3 top-3 rounded p-1 text-neutral-700 transition-colors hover:bg-black/5"
+                      aria-label="シートを閉じる"
+                    >
                       <XIcon />
                     </button>
                   </RadixDialog.Close>
@@ -66,11 +69,15 @@ export const TaskDetailSheet: React.FC<{
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-1 text-sm text-neutral-500">
+                    <label
+                      className="flex items-center gap-1 text-sm text-neutral-500"
+                      htmlFor="description"
+                    >
                       <TextIcon size={18} />
                       <div>説明</div>
-                    </div>
+                    </label>
                     <TaskDescriptionForm
+                      id="description"
                       defaultDescription={task.description}
                       onChangeDescription={(desc) => {
                         updateTaskMutation.mutate({
