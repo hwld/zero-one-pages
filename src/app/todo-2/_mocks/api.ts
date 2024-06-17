@@ -83,7 +83,7 @@ export const updateTaskInputSchema = z
   .merge(taskSchema.pick({ status: true }));
 export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
 
-const updateTaskStatusesInputSchema = z
+export const updateTaskStatusesInputSchema = z
   .object({
     selectedTaskIds: z.array(z.string()),
   })
@@ -233,17 +233,20 @@ export const todo2Handlers = [
       totalPages: Math.ceil(searchedTasks.length / limit),
     } satisfies PaginatedTasksEntry);
   }),
+
   http.get(Todo2API.task(), ({ params }) => {
     const id = z.string().parse(params.id);
     const task = taskStore.get(id);
     return HttpResponse.json(task ?? null);
   }),
+
   http.post(Todo2API.createTask(), async ({ request }) => {
     const input = createTaskInputSchema.parse(await request.json());
     const createdTask = taskStore.add(input);
 
     return HttpResponse.json(createdTask);
   }),
+
   http.put(Todo2API.task(), async ({ params, request }) => {
     const id = z.string().parse(params.id);
     const input = updateTaskInputSchema.parse(await request.json());
@@ -256,6 +259,7 @@ export const todo2Handlers = [
 
     return HttpResponse.json(updatedTask);
   }),
+
   http.patch(Todo2API.updateTaskStatuses(), async ({ request }) => {
     const input = updateTaskStatusesInputSchema.parse(await request.json());
     taskStore.updateTaskStatuses({
@@ -265,6 +269,7 @@ export const todo2Handlers = [
 
     return HttpResponse.json({});
   }),
+
   http.delete(Todo2API.deleteTasks(), async ({ request }) => {
     const ids = z.array(z.string()).parse(await request.json());
     taskStore.remove(ids);

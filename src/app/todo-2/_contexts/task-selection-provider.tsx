@@ -73,7 +73,7 @@ export const useTaskSelection = () => {
   return ctx;
 };
 
-export const TaskSelectionContextProviderMock: React.FC<
+export const MockTaskSelectionProvider: React.FC<
   PropsWithChildren & { value: TaskSelectionContext }
 > = ({ children, value }) => {
   throwIfNotDevelopment();

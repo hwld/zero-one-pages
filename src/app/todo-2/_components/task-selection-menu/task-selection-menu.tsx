@@ -33,6 +33,7 @@ export const TaskSelectionMenu: React.FC = () => {
     <AnimatePresence>
       {selectedTaskIds.length > 0 && (
         <motion.div
+          role="toolbar"
           className="fixed inset-x-0 bottom-4 m-auto flex h-[40px]  w-fit items-center gap-2 rounded-lg bg-zinc-300 px-2 text-sm text-zinc-700 shadow"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -48,6 +49,7 @@ export const TaskSelectionMenu: React.FC = () => {
             <button
               className="grid w-[25px] place-items-center border-l border-dashed border-zinc-500 transition-colors hover:bg-black/5"
               onClick={unselectAllTasks}
+              aria-label="選択解除"
             >
               <XIcon size={18} />
             </button>
@@ -110,6 +112,7 @@ const TaskSelectionMenuButton: React.FC<{
         {...getReferenceProps()}
         className="flex h-[25px] items-center gap-1 rounded bg-zinc-900 px-2 text-xs text-zinc-100 transition-colors hover:bg-zinc-700"
         onClick={onClick}
+        aria-label={label}
       >
         <Icon size={15} />
       </button>
