@@ -88,6 +88,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 
       setSelectionFilter: (filter) => {
         setSelectionFilter(filter);
+        setPage(1);
       },
 
       removeAllFilter: () => {

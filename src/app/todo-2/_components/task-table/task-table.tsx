@@ -8,6 +8,7 @@ import { Task } from "../../_mocks/task-store";
 import { useTaskSelection } from "../../_contexts/task-selection-provider";
 
 type Props = { paginatedTasks: Task[]; totalPages: number };
+
 export const TaskTable: React.FC<Props> = ({ paginatedTasks, totalPages }) => {
   const { selectedTaskIds, selectTaskIds, unselectTaskIds } =
     useTaskSelection();
