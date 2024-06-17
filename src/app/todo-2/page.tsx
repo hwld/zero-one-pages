@@ -14,17 +14,12 @@ import { useMemo } from "react";
 import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
 import { ErrorTaskTable } from "./_components/task-table/error-task-table";
 import { useTodo2HomeCommands } from "./commands";
+import { useTaskSelection } from "./_contexts/task-selection-provider";
 
 const Page: NextPage = () => {
-  const {
-    page,
-    selectedTaskIds,
-    limit,
-    sortEntry,
-    fieldFilters,
-    selectionFilter,
-    searchText,
-  } = useTasksData();
+  const { selectedTaskIds } = useTaskSelection();
+  const { page, limit, sortEntry, fieldFilters, selectionFilter, searchText } =
+    useTasksData();
 
   const { data, status } = usePaginatedTasks({
     searchText,

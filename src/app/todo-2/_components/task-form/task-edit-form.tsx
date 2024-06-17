@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { TaskFormErrorTooltip } from "./error-tooltip";
 import { UpdateTaskInput, updateTaskInputSchema } from "../../_mocks/api";
 import { Task } from "../../_mocks/task-store";
+import { useId } from "react";
 
 type Props = {
   defaultTask: Task;
@@ -31,19 +32,29 @@ export const TaskEditForm: React.FC<Props> = ({
   const inputBaseClass =
     "rounded bg-transparent outline outline-1 outline-zinc-500 focus-visible:outline-1 focus-visible:outline-zinc-100";
 
+  const componentId = useId();
+  const titleErrorMessageId = `${componentId}-title-errormessage`;
+  const descErrorMessageId = `${componentId}-desc-errormessage`;
+
   return (
     <form
       className={taskDetailViewClass.wrapper}
       id={formId}
       onSubmit={handleSubmit(onUpdateTask)}
     >
-      <TaskFormErrorTooltip error={errors.title?.message}>
+      <TaskFormErrorTooltip
+        id={titleErrorMessageId}
+        error={errors.title?.message}
+      >
         <input
           className={clsx(taskDetailViewClass.title, inputBaseClass)}
           {...register("title")}
+          aria-invalid={!!errors.title}
+          aria-errormessage={titleErrorMessageId}
         />
       </TaskFormErrorTooltip>
       <TaskFormErrorTooltip
+        id={descErrorMessageId}
         className="h-full w-full"
         error={errors.description?.message}
         placement="bottom-start"
@@ -55,6 +66,8 @@ export const TaskEditForm: React.FC<Props> = ({
             "resize-none",
           )}
           {...register("description")}
+          aria-invalid={!!errors.description}
+          aria-errormessage={descErrorMessageId}
         />
       </TaskFormErrorTooltip>
     </form>

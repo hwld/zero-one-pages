@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import { TaskSelectionProvider } from "./_contexts/task-selection-provider";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
@@ -40,7 +41,9 @@ const LayoutWithProviders: React.FC<{ children: ReactNode }> = ({
   return (
     <DefaultQueryClientProvider>
       <TasksProvider>
-        <Layout>{children}</Layout>
+        <TaskSelectionProvider>
+          <Layout>{children}</Layout>
+        </TaskSelectionProvider>
       </TasksProvider>
     </DefaultQueryClientProvider>
   );

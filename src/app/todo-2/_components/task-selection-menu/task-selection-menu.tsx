@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { CircleDotIcon, LucideIcon, Trash2Icon, XIcon } from "lucide-react";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useState } from "react";
@@ -12,13 +11,13 @@ import {
 } from "@floating-ui/react";
 import { useUpdateTaskStatuses } from "../../_queries/use-update-task-statuses";
 import { useDeleteTasks } from "../../_queries/use-delete-tasks";
+import { useTaskSelection } from "../../_contexts/task-selection-provider";
 
 export const TaskSelectionMenu: React.FC = () => {
-  const { selectedTaskIds } = useTasksData();
+  const { selectedTaskIds, unselectAllTasks } = useTaskSelection();
 
   const updateTaskStatusesMutation = useUpdateTaskStatuses();
   const deleteTasksMutation = useDeleteTasks();
-  const { unselectAllTasks } = useTaskAction();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const handleConfirm = () => {

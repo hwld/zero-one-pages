@@ -11,7 +11,6 @@ import { FieldFilter, SelectionFilter, SortEntry } from "../_mocks/api";
 
 export type TasksData = {
   searchText: string;
-  selectedTaskIds: string[];
   page: number;
   limit: number;
   sortEntry: SortEntry;
@@ -32,11 +31,6 @@ export type TasksAction = {
 
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
-
-  selectTaskIds: (ids: string[]) => void;
-  unselectTaskIds: (ids: string[]) => void;
-  toggleTaskSelection: (id: string) => void;
-  unselectAllTasks: () => void;
 };
 
 const TasksDataContext = createContext<TasksData | undefined>(undefined);
@@ -45,7 +39,6 @@ const TasksActionContext = createContext<TasksAction | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const scrollTargetRef = useRef<HTMLDivElement>(null);
 
   // これらの情報はquery paramsで持った方が良いが、UIを作ることが目的なので・・・
@@ -59,9 +52,8 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const [fieldFilters, setFieldFilters] = useState<FieldFilter[]>([]);
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>(null);
 
-  const data: TasksData = useMemo(() => {
+  const data = useMemo((): TasksData => {
     return {
-      selectedTaskIds,
       page,
       limit,
       searchText,
@@ -70,17 +62,9 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       selectionFilter,
       scrollTargetRef,
     };
-  }, [
-    fieldFilters,
-    limit,
-    page,
-    searchText,
-    selectedTaskIds,
-    selectionFilter,
-    sortEntry,
-  ]);
+  }, [fieldFilters, limit, page, searchText, selectionFilter, sortEntry]);
 
-  const action: TasksAction = useMemo(() => {
+  const action = useMemo((): TasksAction => {
     return {
       search: (text) => {
         setSearchText(text);
@@ -121,33 +105,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
         setLimit(limit);
         setPage(1);
       },
-
-      toggleTaskSelection: (id: string) => {
-        setSelectedTaskIds((st) => {
-          if (st.includes(id)) {
-            return st.filter((i) => i !== id);
-          }
-          return [...st, id];
-        });
-      },
-
-      selectTaskIds: (ids) => {
-        setSelectedTaskIds((prev) => {
-          return Array.from(new Set([...prev, ...ids]));
-        });
-      },
-
-      unselectTaskIds: (ids) => {
-        setSelectedTaskIds((selectedIds) => {
-          return selectedIds.filter((selectedId) => {
-            return !ids.includes(selectedId);
-          });
-        });
-      },
-
-      unselectAllTasks: () => {
-        setSelectedTaskIds([]);
-      },
     };
   }, []);
 
@@ -163,7 +120,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
 export const useTasksData = (): TasksData => {
   const ctx = useContext(TasksDataContext);
   if (!ctx) {
-    throw new Error("TasksProviderが存在しません");
+    throw new Error(`${TasksProvider.name}が存在しません`);
   }
   return ctx;
 };
@@ -171,7 +128,7 @@ export const useTasksData = (): TasksData => {
 export const useTaskAction = (): TasksAction => {
   const ctx = useContext(TasksActionContext);
   if (!ctx) {
-    throw new Error("TasksProviderが存在しません");
+    throw new Error(`${TasksProvider.name}が存在しません`);
   }
   return ctx;
 };

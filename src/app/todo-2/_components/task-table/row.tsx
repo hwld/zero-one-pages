@@ -1,7 +1,6 @@
 import { IconTrash } from "@tabler/icons-react";
 import { TaskTableData } from "./data";
 import { TaskStatusBadge } from "../task-status-badge";
-import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useMemo, useState } from "react";
 import { Tooltip } from "../tooltip";
@@ -11,15 +10,15 @@ import Link from "next/link";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import { useDeleteTasks } from "../../_queries/use-delete-tasks";
 import { Task } from "../../_mocks/task-store";
+import { useTaskSelection } from "../../_contexts/task-selection-provider";
 
 export const TaskTableRow: React.FC<{
   task: Task;
 }> = ({ task }) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const { selectedTaskIds } = useTasksData();
+  const { selectedTaskIds, toggleTaskSelection } = useTaskSelection();
   const deleteTaskMutation = useDeleteTasks();
   const updateTaskMutation = useUpdateTask();
-  const { toggleTaskSelection } = useTaskAction();
 
   const isSelected = useMemo(() => {
     return selectedTaskIds.includes(task.id);
