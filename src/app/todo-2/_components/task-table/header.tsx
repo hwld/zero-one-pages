@@ -3,9 +3,9 @@ import {
   ChevronUpIcon,
   ChevronsUpDownIcon,
 } from "lucide-react";
-import { useTasksData, useTaskAction } from "../../_contexts/tasks-provider";
 import { ReactNode } from "react";
 import { SortEntry } from "../../_mocks/api";
+import { useTaskSort } from "../../_contexts/task-sort-provider";
 
 type TableHeaderProps = { children: ReactNode; width?: number };
 
@@ -55,8 +55,7 @@ export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
   width,
   fieldName,
 }) => {
-  const { sortEntry } = useTasksData();
-  const { sort } = useTaskAction();
+  const { sortEntry, sort } = useTaskSort();
   const isSorted = sortEntry.field === fieldName;
 
   const handleSort = () => {

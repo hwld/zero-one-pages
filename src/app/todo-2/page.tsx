@@ -15,10 +15,12 @@ import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
 import { ErrorTaskTable } from "./_components/task-table/error-task-table";
 import { useTodo2HomeCommands } from "./commands";
 import { useTaskSelection } from "./_contexts/task-selection-provider";
+import { useTaskSort } from "./_contexts/task-sort-provider";
 
 const Page: NextPage = () => {
   const { selectedTaskIds } = useTaskSelection();
-  const { page, limit, sortEntry, fieldFilters, selectionFilter, searchText } =
+  const { sortEntry } = useTaskSort();
+  const { page, limit, fieldFilters, selectionFilter, searchText } =
     useTasksData();
 
   const { data, status } = usePaginatedTasks({

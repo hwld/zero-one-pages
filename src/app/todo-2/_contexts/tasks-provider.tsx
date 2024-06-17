@@ -7,13 +7,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { FieldFilter, SelectionFilter, SortEntry } from "../_mocks/api";
+import { FieldFilter, SelectionFilter } from "../_mocks/api";
 
 export type TasksData = {
   searchText: string;
   page: number;
   limit: number;
-  sortEntry: SortEntry;
   scrollTargetRef: RefObject<HTMLDivElement>;
   fieldFilters: FieldFilter[];
   selectionFilter: SelectionFilter;
@@ -21,8 +20,6 @@ export type TasksData = {
 
 export type TasksAction = {
   search: (text: string) => void;
-
-  sort: (entry: SortEntry) => void;
 
   addFieldFilter: (filter: FieldFilter) => void;
   removeFieldFilter: (filterId: string) => void;
@@ -45,10 +42,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(30);
   const [searchText, setSearchText] = useState("");
-  const [sortEntry, setSortEntry] = useState<SortEntry>({
-    field: "createdAt",
-    order: "desc",
-  });
   const [fieldFilters, setFieldFilters] = useState<FieldFilter[]>([]);
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>(null);
 
@@ -57,22 +50,16 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({
       page,
       limit,
       searchText,
-      sortEntry,
       fieldFilters,
       selectionFilter,
       scrollTargetRef,
     };
-  }, [fieldFilters, limit, page, searchText, selectionFilter, sortEntry]);
+  }, [fieldFilters, limit, page, searchText, selectionFilter]);
 
   const action = useMemo((): TasksAction => {
     return {
       search: (text) => {
         setSearchText(text);
-        setPage(1);
-      },
-
-      sort: (entry) => {
-        setSortEntry(entry);
         setPage(1);
       },
 
