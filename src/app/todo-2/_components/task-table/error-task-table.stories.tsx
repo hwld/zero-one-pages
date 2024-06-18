@@ -1,3 +1,4 @@
+import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
 import { TaskSortProvider } from "../../_contexts/task-sort-provider";
 import { TasksProvider } from "../../_contexts/tasks-provider";
 import { defaultStoryMeta } from "../../story-meta";
@@ -12,13 +13,15 @@ const meta = {
     ...defaultStoryMeta.decorators,
     (Story) => {
       return (
-        <TasksProvider>
-          <TaskSortProvider>
-            <div className="flex h-[450px]">
-              <Story />
-            </div>
-          </TaskSortProvider>
-        </TasksProvider>
+        <TaskPagingProvider>
+          <TasksProvider>
+            <TaskSortProvider>
+              <div className="flex h-[450px]">
+                <Story />
+              </div>
+            </TaskSortProvider>
+          </TasksProvider>
+        </TaskPagingProvider>
       );
     },
   ],

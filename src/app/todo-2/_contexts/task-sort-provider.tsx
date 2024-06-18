@@ -6,8 +6,8 @@ import {
   useState,
 } from "react";
 import { SortEntry } from "../_mocks/api";
-import { useTaskAction } from "./tasks-provider";
 import { throwIfNotDevelopment } from "@/app/_test/utils";
+import { useTaskPaging } from "./task-paging-provider";
 
 export type TaskSortContext = {
   sortEntry: SortEntry;
@@ -17,7 +17,7 @@ export type TaskSortContext = {
 const TaskSortContext = createContext<TaskSortContext | undefined>(undefined);
 
 export const TaskSortProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const { setPage } = useTaskAction();
+  const { setPage } = useTaskPaging();
 
   const [sortEntry, setSortEntry] = useState<SortEntry>({
     field: "createdAt",

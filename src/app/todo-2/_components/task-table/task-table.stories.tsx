@@ -22,6 +22,7 @@ import {
 import { SortEntry } from "../../_mocks/api";
 import { getNextSortOrder } from "./header";
 import { useState } from "react";
+import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
 
 const dummyTasks = initialTasks.slice(0, 10);
 
@@ -58,13 +59,15 @@ const meta = {
       };
 
       return (
-        <TasksProvider>
-          <MockTaskSelectionProvider value={mockSelectionContext}>
-            <MockTaskSortProvider value={mockSortContext}>
-              <Story />
-            </MockTaskSortProvider>
-          </MockTaskSelectionProvider>
-        </TasksProvider>
+        <TaskPagingProvider>
+          <TasksProvider>
+            <MockTaskSelectionProvider value={mockSelectionContext}>
+              <MockTaskSortProvider value={mockSortContext}>
+                <Story />
+              </MockTaskSortProvider>
+            </MockTaskSelectionProvider>
+          </TasksProvider>
+        </TaskPagingProvider>
       );
     },
   ],

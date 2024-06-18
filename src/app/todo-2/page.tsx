@@ -17,12 +17,14 @@ import { useTodo2HomeCommands } from "./commands";
 import { useTaskSelection } from "./_contexts/task-selection-provider";
 import { useTaskSort } from "./_contexts/task-sort-provider";
 import { useTaskFilter } from "./_contexts/task-filter-provider";
+import { useTaskPaging } from "./_contexts/task-paging-provider";
 
 const Page: NextPage = () => {
   const { selectedTaskIds } = useTaskSelection();
   const { sortEntry } = useTaskSort();
   const { fieldFilters, selectionFilter } = useTaskFilter();
-  const { page, limit, searchText } = useTasksData();
+  const { page, limit } = useTaskPaging();
+  const { searchText } = useTasksData();
 
   const { data, status } = usePaginatedTasks({
     searchText,

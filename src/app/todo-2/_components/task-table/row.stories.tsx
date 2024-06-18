@@ -26,6 +26,7 @@ import {
 import { z } from "zod";
 import { getRouter } from "@storybook/nextjs/router.mock";
 import { Routes } from "../../_lib/routes";
+import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
 
 const dummyTask = initialTasks[0];
 
@@ -75,15 +76,17 @@ const meta = {
       };
 
       return (
-        <TasksProvider>
-          <MockTaskSelectionProvider value={selectionContext}>
-            <table>
-              <tbody>
-                <Story />
-              </tbody>
-            </table>
-          </MockTaskSelectionProvider>
-        </TasksProvider>
+        <TaskPagingProvider>
+          <TasksProvider>
+            <MockTaskSelectionProvider value={selectionContext}>
+              <table>
+                <tbody>
+                  <Story />
+                </tbody>
+              </table>
+            </MockTaskSelectionProvider>
+          </TasksProvider>
+        </TaskPagingProvider>
       );
     },
   ],

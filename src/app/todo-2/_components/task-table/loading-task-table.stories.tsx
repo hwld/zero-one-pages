@@ -3,6 +3,7 @@ import { defaultStoryMeta } from "../../story-meta";
 import { Meta, StoryObj } from "@storybook/react";
 import { LoadingTaskTable } from "./loading-task-table";
 import { TaskSortProvider } from "../../_contexts/task-sort-provider";
+import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
 
 const meta = {
   ...defaultStoryMeta,
@@ -12,13 +13,15 @@ const meta = {
     ...defaultStoryMeta.decorators,
     (Story) => {
       return (
-        <TasksProvider>
-          <TaskSortProvider>
-            <div className="flex h-[450px]">
-              <Story />
-            </div>
-          </TaskSortProvider>
-        </TasksProvider>
+        <TaskPagingProvider>
+          <TasksProvider>
+            <TaskSortProvider>
+              <div className="flex h-[450px]">
+                <Story />
+              </div>
+            </TaskSortProvider>
+          </TasksProvider>
+        </TaskPagingProvider>
       );
     },
   ],

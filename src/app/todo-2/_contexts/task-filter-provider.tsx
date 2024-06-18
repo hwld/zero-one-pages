@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { FieldFilter, SelectionFilter } from "../_mocks/api";
-import { useTaskAction } from "./tasks-provider";
+import { useTaskPaging } from "./task-paging-provider";
 
 export type TaskFilterContext = {
   fieldFilters: FieldFilter[];
@@ -26,7 +26,7 @@ const TaskFilterContext = createContext<TaskFilterContext | undefined>(
 export const TaskFilterProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const { setPage } = useTaskAction();
+  const { setPage } = useTaskPaging();
 
   const [fieldFilters, setFieldFilters] = useState<FieldFilter[]>([]);
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>(null);

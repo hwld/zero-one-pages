@@ -1,19 +1,18 @@
 import { EmptyTableContent } from "./empty-content";
 import { TaskTableRow } from "./row";
-import { useTaskAction, useTasksData } from "../../_contexts/tasks-provider";
 import { Pagination } from "../pagination";
 import { useMemo } from "react";
 import { TaskTableShell } from "./shell";
 import { Task } from "../../_mocks/task-store";
 import { useTaskSelection } from "../../_contexts/task-selection-provider";
+import { useTaskPaging } from "../../_contexts/task-paging-provider";
 
 type Props = { paginatedTasks: Task[]; totalPages: number };
 
 export const TaskTable: React.FC<Props> = ({ paginatedTasks, totalPages }) => {
   const { selectedTaskIds, selectTaskIds, unselectTaskIds } =
     useTaskSelection();
-  const { page } = useTasksData();
-  const { setPage } = useTaskAction();
+  const { page, setPage } = useTaskPaging();
 
   const allSelectedOnPage = useMemo(() => {
     if (paginatedTasks.length === 0) {
