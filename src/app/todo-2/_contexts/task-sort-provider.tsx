@@ -7,6 +7,7 @@ import {
 } from "react";
 import { SortEntry } from "../_mocks/api";
 import { useTaskAction } from "./tasks-provider";
+import { throwIfNotDevelopment } from "@/app/_test/utils";
 
 export type TaskSortContext = {
   sortEntry: SortEntry;
@@ -46,4 +47,16 @@ export const useTaskSort = () => {
     throw new Error(`${TaskSortProvider.name}が存在しません`);
   }
   return ctx;
+};
+
+export const MockTaskSortProvider: React.FC<
+  { value: TaskSortContext } & PropsWithChildren
+> = ({ value, children }) => {
+  throwIfNotDevelopment();
+
+  return (
+    <TaskSortContext.Provider value={value}>
+      {children}
+    </TaskSortContext.Provider>
+  );
 };

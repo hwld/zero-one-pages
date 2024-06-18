@@ -5,7 +5,12 @@ import clsx from "clsx";
 
 type Props = { checked: boolean; onChange: (checked: boolean) => void };
 
-export const TaskTableCheckbox: React.FC<Props> = ({ checked, onChange }) => {
+export const TaskTableCheckbox: React.FC<Props> = ({
+  checked,
+  onChange,
+  // aria-labelなどの属性をそのまま渡せるようにする
+  ...props
+}) => {
   return (
     <div
       className={clsx(
@@ -14,6 +19,7 @@ export const TaskTableCheckbox: React.FC<Props> = ({ checked, onChange }) => {
       )}
     >
       <input
+        {...props}
         type="checkbox"
         checked={checked}
         onChange={() => onChange(!checked)}

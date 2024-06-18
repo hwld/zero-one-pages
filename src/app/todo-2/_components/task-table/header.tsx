@@ -4,7 +4,7 @@ import {
   ChevronsUpDownIcon,
 } from "lucide-react";
 import { ReactNode } from "react";
-import { SortEntry } from "../../_mocks/api";
+import { SortEntry, SortOrder } from "../../_mocks/api";
 import { useTaskSort } from "../../_contexts/task-sort-provider";
 
 type TableHeaderProps = { children: ReactNode; width?: number };
@@ -46,6 +46,15 @@ export const LabelTableHeader: React.FC<LabelTableHeaderProps> = ({
   );
 };
 
+export const getNextSortOrder = (
+  sortEntry: SortEntry,
+  field: SortEntry["field"],
+): SortOrder => {
+  const isSorted = sortEntry.field === field;
+
+  return isSorted ? (sortEntry.order === "desc" ? "asc" : "desc") : "desc";
+};
+
 type SortableTableHeaderProps = LabelTableHeaderProps & {
   fieldName: SortEntry["field"];
 };
@@ -56,12 +65,11 @@ export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
   fieldName,
 }) => {
   const { sortEntry, sort } = useTaskSort();
-  const isSorted = sortEntry.field === fieldName;
 
   const handleSort = () => {
     sort({
       field: fieldName,
-      order: isSorted ? (sortEntry.order === "desc" ? "asc" : "desc") : "desc",
+      order: getNextSortOrder(sortEntry, fieldName),
     });
   };
 
