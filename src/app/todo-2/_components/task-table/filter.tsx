@@ -17,10 +17,10 @@ import {
   XIcon,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
-import { useTasksData, useTaskAction } from "../../_contexts/tasks-provider";
 import { FieldFilter } from "../../_mocks/api";
 import clsx from "clsx";
 import { Button } from "../button";
+import { useTaskFilter } from "../../_contexts/task-filter-provider";
 
 type FieldFilterContent = FieldFilter & { label: string; icon: LucideIcon };
 
@@ -44,13 +44,16 @@ const allStatusFilterContents = [
 ] satisfies FieldFilterContent[];
 
 export const TaskTableFilter: React.FC = () => {
-  const { fieldFilters, selectionFilter } = useTasksData();
   const {
+    fieldFilters,
+    selectionFilter,
+
     addFieldFilter,
     removeFieldFilter,
     removeAllFilter,
     setSelectionFilter,
-  } = useTaskAction();
+  } = useTaskFilter();
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filtered = fieldFilters.length > 0 || selectionFilter !== null;

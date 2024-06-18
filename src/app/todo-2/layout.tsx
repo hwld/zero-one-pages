@@ -1,13 +1,15 @@
 "use client";
 
 import { ReactNode, Suspense } from "react";
-import { TasksProvider, useTasksData } from "./_contexts/tasks-provider";
+import { useTasksData } from "./_contexts/tasks-provider";
+import { TasksProvider } from "./_contexts/tasks-provider";
 import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { TaskSelectionProvider } from "./_contexts/task-selection-provider";
 import { TaskSortProvider } from "./_contexts/task-sort-provider";
+import { TaskFilterProvider } from "./_contexts/task-filter-provider";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
@@ -44,7 +46,9 @@ const LayoutWithProviders: React.FC<{ children: ReactNode }> = ({
       <TasksProvider>
         <TaskSelectionProvider>
           <TaskSortProvider>
-            <Layout>{children}</Layout>
+            <TaskFilterProvider>
+              <Layout>{children}</Layout>
+            </TaskFilterProvider>
           </TaskSortProvider>
         </TaskSelectionProvider>
       </TasksProvider>

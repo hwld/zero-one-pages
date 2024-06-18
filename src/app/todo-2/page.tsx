@@ -16,12 +16,13 @@ import { ErrorTaskTable } from "./_components/task-table/error-task-table";
 import { useTodo2HomeCommands } from "./commands";
 import { useTaskSelection } from "./_contexts/task-selection-provider";
 import { useTaskSort } from "./_contexts/task-sort-provider";
+import { useTaskFilter } from "./_contexts/task-filter-provider";
 
 const Page: NextPage = () => {
   const { selectedTaskIds } = useTaskSelection();
   const { sortEntry } = useTaskSort();
-  const { page, limit, fieldFilters, selectionFilter, searchText } =
-    useTasksData();
+  const { fieldFilters, selectionFilter } = useTaskFilter();
+  const { page, limit, searchText } = useTasksData();
 
   const { data, status } = usePaginatedTasks({
     searchText,
