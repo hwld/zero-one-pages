@@ -139,6 +139,7 @@ export const TaskTableFilter: React.FC = () => {
                 <div className="w-full space-y-1">
                   <div className="h-[1px] w-full bg-zinc-600" />
                   <Button
+                    role="menuitem"
                     variant="ghost"
                     className="w-full"
                     onClick={removeAllFilter}
