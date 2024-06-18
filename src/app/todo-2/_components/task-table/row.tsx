@@ -11,6 +11,7 @@ import { useUpdateTask } from "../../_queries/use-update-task";
 import { useDeleteTasks } from "../../_queries/use-delete-tasks";
 import { Task } from "../../_mocks/task-store";
 import { useTaskSelection } from "../../_contexts/task-selection-provider";
+import { Routes } from "../../_lib/routes";
 
 export const TaskTableRow: React.FC<{
   task: Task;
@@ -33,9 +34,10 @@ export const TaskTableRow: React.FC<{
   };
 
   return (
-    <tr className="border-b border-zinc-600 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
+    <tr className="border-b border-zinc-600 text-zinc-200 transition-colors hover:bg-white/5 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5">
       <TaskTableData>
         <TaskTableCheckbox
+          aria-label="選択状態を切り替える"
           checked={isSelected}
           onChange={() => toggleTaskSelection(task.id)}
         />
@@ -49,7 +51,7 @@ export const TaskTableRow: React.FC<{
       <TaskTableData>
         <Link
           // static exportを使うのでpathではなくsearchParamsにidを指定する
-          href={`/todo-2/detail?id=${task.id}`}
+          href={Routes.detail(task.id)}
           className="hover:text-zinc-50 hover:underline"
         >
           {task.title}
@@ -63,6 +65,7 @@ export const TaskTableRow: React.FC<{
         <div className="flex gap-2">
           <Tooltip label="削除">
             <button
+              aria-label="削除ダイアログを開く"
               className="grid size-[25px] place-items-center rounded text-xs text-zinc-300 transition-colors hover:bg-zinc-500"
               onClick={() => setIsDeleteConfirmOpen(true)}
             >

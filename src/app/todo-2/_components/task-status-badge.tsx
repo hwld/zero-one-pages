@@ -1,6 +1,6 @@
 import { CircleDashedIcon, CircleDotIcon } from "lucide-react";
 import clsx from "clsx";
-import { Task } from "../_mocks/task-store";
+import { Task, getTaskStatusLabel } from "../_mocks/task-store";
 
 type TaskStatusBadgeProps = {
   status: Task["status"];
@@ -15,8 +15,8 @@ export const TaskStatusBadge: React.FC<TaskStatusBadgeProps> = ({
     todo: "border-red-500 text-red-500 hover:bg-red-500/20",
   };
   const options = {
-    done: { text: "完了", icon: CircleDotIcon },
-    todo: { text: "未完了", icon: CircleDashedIcon },
+    done: { text: getTaskStatusLabel("done"), icon: CircleDotIcon },
+    todo: { text: getTaskStatusLabel("todo"), icon: CircleDashedIcon },
   };
 
   const label = options[status].text;

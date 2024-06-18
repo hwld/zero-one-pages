@@ -12,6 +12,20 @@ export const taskSchema = z.object({
 });
 export type Task = z.infer<typeof taskSchema>;
 
+export const getTaskStatusLabel = (status: Task["status"]) => {
+  switch (status) {
+    case "done": {
+      return "完了";
+    }
+    case "todo": {
+      return "未完了";
+    }
+    default: {
+      throw new Error(status satisfies never);
+    }
+  }
+};
+
 export type TaskStoreErrorSimulationScope = "getAll" | "get";
 class TaskStore {
   private allTasks: Task[] = initialTasks;
