@@ -25,7 +25,7 @@ export const TaskTableShell: React.FC<Props> = ({
   onChangeAllSelected = () => {},
 }) => {
   return (
-    <div className="flex grow flex-col overflow-auto rounded-md border border-zinc-600 text-zinc-200">
+    <div className="flex h-full grow flex-col overflow-auto rounded-md border border-zinc-600 text-zinc-200">
       <table className="table w-full border-collapse text-left">
         <thead className="text-xs">
           <tr className="[&_th:first-child]:pl-5 [&_th:last-child]:pr-5">

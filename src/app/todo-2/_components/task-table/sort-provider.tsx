@@ -8,7 +8,6 @@ import {
 import { SortEntry } from "../../_mocks/api";
 import { errorIfNotDevelopment } from "@/app/_test/utils";
 import { useTaskTablePaging } from "./paging-provider";
-import { TaskTableProvider } from "./provider";
 
 export type TaskTableSortContext = {
   sortEntry: SortEntry;

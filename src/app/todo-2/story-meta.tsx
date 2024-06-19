@@ -13,7 +13,9 @@ export const defaultStoryMeta = {
       return (
         <SetupCompletedMswProvider>
           <DefaultQueryClientProvider>
-            <Story />
+            <div className="h-full text-zinc-200">
+              <Story />
+            </div>
           </DefaultQueryClientProvider>
         </SetupCompletedMswProvider>
       );
