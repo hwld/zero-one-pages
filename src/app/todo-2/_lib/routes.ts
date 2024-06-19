@@ -1,3 +1,3 @@
 export const Routes = {
-  detail: (id: string) => `/todo2/detail?id=${id}` as const,
+  detail: (id: string) => `/todo-2/detail?id=${id}` as const,
 };
