@@ -1,8 +1,8 @@
 "use client";
 
 import { ReactNode, Suspense } from "react";
-import { useTasksData } from "./_contexts/tasks-provider";
-import { TasksProvider } from "./_contexts/tasks-provider";
+import { useScrollableRoot } from "./_providers/scrollable-root-provider";
+import { ScrollableRootProvider } from "./_providers/scrollable-root-provider";
 import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
@@ -10,7 +10,7 @@ import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { TaskTableProvider } from "./_components/task-table/provider";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { scrollTargetRef } = useTasksData();
+  const { scrollableRootRef } = useScrollableRoot();
 
   const bgClass = "bg-zinc-900";
   useBodyBgColor(bgClass);
@@ -27,7 +27,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         <Sidebar />
       </div>
       <div
-        ref={scrollTargetRef}
+        ref={scrollableRootRef}
         className="flex w-full flex-col gap-4 overflow-auto py-6 pr-6"
       >
         <Suspense>{children}</Suspense>
@@ -41,11 +41,11 @@ const LayoutWithProviders: React.FC<{ children: ReactNode }> = ({
 }) => {
   return (
     <DefaultQueryClientProvider>
-      <TasksProvider>
+      <ScrollableRootProvider>
         <TaskTableProvider>
           <Layout>{children}</Layout>
         </TaskTableProvider>
-      </TasksProvider>
+      </ScrollableRootProvider>
     </DefaultQueryClientProvider>
   );
 };

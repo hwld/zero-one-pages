@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import { TaskTableRow } from "./row";
 import { defaultStoryMeta } from "../../story-meta";
 import { initialTasks } from "../../_mocks/data";
-import { TasksProvider } from "../../_contexts/tasks-provider";
+import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 import {
   MockTaskTableSelectionProvider,
   TaskTableSelectionContext,
@@ -76,7 +76,7 @@ const meta = {
       };
 
       return (
-        <TasksProvider>
+        <ScrollableRootProvider>
           <TaskTablePagingProvider>
             <MockTaskTableSelectionProvider value={selectionContext}>
               <table>
@@ -86,7 +86,7 @@ const meta = {
               </table>
             </MockTaskTableSelectionProvider>
           </TaskTablePagingProvider>
-        </TasksProvider>
+        </ScrollableRootProvider>
       );
     },
   ],

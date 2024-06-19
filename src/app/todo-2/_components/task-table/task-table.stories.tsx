@@ -5,7 +5,7 @@ import {
   MockTaskTableSelectionProvider,
   TaskTableSelectionContext,
 } from "./selection-provider";
-import { TasksProvider } from "../../_contexts/tasks-provider";
+import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 import { initialTasks } from "../../_mocks/data";
 import {
   MockTaskTableSortProvider,
@@ -59,7 +59,7 @@ const meta = {
       };
 
       return (
-        <TasksProvider>
+        <ScrollableRootProvider>
           <TaskTablePagingProvider>
             <MockTaskTableSelectionProvider value={mockSelectionContext}>
               <MockTaskTableSortProvider value={mockSortContext}>
@@ -67,7 +67,7 @@ const meta = {
               </MockTaskTableSortProvider>
             </MockTaskTableSelectionProvider>
           </TaskTablePagingProvider>
-        </TasksProvider>
+        </ScrollableRootProvider>
       );
     },
   ],

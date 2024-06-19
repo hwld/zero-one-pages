@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useTasksData } from "../../_contexts/tasks-provider";
+import { useScrollableRoot } from "../../_providers/scrollable-root-provider";
 
 export type TaskTablePagingContext = {
   page: number;
@@ -23,7 +23,7 @@ const TaskTablePagingContext = createContext<
 export const TaskTablePagingProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const { scrollTargetRef } = useTasksData();
+  const { scrollableRootRef } = useScrollableRoot();
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(30);
@@ -34,11 +34,11 @@ export const TaskTablePagingProvider: React.FC<PropsWithChildren> = ({
       limit,
       setPage: (page) => {
         setPage(page);
-        scrollTargetRef.current?.scrollTo(0, 0);
+        scrollableRootRef.current?.scrollTo(0, 0);
       },
       setLimit,
     };
-  }, [limit, page, scrollTargetRef]);
+  }, [limit, page, scrollableRootRef]);
 
   return (
     <TaskTablePagingContext.Provider value={value}>
