@@ -2,8 +2,7 @@ import { ScrollableRootProvider } from "../../_providers/scrollable-root-provide
 import { defaultStoryMeta } from "../../story-meta";
 import { Meta, StoryObj } from "@storybook/react";
 import { LoadingTaskTable } from "./loading-task-table";
-import { TaskTableSortProvider } from "./sort-provider";
-import { TaskTablePagingProvider } from "./paging-provider";
+import { TaskTableProvider } from "./provider";
 
 const meta = {
   ...defaultStoryMeta,
@@ -14,13 +13,11 @@ const meta = {
     (Story) => {
       return (
         <ScrollableRootProvider>
-          <TaskTablePagingProvider>
-            <TaskTableSortProvider>
-              <div className="flex h-[450px]">
-                <Story />
-              </div>
-            </TaskTableSortProvider>
-          </TaskTablePagingProvider>
+          <TaskTableProvider>
+            <div className="flex h-[450px]">
+              <Story />
+            </div>
+          </TaskTableProvider>
         </ScrollableRootProvider>
       );
     },

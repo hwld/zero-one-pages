@@ -60,7 +60,7 @@ export const MockTaskTableSortProvider: React.FC<
   errorIfNotDevelopment();
 
   if (!value) {
-    return <TaskTableProvider>{children}</TaskTableProvider>;
+    return <TaskTableSortProvider>{children}</TaskTableSortProvider>;
   }
 
   return (

@@ -1,10 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskSelectionMenu } from "./task-selection-menu";
 import { defaultStoryMeta } from "../../story-meta";
-import {
-  MockTaskTableSelectionProvider,
-  TaskTableSelectionContext,
-} from "../task-table/selection-provider";
+import { TaskTableSelectionContext } from "../task-table/selection-provider";
 import {
   clearAllMocks,
   expect,
@@ -22,6 +19,8 @@ import {
 } from "../../_mocks/api";
 import { z } from "zod";
 import { waitForAnimation } from "@/app/_test/utils";
+import { MockTaskTableProvider } from "../task-table/provider";
+import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 
 const mockUnselectAll = fn();
 const mockDeleteTasks = fn();
@@ -69,9 +68,11 @@ export const Default: Story = {
   decorators: [
     (Story) => {
       return (
-        <MockTaskTableSelectionProvider value={mockContext}>
-          <Story />
-        </MockTaskTableSelectionProvider>
+        <ScrollableRootProvider>
+          <MockTaskTableProvider mockSelection={mockContext}>
+            <Story />
+          </MockTaskTableProvider>
+        </ScrollableRootProvider>
       );
     },
   ],
@@ -149,11 +150,13 @@ export const NoSelect: Story = {
   decorators: [
     (Story) => {
       return (
-        <MockTaskTableSelectionProvider
-          value={{ ...mockContext, selectedTaskIds: [] }}
-        >
-          <Story />
-        </MockTaskTableSelectionProvider>
+        <ScrollableRootProvider>
+          <MockTaskTableProvider
+            mockSelection={{ ...mockContext, selectedTaskIds: [] }}
+          >
+            <Story />
+          </MockTaskTableProvider>
+        </ScrollableRootProvider>
       );
     },
   ],

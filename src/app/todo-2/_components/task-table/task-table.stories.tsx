@@ -1,16 +1,10 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskTable } from "./task-table";
 import { defaultStoryMeta } from "../../story-meta";
-import {
-  MockTaskTableSelectionProvider,
-  TaskTableSelectionContext,
-} from "./selection-provider";
+import { TaskTableSelectionContext } from "./selection-provider";
 import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 import { initialTasks } from "../../_mocks/data";
-import {
-  MockTaskTableSortProvider,
-  TaskTableSortContext,
-} from "./sort-provider";
+import { TaskTableSortContext } from "./sort-provider";
 import {
   clearAllMocks,
   expect,
@@ -22,7 +16,7 @@ import {
 import { SortEntry } from "../../_mocks/api";
 import { getNextSortOrder } from "./header";
 import { useState } from "react";
-import { TaskTablePagingProvider } from "./paging-provider";
+import { MockTaskTableProvider } from "./provider";
 
 const dummyTasks = initialTasks.slice(0, 10);
 
@@ -60,13 +54,12 @@ const meta = {
 
       return (
         <ScrollableRootProvider>
-          <TaskTablePagingProvider>
-            <MockTaskTableSelectionProvider value={mockSelectionContext}>
-              <MockTaskTableSortProvider value={mockSortContext}>
-                <Story />
-              </MockTaskTableSortProvider>
-            </MockTaskTableSelectionProvider>
-          </TaskTablePagingProvider>
+          <MockTaskTableProvider
+            mockSelection={mockSelectionContext}
+            mockSort={mockSortContext}
+          >
+            <Story />
+          </MockTaskTableProvider>
         </ScrollableRootProvider>
       );
     },

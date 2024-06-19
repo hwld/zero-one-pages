@@ -80,7 +80,7 @@ export const MockTaskTableFilterProvider: React.FC<
   errorIfNotDevelopment();
 
   if (!value) {
-    <TaskTableFilterProvider>{children}</TaskTableFilterProvider>;
+    return <TaskTableFilterProvider>{children}</TaskTableFilterProvider>;
   }
 
   return (

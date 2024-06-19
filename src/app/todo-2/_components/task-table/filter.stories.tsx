@@ -1,11 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskTableFilter } from "./filter";
 import { defaultStoryMeta } from "../../story-meta";
-import { TaskTableFilterProvider } from "./filter-provider";
-import {
-  MockTaskTablePagingProvider,
-  TaskTablePagingContext,
-} from "./paging-provider";
+import { TaskTablePagingContext } from "./paging-provider";
 import { useMemo } from "react";
 import {
   clearAllMocks,
@@ -15,6 +11,8 @@ import {
   waitFor,
   within,
 } from "@storybook/test";
+import { MockTaskTableProvider } from "./provider";
+import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 
 const mockSetPage = fn();
 
@@ -33,13 +31,14 @@ const meta = {
           setLimit: () => {},
         };
       }, []);
+      console.log("?");
 
       return (
-        <MockTaskTablePagingProvider value={value}>
-          <TaskTableFilterProvider>
+        <ScrollableRootProvider>
+          <MockTaskTableProvider mockPaging={value}>
             <Story />
-          </TaskTableFilterProvider>
-        </MockTaskTablePagingProvider>
+          </MockTaskTableProvider>
+        </ScrollableRootProvider>
       );
     },
   ],

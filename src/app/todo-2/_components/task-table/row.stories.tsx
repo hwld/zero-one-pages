@@ -3,10 +3,7 @@ import { TaskTableRow } from "./row";
 import { defaultStoryMeta } from "../../story-meta";
 import { initialTasks } from "../../_mocks/data";
 import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
-import {
-  MockTaskTableSelectionProvider,
-  TaskTableSelectionContext,
-} from "./selection-provider";
+import { TaskTableSelectionContext } from "./selection-provider";
 import {
   clearAllMocks,
   expect,
@@ -26,7 +23,7 @@ import {
 import { z } from "zod";
 import { getRouter } from "@storybook/nextjs/router.mock";
 import { Routes } from "../../_lib/routes";
-import { TaskTablePagingProvider } from "./paging-provider";
+import { MockTaskTableProvider } from "./provider";
 
 const dummyTask = initialTasks[0];
 
@@ -77,15 +74,13 @@ const meta = {
 
       return (
         <ScrollableRootProvider>
-          <TaskTablePagingProvider>
-            <MockTaskTableSelectionProvider value={selectionContext}>
-              <table>
-                <tbody>
-                  <Story />
-                </tbody>
-              </table>
-            </MockTaskTableSelectionProvider>
-          </TaskTablePagingProvider>
+          <MockTaskTableProvider mockSelection={selectionContext}>
+            <table>
+              <tbody>
+                <Story />
+              </tbody>
+            </table>
+          </MockTaskTableProvider>
         </ScrollableRootProvider>
       );
     },
