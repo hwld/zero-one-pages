@@ -1,4 +1,4 @@
-import { throwIfNotDevelopment } from "@/app/_test/utils";
+import { errorIfNotDevelopment } from "@/app/_test/utils";
 import {
   PropsWithChildren,
   createContext,
@@ -6,10 +6,10 @@ import {
   useMemo,
   useState,
 } from "react";
-import { FieldFilter, SelectionFilter } from "../_mocks/api";
-import { useTaskPaging } from "./task-paging-provider";
+import { FieldFilter, SelectionFilter } from "../../_mocks/api";
+import { useTaskTablePaging } from "./paging-provider";
 
-export type TaskFilterContext = {
+export type TaskTableFilterContext = {
   fieldFilters: FieldFilter[];
   selectionFilter: SelectionFilter;
 
@@ -19,19 +19,19 @@ export type TaskFilterContext = {
   removeAllFilter: () => void;
 };
 
-const TaskFilterContext = createContext<TaskFilterContext | undefined>(
-  undefined,
-);
+const TaskTableFilterContext = createContext<
+  TaskTableFilterContext | undefined
+>(undefined);
 
-export const TaskFilterProvider: React.FC<PropsWithChildren> = ({
+export const TaskTableFilterProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const { setPage } = useTaskPaging();
+  const { setPage } = useTaskTablePaging();
 
   const [fieldFilters, setFieldFilters] = useState<FieldFilter[]>([]);
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>(null);
 
-  const value = useMemo((): TaskFilterContext => {
+  const value = useMemo((): TaskTableFilterContext => {
     return {
       fieldFilters,
       selectionFilter,
@@ -60,28 +60,32 @@ export const TaskFilterProvider: React.FC<PropsWithChildren> = ({
   }, [fieldFilters, selectionFilter, setPage]);
 
   return (
-    <TaskFilterContext.Provider value={value}>
+    <TaskTableFilterContext.Provider value={value}>
       {children}
-    </TaskFilterContext.Provider>
+    </TaskTableFilterContext.Provider>
   );
 };
 
-export const useTaskFilter = () => {
-  const ctx = useContext(TaskFilterContext);
+export const useTaskTableFilter = () => {
+  const ctx = useContext(TaskTableFilterContext);
   if (!ctx) {
-    throw new Error(`${TaskFilterProvider.name}が存在しません`);
+    throw new Error(`${TaskTableFilterProvider.name}が存在しません`);
   }
   return ctx;
 };
 
-export const MockTaskFilterProvider: React.FC<
-  { value: TaskFilterContext } & PropsWithChildren
+export const MockTaskTableFilterProvider: React.FC<
+  { value?: TaskTableFilterContext } & PropsWithChildren
 > = ({ value, children }) => {
-  throwIfNotDevelopment();
+  errorIfNotDevelopment();
+
+  if (!value) {
+    <TaskTableFilterProvider>{children}</TaskTableFilterProvider>;
+  }
 
   return (
-    <TaskFilterContext.Provider value={value}>
+    <TaskTableFilterContext.Provider value={value}>
       {children}
-    </TaskFilterContext.Provider>
+    </TaskTableFilterContext.Provider>
   );
 };

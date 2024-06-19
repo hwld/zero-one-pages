@@ -2,15 +2,15 @@ import { Meta, StoryObj } from "@storybook/react";
 import { TaskTable } from "./task-table";
 import { defaultStoryMeta } from "../../story-meta";
 import {
-  MockTaskSelectionProvider,
-  TaskSelectionContext,
-} from "../../_contexts/task-selection-provider";
+  MockTaskTableSelectionProvider,
+  TaskTableSelectionContext,
+} from "./selection-provider";
 import { TasksProvider } from "../../_contexts/tasks-provider";
 import { initialTasks } from "../../_mocks/data";
 import {
-  MockTaskSortProvider,
-  TaskSortContext,
-} from "../../_contexts/task-sort-provider";
+  MockTaskTableSortProvider,
+  TaskTableSortContext,
+} from "./sort-provider";
 import {
   clearAllMocks,
   expect,
@@ -22,7 +22,7 @@ import {
 import { SortEntry } from "../../_mocks/api";
 import { getNextSortOrder } from "./header";
 import { useState } from "react";
-import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
+import { TaskTablePagingProvider } from "./paging-provider";
 
 const dummyTasks = initialTasks.slice(0, 10);
 
@@ -30,7 +30,7 @@ const mockSelectTasks = fn();
 const mockUnselectTasks = fn();
 
 const mockSort = fn();
-const mockSortContext: TaskSortContext = {
+const mockSortContext: TaskTableSortContext = {
   sortEntry: { field: "createdAt", order: "desc" },
   sort: mockSort,
 };
@@ -44,7 +44,7 @@ const meta = {
     (Story) => {
       const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-      const mockSelectionContext: TaskSelectionContext = {
+      const mockSelectionContext: TaskTableSelectionContext = {
         selectedTaskIds: selectedIds,
         selectTaskIds: (ids) => {
           mockSelectTasks(ids);
@@ -59,15 +59,15 @@ const meta = {
       };
 
       return (
-        <TaskPagingProvider>
-          <TasksProvider>
-            <MockTaskSelectionProvider value={mockSelectionContext}>
-              <MockTaskSortProvider value={mockSortContext}>
+        <TasksProvider>
+          <TaskTablePagingProvider>
+            <MockTaskTableSelectionProvider value={mockSelectionContext}>
+              <MockTaskTableSortProvider value={mockSortContext}>
                 <Story />
-              </MockTaskSortProvider>
-            </MockTaskSelectionProvider>
-          </TasksProvider>
-        </TaskPagingProvider>
+              </MockTaskTableSortProvider>
+            </MockTaskTableSelectionProvider>
+          </TaskTablePagingProvider>
+        </TasksProvider>
       );
     },
   ],

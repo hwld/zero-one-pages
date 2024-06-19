@@ -11,10 +11,10 @@ import {
 } from "@floating-ui/react";
 import { useUpdateTaskStatuses } from "../../_queries/use-update-task-statuses";
 import { useDeleteTasks } from "../../_queries/use-delete-tasks";
-import { useTaskSelection } from "../../_contexts/task-selection-provider";
+import { useTaskTableSelection } from "../task-table/selection-provider";
 
 export const TaskSelectionMenu: React.FC = () => {
-  const { selectedTaskIds, unselectAllTasks } = useTaskSelection();
+  const { selectedTaskIds, unselectAllTasks } = useTaskTableSelection();
 
   const updateTaskStatusesMutation = useUpdateTaskStatuses();
   const deleteTasksMutation = useDeleteTasks();

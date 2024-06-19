@@ -1,4 +1,4 @@
-import { throwIfNotDevelopment } from "@/app/_test/utils";
+import { errorIfNotDevelopment } from "@/app/_test/utils";
 import React, {
   PropsWithChildren,
   createContext,
@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 
-export type TaskSelectionContext = {
+export type TaskTableSelectionContext = {
   selectedTaskIds: string[];
 
   selectTaskIds: (ids: string[]) => void;
@@ -16,16 +16,16 @@ export type TaskSelectionContext = {
   unselectAllTasks: () => void;
 };
 
-const TaskSelectionContext = createContext<TaskSelectionContext | undefined>(
-  undefined,
-);
+const TaskTableSelectionContext = createContext<
+  TaskTableSelectionContext | undefined
+>(undefined);
 
-export const TaskSelectionProvider: React.FC<PropsWithChildren> = ({
+export const TaskTableSelectionProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
 
-  const value = useMemo((): TaskSelectionContext => {
+  const value = useMemo((): TaskTableSelectionContext => {
     return {
       selectedTaskIds,
 
@@ -59,28 +59,32 @@ export const TaskSelectionProvider: React.FC<PropsWithChildren> = ({
   }, [selectedTaskIds]);
 
   return (
-    <TaskSelectionContext.Provider value={value}>
+    <TaskTableSelectionContext.Provider value={value}>
       {children}
-    </TaskSelectionContext.Provider>
+    </TaskTableSelectionContext.Provider>
   );
 };
 
-export const useTaskSelection = () => {
-  const ctx = useContext(TaskSelectionContext);
+export const useTaskTableSelection = () => {
+  const ctx = useContext(TaskTableSelectionContext);
   if (!ctx) {
-    throw new Error(`${TaskSelectionProvider.name}が存在しません`);
+    throw new Error(`${TaskTableSelectionProvider.name}が存在しません`);
   }
   return ctx;
 };
 
-export const MockTaskSelectionProvider: React.FC<
-  PropsWithChildren & { value: TaskSelectionContext }
+export const MockTaskTableSelectionProvider: React.FC<
+  PropsWithChildren & { value?: TaskTableSelectionContext }
 > = ({ children, value }) => {
-  throwIfNotDevelopment();
+  errorIfNotDevelopment();
+
+  if (!value) {
+    return <TaskTableSelectionProvider>{children}</TaskTableSelectionProvider>;
+  }
 
   return (
-    <TaskSelectionContext.Provider value={value}>
+    <TaskTableSelectionContext.Provider value={value}>
       {children}
-    </TaskSelectionContext.Provider>
+    </TaskTableSelectionContext.Provider>
   );
 };

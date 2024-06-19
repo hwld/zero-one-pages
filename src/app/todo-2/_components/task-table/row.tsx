@@ -10,14 +10,14 @@ import Link from "next/link";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import { useDeleteTasks } from "../../_queries/use-delete-tasks";
 import { Task } from "../../_mocks/task-store";
-import { useTaskSelection } from "../../_contexts/task-selection-provider";
+import { useTaskTableSelection } from "./selection-provider";
 import { Routes } from "../../_lib/routes";
 
 export const TaskTableRow: React.FC<{
   task: Task;
 }> = ({ task }) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const { selectedTaskIds, toggleTaskSelection } = useTaskSelection();
+  const { selectedTaskIds, toggleTaskSelection } = useTaskTableSelection();
   const deleteTaskMutation = useDeleteTasks();
   const updateTaskMutation = useUpdateTask();
 

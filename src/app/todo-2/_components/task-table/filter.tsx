@@ -20,7 +20,7 @@ import { ReactNode, useState } from "react";
 import { FieldFilter } from "../../_mocks/api";
 import clsx from "clsx";
 import { Button } from "../button";
-import { useTaskFilter } from "../../_contexts/task-filter-provider";
+import { useTaskTableFilter } from "./filter-provider";
 
 type FieldFilterContent = FieldFilter & { label: string; icon: LucideIcon };
 
@@ -52,7 +52,7 @@ export const TaskTableFilter: React.FC = () => {
     removeFieldFilter,
     removeAllFilter,
     setSelectionFilter,
-  } = useTaskFilter();
+  } = useTaskTableFilter();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 

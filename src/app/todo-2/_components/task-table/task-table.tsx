@@ -4,15 +4,15 @@ import { Pagination } from "../pagination";
 import { useMemo } from "react";
 import { TaskTableShell } from "./shell";
 import { Task } from "../../_mocks/task-store";
-import { useTaskSelection } from "../../_contexts/task-selection-provider";
-import { useTaskPaging } from "../../_contexts/task-paging-provider";
+import { useTaskTableSelection } from "./selection-provider";
+import { useTaskTablePaging } from "./paging-provider";
 
 type Props = { paginatedTasks: Task[]; totalPages: number };
 
 export const TaskTable: React.FC<Props> = ({ paginatedTasks, totalPages }) => {
   const { selectedTaskIds, selectTaskIds, unselectTaskIds } =
-    useTaskSelection();
-  const { page, setPage } = useTaskPaging();
+    useTaskTableSelection();
+  const { page, setPage } = useTaskTablePaging();
 
   const allSelectedOnPage = useMemo(() => {
     if (paginatedTasks.length === 0) {

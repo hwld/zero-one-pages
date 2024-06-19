@@ -1,11 +1,11 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskTableFilter } from "./filter";
 import { defaultStoryMeta } from "../../story-meta";
-import { TaskFilterProvider } from "../../_contexts/task-filter-provider";
+import { TaskTableFilterProvider } from "./filter-provider";
 import {
-  MockTaskPaginProvider,
-  TaskPagingContext,
-} from "../../_contexts/task-paging-provider";
+  MockTaskTablePagingProvider,
+  TaskTablePagingContext,
+} from "./paging-provider";
 import { useMemo } from "react";
 import {
   clearAllMocks,
@@ -25,7 +25,7 @@ const meta = {
   decorators: [
     ...defaultStoryMeta.decorators,
     (Story) => {
-      const value = useMemo((): TaskPagingContext => {
+      const value = useMemo((): TaskTablePagingContext => {
         return {
           page: 0,
           limit: 0,
@@ -35,11 +35,11 @@ const meta = {
       }, []);
 
       return (
-        <MockTaskPaginProvider value={value}>
-          <TaskFilterProvider>
+        <MockTaskTablePagingProvider value={value}>
+          <TaskTableFilterProvider>
             <Story />
-          </TaskFilterProvider>
-        </MockTaskPaginProvider>
+          </TaskTableFilterProvider>
+        </MockTaskTablePagingProvider>
       );
     },
   ],

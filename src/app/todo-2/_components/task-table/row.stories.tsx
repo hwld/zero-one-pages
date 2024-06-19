@@ -4,9 +4,9 @@ import { defaultStoryMeta } from "../../story-meta";
 import { initialTasks } from "../../_mocks/data";
 import { TasksProvider } from "../../_contexts/tasks-provider";
 import {
-  MockTaskSelectionProvider,
-  TaskSelectionContext,
-} from "../../_contexts/task-selection-provider";
+  MockTaskTableSelectionProvider,
+  TaskTableSelectionContext,
+} from "./selection-provider";
 import {
   clearAllMocks,
   expect,
@@ -26,7 +26,7 @@ import {
 import { z } from "zod";
 import { getRouter } from "@storybook/nextjs/router.mock";
 import { Routes } from "../../_lib/routes";
-import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
+import { TaskTablePagingProvider } from "./paging-provider";
 
 const dummyTask = initialTasks[0];
 
@@ -62,7 +62,7 @@ const meta = {
     (Story) => {
       const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-      const selectionContext: TaskSelectionContext = {
+      const selectionContext: TaskTableSelectionContext = {
         selectedTaskIds: selectedIds,
         selectTaskIds: () => {},
         toggleTaskSelection: (id) => {
@@ -76,17 +76,17 @@ const meta = {
       };
 
       return (
-        <TaskPagingProvider>
-          <TasksProvider>
-            <MockTaskSelectionProvider value={selectionContext}>
+        <TasksProvider>
+          <TaskTablePagingProvider>
+            <MockTaskTableSelectionProvider value={selectionContext}>
               <table>
                 <tbody>
                   <Story />
                 </tbody>
               </table>
-            </MockTaskSelectionProvider>
-          </TasksProvider>
-        </TaskPagingProvider>
+            </MockTaskTableSelectionProvider>
+          </TaskTablePagingProvider>
+        </TasksProvider>
       );
     },
   ],

@@ -2,9 +2,9 @@ import { Meta, StoryObj } from "@storybook/react";
 import { TaskSelectionMenu } from "./task-selection-menu";
 import { defaultStoryMeta } from "../../story-meta";
 import {
-  MockTaskSelectionProvider,
-  TaskSelectionContext,
-} from "../../_contexts/task-selection-provider";
+  MockTaskTableSelectionProvider,
+  TaskTableSelectionContext,
+} from "../task-table/selection-provider";
 import {
   clearAllMocks,
   expect,
@@ -27,7 +27,7 @@ const mockUnselectAll = fn();
 const mockDeleteTasks = fn();
 const mockUpdateTaskStatuses = fn();
 
-const mockContext: TaskSelectionContext = {
+const mockContext: TaskTableSelectionContext = {
   selectedTaskIds: ["1", "2", "3"],
   selectTaskIds: () => {},
   toggleTaskSelection: () => {},
@@ -69,9 +69,9 @@ export const Default: Story = {
   decorators: [
     (Story) => {
       return (
-        <MockTaskSelectionProvider value={mockContext}>
+        <MockTaskTableSelectionProvider value={mockContext}>
           <Story />
-        </MockTaskSelectionProvider>
+        </MockTaskTableSelectionProvider>
       );
     },
   ],
@@ -149,11 +149,11 @@ export const NoSelect: Story = {
   decorators: [
     (Story) => {
       return (
-        <MockTaskSelectionProvider
+        <MockTaskTableSelectionProvider
           value={{ ...mockContext, selectedTaskIds: [] }}
         >
           <Story />
-        </MockTaskSelectionProvider>
+        </MockTaskTableSelectionProvider>
       );
     },
   ],

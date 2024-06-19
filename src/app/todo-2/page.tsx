@@ -8,23 +8,23 @@ import { TaskTableFilter } from "./_components/task-table/filter";
 import { TaskSearch } from "./_components/task-search";
 import { TaskSelectionMenu } from "./_components/task-selection-menu/task-selection-menu";
 import { Card } from "./_components/card";
-import { useTasksData } from "./_contexts/tasks-provider";
 import { usePaginatedTasks } from "./_queries/use-paginated-tasks";
 import { useMemo } from "react";
 import { LoadingTaskTable } from "./_components/task-table/loading-task-table";
 import { ErrorTaskTable } from "./_components/task-table/error-task-table";
 import { useTodo2HomeCommands } from "./commands";
-import { useTaskSelection } from "./_contexts/task-selection-provider";
-import { useTaskSort } from "./_contexts/task-sort-provider";
-import { useTaskFilter } from "./_contexts/task-filter-provider";
-import { useTaskPaging } from "./_contexts/task-paging-provider";
+import { useTaskTableSelection } from "./_components/task-table/selection-provider";
+import { useTaskTableSort } from "./_components/task-table/sort-provider";
+import { useTaskTableFilter } from "./_components/task-table/filter-provider";
+import { useTaskTablePaging } from "./_components/task-table/paging-provider";
+import { useTaskTableSearch } from "./_components/task-table/search-provider";
 
 const Page: NextPage = () => {
-  const { selectedTaskIds } = useTaskSelection();
-  const { sortEntry } = useTaskSort();
-  const { fieldFilters, selectionFilter } = useTaskFilter();
-  const { page, limit } = useTaskPaging();
-  const { searchText } = useTasksData();
+  const { selectedTaskIds } = useTaskTableSelection();
+  const { sortEntry } = useTaskTableSort();
+  const { fieldFilters, selectionFilter } = useTaskTableFilter();
+  const { page, limit } = useTaskTablePaging();
+  const { searchText } = useTaskTableSearch();
 
   const { data, status } = usePaginatedTasks({
     searchText,

@@ -7,10 +7,7 @@ import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
-import { TaskSelectionProvider } from "./_contexts/task-selection-provider";
-import { TaskSortProvider } from "./_contexts/task-sort-provider";
-import { TaskFilterProvider } from "./_contexts/task-filter-provider";
-import { TaskPagingProvider } from "./_contexts/task-paging-provider";
+import { TaskTableProvider } from "./_components/task-table/provider";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollTargetRef } = useTasksData();
@@ -44,17 +41,11 @@ const LayoutWithProviders: React.FC<{ children: ReactNode }> = ({
 }) => {
   return (
     <DefaultQueryClientProvider>
-      <TaskPagingProvider>
-        <TasksProvider>
-          <TaskSelectionProvider>
-            <TaskSortProvider>
-              <TaskFilterProvider>
-                <Layout>{children}</Layout>
-              </TaskFilterProvider>
-            </TaskSortProvider>
-          </TaskSelectionProvider>
-        </TasksProvider>
-      </TaskPagingProvider>
+      <TasksProvider>
+        <TaskTableProvider>
+          <Layout>{children}</Layout>
+        </TaskTableProvider>
+      </TasksProvider>
     </DefaultQueryClientProvider>
   );
 };

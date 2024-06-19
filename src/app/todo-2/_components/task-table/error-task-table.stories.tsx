@@ -1,5 +1,5 @@
-import { TaskPagingProvider } from "../../_contexts/task-paging-provider";
-import { TaskSortProvider } from "../../_contexts/task-sort-provider";
+import { TaskTablePagingProvider } from "./paging-provider";
+import { TaskTableSortProvider } from "./sort-provider";
 import { TasksProvider } from "../../_contexts/tasks-provider";
 import { defaultStoryMeta } from "../../story-meta";
 import { ErrorTaskTable } from "./error-task-table";
@@ -13,15 +13,15 @@ const meta = {
     ...defaultStoryMeta.decorators,
     (Story) => {
       return (
-        <TaskPagingProvider>
-          <TasksProvider>
-            <TaskSortProvider>
+        <TasksProvider>
+          <TaskTablePagingProvider>
+            <TaskTableSortProvider>
               <div className="flex h-[450px]">
                 <Story />
               </div>
-            </TaskSortProvider>
-          </TasksProvider>
-        </TaskPagingProvider>
+            </TaskTableSortProvider>
+          </TaskTablePagingProvider>
+        </TasksProvider>
       );
     },
   ],

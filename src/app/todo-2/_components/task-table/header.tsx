@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { ReactNode } from "react";
 import { SortEntry, SortOrder } from "../../_mocks/api";
-import { useTaskSort } from "../../_contexts/task-sort-provider";
+import { useTaskTableSort } from "./sort-provider";
 
 type TableHeaderProps = { children: ReactNode; width?: number };
 
@@ -64,7 +64,7 @@ export const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
   width,
   fieldName,
 }) => {
-  const { sortEntry, sort } = useTaskSort();
+  const { sortEntry, sort } = useTaskTableSort();
 
   const handleSort = () => {
     sort({

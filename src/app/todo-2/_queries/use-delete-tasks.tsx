@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { deleteTasks } from "../_mocks/api";
-import { useTaskSelection } from "../_contexts/task-selection-provider";
+import { useTaskTableSelection } from "../_components/task-table/selection-provider";
 
 export const useDeleteTasks = () => {
-  const { unselectTaskIds } = useTaskSelection();
+  const { unselectTaskIds } = useTaskTableSelection();
 
   return useMutation({
     mutationFn: (ids: string[]) => {

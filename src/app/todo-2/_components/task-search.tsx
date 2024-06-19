@@ -1,11 +1,11 @@
 import { SearchIcon, XIcon } from "lucide-react";
-import { useTaskAction } from "../_contexts/tasks-provider";
 import { useState } from "react";
 import { Button } from "./button";
+import { useTaskTableSearch } from "./task-table/search-provider";
 
 export const TaskSearch: React.FC = () => {
   const [searchText, setSearchText] = useState("");
-  const { search } = useTaskAction();
+  const { search } = useTaskTableSearch();
 
   const handleSearch = () => {
     search(searchText);
