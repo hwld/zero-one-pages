@@ -25,6 +25,7 @@ export const TaskEditForm: React.FC<Props> = ({
     defaultValues: {
       title: defaultTask.title,
       description: defaultTask.description,
+      status: defaultTask.status,
     },
     resolver: zodResolver(updateTaskInputSchema),
   });
