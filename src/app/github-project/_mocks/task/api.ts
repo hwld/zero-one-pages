@@ -4,6 +4,14 @@ import { fetcher } from "@/lib/fetcher";
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 
+export const fetchTask = async (id: string): Promise<Task> => {
+  const res = await fetcher.get(GitHubProjectAPI.task(id));
+  const json = await res.json();
+  const task = taskSchema.parse(json);
+
+  return task;
+};
+
 export const createTaskInputSchema = z.object({
   title: z
     .string()
@@ -26,6 +34,14 @@ export const deleteTask = async (id: string) => {
 };
 
 export const taskApiHandler = [
+  http.get(GitHubProjectAPI.task(), async ({ params }) => {
+    await delay();
+    const id = z.string().parse(params.id);
+    const task = taskStore.get(id);
+
+    return HttpResponse.json(task);
+  }),
+
   http.post(GitHubProjectAPI.tasks(), async ({ request }) => {
     await delay();
     const input = createTaskInputSchema.parse(await request.json());
