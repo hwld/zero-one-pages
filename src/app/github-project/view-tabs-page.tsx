@@ -1,5 +1,5 @@
 "use client";
-import { CatIcon, GhostIcon, PlusIcon } from "lucide-react";
+import { GhostIcon, PlusIcon } from "lucide-react";
 import React, { ReactNode } from "react";
 import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
 import { useSearchParams } from "next/navigation";
@@ -8,6 +8,7 @@ import { useView } from "./_queries/use-view";
 import { Button } from "./_components/button";
 import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
+import { LoadingAnimation } from "./_components/loading-animation";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   tabs,
@@ -75,9 +76,8 @@ export const ViewTabsPage: React.FC = () => {
       }
       content={
         viewStatus === "pending" ? (
-          <div className="grid h-full w-full place-content-center place-items-center gap-2 text-neutral-400">
-            <CatIcon size={50} className="animate-bounce" />
-            <div className="text-sm">One moment please...</div>
+          <div className="grid size-full place-content-center place-items-center">
+            <LoadingAnimation />
           </div>
         ) : (
           <React.Fragment key={view.id}>
