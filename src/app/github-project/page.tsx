@@ -6,7 +6,10 @@ import {
 } from "lucide-react";
 import React, { Suspense } from "react";
 import { Tooltip } from "./_components/tooltip";
-import { AppHeader } from "./_components/app-header/app-header";
+import {
+  AppHeader,
+  appHeaderHeightPx,
+} from "./_components/app-header/app-header";
 import { ButtonGroupItem } from "./_components/button-group-item";
 import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { Toaster } from "./_components/toast/toaster";
@@ -14,6 +17,7 @@ import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
+import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
 const GitHubProjectPage: React.FC = () => {
   const bgColor = "bg-neutral-900";
@@ -25,10 +29,13 @@ const GitHubProjectPage: React.FC = () => {
     <>
       <div
         className={clsx(
-          "grid h-[100dvh] w-[100dvw] grid-rows-[64px_48px_minmax(0,1fr)] overflow-hidden text-neutral-100",
+          "grid h-[100dvh] w-[100dvw] grid-rows-[var(--header-height)_48px_minmax(0,1fr)] overflow-hidden text-neutral-100",
           bgColor,
         )}
-        style={{ colorScheme: "dark" }}
+        style={{
+          colorScheme: "dark",
+          ["--header-height" as string]: appHeaderHeightPx,
+        }}
       >
         <AppHeader />
         <div className="flex items-center justify-between px-8">
@@ -50,6 +57,9 @@ const GitHubProjectPage: React.FC = () => {
             </div>
           </div>
         </div>
+        <Suspense>
+          <TaskDetailPanel />
+        </Suspense>
         <Suspense>
           <ViewTabsPage />
         </Suspense>

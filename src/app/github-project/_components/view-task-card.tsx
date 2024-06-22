@@ -6,6 +6,7 @@ import { ViewTask, MoveTaskInput, ViewColumn } from "../_mocks/view/api";
 import { DRAG_TYPE } from "../consts";
 import { ViewTaskMenuTrigger } from "./view-task-menu/trigger";
 import { DropPreviewLine } from "./drop-preview-line";
+import Link from "next/link";
 
 type Props = {
   task: ViewTask;
@@ -115,7 +116,7 @@ export const ViewTaskCard: React.FC<Props> = ({
         draggable
         onDragStart={handleDragStart}
       >
-        <div className="flex items-center justify-between">
+        <div className="mb-1 flex items-center justify-between">
           <div className="flex items-center gap-1 text-neutral-400">
             <CircleDashedIcon size={16} strokeWidth={3} />
             <div className="text-xs">Draft</div>
@@ -128,7 +129,12 @@ export const ViewTaskCard: React.FC<Props> = ({
             />
           </div>
         </div>
-        <div className="text-sm">{task.title}</div>
+        <Link
+          className="w-fit text-sm hover:text-sky-500 hover:underline"
+          href={`?panel=detail&id=${task.id}`}
+        >
+          {task.title}
+        </Link>
       </div>
     </div>
   );
