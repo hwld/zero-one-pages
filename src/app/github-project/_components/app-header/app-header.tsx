@@ -15,6 +15,8 @@ import { Tooltip } from "../tooltip";
 import { CreateNewMenuTrigger } from "./create-new-menu-trigger";
 import { UserDrawer } from "../user-drawer/user-drawer";
 
+export const appHeaderHeightPx = "64px";
+
 export const AppHeader: React.FC = () => {
   return (
     <div className="flex items-center justify-between gap-2 border-b border-neutral-600 px-4">

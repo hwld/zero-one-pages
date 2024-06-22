@@ -2,6 +2,8 @@ import { XIcon } from "lucide-react";
 import { ComponentPropsWithoutRef } from "react";
 
 type Props = ComponentPropsWithoutRef<"button">;
+
+// TODO: IconButtonを作る
 export const CloseButton: React.FC<Props> = (props) => {
   return (
     <button
