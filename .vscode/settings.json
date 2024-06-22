@@ -9,6 +9,7 @@
     "classNames",
     "ngClass",
     ".*ClassMap",
+    ".*CLASS_NAMES",
   ],
   "tailwindCSS.experimental.classRegex": [
     [
