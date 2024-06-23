@@ -23,12 +23,12 @@ export const SliceByMenuTrigger: React.FC<Props> = ({ children }) => {
       <DropdownContent>
         <DropdownCard>
           <DropdownItemGroup group="Slice by">
-            <DropdownItem icon={UsersIcon} title="Assigness" />
-            <DropdownItem icon={ChevronDownSquareIcon} title="Status" />
-            <DropdownItem icon={TagIcon} title="Labels" />
-            <DropdownItem icon={BookMarkedIcon} title="Repository" />
-            <DropdownItem icon={MilestoneIcon} title="Milestone" />
-            <DropdownItem icon={XIcon} title="No slicing" />
+            <DropdownItem icon={UsersIcon} label="Assigness" />
+            <DropdownItem icon={ChevronDownSquareIcon} label="Status" />
+            <DropdownItem icon={TagIcon} label="Labels" />
+            <DropdownItem icon={BookMarkedIcon} label="Repository" />
+            <DropdownItem icon={MilestoneIcon} label="Milestone" />
+            <DropdownItem icon={XIcon} label="No slicing" />
           </DropdownItemGroup>
         </DropdownCard>
       </DropdownContent>

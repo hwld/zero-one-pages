@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { LucideIcon } from "lucide-react";
 import {
   ComponentPropsWithoutRef,
@@ -8,6 +7,7 @@ import {
 } from "react";
 import { useDropdown } from "./provider";
 import { useListItem, useMergeRefs } from "@floating-ui/react";
+import { ListButtonBase, ListButtonContent } from "../list-button";
 
 type DropdownItemGroupProps = { group: string; children: ReactNode };
 export const DropdownItemGroup: React.FC<DropdownItemGroupProps> = ({
@@ -37,7 +37,7 @@ type DropdownItemBaseProps = {
 export const DropdownItemBase = forwardRef<
   HTMLButtonElement,
   DropdownItemBaseProps
->(function DropdownItemBase({ red, children, ...props }, outerRef) {
+>(function DropdownItemBase({ children, ...props }, outerRef) {
   const { activeIndex } = useDropdown();
   const { ref, index } = useListItem();
   const isActive = activeIndex === index;
@@ -45,45 +45,29 @@ export const DropdownItemBase = forwardRef<
   const mergedRef = useMergeRefs([outerRef, ref]);
 
   return (
-    <button
-      ref={mergedRef}
-      {...props}
-      tabIndex={isActive ? 0 : -1}
-      className={clsx(
-        "h-8 w-full cursor-pointer rounded-md px-2 transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-        red
-          ? "text-red-500 hover:bg-red-500/15 focus-visible:bg-red-500/15"
-          : "text-neutral-100 hover:bg-white/15 focus-visible:bg-white/15",
-      )}
-    >
+    <ListButtonBase ref={mergedRef} {...props} tabIndex={isActive ? 0 : -1}>
       {children}
-    </button>
+    </ListButtonBase>
   );
 });
 
 type DropdownItemProps = {
   icon: LucideIcon;
-  title: string;
+  label: string;
   red?: boolean;
   rightIcon?: LucideIcon;
 } & ComponentPropsWithoutRef<"button">;
+
 export const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(
-  function DropdownItem(
-    { icon: Icon, title, red, rightIcon: RightIcon, ...props },
-    ref,
-  ) {
+  function DropdownItem({ icon, label, red, rightIcon, ...props }, ref) {
     return (
       <DropdownItemBase ref={ref} {...props} red={red}>
-        <div className="flex size-full items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon
-              size={16}
-              className={clsx("text-neutral-400", red && "text-red-500")}
-            />
-            <div className="text-sm">{title}</div>
-          </div>
-          {RightIcon && <RightIcon size={16} className="text-neutral-400" />}
-        </div>
+        <ListButtonContent
+          red={red}
+          icon={icon}
+          label={label}
+          rightIcon={rightIcon}
+        />
       </DropdownItemBase>
     );
   },

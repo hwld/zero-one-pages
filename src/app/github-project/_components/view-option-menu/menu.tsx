@@ -80,20 +80,20 @@ export const ViewOptionMenu: React.FC<Props> = ({ onChangeMode }) => {
       </DropdownItemGroup>
       <Divider />
       <DropdownItemList>
-        <DropdownItem icon={LineChartIcon} title="Generate chart" />
+        <DropdownItem icon={LineChartIcon} label="Generate chart" />
       </DropdownItemList>
       <Divider />
       <DropdownItemList>
-        <DropdownItem icon={PenIcon} title="Rename view" />
+        <DropdownItem icon={PenIcon} label="Rename view" />
         <DropdownItem
           icon={GalleryHorizontalEndIcon}
-          title="Save changes to new view"
+          label="Save changes to new view"
         />
-        <DropdownItem icon={TrashIcon} title="Delete view" red />
+        <DropdownItem icon={TrashIcon} label="Delete view" red />
       </DropdownItemList>
       <Divider />
       <DropdownItemList>
-        <DropdownItem icon={UploadIcon} title="Export view data" />
+        <DropdownItem icon={UploadIcon} label="Export view data" />
       </DropdownItemList>
       <Divider />
       <DropdownItemList>

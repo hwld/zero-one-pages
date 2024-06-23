@@ -37,40 +37,40 @@ export const ViewTaskCardMenu = forwardRef<HTMLDivElement, Props>(
     return (
       <DropdownCard ref={ref}>
         <DropdownItemList>
-          <DropdownItem icon={CircleDotIcon} title="Convert to issue" />
-          <DropdownItem icon={CopyIcon} title="Copy link in project" />
+          <DropdownItem icon={CircleDotIcon} label="Convert to issue" />
+          <DropdownItem icon={CopyIcon} label="Copy link in project" />
         </DropdownItemList>
         <Divider />
         <DropdownItemList>
           <DropdownItem
             icon={ArrowUpToLine}
-            title="Move to top"
+            label="Move to top"
             disabled={onMoveTop === undefined}
             onClick={onMoveTop}
           />
           <DropdownItem
             icon={ArrowDownToLineIcon}
-            title="Move to bottom"
+            label="Move to bottom"
             disabled={onMoveBottom === undefined}
             onClick={onMoveBottom}
           />
           <DropdownItem
             icon={MoveHorizontalIcon}
             rightIcon={ChevronRightIcon}
-            title="Move to column"
+            label="Move to column"
             onClick={onOpenMoveToColumnMenu}
           />
         </DropdownItemList>
         <Divider />
         <DropdownItemList>
-          <DropdownItem icon={ArchiveIcon} title="Archive" />
+          <DropdownItem icon={ArchiveIcon} label="Archive" />
           <DeleteTaskConfirmDialogTrigger
             onDelete={handleDeleteTask}
             isDeleting={deleteTaskMutation.isPending}
           >
             <DropdownItem
               icon={TrashIcon}
-              title="Delete from project"
+              label="Delete from project"
               red
               disabled={deleteTaskMutation.isPending}
             />

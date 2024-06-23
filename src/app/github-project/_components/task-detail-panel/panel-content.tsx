@@ -13,8 +13,8 @@ import { LoadingAnimation } from "../loading-animation";
 import { Button } from "../button";
 import { TaskStatusBadge } from "../task-status-badge";
 import { TaskDetailPanelMetaRow } from "./meta-row";
-import { TaskDetailPanelListButton } from "./list-button";
 import { IconButton } from "../icon-button";
+import { ListButton } from "../list-button";
 
 export const TaskDetailPanelContent: React.FC<{
   taskId: string;
@@ -75,20 +75,10 @@ export const TaskDetailPanelContent: React.FC<{
               </TaskDetailPanelMetaRow>
             </div>
             <div className="space-y-1 p-4">
-              <TaskDetailPanelListButton
-                icon={CircleDotIcon}
-                label="Convert to issue"
-              />
-              <TaskDetailPanelListButton
-                icon={CopyIcon}
-                label="Copy link in project"
-              />
-              <TaskDetailPanelListButton icon={ArchiveIcon} label="Archive" />
-              <TaskDetailPanelListButton
-                red
-                icon={TrashIcon}
-                label="Delete from project"
-              />
+              <ListButton icon={CircleDotIcon} label="Convert to issue" />
+              <ListButton icon={CopyIcon} label="Copy link in project" />
+              <ListButton icon={ArchiveIcon} label="Archive" />
+              <ListButton red icon={TrashIcon} label="Delete from project" />
             </div>
           </div>
         </motion.div>

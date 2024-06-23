@@ -36,16 +36,16 @@ export const ProjectMenuTrigger: React.FC<Props> = ({ children }) => {
       <DropdownContent>
         <DropdownCard>
           <DropdownItemList>
-            <DropdownItem icon={WorkflowIcon} title="Workflows" />
-            <DropdownItem icon={ArchiveIcon} title="Archived items" />
-            <DropdownItem icon={SettingsIcon} title="Settings" />
-            <DropdownItem icon={CopyIcon} title="Make a copy" />
+            <DropdownItem icon={WorkflowIcon} label="Workflows" />
+            <DropdownItem icon={ArchiveIcon} label="Archived items" />
+            <DropdownItem icon={SettingsIcon} label="Settings" />
+            <DropdownItem icon={CopyIcon} label="Make a copy" />
           </DropdownItemList>
           <Divider />
           <DropdownItemGroup group="GitHub Projects">
-            <DropdownItem icon={RocketIcon} title="What's new" />
-            <DropdownItem icon={MessageSquareIcon} title="Give feedback" />
-            <DropdownItem icon={BookOpenIcon} title="GitHub Docs" />
+            <DropdownItem icon={RocketIcon} label="What's new" />
+            <DropdownItem icon={MessageSquareIcon} label="Give feedback" />
+            <DropdownItem icon={BookOpenIcon} label="GitHub Docs" />
           </DropdownItemGroup>
         </DropdownCard>
       </DropdownContent>

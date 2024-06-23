@@ -28,18 +28,18 @@ export const CreateNewMenuTrigger: React.FC<Props> = ({ children }) => {
       <DropdownContent>
         <DropdownCard>
           <DropdownItemList>
-            <DropdownItem icon={BookMarkedIcon} title="New repository" />
-            <DropdownItem icon={BookDownIcon} title="Import repository" />
+            <DropdownItem icon={BookMarkedIcon} label="New repository" />
+            <DropdownItem icon={BookDownIcon} label="Import repository" />
           </DropdownItemList>
           <Divider />
           <DropdownItemList>
-            <DropdownItem icon={ComputerIcon} title="New codespace" />
-            <DropdownItem icon={CodeIcon} title="New gist" />
+            <DropdownItem icon={ComputerIcon} label="New codespace" />
+            <DropdownItem icon={CodeIcon} label="New gist" />
           </DropdownItemList>
           <Divider />
           <DropdownItemList>
-            <DropdownItem icon={BuildingIcon} title="New organization" />
-            <DropdownItem icon={KanbanSquareIcon} title="New project" />
+            <DropdownItem icon={BuildingIcon} label="New organization" />
+            <DropdownItem icon={KanbanSquareIcon} label="New project" />
           </DropdownItemList>
         </DropdownCard>
       </DropdownContent>

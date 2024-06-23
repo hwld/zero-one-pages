@@ -38,15 +38,15 @@ export const ViewColumnMenuTrigger: React.FC<Props> = ({
       <DropdownContent>
         <DropdownCard>
           <DropdownItemGroup group="Items">
-            <DropdownItem icon={ArchiveIcon} title="Archive all" />
-            <DropdownItem icon={TrashIcon} title="Delete all" red />
+            <DropdownItem icon={ArchiveIcon} label="Archive all" />
+            <DropdownItem icon={TrashIcon} label="Delete all" red />
           </DropdownItemGroup>
           <Divider />
           <DropdownItemGroup group="Column">
-            <DropdownItem icon={Settings2Icon} title="Set limit" />
-            <DropdownItem icon={PenIcon} title="Edit details" />
-            <DropdownItem icon={EyeOffIcon} title="Hide from view" />
-            <DropdownItem icon={TrashIcon} title="Delete" red />
+            <DropdownItem icon={Settings2Icon} label="Set limit" />
+            <DropdownItem icon={PenIcon} label="Edit details" />
+            <DropdownItem icon={EyeOffIcon} label="Hide from view" />
+            <DropdownItem icon={TrashIcon} label="Delete" red />
           </DropdownItemGroup>
         </DropdownCard>
       </DropdownContent>
