@@ -11,17 +11,11 @@ import {
 import { useTask } from "../../_queries/use-task";
 import { LoadingAnimation } from "../loading-animation";
 import { Button } from "../button";
-import { TaskStatusBadge } from "../task-status-badge";
 import { TaskDetailPanelMetaRow } from "./meta-row";
 import { IconButton } from "../icon-button";
 import { ListButton } from "../list-button";
-import { DropdownProvider } from "../dropdown/provider";
-import { useState } from "react";
-import { DropdownTrigger } from "../dropdown/trigger";
-import { DropdownContent } from "../dropdown/content";
-import { TaskStatusSelectionMenu } from "../view-task-menu/task-status-selection-menu/menu";
 import { ViewColumn } from "../../_mocks/view/api";
-import { Task } from "../../_mocks/task/store";
+import { UpdateTaskStatusMenuTrigger } from "./update-task-status-menu-trigger";
 
 export const TaskDetailPanelContent: React.FC<{
   columns: ViewColumn[];
@@ -93,37 +87,4 @@ export const TaskDetailPanelContent: React.FC<{
   })();
 
   return <AnimatePresence mode="popLayout">{content}</AnimatePresence>;
-};
-
-// TODO: もっと簡単に全Statusを取得したい
-// columnじゃなくてTaskStatus[]を受け取れると良いと思う
-const UpdateTaskStatusMenuTrigger: React.FC<{
-  allColumns: ViewColumn[];
-  task: Task;
-}> = ({ allColumns, task }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <DropdownProvider isOpen={isOpen} onOpenChange={setIsOpen}>
-      <DropdownTrigger>
-        <button className="h-full w-full rounded px-2 text-start text-sm transition-colors hover:bg-white/15">
-          <TaskStatusBadge status={task.status} />
-        </button>
-      </DropdownTrigger>
-      <DropdownContent
-        onEscapeKeydown={(e) => {
-          e.stopPropagation();
-          setIsOpen(false);
-        }}
-      >
-        <TaskStatusSelectionMenu
-          columns={allColumns}
-          status={task.status}
-          // TODO:
-          onSelect={() => {}}
-          onClose={() => setIsOpen(false)}
-        />
-      </DropdownContent>
-    </DropdownProvider>
-  );
 };

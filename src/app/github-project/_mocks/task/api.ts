@@ -33,6 +33,21 @@ export const deleteTask = async (id: string) => {
   await fetcher.delete(GitHubProjectAPI.task(id));
 };
 
+export const updateTaskInputSchema = createTaskInputSchema;
+
+export type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
+
+export const updateTask = async ({
+  id,
+  ...input
+}: UpdateTaskInput & { id: string }) => {
+  const res = await fetcher.put(GitHubProjectAPI.task(id), { body: input });
+  const json = await res.json();
+  const updated = taskSchema.parse(json);
+
+  return updated;
+};
+
 export const taskApiHandler = [
   http.get(GitHubProjectAPI.task(), async ({ params }) => {
     await delay();
@@ -48,6 +63,20 @@ export const taskApiHandler = [
     const createdTask = taskStore.add(input);
 
     return HttpResponse.json(createdTask);
+  }),
+
+  http.put(GitHubProjectAPI.task(), async ({ params, request }) => {
+    await delay();
+    const taskId = z.string().parse(params.id);
+    const input = updateTaskInputSchema.parse(await request.json());
+
+    const updatedTask = taskStore.update({
+      id: taskId,
+      title: input.title,
+      statusId: input.statusId,
+    });
+
+    return HttpResponse.json(updatedTask);
   }),
 
   http.delete(GitHubProjectAPI.task(), async ({ params }) => {

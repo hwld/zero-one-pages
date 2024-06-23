@@ -133,6 +133,8 @@ export const viewApiHandler = [
     return HttpResponse.json(view);
   }),
 
+  // TODO: Statusを更新する場合、指定されたview以外でのOrderが不自然な挙動になってしまう。
+  // 指定されたView以外では、StatusColumnの最後に配置されるのが自然だと思う
   http.post(GitHubProjectAPI.moveTask(), async ({ params, request }) => {
     await delay();
 

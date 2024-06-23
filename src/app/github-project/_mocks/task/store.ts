@@ -62,21 +62,24 @@ class TaskStore {
     this.throwErrorForScope("mutation");
 
     const status = taskStatusStore.get(input.statusId);
-
     if (!status) {
       throw new Error("statusが存在しません");
     }
 
+    let updatedTask: Task | undefined;
     this.tasks = this.tasks.map((t) => {
       if (t.id === input.id) {
-        return {
-          ...t,
-          title: input.title,
-          status: status,
-        };
+        updatedTask = { ...t, title: input.title, status };
+        return updatedTask;
       }
       return t;
     });
+
+    if (!updatedTask) {
+      throw new Error("taskが存在しません");
+    }
+
+    return updatedTask;
   }
 
   public remove(id: string) {
