@@ -16,6 +16,7 @@ import { IconButton } from "../icon-button";
 import { ListButton } from "../list-button";
 import { ViewColumn } from "../../_mocks/view/api";
 import { UpdateTaskStatusMenuTrigger } from "./update-task-status-menu-trigger";
+import { TaskTitleSection } from "./task-title-section";
 
 export const TaskDetailPanelContent: React.FC<{
   columns: ViewColumn[];
@@ -53,14 +54,12 @@ export const TaskDetailPanelContent: React.FC<{
     } else if (status === "success") {
       return (
         <motion.div className="grid size-full grid-cols-[1fr,400px] grid-rows-[min-content,1fr]">
-          <div className="col-span-2 border-b border-neutral-600 p-4">
+          <div className="col-span-2 space-y-2 border-b border-neutral-600 p-4">
             <div className="flex items-center justify-end gap-2">
               <IconButton icon={PinIcon} />
               <IconButton icon={XIcon} onClick={onClose} />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">{task.title}</h2>
-            </div>
+            <TaskTitleSection task={task} />
           </div>
           <div className="border-r border-neutral-600 p-4"></div>
           <div className="grid grid-rows-[min-content,1fr]">
