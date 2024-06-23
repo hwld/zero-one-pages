@@ -17,7 +17,6 @@ import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
-import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
 const GitHubProjectPage: React.FC = () => {
   const bgColor = "bg-neutral-900";
@@ -57,9 +56,6 @@ const GitHubProjectPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <Suspense>
-          <TaskDetailPanel />
-        </Suspense>
         <Suspense>
           <ViewTabsPage />
         </Suspense>

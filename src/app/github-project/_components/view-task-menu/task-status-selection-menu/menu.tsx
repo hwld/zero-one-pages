@@ -3,33 +3,35 @@ import { TaskStatus } from "../../../_mocks/task-status/store";
 import { ViewColumn } from "../../../_mocks/view/api";
 import { SelectionMenu } from "../../selection-menu/menu";
 import { forwardRef } from "react";
-import { MoveToColumnItem } from "./item";
+import { TaskStatusSelectionMenuItem } from "./item";
 
 type Props = {
   columns: ViewColumn[];
   status: TaskStatus;
-  onBack: () => void;
+  onBack?: () => void;
   onClose: () => void;
-  onMoveToColumn: (statusId: string) => void;
+  onSelect: (statusId: string) => void;
+  placeHolder?: string;
 };
-export const MoveToColumnMenu = forwardRef<HTMLDivElement, Props>(
-  function MoveToColumnMenu(
-    { columns, status, onBack, onClose: onClose, onMoveToColumn },
+
+export const TaskStatusSelectionMenu = forwardRef<HTMLDivElement, Props>(
+  function TaskStatusSelectionMenu(
+    { columns, status, onBack, onClose, onSelect, placeHolder = "Status..." },
     ref,
   ) {
     return (
-      <SelectionMenu ref={ref} onBack={onBack} placeholder="Column...">
+      <SelectionMenu ref={ref} onBack={onBack} placeholder={placeHolder}>
         {columns.map((column) => {
           return (
             <Command.Item
               asChild
               key={column.statusId}
               onSelect={() => {
-                onMoveToColumn(column.status.id);
+                onSelect(column.status.id);
                 onClose();
               }}
             >
-              <MoveToColumnItem
+              <TaskStatusSelectionMenuItem
                 status={column.status}
                 active={column.status.name === status.name}
               />

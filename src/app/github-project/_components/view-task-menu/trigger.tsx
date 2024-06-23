@@ -6,7 +6,7 @@ import { DropdownMultiContent } from "../dropdown/content";
 import { DropdownProvider } from "../dropdown/provider";
 import { DropdownTrigger } from "../dropdown/trigger";
 import { ViewTaskCardMenu } from "./menu";
-import { MoveToColumnMenu } from "./move-to-column-menu/menu";
+import { TaskStatusSelectionMenu } from "./task-status-selection-menu/menu";
 
 export type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
 
@@ -53,12 +53,13 @@ export const ViewTaskMenuTrigger: React.FC<Props> = ({
         />
       ),
       moveToColumn: (
-        <MoveToColumnMenu
+        <TaskStatusSelectionMenu
+          placeHolder="Column..."
           columns={columns}
           status={task.status}
           onBack={() => setMode("main")}
           onClose={() => setMode("close")}
-          onMoveToColumn={onMoveToColumn}
+          onSelect={onMoveToColumn}
         />
       ),
     };

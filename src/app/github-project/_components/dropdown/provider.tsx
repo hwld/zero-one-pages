@@ -2,6 +2,7 @@ import {
   FloatingList,
   Placement,
   UseFloatingReturn,
+  autoUpdate,
   flip,
   offset,
   useClick,
@@ -50,6 +51,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   placement?: Placement;
 };
+
 export const DropdownProvider: React.FC<Props> = ({
   children,
   isOpen,
@@ -61,6 +63,7 @@ export const DropdownProvider: React.FC<Props> = ({
     onOpenChange,
     placement,
     middleware: [offset(4), flip()],
+    whileElementsMounted: autoUpdate,
   });
 
   const click = useClick(floating.context);

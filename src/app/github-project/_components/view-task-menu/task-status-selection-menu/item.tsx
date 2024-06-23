@@ -4,8 +4,12 @@ import { TaskStatus } from "@/app/github-project/_mocks/task-status/store";
 import { CheckIcon } from "lucide-react";
 
 type Props = { status: TaskStatus; active?: boolean };
-export const MoveToColumnItem = forwardRef<HTMLButtonElement, Props>(
-  function MoveToColumnItem({ status, active = false, ...props }, ref) {
+
+export const TaskStatusSelectionMenuItem = forwardRef<HTMLButtonElement, Props>(
+  function TaskStatusSelectionMenuItem(
+    { status, active = false, ...props },
+    ref,
+  ) {
     return (
       <button
         {...props}

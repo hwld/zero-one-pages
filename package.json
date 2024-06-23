@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@floating-ui/react": "^0.26.14",
+    "@floating-ui/react": "^0.26.17",
     "@headlessui/react": "^2.0.3",
     "@hookform/resolvers": "^3.3.4",
     "@mantine/hooks": "^7.6.0",

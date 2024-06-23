@@ -11,13 +11,16 @@ import {
   FloatingPortal,
 } from "@floating-ui/react";
 
-type BaseProps = { onEscapeKeydown?: () => void };
+type BaseProps = {
+  onEscapeKeydown?: (e: React.KeyboardEvent<HTMLElement>) => void;
+};
 
 type DropdownContentProps = {
   contentKey?: string;
   children: ReactNode;
   animationMode?: AnimatePresenceProps["mode"];
 } & BaseProps;
+
 export const DropdownContent: React.FC<DropdownContentProps> = ({
   children,
   contentKey,
@@ -32,7 +35,7 @@ export const DropdownContent: React.FC<DropdownContentProps> = ({
     <AnimatePresence mode={animationMode}>
       {isOpen && isPresent && (
         <FloatingPortal>
-          <FloatingOverlay>
+          <FloatingOverlay style={{ colorScheme: "dark" }}>
             <FloatingFocusManager context={context}>
               <div
                 key={contentKey}
@@ -41,14 +44,14 @@ export const DropdownContent: React.FC<DropdownContentProps> = ({
                   onKeyDown: (e) => {
                     if (e.key === "Escape") {
                       if (onEscapeKeydown) {
-                        onEscapeKeydown();
+                        onEscapeKeydown(e);
                       } else {
                         context.onOpenChange(false);
                       }
                     }
                   },
                 })}
-                style={{ ...floatingStyles, colorScheme: "dark" }}
+                style={{ ...floatingStyles }}
                 className="focus-visible:outline-none"
               >
                 {children}

@@ -1,6 +1,6 @@
 "use client";
 import { GhostIcon, PlusIcon } from "lucide-react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, Suspense } from "react";
 import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
 import { useSearchParams } from "next/navigation";
 import { useViewSummaries } from "./_queries/use-view-summaries";
@@ -10,6 +10,7 @@ import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
+import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   tabs,
@@ -81,6 +82,9 @@ export const ViewTabsPage: React.FC = () => {
             <React.Fragment key={view.id}>
               <SlicerPanel columns={view.columns} />
               <MainPanel view={view} />
+              <Suspense>
+                <TaskDetailPanel columns={view.columns} />
+              </Suspense>
             </React.Fragment>
           )}
           <AnimatePresence>
