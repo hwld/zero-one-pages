@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Drawer } from "../drawer/drawer";
 import { Avatar } from "../avatar";
-import { CloseButton } from "../close-button";
 import { DrawerItem } from "../drawer/item";
 import {
   BookMarkedIcon,
@@ -20,8 +19,10 @@ import {
   UserIcon,
   UserPlusIcon,
   UsersIcon,
+  XIcon,
 } from "lucide-react";
 import { Divider } from "../divider";
+import { IconButton } from "../icon-button";
 
 export const UserDrawer: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +48,7 @@ export const UserDrawer: React.FC = () => {
             </div>
           </div>
           <div className="self-start">
-            <CloseButton onClick={() => setIsOpen(false)} />
+            <IconButton icon={XIcon} onClick={() => setIsOpen(false)} />
           </div>
         </div>
         <div className="mt-4 space-y-2">

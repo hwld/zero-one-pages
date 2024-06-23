@@ -11,13 +11,14 @@ import {
   PanelsTopLeftIcon,
   SearchIcon,
   TelescopeIcon,
+  XIcon,
 } from "lucide-react";
 import { Logo } from "../logo";
-import { CloseButton } from "../close-button";
 import { DrawerItem } from "../drawer/item";
 import { Divider } from "../divider";
 import { HeaderButton } from "../app-header/button";
 import { Avatar } from "../avatar";
+import { IconButton } from "../icon-button";
 
 export const AppDrawer: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +32,7 @@ export const AppDrawer: React.FC = () => {
     >
       <div className="flex w-full items-center justify-between px-4 pb-2 pt-4">
         <Logo />
-        <CloseButton onClick={() => setIsOpen(false)} />
+        <IconButton icon={XIcon} onClick={() => setIsOpen(false)} />
       </div>
       <div className="min-w-0 grow space-y-2 overflow-auto px-4 pt-2">
         <div>
@@ -51,9 +52,7 @@ export const AppDrawer: React.FC = () => {
         <div>
           <div className="flex items-center justify-between text-neutral-400">
             <div className="p-2 text-xs font-bold">Repositories</div>
-            <button className="grid size-8 place-items-center rounded-md transition-colors hover:bg-white/15">
-              <SearchIcon size={16} />
-            </button>
+            <IconButton icon={SearchIcon} />
           </div>
           <div>
             <DrawerItem icon={Avatar} title="hwld/aluep" />

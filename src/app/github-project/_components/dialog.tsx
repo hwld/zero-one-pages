@@ -11,7 +11,8 @@ import {
 import { Slot } from "@radix-ui/react-slot";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { ReactNode } from "react";
-import { CloseButton } from "./close-button";
+import { IconButton } from "./icon-button";
+import { XIcon } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
@@ -22,6 +23,7 @@ type Props = {
   action: ReactNode;
   width?: number;
 };
+
 export const Dialog: React.FC<Props> = ({
   isOpen,
   onOpenChange,
@@ -73,7 +75,10 @@ export const Dialog: React.FC<Props> = ({
                     >
                       <h2 className="text-lg font-bold">{title}</h2>
                       <div className="absolute right-2 top-2">
-                        <CloseButton onClick={() => onOpenChange(false)} />
+                        <IconButton
+                          icon={XIcon}
+                          onClick={() => onOpenChange(false)}
+                        />
                       </div>
                       {children}
                       {action}

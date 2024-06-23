@@ -12,9 +12,9 @@ import { useTask } from "../../_queries/use-task";
 import { LoadingAnimation } from "../loading-animation";
 import { Button } from "../button";
 import { TaskStatusBadge } from "../task-status-badge";
-import { TaskDetailPanelButton } from "./button";
 import { TaskDetailPanelMetaRow } from "./meta-row";
 import { TaskDetailPanelListButton } from "./list-button";
+import { IconButton } from "../icon-button";
 
 export const TaskDetailPanelContent: React.FC<{
   taskId: string;
@@ -53,8 +53,8 @@ export const TaskDetailPanelContent: React.FC<{
         <motion.div className="grid size-full grid-cols-[1fr,400px] grid-rows-[min-content,1fr]">
           <div className="col-span-2 border-b border-neutral-600 p-4">
             <div className="flex items-center justify-end gap-2">
-              <TaskDetailPanelButton icon={PinIcon} />
-              <TaskDetailPanelButton icon={XIcon} onClick={onClose} />
+              <IconButton icon={PinIcon} />
+              <IconButton icon={XIcon} onClick={onClose} />
             </div>
             <div>
               <h2 className="text-2xl font-bold">{task.title}</h2>
