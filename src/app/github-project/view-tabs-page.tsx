@@ -9,6 +9,7 @@ import { Button } from "./_components/button";
 import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
+import { AnimatePresence, motion } from "framer-motion";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   tabs,
@@ -19,7 +20,7 @@ const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
       <div className="flex items-stretch border-b border-neutral-600 px-8">
         {tabs}
       </div>
-      <div className="flex w-[100dvw] bg-neutral-800">{content}</div>
+      <div className="relative flex w-[100dvw] bg-neutral-800">{content}</div>
     </div>
   );
 };
@@ -75,16 +76,23 @@ export const ViewTabsPage: React.FC = () => {
         )
       }
       content={
-        viewStatus === "pending" ? (
-          <div className="grid size-full place-content-center place-items-center">
-            <LoadingAnimation />
-          </div>
-        ) : (
-          <React.Fragment key={view.id}>
-            <SlicerPanel columns={view.columns} />
-            <MainPanel view={view} />
-          </React.Fragment>
-        )
+        <>
+          {view && (
+            <React.Fragment key={view.id}>
+              <SlicerPanel columns={view.columns} />
+              <MainPanel view={view} />
+            </React.Fragment>
+          )}
+          <AnimatePresence>
+            {viewStatus === "pending" && (
+              <div className="absolute top-0 grid size-full place-content-center place-items-center">
+                <motion.div exit={{ opacity: 0 }}>
+                  <LoadingAnimation />
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+        </>
       }
     />
   );
