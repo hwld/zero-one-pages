@@ -6,15 +6,15 @@ import { DropdownContent } from "../dropdown/content";
 import { TaskStatusSelectionMenu } from "../view-task-menu/task-status-selection-menu/menu";
 import { Task } from "../../_mocks/task/store";
 import { useUpdateTask } from "../../_queries/use-update-task";
-import { TaskStatus } from "../../_mocks/task-status/store";
+import { useAllTaskStatus } from "../../_queries/use-all-task-status";
 
-// TODO: もっと簡単に全Statusを取得したい
-// columnじゃなくてTaskStatus[]を受け取れると良いと思う
-export const UpdateTaskStatusMenuTrigger: React.FC<{
-  allStatus: TaskStatus[];
+type Props = {
   task: Task;
-}> = ({ allStatus, task }) => {
+};
+
+export const UpdateTaskStatusMenuTrigger: React.FC<Props> = ({ task }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: allTaskStatus = [] } = useAllTaskStatus();
   const updateTaskMutation = useUpdateTask();
 
   const handleUpdateTaskStatus = (statusId: string) => {
@@ -38,7 +38,7 @@ export const UpdateTaskStatusMenuTrigger: React.FC<{
         }}
       >
         <TaskStatusSelectionMenu
-          allStatus={allStatus}
+          allStatus={allTaskStatus}
           currentStatus={task.status}
           onSelect={handleUpdateTaskStatus}
           onClose={() => setIsOpen(false)}

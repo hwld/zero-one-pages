@@ -83,9 +83,7 @@ export const ViewTabsPage: React.FC = () => {
               <SlicerPanel columns={view.columns} />
               <MainPanel view={view} />
               <Suspense>
-                <TaskDetailPanel
-                  allStatus={view.columns.map((c) => c.status)}
-                />
+                <TaskDetailPanel />
               </Suspense>
             </React.Fragment>
           )}

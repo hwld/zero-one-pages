@@ -8,4 +8,5 @@ export const GitHubProjectAPI = {
     `${GitHubProjectAPI.view(viewId)}/move-column`,
   tasks: () => `${GitHubProjectAPI.base}/tasks` as const,
   task: (id?: string) => `${GitHubProjectAPI.tasks()}/${id ?? ":id"}` as const,
+  allTaskStatus: () => `${GitHubProjectAPI.base}/all-task-status` as const,
 } as const;

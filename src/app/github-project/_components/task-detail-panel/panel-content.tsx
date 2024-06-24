@@ -17,13 +17,16 @@ import { ListButton } from "../list-button";
 import { UpdateTaskStatusMenuTrigger } from "./update-task-status-menu-trigger";
 import { TaskTitleSection } from "./task-title-section";
 import { TaskCommentSection } from "./task-comment-section";
-import { TaskStatus } from "../../_mocks/task-status/store";
 
-export const TaskDetailPanelContent: React.FC<{
+type Props = {
   taskId: string;
-  allStatus: TaskStatus[];
   onClose: () => void;
-}> = ({ allStatus, taskId, onClose }) => {
+};
+
+export const TaskDetailPanelContent: React.FC<Props> = ({
+  taskId,
+  onClose,
+}) => {
   const { data: task, status } = useTask(taskId);
 
   const content = (() => {
@@ -73,10 +76,7 @@ export const TaskDetailPanelContent: React.FC<{
                 </button>
               </TaskDetailPanelMetaRow>
               <TaskDetailPanelMetaRow label="Status">
-                <UpdateTaskStatusMenuTrigger
-                  allStatus={allStatus}
-                  task={task}
-                />
+                <UpdateTaskStatusMenuTrigger task={task} />
               </TaskDetailPanelMetaRow>
             </div>
             <div className="space-y-1 p-4">
