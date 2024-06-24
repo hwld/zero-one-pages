@@ -77,7 +77,7 @@ export const taskApiHandler = [
     const updatedTask = taskStore.update({
       id: taskId,
       title: input.title,
-      description: input.comment,
+      comment: input.comment,
       statusId: input.statusId,
     });
 

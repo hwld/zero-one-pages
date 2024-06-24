@@ -63,7 +63,7 @@ class TaskStore {
   public update(input: {
     id: string;
     title: string;
-    description: string;
+    comment: string;
     statusId: string;
   }) {
     this.throwErrorForScope("mutation");
@@ -79,7 +79,7 @@ class TaskStore {
         updatedTask = {
           ...t,
           title: input.title,
-          comment: input.description,
+          comment: input.comment,
           status,
         };
         return updatedTask;
