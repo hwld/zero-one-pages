@@ -80,7 +80,7 @@ export const TaskDetailPanel: React.FC<{ columns: ViewColumn[] }> = ({
             >
               <div ref={refs.setFloating} {...getFloatingProps()}>
                 <motion.div
-                  className="fixed inset-y-0 right-0 top-[var(--header-height)] w-full max-w-[1000px] rounded-l-md border border-neutral-600 bg-neutral-900 text-neutral-100 shadow"
+                  className="fixed inset-y-0 right-0 top-[var(--header-height)] w-full max-w-[1100px] rounded-l-md border border-neutral-600 bg-neutral-900 text-neutral-100 shadow"
                   initial={{ opacity: 0, x: 100 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}

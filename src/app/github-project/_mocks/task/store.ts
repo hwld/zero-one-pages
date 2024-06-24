@@ -6,6 +6,7 @@ import { initialTasks } from "./data";
 export const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string(),
   status: taskStatusSchema,
 });
 
@@ -46,6 +47,7 @@ class TaskStore {
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
+      description: "",
       status,
     };
     this.tasks = [...this.tasks, newTask];
@@ -58,7 +60,12 @@ class TaskStore {
     return newTask;
   }
 
-  public update(input: { id: string; title: string; statusId: string }) {
+  public update(input: {
+    id: string;
+    title: string;
+    description: string;
+    statusId: string;
+  }) {
     this.throwErrorForScope("mutation");
 
     const status = taskStatusStore.get(input.statusId);
@@ -69,7 +76,12 @@ class TaskStore {
     let updatedTask: Task | undefined;
     this.tasks = this.tasks.map((t) => {
       if (t.id === input.id) {
-        updatedTask = { ...t, title: input.title, status };
+        updatedTask = {
+          ...t,
+          title: input.title,
+          description: input.description,
+          status,
+        };
         return updatedTask;
       }
       return t;

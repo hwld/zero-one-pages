@@ -24,7 +24,11 @@ export const TaskTitleForm: React.FC<{
     formState: { errors },
     handleSubmit: buildHandleSubmit,
   } = useForm<UpdateTaskInput>({
-    defaultValues: { title: task.title, statusId: task.status.id },
+    defaultValues: {
+      title: task.title,
+      statusId: task.status.id,
+      description: task.description,
+    },
     resolver: zodResolver(updateTaskInputSchema),
   });
 
