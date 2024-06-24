@@ -14,16 +14,16 @@ import { Button } from "../button";
 import { TaskDetailPanelMetaRow } from "./meta-row";
 import { IconButton } from "../icon-button";
 import { ListButton } from "../list-button";
-import { ViewColumn } from "../../_mocks/view/api";
 import { UpdateTaskStatusMenuTrigger } from "./update-task-status-menu-trigger";
 import { TaskTitleSection } from "./task-title-section";
 import { TaskCommentSection } from "./task-comment-section";
+import { TaskStatus } from "../../_mocks/task-status/store";
 
 export const TaskDetailPanelContent: React.FC<{
-  columns: ViewColumn[];
   taskId: string;
+  allStatus: TaskStatus[];
   onClose: () => void;
-}> = ({ columns, taskId, onClose }) => {
+}> = ({ allStatus, taskId, onClose }) => {
   const { data: task, status } = useTask(taskId);
 
   const content = (() => {
@@ -73,7 +73,10 @@ export const TaskDetailPanelContent: React.FC<{
                 </button>
               </TaskDetailPanelMetaRow>
               <TaskDetailPanelMetaRow label="Status">
-                <UpdateTaskStatusMenuTrigger allColumns={columns} task={task} />
+                <UpdateTaskStatusMenuTrigger
+                  allStatus={allStatus}
+                  task={task}
+                />
               </TaskDetailPanelMetaRow>
             </div>
             <div className="space-y-1 p-4">

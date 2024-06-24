@@ -4,16 +4,16 @@ import { useState } from "react";
 import { DropdownTrigger } from "../dropdown/trigger";
 import { DropdownContent } from "../dropdown/content";
 import { TaskStatusSelectionMenu } from "../view-task-menu/task-status-selection-menu/menu";
-import { ViewColumn } from "../../_mocks/view/api";
 import { Task } from "../../_mocks/task/store";
 import { useUpdateTask } from "../../_queries/use-update-task";
+import { TaskStatus } from "../../_mocks/task-status/store";
 
 // TODO: もっと簡単に全Statusを取得したい
 // columnじゃなくてTaskStatus[]を受け取れると良いと思う
 export const UpdateTaskStatusMenuTrigger: React.FC<{
-  allColumns: ViewColumn[];
+  allStatus: TaskStatus[];
   task: Task;
-}> = ({ allColumns, task }) => {
+}> = ({ allStatus, task }) => {
   const [isOpen, setIsOpen] = useState(false);
   const updateTaskMutation = useUpdateTask();
 
@@ -38,8 +38,8 @@ export const UpdateTaskStatusMenuTrigger: React.FC<{
         }}
       >
         <TaskStatusSelectionMenu
-          columns={allColumns}
-          status={task.status}
+          allStatus={allStatus}
+          currentStatus={task.status}
           onSelect={handleUpdateTaskStatus}
           onClose={() => setIsOpen(false)}
         />

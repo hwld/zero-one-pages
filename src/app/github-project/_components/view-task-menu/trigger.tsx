@@ -55,8 +55,8 @@ export const ViewTaskMenuTrigger: React.FC<Props> = ({
       moveToColumn: (
         <TaskStatusSelectionMenu
           placeHolder="Column..."
-          columns={columns}
-          status={task.status}
+          allStatus={columns.map((c) => c.status)}
+          currentStatus={task.status}
           onBack={() => setMode("main")}
           onClose={() => setMode("close")}
           onSelect={onMoveToColumn}

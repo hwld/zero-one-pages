@@ -10,13 +10,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
-import { ViewColumn } from "../../_mocks/view/api";
+import { TaskStatus } from "../../_mocks/task-status/store";
 
 const overlayClass = "detail-panel-overlay";
 
-export const TaskDetailPanel: React.FC<{ columns: ViewColumn[] }> = ({
-  columns,
-}) => {
+type Props = { allStatus: TaskStatus[] };
+
+export const TaskDetailPanel: React.FC<Props> = ({ allStatus }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -86,7 +86,7 @@ export const TaskDetailPanel: React.FC<{ columns: ViewColumn[] }> = ({
                   exit={{ opacity: 0, x: 100 }}
                 >
                   <TaskDetailPanelContent
-                    columns={columns}
+                    allStatus={allStatus}
                     taskId={taskId}
                     onClose={closePanel}
                   />

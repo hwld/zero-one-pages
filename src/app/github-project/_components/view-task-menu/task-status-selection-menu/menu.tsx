@@ -1,13 +1,12 @@
 import { Command } from "cmdk";
 import { TaskStatus } from "../../../_mocks/task-status/store";
-import { ViewColumn } from "../../../_mocks/view/api";
 import { SelectionMenu } from "../../selection-menu/menu";
 import { forwardRef } from "react";
 import { TaskStatusSelectionMenuItem } from "./item";
 
 type Props = {
-  columns: ViewColumn[];
-  status: TaskStatus;
+  allStatus: TaskStatus[];
+  currentStatus: TaskStatus;
   onBack?: () => void;
   onClose: () => void;
   onSelect: (statusId: string) => void;
@@ -16,24 +15,31 @@ type Props = {
 
 export const TaskStatusSelectionMenu = forwardRef<HTMLDivElement, Props>(
   function TaskStatusSelectionMenu(
-    { columns, status, onBack, onClose, onSelect, placeHolder = "Status..." },
+    {
+      allStatus,
+      currentStatus,
+      onBack,
+      onClose,
+      onSelect,
+      placeHolder = "Status...",
+    },
     ref,
   ) {
     return (
       <SelectionMenu ref={ref} onBack={onBack} placeholder={placeHolder}>
-        {columns.map((column) => {
+        {allStatus.map((status) => {
           return (
             <Command.Item
               asChild
-              key={column.statusId}
+              key={status.id}
               onSelect={() => {
-                onSelect(column.status.id);
+                onSelect(status.id);
                 onClose();
               }}
             >
               <TaskStatusSelectionMenuItem
-                status={column.status}
-                active={column.status.name === status.name}
+                status={status}
+                active={status.id === currentStatus.id}
               />
             </Command.Item>
           );
