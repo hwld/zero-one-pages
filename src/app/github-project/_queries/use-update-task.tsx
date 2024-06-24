@@ -25,7 +25,7 @@ export const useUpdateTask = () => {
           return task;
         }
 
-        return { ...task, title: input.title };
+        return { ...task, title: input.title, comment: input.comment };
       });
     },
   });

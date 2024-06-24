@@ -6,9 +6,9 @@ export const initialTasks: Task[] = initialStatuses.flatMap(
   (status, statusIndex) => {
     return [...new Array(taskCounts[statusIndex] ?? 0)].map((_, i): Task => {
       return {
-        id: crypto.randomUUID(),
+        id: `${statusIndex}-${i}`,
         title: `task${i + 1}`,
-        description: "",
+        comment: "",
         status,
       };
     });

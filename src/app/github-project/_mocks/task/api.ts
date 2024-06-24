@@ -35,7 +35,7 @@ export const deleteTask = async (id: string) => {
 
 export const updateTaskInputSchema = createTaskInputSchema.merge(
   z.object({
-    description: z.string().max(1000, "1000文字以内で入力してください"),
+    comment: z.string().max(1000, "1000文字以内で入力してください"),
   }),
 );
 
@@ -77,7 +77,7 @@ export const taskApiHandler = [
     const updatedTask = taskStore.update({
       id: taskId,
       title: input.title,
-      description: input.description,
+      description: input.comment,
       statusId: input.statusId,
     });
 

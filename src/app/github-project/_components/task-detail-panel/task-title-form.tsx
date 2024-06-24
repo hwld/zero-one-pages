@@ -27,7 +27,7 @@ export const TaskTitleForm: React.FC<{
     defaultValues: {
       title: task.title,
       statusId: task.status.id,
-      description: task.description,
+      comment: task.comment,
     },
     resolver: zodResolver(updateTaskInputSchema),
   });

@@ -6,7 +6,7 @@ import { initialTasks } from "./data";
 export const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
-  description: z.string(),
+  comment: z.string(),
   status: taskStatusSchema,
 });
 
@@ -47,7 +47,7 @@ class TaskStore {
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
-      description: "",
+      comment: "",
       status,
     };
     this.tasks = [...this.tasks, newTask];
@@ -79,7 +79,7 @@ class TaskStore {
         updatedTask = {
           ...t,
           title: input.title,
-          description: input.description,
+          comment: input.description,
           status,
         };
         return updatedTask;

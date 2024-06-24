@@ -17,6 +17,7 @@ import { ListButton } from "../list-button";
 import { ViewColumn } from "../../_mocks/view/api";
 import { UpdateTaskStatusMenuTrigger } from "./update-task-status-menu-trigger";
 import { TaskTitleSection } from "./task-title-section";
+import { TaskCommentSection } from "./task-comment-section";
 
 export const TaskDetailPanelContent: React.FC<{
   columns: ViewColumn[];
@@ -61,7 +62,9 @@ export const TaskDetailPanelContent: React.FC<{
             </div>
             <TaskTitleSection task={task} />
           </div>
-          <div className="border-r border-neutral-600 p-4"></div>
+          <div className="overflow-auto border-r border-neutral-600 p-4">
+            <TaskCommentSection task={task} />
+          </div>
           <div className="grid grid-rows-[min-content,1fr]">
             <div className="space-y-2 border-b border-neutral-600 p-4">
               <TaskDetailPanelMetaRow label="Assignees">
