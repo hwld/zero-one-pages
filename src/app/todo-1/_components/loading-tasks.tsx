@@ -13,7 +13,7 @@ export const LoadingTasks: React.FC = () => {
   );
 };
 
-const BounceDot: React.FC<{ delay: number }> = ({ delay }) => {
+export const BounceDot: React.FC<{ delay: number }> = ({ delay }) => {
   return (
     <motion.div
       className="size-1 rounded-full bg-neutral-700 text-2xl"

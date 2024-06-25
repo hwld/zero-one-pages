@@ -20,11 +20,6 @@ export const useOptimisticEventsInCol = ({
     date: day,
     // tanstack-queryのキャッシュレベルで実装すると、他の更新があったときに壊れてしまうので
     // 楽観的更新をここで実装する
-    //
-    // TODO:
-    // https://github.com/TkDodo/trellix-query/blob/61a73e6dd7901adf8dea163b172306c31c522223/src/App.tsx#L25
-    // ここに書いてあるように、onSettledの中でMutatingの数をカウントして、最後のmutationの場合にだけinvalidateQueriesを実行する
-    // という方法がありそうで、そっちで解決できるかもしれない。
     events: events.map((event): Event => {
       // イベントのリサイズがバックエンドに反映されていない場合は、リサイズ後のPreviewのデータを返したい
       const resizePreviewVisible = event.id === resizeEventPreview?.id;

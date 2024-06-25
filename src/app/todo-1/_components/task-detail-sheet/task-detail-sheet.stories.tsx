@@ -31,6 +31,10 @@ export const Default: Story = {
   parameters: {
     msw: {
       handlers: [
+        http.get(Todo1API.task(), () => {
+          return HttpResponse.json(dummyTask);
+        }),
+
         http.put(Todo1API.task(), async ({ params, request }) => {
           const input = updateTaskInputSchema.parse(await request.json());
           updateTaskMock({ id: params.id, ...input });
@@ -40,19 +44,24 @@ export const Default: Story = {
       ],
     },
   },
-  args: { isOpen: true, onOpenChange: handleOpenChangeMock, task: dummyTask },
-  play: async ({ canvasElement, step, args }) => {
-    const task = args.task;
-    const statusText = task.done ? "完了" : "未完了";
+  args: {
+    isOpen: true,
+    onOpenChange: handleOpenChangeMock,
+    taskId: dummyTask.id,
+  },
+  play: async ({ canvasElement, step }) => {
+    const statusText = dummyTask.done ? "完了" : "未完了";
     const canvas = within(canvasElement.parentElement!);
 
     await waitForAnimation();
 
     await step("タスクの情報が表示される", async () => {
-      await expect(await canvas.findByText(task.title)).toBeInTheDocument();
+      await expect(
+        await canvas.findByText(dummyTask.title),
+      ).toBeInTheDocument();
       await expect(await canvas.findByText(statusText)).toBeInTheDocument();
       await expect(
-        await canvas.findByDisplayValue(task.description, {
+        await canvas.findByDisplayValue(dummyTask.description, {
           collapseWhitespace: false,
         }),
       ).toBeInTheDocument();
@@ -68,7 +77,7 @@ export const Default: Story = {
       await waitFor(async () => {
         await expect(updateTaskMock).toHaveBeenCalledTimes(1);
         await expect(updateTaskMock).toHaveBeenCalledWith(
-          expect.objectContaining({ id: task.id, done: !task.done }),
+          expect.objectContaining({ id: dummyTask.id, done: !dummyTask.done }),
         );
       });
 
@@ -88,7 +97,7 @@ export const Default: Story = {
       await waitFor(async () => {
         await expect(updateTaskMock).toHaveBeenCalledTimes(1);
         await expect(updateTaskMock).toHaveBeenCalledWith(
-          expect.objectContaining({ id: task.id, description: newDesc }),
+          expect.objectContaining({ id: dummyTask.id, description: newDesc }),
         );
       });
 
