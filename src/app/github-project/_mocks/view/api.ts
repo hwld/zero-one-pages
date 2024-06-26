@@ -1,21 +1,21 @@
 import { z } from "zod";
 import {
-  viewColumnConfigSchema,
-  viewConfigSchema,
-  viewConfigStore,
-  viewTaskConfigSchema,
-} from "./view-config-store";
+  viewColumnRecordSchema,
+  viewRecordSchema,
+  viewRecordStore,
+  viewTaskRecordSchema,
+} from "./view-record-store";
 import { taskSchema, taskStore } from "../task/store";
 import { taskStatusSchema, taskStatusStore } from "../task-status/store";
 import { fetcher } from "@/lib/fetcher";
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 
-const viewTaskSchema = viewTaskConfigSchema.merge(taskSchema);
-const viewColumnSchema = viewColumnConfigSchema.merge(
+const viewTaskSchema = viewTaskRecordSchema.merge(taskSchema);
+const viewColumnSchema = viewColumnRecordSchema.merge(
   z.object({ tasks: z.array(viewTaskSchema), status: taskStatusSchema }),
 );
-const viewSummarySchema = viewConfigSchema.pick({ id: true, name: true });
+const viewSummarySchema = viewRecordSchema.pick({ id: true, name: true });
 const viewSchema = viewSummarySchema.merge(
   z.object({
     columns: z.array(viewColumnSchema),
@@ -76,10 +76,10 @@ export const viewApiHandler = [
   http.get(GitHubProjectAPI.views(), async () => {
     await delay();
 
-    const summaries: ViewSummary[] = viewConfigStore
+    const summaries: ViewSummary[] = viewRecordStore
       .getAll()
-      .map((config): ViewSummary => {
-        return { id: config.id, name: config.name };
+      .map((viewRecord): ViewSummary => {
+        return { id: viewRecord.id, name: viewRecord.name };
       });
 
     return HttpResponse.json(summaries);
@@ -89,31 +89,32 @@ export const viewApiHandler = [
     await delay();
     const viewId = z.string().parse(params.id);
 
-    const viewConfig = viewConfigStore.get(viewId);
-    if (!viewConfig) {
+    const viewRecord = viewRecordStore.get(viewId);
+    if (!viewRecord) {
       throw new HttpResponse(null, { status: 404 });
     }
 
     const allStatus = taskStatusStore.getAll();
     const allTasks = taskStore.getAll();
 
-    const columns = viewConfig.columnConfigs.map((column): ViewColumn => {
+    const columns = viewRecord.columnRecords.map((column): ViewColumn => {
       const status = allStatus.find((s) => s.id === column.statusId);
       if (!status) {
         throw new HttpResponse(null, { status: 404 });
       }
 
-      const tasks: ViewTask[] = viewConfig.taskConfigs
-        .map((taskConfig): ViewTask | null => {
+      const tasks: ViewTask[] = viewRecord.taskRecords
+        .map((taskRecord): ViewTask | null => {
           const task = allTasks.find(
-            (t) => t.id === taskConfig.taskId && t.status.id === status.id,
+            (t) => t.id === taskRecord.taskId && t.status.id === status.id,
           );
           if (!task) {
             return null;
           }
-          return { ...taskConfig, ...task };
+          return { ...taskRecord, ...task };
         })
         .filter((task): task is ViewTask => Boolean(task));
+
       const sortedTasks = [...tasks].sort((a, b) => a.order - b.order);
 
       return {
@@ -125,8 +126,8 @@ export const viewApiHandler = [
     const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
 
     const view: View = {
-      id: viewConfig.id,
-      name: viewConfig.name,
+      id: viewRecord.id,
+      name: viewRecord.name,
       columns: sortedColumns,
     };
 
@@ -150,7 +151,7 @@ export const viewApiHandler = [
       taskStore.update({ ...task, statusId: input.statusId });
     }
 
-    viewConfigStore.moveTask({
+    viewRecordStore.moveTask({
       viewId,
       taskId: input.taskId,
       newOrder: input.newOrder,
@@ -165,7 +166,7 @@ export const viewApiHandler = [
     const viewId = z.string().parse(params.id);
     const input = moveColumnInputSchema.parse(await request.json());
 
-    viewConfigStore.moveColumn({
+    viewRecordStore.moveColumn({
       viewId,
       statusId: input.statusId,
       newOrder: input.newOrder,

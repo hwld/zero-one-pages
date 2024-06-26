@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { taskStatusSchema, taskStatusStore } from "../task-status/store";
-import { viewConfigStore } from "../view/view-config-store";
+import { viewRecordStore } from "../view/view-record-store";
 import { initialTasks } from "./data";
 
 export const taskSchema = z.object({
@@ -52,7 +52,7 @@ class TaskStore {
     };
     this.tasks = [...this.tasks, newTask];
 
-    viewConfigStore.addTaskToAllConfigs({
+    viewRecordStore.addTaskToAllRecords({
       taskId: newTask.id,
       statusId: newTask.status.id,
     });
@@ -99,7 +99,7 @@ class TaskStore {
 
     this.tasks = this.tasks.filter((t) => t.id !== id);
 
-    viewConfigStore.removeTaskFromAllConfigs(id);
+    viewRecordStore.removeTaskFromAllRecords(id);
   }
 
   public addErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {
