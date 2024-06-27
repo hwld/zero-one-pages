@@ -134,27 +134,37 @@ export const viewApiHandler = [
     return HttpResponse.json(view);
   }),
 
-  // TODO: Statusを更新する場合、指定されたview以外でのOrderが不自然な挙動になってしまう。
-  // 指定されたView以外では、StatusColumnの最後に配置されるのが自然だと思う
   http.post(GitHubProjectAPI.moveTask(), async ({ params, request }) => {
     await delay();
 
     const viewId = z.string().parse(params.id);
-    const input = moveTaskInputSchema.parse(await request.json());
+    const updateInput = moveTaskInputSchema.parse(await request.json());
 
-    const task = taskStore.get(input.taskId);
-    if (!task) {
+    const targetTask = taskStore.get(updateInput.taskId);
+    if (!targetTask) {
       return new HttpResponse(null, { status: 404 });
     }
 
-    if (task.status.id !== input.statusId) {
-      taskStore.update({ ...task, statusId: input.statusId });
+    if (targetTask.status.id !== updateInput.statusId) {
+      const otherViewIds = viewRecordStore
+        .getAll()
+        .filter((v) => v.id !== viewId)
+        .map((v) => v.id);
+
+      viewRecordStore.moveTaskToEndOfStatus({
+        viewIds: otherViewIds,
+        taskId: targetTask.id,
+        targetStatusTaskIds: taskStore
+          .getByStatusId(updateInput.statusId)
+          .map((t) => t.id),
+      });
+      taskStore.update({ ...targetTask, statusId: updateInput.statusId });
     }
 
     viewRecordStore.moveTask({
       viewId,
-      taskId: input.taskId,
-      newOrder: input.newOrder,
+      taskId: updateInput.taskId,
+      newOrder: updateInput.newOrder,
     });
 
     return HttpResponse.json({});

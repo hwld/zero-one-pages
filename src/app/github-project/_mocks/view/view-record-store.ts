@@ -87,6 +87,33 @@ class ViewRecordStore {
     });
   }
 
+  public moveTaskToEndOfStatus(input: {
+    viewIds: string[];
+    taskId: string;
+    targetStatusTaskIds: string[];
+  }) {
+    this.viewRecords = this.viewRecords.map((viewRecord) => {
+      if (!input.viewIds.includes(viewRecord.id)) {
+        return viewRecord;
+      }
+
+      const targetStatusTaskOrders = viewRecord.taskRecords
+        .filter((task) => input.targetStatusTaskIds.includes(task.taskId))
+        .map((t) => t.order);
+      const maxOrderInStatus = Math.max(...targetStatusTaskOrders);
+
+      return {
+        ...viewRecord,
+        taskRecords: viewRecord.taskRecords.map((task) => {
+          if (task.taskId === input.taskId) {
+            return { ...task, order: maxOrderInStatus + 1 };
+          }
+          return task;
+        }),
+      };
+    });
+  }
+
   public moveColumn(input: {
     viewId: string;
     statusId: string;

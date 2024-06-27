@@ -87,13 +87,30 @@ export const taskApiHandler = [
   http.put(GitHubProjectAPI.task(), async ({ params, request }) => {
     await delay();
     const taskId = z.string().parse(params.id);
-    const input = updateTaskInputSchema.parse(await request.json());
+    const updateInput = updateTaskInputSchema.parse(await request.json());
+
+    const targetTask = taskStore.get(taskId);
+    if (!targetTask) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    if (targetTask.status.id !== updateInput.statusId) {
+      const allViweIds = viewRecordStore.getAll().map((v) => v.id);
+
+      viewRecordStore.moveTaskToEndOfStatus({
+        viewIds: allViweIds,
+        taskId,
+        targetStatusTaskIds: taskStore
+          .getByStatusId(updateInput.statusId)
+          .map((t) => t.id),
+      });
+    }
 
     const updatedTask = taskStore.update({
       id: taskId,
-      title: input.title,
-      comment: input.comment,
-      statusId: input.statusId,
+      title: updateInput.title,
+      comment: updateInput.comment,
+      statusId: updateInput.statusId,
     });
 
     return HttpResponse.json(updatedTask);
