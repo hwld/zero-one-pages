@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { taskStatusStore } from "../task-status/store";
+import { TaskStatus } from "../task-status/store";
 import { initialStatuses } from "../task-status/data";
-import { taskStore } from "../task/store";
+import { Task } from "../task/store";
 import { initialTasks } from "../task/data";
 
 export const viewColumnRecordSchema = z.object({
@@ -51,17 +51,18 @@ class ViewRecordStore {
     return this.viewRecords.find((vc) => vc.id === id);
   }
 
-  public add(name: string) {
-    const allStatus = taskStatusStore.getAll();
-    const allTasks = taskStore.getAll();
-
+  public add(input: {
+    name: string;
+    allTasks: Task[];
+    allStatus: TaskStatus[];
+  }) {
     const newView: ViewRecord = {
       id: crypto.randomUUID(),
-      name,
-      columnRecords: allStatus.map((s, i): ViewColumnRecord => {
+      name: input.name,
+      columnRecords: input.allStatus.map((s, i): ViewColumnRecord => {
         return { statusId: s.id, order: i + 1 };
       }),
-      taskRecords: allTasks.map((t, i): ViewTaskRecord => {
+      taskRecords: input.allTasks.map((t, i): ViewTaskRecord => {
         return { taskId: t.id, order: i + 1 };
       }),
     };
@@ -122,14 +123,14 @@ class ViewRecordStore {
     });
   }
 
-  public addTaskToAllRecords(input: { taskId: string; statusId: string }) {
+  public addTaskToAllRecords(input: {
+    taskId: string;
+    statusId: string;
+    sameStatusTaskIds: string[];
+  }) {
     this.viewRecords = this.viewRecords.map((config): ViewRecord => {
-      const taskIdsWithSameStatus = taskStore
-        .getByStatusId(input.statusId)
-        .map((t) => t.id);
-
       const tasks = config.taskRecords.filter((t) =>
-        taskIdsWithSameStatus.includes(t.taskId),
+        input.sameStatusTaskIds.includes(t.taskId),
       );
       const newOrder =
         tasks.length === 0 ? 1 : Math.max(...tasks.map((t) => t.order)) + 1;

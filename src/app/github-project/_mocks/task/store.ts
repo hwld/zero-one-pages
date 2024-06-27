@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { taskStatusSchema, taskStatusStore } from "../task-status/store";
-import { viewRecordStore } from "../view/view-record-store";
+import {
+  TaskStatus,
+  taskStatusSchema,
+  taskStatusStore,
+} from "../task-status/store";
 import { initialTasks } from "./data";
 
 export const taskSchema = z.object({
@@ -36,26 +39,16 @@ class TaskStore {
     return this.tasks.filter((t) => t.status.id === statusId);
   }
 
-  public add(input: { title: string; statusId: string }): Task {
+  public add(input: { title: string; status: TaskStatus }): Task {
     this.throwErrorForScope("mutation");
-
-    const status = taskStatusStore.get(input.statusId);
-    if (!status) {
-      throw new Error("Statusが存在しません");
-    }
 
     const newTask: Task = {
       id: crypto.randomUUID(),
       title: input.title,
       comment: "",
-      status,
+      status: input.status,
     };
     this.tasks = [...this.tasks, newTask];
-
-    viewRecordStore.addTaskToAllRecords({
-      taskId: newTask.id,
-      statusId: newTask.status.id,
-    });
 
     return newTask;
   }
@@ -98,8 +91,6 @@ class TaskStore {
     this.throwErrorForScope("mutation");
 
     this.tasks = this.tasks.filter((t) => t.id !== id);
-
-    viewRecordStore.removeTaskFromAllRecords(id);
   }
 
   public addErrorSimulationScope(scope: TaskStoreErrorSimulationScope) {

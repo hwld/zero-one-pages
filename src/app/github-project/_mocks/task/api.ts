@@ -3,6 +3,8 @@ import { Task, taskSchema, taskStore } from "./store";
 import { fetcher } from "@/lib/fetcher";
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
+import { taskStatusStore } from "../task-status/store";
+import { viewRecordStore } from "../view/view-record-store";
 
 export const fetchTask = async (id: string): Promise<Task> => {
   const res = await fetcher.get(GitHubProjectAPI.task(id));
@@ -64,7 +66,20 @@ export const taskApiHandler = [
   http.post(GitHubProjectAPI.tasks(), async ({ request }) => {
     await delay();
     const input = createTaskInputSchema.parse(await request.json());
-    const createdTask = taskStore.add(input);
+
+    const status = taskStatusStore.get(input.statusId);
+    if (!status) {
+      throw new Error("存在しないステータス");
+    }
+
+    const createdTask = taskStore.add({ title: input.title, status });
+    viewRecordStore.addTaskToAllRecords({
+      taskId: createdTask.id,
+      statusId: createdTask.status.id,
+      sameStatusTaskIds: taskStore
+        .getByStatusId(createdTask.status.id)
+        .map((t) => t.id),
+    });
 
     return HttpResponse.json(createdTask);
   }),
@@ -87,7 +102,9 @@ export const taskApiHandler = [
   http.delete(GitHubProjectAPI.task(), async ({ params }) => {
     await delay();
     const id = z.string().parse(params?.id);
+
     taskStore.remove(id);
+    viewRecordStore.removeTaskFromAllRecords(id);
 
     return HttpResponse.json({});
   }),
