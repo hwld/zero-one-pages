@@ -6,7 +6,7 @@ import {
   LONG_TERM_EVENT_DISPLAY_LIMIT,
   LongTermEventCell,
 } from "./long-term-event-cell";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { useState } from "react";
 import { isSameDay, isSameMonth } from "date-fns";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";

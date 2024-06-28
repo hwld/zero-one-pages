@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { ViewTask } from "../../_mocks/view/api";
+import { ViewTask } from "../../_backend/view/api";
 import {
   CircleDotIcon,
   CopyIcon,

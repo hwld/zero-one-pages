@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Task } from "../../_mocks/task/store";
+import { Task } from "../../_backend/task/store";
 import { Button } from "../button";
 import { TaskCommentForm } from "./task-comment-form";
 

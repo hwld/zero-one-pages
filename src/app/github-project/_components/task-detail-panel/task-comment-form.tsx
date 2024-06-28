@@ -1,9 +1,12 @@
 import { useId } from "react";
-import { Task } from "../../_mocks/task/store";
+import { Task } from "../../_backend/task/store";
 import { Button } from "../button";
 import { Textarea } from "../textarea";
 import { useForm } from "react-hook-form";
-import { UpdateTaskInput, updateTaskInputSchema } from "../../_mocks/task/api";
+import {
+  UpdateTaskInput,
+  updateTaskInputSchema,
+} from "../../_backend/task/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateTask } from "../../_queries/use-update-task";
 

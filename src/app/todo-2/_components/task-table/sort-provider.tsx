@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { SortEntry } from "../../_mocks/api";
+import { SortEntry } from "../../_backend/api";
 import { errorIfNotDevelopment } from "@/app/_test/utils";
 import { useTaskTablePaging } from "./paging-provider";
 

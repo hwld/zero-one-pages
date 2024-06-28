@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskTableRow } from "./row";
 import { defaultStoryMeta } from "../../story-meta";
-import { initialTasks } from "../../_mocks/data";
+import { initialTasks } from "../../_backend/data";
 import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
 import { TaskTableSelectionContext } from "./selection-provider";
 import {
@@ -13,13 +13,13 @@ import {
   within,
 } from "@storybook/test";
 import { useState } from "react";
-import { getTaskStatusLabel } from "../../_mocks/task-store";
+import { getTaskStatusLabel } from "../../_backend/task-store";
 import { HttpResponse, http } from "msw";
 import {
   Todo2API,
   UpdateTaskInput,
   updateTaskInputSchema,
-} from "../../_mocks/api";
+} from "../../_backend/api";
 import { z } from "zod";
 import { getRouter } from "@storybook/nextjs/router.mock";
 import { Routes } from "../../_lib/routes";

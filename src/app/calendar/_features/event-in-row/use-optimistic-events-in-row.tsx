@@ -1,4 +1,4 @@
-import { Event } from "@/app/calendar/_mocks/event-store";
+import { Event } from "@/app/calendar/_backend/event-store";
 import { useMoveEventInRow } from "./move-event-provider";
 import { getEventFromMoveEventPreview, getEventsInRow } from "./utils";
 import { useResizeEventInRow } from "./resize-event-provider";

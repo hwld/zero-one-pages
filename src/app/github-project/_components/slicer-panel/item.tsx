@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ViewColumn } from "../../_mocks/view/api";
+import { ViewColumn } from "../../_backend/view/api";
 import { TaskStatusIcon } from "../task-status-icon";
 import { CountBadge } from "../count-badge";
 

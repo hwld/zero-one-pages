@@ -10,7 +10,7 @@ import {
   PropsWithChildren,
 } from "react";
 import { DragDateRange } from "../../utils";
-import { CreateEventInput } from "../../_mocks/api";
+import { CreateEventInput } from "../../_backend/api";
 import { max, min } from "date-fns";
 
 type PrepareCreateEventState = {

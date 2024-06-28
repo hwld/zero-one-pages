@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "../../_components/dialog";
-import { CreateEventInput } from "../../_mocks/api";
+import { CreateEventInput } from "../../_backend/api";
 import { useCreateEvent } from "./use-create-event";
 import { EVENT_FORM_ID, EventForm } from "./event-form";
 import { DragDateRange } from "../../utils";

@@ -4,8 +4,8 @@ import { useId, useState } from "react";
 import { TaskEditForm } from "./task-form/task-edit-form";
 import { useUpdateTask } from "../_queries/use-update-task";
 import { Button } from "./button";
-import { Task } from "../_mocks/task-store";
-import { CreateTaskInput } from "../_mocks/api";
+import { Task } from "../_backend/task-store";
+import { CreateTaskInput } from "../_backend/api";
 
 export const taskDetailViewClass = {
   wrapper: "flex h-full flex-col gap-2",

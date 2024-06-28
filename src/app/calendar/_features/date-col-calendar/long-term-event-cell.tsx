@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { DragDateRange, isDayWithinDragDateRange } from "../../utils";
 import { DATE_EVENT_MIN_HEIGHT } from "../event-in-col/utils";
 import { endOfDay, isWithinInterval, startOfDay } from "date-fns";

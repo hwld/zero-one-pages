@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MoveTaskInput, View, moveTask } from "../_mocks/view/api";
+import { MoveTaskInput, View, moveTask } from "../_backend/view/api";
 import { useToast } from "../_components/toast/use-toast";
 import { viewQueryOption } from "./use-view";
 

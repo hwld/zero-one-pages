@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MONTHLY_EVENT_ROW_SIZE, WEEK_DAY_LABELS } from "../../consts";
 import { getCalendarDates } from "../../utils";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { MoveEventInRowProvider } from "../event-in-row/move-event-provider";
 import { CreateEventFormDialog } from "../event/create-event-form-dialog";

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../_components/toast/use-toast";
-import { MoveColumnInput, moveColumn } from "../_mocks/view/api";
+import { MoveColumnInput, moveColumn } from "../_backend/view/api";
 import { viewQueryOption } from "./use-view";
 
 export const useMoveColumn = () => {

@@ -1,5 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { fetchView } from "../_mocks/view/api";
+import { fetchView } from "../_backend/view/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
 export const viewQueryOption = (id: string) =>

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { CircleDashedIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { ViewTask, MoveTaskInput, ViewColumn } from "../_mocks/view/api";
+import { ViewTask, MoveTaskInput, ViewColumn } from "../_backend/view/api";
 import { DRAG_TYPE } from "../consts";
 import { ViewTaskMenuTrigger } from "./view-task-menu/trigger";
 import { DropPreviewLine } from "./drop-preview-line";

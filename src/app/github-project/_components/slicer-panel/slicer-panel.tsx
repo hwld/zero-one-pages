@@ -1,5 +1,5 @@
 import { ChevronDownIcon } from "lucide-react";
-import { ViewColumn } from "../../_mocks/view/api";
+import { ViewColumn } from "../../_backend/view/api";
 import { SlicerListItem } from "./item";
 import { SliceByMenuTrigger } from "./slice-by-menu-trigger";
 

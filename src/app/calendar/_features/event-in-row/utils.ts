@@ -11,7 +11,7 @@ import {
   isSameDay,
 } from "date-fns";
 import { MoveEventInRowPreview, EventInRow } from "./type";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { getOverlappingDates } from "../../utils";
 
 export const getEventsInRow = ({

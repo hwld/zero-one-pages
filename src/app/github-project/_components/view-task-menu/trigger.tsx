@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { MoreHorizontalIcon } from "lucide-react";
 import { useState, useMemo } from "react";
-import { ViewColumn, ViewTask } from "../../_mocks/view/api";
+import { ViewColumn, ViewTask } from "../../_backend/view/api";
 import { DropdownMultiContent } from "../dropdown/content";
 import { DropdownProvider } from "../dropdown/provider";
 import { DropdownTrigger } from "../dropdown/trigger";

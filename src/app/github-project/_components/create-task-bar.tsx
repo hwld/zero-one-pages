@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2Icon, PlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { createTaskInputSchema } from "../_mocks/task/api";
+import { createTaskInputSchema } from "../_backend/task/api";
 import { useCreateTask } from "../_queries/use-create-task";
 import { z } from "zod";
 import clsx from "clsx";

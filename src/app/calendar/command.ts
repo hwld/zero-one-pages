@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   EventStoreErrorSimulationScope,
   eventStore,
-} from "./_mocks/event-store";
+} from "./_backend/event-store";
 import { useGlobalCommandConfig } from "../_providers/global-command/global-command-provider";
 import { TriangleAlertIcon, TriangleIcon } from "lucide-react";
 

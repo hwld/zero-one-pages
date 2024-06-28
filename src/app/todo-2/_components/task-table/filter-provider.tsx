@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { FieldFilter, SelectionFilter } from "../../_mocks/api";
+import { FieldFilter, SelectionFilter } from "../../_backend/api";
 import { useTaskTablePaging } from "./paging-provider";
 
 export type TaskTableFilterContext = {

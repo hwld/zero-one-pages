@@ -1,7 +1,7 @@
 import { useMoveEventInCol } from "./move-event-provider";
 import { useResizeEventInCol } from "./resize-event-provider";
 import { getEventsInCol } from "./utils";
-import { Event } from "@/app/calendar/_mocks/event-store";
+import { Event } from "@/app/calendar/_backend/event-store";
 
 /**
  *  日付を指定して、EventのMoveやResizeの状態から更新後のeventsを返す

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchTask } from "../_mocks/api";
+import { fetchTask } from "../_backend/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
 export const useTask = (id: string) => {

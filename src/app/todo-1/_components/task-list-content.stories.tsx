@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskListContent } from "./task-list-content";
 import { defaultStoryMeta } from "../story-meta";
-import { initialTasks } from "../_mocks/data";
+import { initialTasks } from "../_backend/data";
 
 const meta = {
   ...defaultStoryMeta,

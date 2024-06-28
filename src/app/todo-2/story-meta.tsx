@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { todo2Handlers } from "./_mocks/api";
+import { todo2Handlers } from "./_backend/api";
 import { SetupCompletedMswProvider } from "../_providers/msw-provider";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 

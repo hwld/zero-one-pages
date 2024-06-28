@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskDetailContentCard } from "./task-detail-content-card";
 import { defaultStoryMeta } from "../story-meta";
-import { initialTasks } from "../_mocks/data";
+import { initialTasks } from "../_backend/data";
 import {
   clearAllMocks,
   expect,
@@ -15,7 +15,7 @@ import {
   Todo2API,
   UpdateTaskInput,
   updateTaskInputSchema,
-} from "../_mocks/api";
+} from "../_backend/api";
 
 const dummyTask = initialTasks[0];
 

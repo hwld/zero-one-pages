@@ -10,7 +10,7 @@ import {
 } from "react";
 import { IconType } from "react-icons/lib";
 import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
-import { EventInput, eventInputSchema } from "../../_mocks/api";
+import { EventInput, eventInputSchema } from "../../_backend/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchViewSummaries } from "../_mocks/view/api";
+import { fetchViewSummaries } from "../_backend/view/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
 export const useViewSummaries = () => {

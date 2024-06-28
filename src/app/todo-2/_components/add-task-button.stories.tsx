@@ -2,9 +2,9 @@ import { Meta, StoryObj } from "@storybook/react";
 import { defaultStoryMeta } from "../story-meta";
 import { expect, fn, userEvent, within } from "@storybook/test";
 import { AddTaskButton } from "./add-task-button";
-import { Todo2API } from "../_mocks/api";
+import { Todo2API } from "../_backend/api";
 import { HttpResponse, http } from "msw";
-import { initialTasks } from "../_mocks/data";
+import { initialTasks } from "../_backend/data";
 
 const createTaskMock = fn();
 const dummyTask = initialTasks[0];

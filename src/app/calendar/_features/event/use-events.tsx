@@ -1,5 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { fetchEvents } from "../../_mocks/api";
+import { fetchEvents } from "../../_backend/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 import { usePendingDeleteEvents } from "./use-delete-event";
 

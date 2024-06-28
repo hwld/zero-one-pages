@@ -5,7 +5,7 @@ import { z } from "zod";
 import { DRAG_TYPE } from "../consts";
 import { ViewTaskCard } from "./view-task-card";
 import { useState } from "react";
-import { MoveTaskInput, ViewColumn, ViewTask } from "../_mocks/view/api";
+import { MoveTaskInput, ViewColumn, ViewTask } from "../_backend/view/api";
 import { useMoveTask } from "../_queries/use-move-task";
 
 type Props = {

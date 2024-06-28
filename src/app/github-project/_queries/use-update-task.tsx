@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../_components/toast/use-toast";
-import { UpdateTaskInput, updateTask } from "../_mocks/task/api";
+import { UpdateTaskInput, updateTask } from "../_backend/task/api";
 import { taskQueryOption } from "./use-task";
 
 export const useUpdateTask = () => {

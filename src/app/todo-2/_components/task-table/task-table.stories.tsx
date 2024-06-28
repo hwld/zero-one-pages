@@ -3,7 +3,7 @@ import { TaskTable } from "./task-table";
 import { defaultStoryMeta } from "../../story-meta";
 import { TaskTableSelectionContext } from "./selection-provider";
 import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
-import { initialTasks } from "../../_mocks/data";
+import { initialTasks } from "../../_backend/data";
 import { TaskTableSortContext } from "./sort-provider";
 import {
   clearAllMocks,
@@ -13,7 +13,7 @@ import {
   waitFor,
   within,
 } from "@storybook/test";
-import { SortEntry } from "../../_mocks/api";
+import { SortEntry } from "../../_backend/api";
 import { getNextSortOrder } from "./header";
 import { useState } from "react";
 import { MockTaskTableProvider } from "./provider";

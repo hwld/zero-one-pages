@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { TaskStatus } from "../_mocks/task-status/store";
+import { TaskStatus } from "../_backend/task-status/store";
 import { TASK_STATUS_COLOR_CLASS_NAMES } from "../consts";
 
 type Props = { status: TaskStatus };

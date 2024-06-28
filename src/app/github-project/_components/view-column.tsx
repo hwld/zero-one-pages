@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { ViewColumn as ViewColumnData } from "../_mocks/view/api";
+import { ViewColumn as ViewColumnData } from "../_backend/view/api";
 import { CountBadge } from "./count-badge";
 import { TaskStatusIcon } from "./task-status-icon";
 import { ViewColumnMenuTrigger } from "./view-column-menu-trigger";

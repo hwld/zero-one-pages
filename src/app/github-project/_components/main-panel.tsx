@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { View } from "../_mocks/view/api";
+import { View } from "../_backend/view/api";
 import { useMoveTask } from "../_queries/use-move-task";
 import { Button } from "./button";
 import { CreateTaskBar } from "./create-task-bar";

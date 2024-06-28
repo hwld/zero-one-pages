@@ -10,7 +10,7 @@ import {
   DATE_EVENT_MIN_MINUTES,
 } from "../event-in-col/utils";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { EventsColumn } from "../event-in-col/events-column";
 import { useOptimisticEventsInCol } from "../event-in-col/use-optimistic-events-in-col";
 import { useMinuteClock } from "../../_components/use-minute-clock";

@@ -1,5 +1,5 @@
 "use client";
-import { todo2Handlers } from "../todo-2/_mocks/api";
+import { todo2Handlers } from "../todo-2/_backend/api";
 import {
   ReactNode,
   createContext,
@@ -8,9 +8,9 @@ import {
   useState,
 } from "react";
 import { setupWorker } from "msw/browser";
-import { todo1Handlers } from "@/app/todo-1/_mocks/api";
-import { githubProjcetApiHandler } from "../github-project/_mocks/api";
-import { calendarApiHandlers } from "../calendar/_mocks/api";
+import { todo1Handlers } from "@/app/todo-1/_backend/api";
+import { githubProjcetApiHandler } from "../github-project/_backend/api";
+import { calendarApiHandlers } from "../calendar/_backend/api";
 
 type MswState = { isMockserverUp: boolean };
 const MswContext = createContext<MswState | undefined>(undefined);

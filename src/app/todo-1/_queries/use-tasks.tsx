@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchTasks } from "../_mocks/api";
+import { fetchTasks } from "../_backend/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
 export const useTasks = () => {

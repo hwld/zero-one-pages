@@ -2,7 +2,7 @@ import { MONTHLY_EVENT_ROW_SIZE } from "../../consts";
 import { EventsRow } from "../event-in-row/events-row";
 import { CalendarDate, MONTHLY_DATE_HEADER_HEIGHT } from "./calendar-date";
 import { useOptimisticEventsInRow } from "../event-in-row/use-optimistic-events-in-row";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { RefObject } from "react";
 import { useAppState } from "../../_components/use-app-state";
 

@@ -1,4 +1,4 @@
-import { Event } from "@/app/calendar/_mocks/event-store";
+import { Event } from "@/app/calendar/_backend/event-store";
 import {
   areIntervalsOverlapping,
   startOfDay,

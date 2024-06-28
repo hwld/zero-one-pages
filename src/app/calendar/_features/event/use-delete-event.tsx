@@ -10,7 +10,7 @@ import {
   useState,
   useContext,
 } from "react";
-import { deleteEvent } from "../../_mocks/api";
+import { deleteEvent } from "../../_backend/api";
 
 type _Context = [
   pendingDeleteEventIds: string[],

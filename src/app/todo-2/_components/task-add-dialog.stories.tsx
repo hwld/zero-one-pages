@@ -14,8 +14,8 @@ import {
   CreateTaskInput,
   Todo2API,
   createTaskInputSchema,
-} from "../_mocks/api";
-import { initialTasks } from "../_mocks/data";
+} from "../_backend/api";
+import { initialTasks } from "../_backend/data";
 
 const createTaskMock = fn();
 const handleOpenChangeMock = fn();

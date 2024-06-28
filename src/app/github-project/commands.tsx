@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useGlobalCommandConfig } from "../_providers/global-command/global-command-provider";
 import { TriangleAlertIcon, TriangleIcon } from "lucide-react";
-import { taskStore } from "./_mocks/task/store";
+import { taskStore } from "./_backend/task/store";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useGitHubProjectCommands = () => {

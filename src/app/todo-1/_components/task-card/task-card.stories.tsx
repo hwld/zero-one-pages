@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TaskCard } from "./task-card";
 import { defaultStoryMeta } from "../../story-meta";
-import { initialTasks } from "../../_mocks/data";
+import { initialTasks } from "../../_backend/data";
 import {
   clearAllMocks,
   expect,
@@ -11,7 +11,7 @@ import {
   within,
 } from "@storybook/test";
 import { HttpResponse, http } from "msw";
-import { Todo1API, updateTaskInputSchema } from "../../_mocks/api";
+import { Todo1API, updateTaskInputSchema } from "../../_backend/api";
 
 const updateTaskMock = fn();
 const deleteTaskMock = fn();

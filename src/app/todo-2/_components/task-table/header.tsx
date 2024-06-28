@@ -4,7 +4,7 @@ import {
   ChevronsUpDownIcon,
 } from "lucide-react";
 import { ReactNode } from "react";
-import { SortEntry, SortOrder } from "../../_mocks/api";
+import { SortEntry, SortOrder } from "../../_backend/api";
 import { useTaskTableSort } from "./sort-provider";
 
 type TableHeaderProps = { children: ReactNode; width?: number };

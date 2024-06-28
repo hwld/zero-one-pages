@@ -16,7 +16,7 @@ import {
   Todo2API,
   UpdateTaskStatusesInput,
   updateTaskStatusesInputSchema,
-} from "../../_mocks/api";
+} from "../../_backend/api";
 import { z } from "zod";
 import { waitForAnimation } from "@/app/_test/utils";
 import { MockTaskTableProvider } from "../task-table/provider";

@@ -12,7 +12,7 @@ import {
 } from "@floating-ui/react";
 import { Slot } from "@radix-ui/react-slot";
 import { ReactNode, useMemo, useState } from "react";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
 import { TbClockHour5, TbPencilMinus, TbTrash, TbX } from "react-icons/tb";
 import { format, isSameDay, isSameYear } from "date-fns";

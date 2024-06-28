@@ -1,5 +1,5 @@
 import { differenceInHours } from "date-fns";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 
 type SplitEventResult = {
   /**

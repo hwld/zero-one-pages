@@ -1,11 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../button";
-import { Task } from "../../_mocks/task/store";
+import { Task } from "../../_backend/task/store";
 import { useId } from "react";
 import { Input } from "../input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateTaskInput, updateTaskInputSchema } from "../../_mocks/task/api";
+import {
+  UpdateTaskInput,
+  updateTaskInputSchema,
+} from "../../_backend/task/api";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import {
   autoUpdate,

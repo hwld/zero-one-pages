@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { deleteTasks } from "../_mocks/api";
+import { deleteTasks } from "../_backend/api";
 import { useTaskTableSelection } from "../_components/task-table/selection-provider";
 
 export const useDeleteTasks = () => {

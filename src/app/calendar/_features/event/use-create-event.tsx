@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { CreateEventInput, createEvent } from "../../_mocks/api";
+import { CreateEventInput, createEvent } from "../../_backend/api";
 import { useToast } from "../../_components/toast";
 
 export const useCreateEvent = () => {

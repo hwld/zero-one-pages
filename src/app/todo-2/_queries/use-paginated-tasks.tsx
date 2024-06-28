@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { PaginatedTasksInput, fetchPaginatedTasks } from "../_mocks/api";
+import { PaginatedTasksInput, fetchPaginatedTasks } from "../_backend/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
 export const usePaginatedTasks = (args: PaginatedTasksInput) => {

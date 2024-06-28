@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DropdownTrigger } from "../dropdown/trigger";
 import { DropdownContent } from "../dropdown/content";
 import { TaskStatusSelectionMenu } from "../view-task-menu/task-status-selection-menu/menu";
-import { Task } from "../../_mocks/task/store";
+import { Task } from "../../_backend/task/store";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import { useAllTaskStatus } from "../../_queries/use-all-task-status";
 

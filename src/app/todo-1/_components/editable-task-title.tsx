@@ -5,8 +5,8 @@ import { useMergeRefs } from "@floating-ui/react";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircleIcon } from "lucide-react";
-import { Task } from "../_mocks/task-store";
-import { UpdateTaskInput, updateTaskInputSchema } from "../_mocks/api";
+import { Task } from "../_backend/task-store";
+import { UpdateTaskInput, updateTaskInputSchema } from "../_backend/api";
 
 export const EditableTaskTitle = forwardRef<
   HTMLInputElement,

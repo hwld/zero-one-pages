@@ -9,7 +9,7 @@ import {
   addDays,
 } from "date-fns";
 import { useMemo } from "react";
-import { Event } from "../../_mocks/event-store";
+import { Event } from "../../_backend/event-store";
 import { splitEvent } from "./utils";
 import {
   DATE_EVENT_MIN_HEIGHT,

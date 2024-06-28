@@ -1,4 +1,4 @@
-import { Event } from "@/app/calendar/_mocks/event-store";
+import { Event } from "@/app/calendar/_backend/event-store";
 
 /**
  * 列内に表示されるイベント

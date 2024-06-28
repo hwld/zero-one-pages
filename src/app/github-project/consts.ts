@@ -1,4 +1,4 @@
-import { TaskStatus } from "./_mocks/task-status/store";
+import { TaskStatus } from "./_backend/task-status/store";
 
 export const DRAG_TYPE = {
   task: "application/task",

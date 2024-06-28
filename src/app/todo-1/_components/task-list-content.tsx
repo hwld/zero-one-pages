@@ -4,7 +4,7 @@ import { ErrorTasks } from "./error-tasks";
 import { LoadingTasks } from "./loading-tasks";
 import { TaskCard } from "./task-card/task-card";
 import { useMemo } from "react";
-import { Task } from "../_mocks/task-store";
+import { Task } from "../_backend/task-store";
 import { UseQueryResult } from "@tanstack/react-query";
 
 type Props = { tasks: Task[]; status: UseQueryResult["status"] };
