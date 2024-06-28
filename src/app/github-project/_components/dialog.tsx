@@ -65,7 +65,11 @@ export const Dialog: React.FC<Props> = ({
                 exit={{ opacity: 0 }}
               >
                 <FloatingFocusManager context={context}>
-                  <div ref={refs.setFloating} {...getFloatingProps()}>
+                  <div
+                    ref={refs.setFloating}
+                    {...getFloatingProps()}
+                    style={{ colorScheme: "dark" }}
+                  >
                     <motion.div
                       className="fixed left-1/2 top-1/2 flex flex-col gap-2 rounded-lg border border-neutral-600 bg-neutral-800 p-4 text-neutral-100"
                       style={{ width }}

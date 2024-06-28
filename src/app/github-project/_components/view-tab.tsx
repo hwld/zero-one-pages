@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { KanbanSquareIcon, LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode, forwardRef } from "react";
 import Link from "next/link";
 import { ViewOptionMenuTrigger } from "./view-option-menu/trigger";
 
@@ -42,17 +42,20 @@ const viewTabClass = (active: boolean = false) =>
       : "rounded-md border-transparent",
   );
 
-type ViewTabButtonProps = ViewTabProps & { active?: boolean };
-export const ViewTabButton: React.FC<ViewTabButtonProps> = ({
-  icon,
-  children,
-}) => {
-  return (
-    <button className={viewTabClass(false)}>
-      <ViewTabContent icon={icon}>{children}</ViewTabContent>
-    </button>
-  );
-};
+type ViewTabButtonProps = ViewTabProps & { active?: boolean } & Omit<
+    ComponentPropsWithoutRef<"button">,
+    "className"
+  >;
+
+export const ViewTabButton = forwardRef<HTMLButtonElement, ViewTabButtonProps>(
+  function ViewTabButton({ icon, children, ...props }, ref) {
+    return (
+      <button ref={ref} {...props} className={viewTabClass(false)}>
+        <ViewTabContent icon={icon}>{children}</ViewTabContent>
+      </button>
+    );
+  },
+);
 
 type ViewTabLinkProps = ViewTabProps & { href: string; active?: boolean };
 export const ViewTabLink: React.FC<ViewTabLinkProps> = ({
