@@ -27,6 +27,18 @@ export type ViewSummary = Pick<View, "id" | "name">;
 export type ViewColumn = z.infer<typeof viewColumnSchema>;
 export type ViewTask = z.infer<typeof viewTaskSchema>;
 
+export const createViewInputSchema = z.object({
+  name: z
+    .string()
+    .min(1, "名前の入力は必須です")
+    .max(200, "200文字以内で入力してください"),
+});
+export type CreateViewInput = z.infer<typeof createViewInputSchema>;
+
+export const createView = async (input: CreateViewInput): Promise<void> => {
+  await fetcher.post(GitHubProjectAPI.views(), { body: input });
+};
+
 export const fetchView = async (id: string): Promise<View> => {
   const res = await fetcher.get(GitHubProjectAPI.view(id));
   const json = await res.json();
@@ -83,6 +95,22 @@ export const viewApiHandler = [
       });
 
     return HttpResponse.json(summaries);
+  }),
+
+  http.post(GitHubProjectAPI.views(), async ({ request }) => {
+    await delay();
+    const input = createViewInputSchema.parse(await request.json());
+
+    const allTasks = taskStore.getAll();
+    const allStatus = taskStatusStore.getAll();
+
+    viewRecordStore.add({
+      name: input.name,
+      allTasks,
+      allStatus,
+    });
+
+    return HttpResponse.json({});
   }),
 
   http.get(GitHubProjectAPI.view(), async ({ params }) => {
