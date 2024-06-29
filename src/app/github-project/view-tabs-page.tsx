@@ -66,6 +66,7 @@ export const ViewTabsPage: React.FC = () => {
             {viewSummaries.map((summary) => {
               return (
                 <ViewTabLink
+                  viewSummary={summary}
                   href={`/github-project?viewId=${summary.id}`}
                   key={summary.id}
                   active={viewId === summary.id}

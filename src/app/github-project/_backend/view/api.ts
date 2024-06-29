@@ -39,6 +39,10 @@ export const createView = async (input: CreateViewInput): Promise<void> => {
   await fetcher.post(GitHubProjectAPI.views(), { body: input });
 };
 
+export const deleteView = async (viewId: string): Promise<void> => {
+  await fetcher.delete(GitHubProjectAPI.view(viewId));
+};
+
 export const fetchView = async (id: string): Promise<View> => {
   const res = await fetcher.get(GitHubProjectAPI.view(id));
   const json = await res.json();
@@ -160,6 +164,15 @@ export const viewApiHandler = [
     };
 
     return HttpResponse.json(view);
+  }),
+
+  http.delete(GitHubProjectAPI.view(), async ({ params }) => {
+    await delay();
+
+    const viewId = z.string().parse(params.id);
+    viewRecordStore.remove(viewId);
+
+    return HttpResponse.json({});
   }),
 
   http.post(GitHubProjectAPI.moveTask(), async ({ params, request }) => {

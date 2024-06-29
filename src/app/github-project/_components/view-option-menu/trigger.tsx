@@ -11,6 +11,7 @@ import { DropdownMultiContent } from "../dropdown/content";
 import { DropdownProvider } from "../dropdown/provider";
 import { DropdownTrigger } from "../dropdown/trigger";
 import { Tooltip } from "../tooltip";
+import { ViewSummary } from "../../_backend/view/api";
 
 export type ViewOptionMenuMode =
   | "close"
@@ -22,13 +23,15 @@ export type ViewOptionMenuMode =
   | "fieldSumConfig"
   | "sliceByConfig";
 
-export const ViewOptionMenuTrigger: React.FC = () => {
+type Props = { viewSummary: ViewSummary };
+
+export const ViewOptionMenuTrigger: React.FC<Props> = ({ viewSummary }) => {
   const [mode, setMode] = useState<ViewOptionMenuMode>("close");
 
   const contents = useMemo((): Record<ViewOptionMenuMode, ReactNode> => {
     return {
       close: null,
-      main: <ViewOptionMenu onChangeMode={setMode} />,
+      main: <ViewOptionMenu viewSummary={viewSummary} onChangeMode={setMode} />,
       fieldsConfig: <FieldsConfigMenu onBack={() => setMode("main")} />,
       columnByConfig: <ColumnByConfigMenu onBack={() => setMode("main")} />,
       groupByConfig: <GroupByConfigMenu onBack={() => setMode("main")} />,
@@ -36,7 +39,7 @@ export const ViewOptionMenuTrigger: React.FC = () => {
       fieldSumConfig: <FieldSumConfigMenu onBack={() => setMode("main")} />,
       sliceByConfig: <SliceByConfigMenu onBack={() => setMode("main")} />,
     };
-  }, []);
+  }, [viewSummary]);
 
   const isOpen = mode !== "close";
   const handleOpenChange = (open: boolean) => {

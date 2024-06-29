@@ -70,6 +70,12 @@ class ViewRecordStore {
     this.viewRecords = [...this.viewRecords, newView];
   }
 
+  public remove(viewId: string) {
+    this.viewRecords = this.viewRecords.filter(
+      (record) => record.id !== viewId,
+    );
+  }
+
   public moveTask(input: { viewId: string; taskId: string; newOrder: number }) {
     this.viewRecords = this.viewRecords.map((viewRecord) => {
       if (viewRecord.id === input.viewId) {

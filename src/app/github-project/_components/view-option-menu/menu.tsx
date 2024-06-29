@@ -8,7 +8,6 @@ import {
   Rows2Icon,
   TableRowsSplitIcon,
   TextIcon,
-  TrashIcon,
   UploadIcon,
 } from "lucide-react";
 import { DropdownCard } from "../dropdown/card";
@@ -20,12 +19,18 @@ import {
 import { ViewOptionMenuMode } from "./trigger";
 import { Divider } from "../divider";
 import { ViewConfigMenuItem } from "./item";
+import { DeleteViewItem } from "./delete-view-item";
+import { ViewSummary } from "../../_backend/view/api";
 
 type Props = {
+  viewSummary: ViewSummary;
   onChangeMode: (mode: ViewOptionMenuMode) => void;
 };
 
-export const ViewOptionMenu: React.FC<Props> = ({ onChangeMode }) => {
+export const ViewOptionMenu: React.FC<Props> = ({
+  viewSummary,
+  onChangeMode,
+}) => {
   return (
     <DropdownCard width={320}>
       <DropdownItemGroup group="configuration">
@@ -89,7 +94,7 @@ export const ViewOptionMenu: React.FC<Props> = ({ onChangeMode }) => {
           icon={GalleryHorizontalEndIcon}
           label="Save changes to new view"
         />
-        <DropdownItem icon={TrashIcon} label="Delete view" red />
+        <DeleteViewItem viewSummary={viewSummary} />
       </DropdownItemList>
       <Divider />
       <DropdownItemList>

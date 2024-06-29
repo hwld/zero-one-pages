@@ -85,7 +85,9 @@ export const Dialog: React.FC<Props> = ({
                         />
                       </div>
                       {children}
-                      {action}
+                      <div className="flex w-full justify-end gap-2">
+                        {action}
+                      </div>
                     </motion.div>
                   </div>
                 </FloatingFocusManager>

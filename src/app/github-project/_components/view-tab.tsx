@@ -10,6 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { ViewOptionMenuTrigger } from "./view-option-menu/trigger";
+import { ViewSummary } from "../_backend/view/api";
 
 type ViewTabProps = {
   icon?: LucideIcon;
@@ -109,10 +110,15 @@ export const ViewTabButton = forwardRef<HTMLButtonElement, ViewTabButtonProps>(
   },
 );
 
-type ViewTabLinkProps = ViewTabProps & { href: string; active?: boolean };
+type ViewTabLinkProps = ViewTabProps & {
+  href: string;
+  active?: boolean;
+  viewSummary: ViewSummary;
+};
 
 export const ViewTabLink: React.FC<ViewTabLinkProps> = ({
   href,
+  viewSummary,
   icon,
   active = false,
   children,
@@ -124,7 +130,7 @@ export const ViewTabLink: React.FC<ViewTabLinkProps> = ({
       <ViewTabContent
         icon={icon}
         interactive={!active}
-        rightIcon={active && <ViewOptionMenuTrigger />}
+        rightIcon={active && <ViewOptionMenuTrigger viewSummary={viewSummary} />}
       >
         {children}
         {active && (

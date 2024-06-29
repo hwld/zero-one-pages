@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
 import { Dialog } from "./dialog";
+import { ReactNode, useState } from "react";
 import { Button } from "./button";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   isDeleting: boolean;
 };
 
-export const DeleteTaskConfirmDialogTrigger: React.FC<Props> = ({
+export const DeleteViewConfirmDialogTrigger: React.FC<Props> = ({
   children,
   onDelete,
   isDeleting,
@@ -19,7 +19,7 @@ export const DeleteTaskConfirmDialogTrigger: React.FC<Props> = ({
     <Dialog
       isOpen={isOpen}
       onOpenChange={setIsOpen}
-      title="Delete item?"
+      title="Delete view?"
       trigger={children}
       action={
         <>

@@ -27,7 +27,7 @@ export const CreateViewDialogTrigger: React.FC<Props> = ({ children }) => {
       title="Create view"
       trigger={children}
       action={
-        <div className="flex w-full justify-end gap-2">
+        <>
           <Button size="lg" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
@@ -39,7 +39,7 @@ export const CreateViewDialogTrigger: React.FC<Props> = ({ children }) => {
           >
             Create
           </Button>
-        </div>
+        </>
       }
     >
       <CreateViewForm id={formId} onSubmit={handleSubmit} />
