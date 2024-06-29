@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { PropsWithChildren, useState } from "react";
 import { useToast } from "../_components/toast";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const QueryClientProvider: React.FC<PropsWithChildren> = ({
   children,
@@ -40,6 +41,9 @@ export const QueryClientProvider: React.FC<PropsWithChildren> = ({
   });
 
   return (
-    <_QueryClientProvider client={queryClient}>{children}</_QueryClientProvider>
+    <_QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </_QueryClientProvider>
   );
 };
