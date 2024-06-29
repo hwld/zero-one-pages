@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { TaskStatusIcon } from "../../task-status-icon";
-import { TaskStatus } from "@/app/github-project/_backend/task-status/store";
 import { CheckIcon } from "lucide-react";
+import { TaskStatus } from "@/app/github-project/_backend/task-status/store";
 
 type Props = { status: TaskStatus; active?: boolean };
 

@@ -4,6 +4,7 @@ import { ViewSummary } from "../../_backend/view/api";
 import { useDeleteView } from "../../_queries/use-delete-view";
 import { DeleteViewConfirmDialogTrigger } from "../delete-view-confirm-dialog";
 import { useRouter } from "next/navigation";
+import { Routes } from "../../routes";
 
 type Props = { viewSummary: ViewSummary };
 
@@ -11,7 +12,7 @@ export const DeleteViewItem: React.FC<Props> = ({ viewSummary }) => {
   const router = useRouter();
   const deleteViewMutation = useDeleteView({
     onSuccess: () => {
-      router.push("/github-project");
+      router.push(Routes.home({}));
     },
   });
 

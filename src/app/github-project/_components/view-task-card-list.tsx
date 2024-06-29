@@ -118,6 +118,7 @@ export const ViewTaskCardList: React.FC<Props> = ({
                 exit={{ opacity: 0 }}
               >
                 <ViewTaskCard
+                  viewId={viewId}
                   task={task}
                   columns={allColumns}
                   onMove={handleMoveTask}

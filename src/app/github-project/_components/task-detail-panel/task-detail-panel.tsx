@@ -6,32 +6,31 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
+import { useSearchParams } from "../../use-search-params";
+import { DetailSearchParamsSchema, Routes } from "../../routes";
 
 const overlayClass = "detail-panel-overlay";
 
 export const TaskDetailPanel: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(DetailSearchParamsSchema);
 
   const taskId = useMemo(() => {
-    const id = searchParams.get("id");
-    const panel = searchParams.get("panel");
+    const { taskId, panel } = searchParams;
 
-    if (panel === "detail" && typeof id === "string" && id !== "") {
-      return id;
+    if (panel === "detail" && typeof taskId === "string" && taskId !== "") {
+      return taskId;
     }
 
     return undefined;
   }, [searchParams]);
 
   const closePanel = () => {
-    const url = new URL(window.location.href);
-    url.search = "";
-    router.push(url.toString());
+    router.push(Routes.home({ viewId: searchParams.viewId }));
   };
 
   const { refs, context } = useFloating({

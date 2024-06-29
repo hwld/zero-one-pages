@@ -55,7 +55,7 @@ export const TaskCommentForm: React.FC<TaskCommentFormProps> = ({
         <p id={errorMessageId} className="text-sm text-red-400">
           {errors.comment?.message}
         </p>
-        <div className="space-x-2">
+        <div className="flex gap-2">
           <Button onClick={onCancel}>Cancel</Button>
           <Button color="primary">Update comment</Button>
         </div>

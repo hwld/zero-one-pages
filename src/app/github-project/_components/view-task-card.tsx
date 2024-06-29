@@ -7,8 +7,10 @@ import { DRAG_TYPE } from "../consts";
 import { ViewTaskMenuTrigger } from "./view-task-menu/trigger";
 import { DropPreviewLine } from "./drop-preview-line";
 import Link from "next/link";
+import { Routes } from "../routes";
 
 type Props = {
+  viewId: string;
   task: ViewTask;
   columns: ViewColumn[];
   previousOrder: number;
@@ -25,6 +27,7 @@ type Props = {
 };
 
 export const ViewTaskCard: React.FC<Props> = ({
+  viewId,
   task,
   columns,
   previousOrder,
@@ -131,7 +134,7 @@ export const ViewTaskCard: React.FC<Props> = ({
         </div>
         <Link
           className="w-fit text-sm hover:text-sky-500 hover:underline"
-          href={`?panel=detail&id=${task.id}`}
+          href={Routes.detail({ viewId, taskId: task.id })}
         >
           {task.title}
         </Link>

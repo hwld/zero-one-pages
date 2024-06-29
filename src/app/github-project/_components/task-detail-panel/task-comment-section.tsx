@@ -26,7 +26,7 @@ export const TaskCommentSection: React.FC<Props> = ({ task }) => {
         />
       ) : (
         <>
-          <div className="w-full text-end">
+          <div className="flex w-full justify-end">
             <Button color="default" onClick={enableEditing}>
               Edit
             </Button>

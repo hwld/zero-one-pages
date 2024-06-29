@@ -12,6 +12,7 @@ import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 import { CreateViewDialogTrigger } from "./_components/create-view-dialog.tsx/dialog-trigger";
+import { Routes } from "./routes";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   tabs,
@@ -30,12 +31,8 @@ const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
 };
 
 export const ViewTabsPage: React.FC = () => {
-  const {
-    data: viewSummaries,
-    status: viewSummariesStatus,
-    error,
-  } = useViewSummaries();
-  console.log(error);
+  const { data: viewSummaries, status: viewSummariesStatus } =
+    useViewSummaries();
 
   const firstViewId = viewSummaries ? viewSummaries[0].id : undefined;
   const viewId = useSearchParams().get("viewId") ?? firstViewId;
@@ -54,7 +51,7 @@ export const ViewTabsPage: React.FC = () => {
                 失敗しました
               </div>
             </div>
-            <ButtonLink external color="primary" href="/github-project">
+            <ButtonLink external color="primary" href={Routes.home({})}>
               ホームに戻る
             </ButtonLink>
           </div>
@@ -72,7 +69,7 @@ export const ViewTabsPage: React.FC = () => {
               return (
                 <ViewTabLink
                   viewSummary={summary}
-                  href={`/github-project?viewId=${summary.id}`}
+                  href={Routes.home({ viewId: summary.id })}
                   key={summary.id}
                   active={viewId === summary.id}
                 >
