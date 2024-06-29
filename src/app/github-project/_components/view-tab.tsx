@@ -1,6 +1,13 @@
 import clsx from "clsx";
 import { KanbanSquareIcon, LucideIcon } from "lucide-react";
-import { ComponentPropsWithoutRef, ReactNode, forwardRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import { ViewOptionMenuTrigger } from "./view-option-menu/trigger";
 
@@ -10,36 +17,81 @@ type ViewTabProps = {
   interactive?: boolean;
   rightIcon?: ReactNode;
 };
+
 const ViewTabContent: React.FC<ViewTabProps> = ({
   icon: Icon = KanbanSquareIcon,
   children,
   interactive = true,
   rightIcon,
 }) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const [isOverflow, setIsOverflow] = useState(false);
+
+  useEffect(() => {
+    if (!contentRef.current) {
+      return;
+    }
+    const content = contentRef.current;
+
+    const observer = new ResizeObserver(() => {
+      const parent = content.parentElement;
+      if (!parent) {
+        return;
+      }
+
+      const isOverflow = content.clientWidth > parent.clientWidth;
+      setIsOverflow(isOverflow);
+    });
+
+    observer.observe(content);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div
       className={clsx(
-        "flex w-full items-center gap-3 rounded-md border-[2px] border-transparent px-2 py-[6px] outline-1 transition-colors group-focus-visible:border-blue-300",
+        "flex w-full items-center gap-3 overflow-hidden rounded-md border-[2px] border-transparent px-2 py-[6px] outline-1 transition-colors group-focus-visible:border-blue-300",
         interactive
-          ? "text-neutral-400 group-hover:bg-white/10 group-hover:text-neutral-100"
+          ? "text-neutral-400 group-hover:bg-neutral-700 group-hover:text-neutral-100"
           : "text-neutral-100",
       )}
     >
-      <div className="flex items-center gap-2">
-        <Icon size={16} />
-        <div className="text-sm">{children}</div>
+      <div className={clsx("flex items-center gap-2 overflow-hidden")}>
+        <Icon size={16} className="shrink-0" />
+        <div
+          className={clsx(
+            "w-full min-w-0 whitespace-nowrap text-sm",
+            isOverflow &&
+              "bg-gradient-to-r from-neutral-400 from-85% to-transparent bg-clip-text text-transparent group-hover:from-neutral-100",
+          )}
+        >
+          {children}
+        </div>
+
+        {/* テキストがoverflowしているかを判定するために使用する */}
+        <div
+          ref={contentRef}
+          className="invisible fixed top-full text-sm"
+          aria-hidden
+        >
+          {children}
+        </div>
       </div>
       {rightIcon}
     </div>
   );
 };
 
-const viewTabClass = (active: boolean = false) =>
+const viewTabWrapperClass = (active: boolean = false) =>
   clsx(
-    "group relative -mb-[1px] flex min-w-[100px] items-start gap-1 border-x border-t px-1 focus-visible:outline-none",
+    "group relative flex min-w-[100px] shrink-0 items-start gap-1 border-x border-t px-1 focus-visible:outline-none",
     active
       ? "rounded-t-md border-neutral-600 bg-neutral-800 text-neutral-100"
-      : "rounded-md border-transparent",
+      : "max-w-[200px] rounded-md border-transparent",
   );
 
 type ViewTabButtonProps = ViewTabProps & { active?: boolean } & Omit<
@@ -50,7 +102,7 @@ type ViewTabButtonProps = ViewTabProps & { active?: boolean } & Omit<
 export const ViewTabButton = forwardRef<HTMLButtonElement, ViewTabButtonProps>(
   function ViewTabButton({ icon, children, ...props }, ref) {
     return (
-      <button ref={ref} {...props} className={viewTabClass(false)}>
+      <button ref={ref} {...props} className={viewTabWrapperClass(false)}>
         <ViewTabContent icon={icon}>{children}</ViewTabContent>
       </button>
     );
@@ -58,6 +110,7 @@ export const ViewTabButton = forwardRef<HTMLButtonElement, ViewTabButtonProps>(
 );
 
 type ViewTabLinkProps = ViewTabProps & { href: string; active?: boolean };
+
 export const ViewTabLink: React.FC<ViewTabLinkProps> = ({
   href,
   icon,
@@ -65,8 +118,9 @@ export const ViewTabLink: React.FC<ViewTabLinkProps> = ({
   children,
 }) => {
   const Wrapper = active ? "div" : Link;
+
   return (
-    <Wrapper href={href} className={viewTabClass(active)}>
+    <Wrapper href={href} className={viewTabWrapperClass(active)}>
       <ViewTabContent
         icon={icon}
         interactive={!active}
@@ -95,7 +149,7 @@ const OuterBottomCorner: React.FC<{
   return (
     <div
       className={clsx(
-        "absolute bottom-0 size-2 bg-neutral-800 before:absolute before:left-0 before:top-0 before:size-2  before:border-b before:border-neutral-600 before:bg-neutral-900 before:content-['']",
+        "corner absolute bottom-0 size-2 bg-neutral-800 before:absolute before:left-0 before:top-0 before:size-2  before:border-b before:border-neutral-600 before:bg-neutral-900 before:content-['']",
         positionClass[position],
       )}
     />

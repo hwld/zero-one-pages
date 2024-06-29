@@ -18,9 +18,10 @@ const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   content,
 }) => {
   return (
-    <div className="grid grid-rows-[42px_minmax(0,1fr)]">
-      <div className="flex items-stretch border-b border-neutral-600 px-8">
-        {tabs}
+    // 42px
+    <div className="grid grid-rows-[min-content_minmax(0,1fr)]">
+      <div className="flex items-stretch overflow-x-auto border-b border-neutral-600 px-8">
+        <div className="flex h-[42px] items-stretch">{tabs}</div>
       </div>
       <div className="relative flex w-[100dvw] bg-neutral-800">{content}</div>
     </div>
