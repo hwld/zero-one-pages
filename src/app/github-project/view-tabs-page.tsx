@@ -5,7 +5,7 @@ import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
 import { useSearchParams } from "next/navigation";
 import { useViewSummaries } from "./_queries/use-view-summaries";
 import { useView } from "./_queries/use-view";
-import { Button } from "./_components/button";
+import { ButtonLink } from "./_components/button";
 import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
@@ -18,19 +18,24 @@ const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   content,
 }) => {
   return (
-    // 42px
     <div className="grid grid-rows-[min-content_minmax(0,1fr)]">
       <div className="flex items-stretch overflow-x-auto border-b border-neutral-600 px-8">
         <div className="flex h-[42px] items-stretch">{tabs}</div>
       </div>
-      <div className="relative flex w-[100dvw] bg-neutral-800">{content}</div>
+      <div className="relative flex w-[100dvw] overflow-auto bg-neutral-800">
+        {content}
+      </div>
     </div>
   );
 };
 
 export const ViewTabsPage: React.FC = () => {
-  const { data: viewSummaries, status: viewSummariesStatus } =
-    useViewSummaries();
+  const {
+    data: viewSummaries,
+    status: viewSummariesStatus,
+    error,
+  } = useViewSummaries();
+  console.log(error);
 
   const firstViewId = viewSummaries ? viewSummaries[0].id : undefined;
   const viewId = useSearchParams().get("viewId") ?? firstViewId;
@@ -40,7 +45,7 @@ export const ViewTabsPage: React.FC = () => {
     return (
       <PageLayout
         content={
-          <div className="-mt-10 grid h-full w-full place-content-center place-items-center gap-6">
+          <div className="grid h-full min-h-fit w-full place-content-center place-items-center gap-6">
             <div className="flex flex-col items-center justify-center gap-2">
               <GhostIcon size={150} />
               <div className="text-center text-sm text-neutral-100">
@@ -49,9 +54,9 @@ export const ViewTabsPage: React.FC = () => {
                 失敗しました
               </div>
             </div>
-            <Button color="primary" onClick={() => window.location.reload()}>
-              更新する
-            </Button>
+            <ButtonLink external color="primary" href="/github-project">
+              ホームに戻る
+            </ButtonLink>
           </div>
         }
       />
