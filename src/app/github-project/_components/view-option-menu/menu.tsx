@@ -21,6 +21,7 @@ import { Divider } from "../divider";
 import { ViewConfigMenuItem } from "./item";
 import { DeleteViewItem } from "./delete-view-item";
 import { ViewSummary } from "../../_backend/view/api";
+import { UpdateViewDialogTrigger } from "../update-view-dialog";
 
 type Props = {
   viewSummary: ViewSummary;
@@ -89,7 +90,9 @@ export const ViewOptionMenu: React.FC<Props> = ({
       </DropdownItemList>
       <Divider />
       <DropdownItemList>
-        <DropdownItem icon={PenIcon} label="Rename view" />
+        <UpdateViewDialogTrigger viewSummary={viewSummary}>
+          <DropdownItem icon={PenIcon} label="Rename view" />
+        </UpdateViewDialogTrigger>
         <DropdownItem
           icon={GalleryHorizontalEndIcon}
           label="Save changes to new view"

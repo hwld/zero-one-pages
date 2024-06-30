@@ -11,7 +11,7 @@ import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
-import { CreateViewDialogTrigger } from "./_components/create-view-dialog.tsx/dialog-trigger";
+import { CreateViewDialogTrigger } from "./_components/create-view-dialog";
 import { Routes } from "./routes";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({

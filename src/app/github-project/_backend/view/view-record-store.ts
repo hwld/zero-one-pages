@@ -70,6 +70,16 @@ class ViewRecordStore {
     this.viewRecords = [...this.viewRecords, newView];
   }
 
+  public update(input: { id: string; name: string }) {
+    this.viewRecords = this.viewRecords.map((view): ViewRecord => {
+      if (view.id !== input.id) {
+        return view;
+      }
+
+      return { ...view, name: input.name };
+    });
+  }
+
   public remove(viewId: string) {
     this.viewRecords = this.viewRecords.filter(
       (record) => record.id !== viewId,

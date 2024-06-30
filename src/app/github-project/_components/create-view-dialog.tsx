@@ -1,9 +1,9 @@
 import { ReactNode, useId, useState } from "react";
-import { Dialog } from "../dialog";
-import { Button } from "../button";
-import { CreateViewForm } from "./form";
-import { useCreateView } from "../../_queries/use-create-view";
-import { CreateViewInput } from "../../_backend/view/api";
+import { Dialog } from "./dialog";
+import { Button } from "./button";
+import { ViewForm } from "./view-form";
+import { useCreateView } from "../_queries/use-create-view";
+import { CreateViewInput } from "../_backend/view/api";
 
 type Props = { children: ReactNode };
 
@@ -42,7 +42,7 @@ export const CreateViewDialogTrigger: React.FC<Props> = ({ children }) => {
         </>
       }
     >
-      <CreateViewForm id={formId} onSubmit={handleSubmit} />
+      <ViewForm id={formId} onSubmit={handleSubmit} />
     </Dialog>
   );
 };

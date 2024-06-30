@@ -32,7 +32,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/app/github-project/_components/create-view-dialog"
   ],
   "exclude": [
     "node_modules"

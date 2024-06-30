@@ -1,23 +1,28 @@
 import { useForm } from "react-hook-form";
-import {
-  CreateViewInput,
-  createViewInputSchema,
-} from "../../_backend/view/api";
+import { ViewFormData, viewFormSchema } from "../_backend/view/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "../input";
+import { Input } from "./input";
 import { useId } from "@floating-ui/react";
-import { FloatingErrorMessage } from "../floating-error-message";
+import { FloatingErrorMessage } from "./floating-error-message";
 
-type Props = { id: string; onSubmit: (input: CreateViewInput) => void };
+type Props = {
+  id: string;
+  defaultValues?: ViewFormData;
+  onSubmit: (input: ViewFormData) => void;
+};
 
-export const CreateViewForm: React.FC<Props> = ({ id, onSubmit }) => {
+export const ViewForm: React.FC<Props> = ({
+  id,
+  defaultValues = { name: "" },
+  onSubmit,
+}) => {
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<CreateViewInput>({
-    defaultValues: { name: "" },
-    resolver: zodResolver(createViewInputSchema),
+  } = useForm<ViewFormData>({
+    defaultValues,
+    resolver: zodResolver(viewFormSchema),
   });
 
   const nameErrorId = `${useId()}-title-error`;

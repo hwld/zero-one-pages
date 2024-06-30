@@ -27,16 +27,29 @@ export type ViewSummary = Pick<View, "id" | "name">;
 export type ViewColumn = z.infer<typeof viewColumnSchema>;
 export type ViewTask = z.infer<typeof viewTaskSchema>;
 
-export const createViewInputSchema = z.object({
+export const viewFormSchema = z.object({
   name: z
     .string()
     .min(1, "名前の入力は必須です")
     .max(200, "200文字以内で入力してください"),
 });
+export type ViewFormData = z.infer<typeof viewFormSchema>;
+
+export const createViewInputSchema = viewFormSchema;
 export type CreateViewInput = z.infer<typeof createViewInputSchema>;
 
 export const createView = async (input: CreateViewInput): Promise<void> => {
   await fetcher.post(GitHubProjectAPI.views(), { body: input });
+};
+
+export const updateViewInputSchema = viewFormSchema;
+export type UpdateViewInput = z.infer<typeof updateViewInputSchema>;
+
+export const updateView = async ({
+  id,
+  ...input
+}: UpdateViewInput & { id: string }): Promise<void> => {
+  await fetcher.put(GitHubProjectAPI.view(id), { body: input });
 };
 
 export const deleteView = async (viewId: string): Promise<void> => {
@@ -164,6 +177,17 @@ export const viewApiHandler = [
     };
 
     return HttpResponse.json(view);
+  }),
+
+  http.put(GitHubProjectAPI.view(), async ({ params, request }) => {
+    await delay();
+
+    const viewId = z.string().parse(params.id);
+    const input = updateViewInputSchema.parse(await request.json());
+
+    viewRecordStore.update({ id: viewId, name: input.name });
+
+    return HttpResponse.json({});
   }),
 
   http.delete(GitHubProjectAPI.view(), async ({ params }) => {
