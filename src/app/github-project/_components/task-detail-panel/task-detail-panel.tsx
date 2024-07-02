@@ -12,10 +12,14 @@ import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
 import { useSearchParams } from "../../use-search-params";
 import { DetailSearchParamsSchema, Routes } from "../../routes";
+import { Panel } from "react-resizable-panels";
+import { PanelResizeHandle } from "../panel-resize-handle";
 
 const overlayClass = "detail-panel-overlay";
 
-export const TaskDetailPanel: React.FC = () => {
+type Props = { isPinned: boolean; onTogglePin: () => void };
+
+export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
   const router = useRouter();
   const searchParams = useSearchParams(DetailSearchParamsSchema);
 
@@ -56,6 +60,22 @@ export const TaskDetailPanel: React.FC = () => {
 
   const { getFloatingProps } = useInteractions([dismiss]);
 
+  if (isPinned && taskId) {
+    return (
+      <>
+        <PanelResizeHandle />
+        <Panel minSize={30}>
+          <TaskDetailPanelContent
+            taskId={taskId}
+            onClose={closePanel}
+            isPinned={isPinned}
+            onTogglePin={onTogglePin}
+          />
+        </Panel>
+      </>
+    );
+  }
+
   return (
     <FloatingPortal>
       <AnimatePresence>
@@ -84,6 +104,8 @@ export const TaskDetailPanel: React.FC = () => {
                   <TaskDetailPanelContent
                     taskId={taskId}
                     onClose={closePanel}
+                    isPinned={isPinned}
+                    onTogglePin={onTogglePin}
                   />
                 </motion.div>
               </div>

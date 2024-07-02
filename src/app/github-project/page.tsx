@@ -4,7 +4,7 @@ import {
   MoreHorizontalIcon,
   PanelRightOpenIcon,
 } from "lucide-react";
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { Tooltip } from "./_components/tooltip";
 import {
   AppHeader,
@@ -18,11 +18,13 @@ import { useGitHubProjectCommands } from "./commands";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
 import { Panel, PanelGroup } from "react-resizable-panels";
-import { PanelResizeHandle } from "./_components/panel-resize-handle";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
+const bgColor = "bg-neutral-900";
+
 const GitHubProjectPage: React.FC = () => {
-  const bgColor = "bg-neutral-900";
+  const [isDetailPinned, setIsDetailPinned] = useState(false);
+
   useBodyBgColor(bgColor);
 
   useGitHubProjectCommands();
@@ -70,9 +72,11 @@ const GitHubProjectPage: React.FC = () => {
               </Suspense>
             </div>
           </Panel>
-          <PanelResizeHandle />
           <Suspense>
-            <TaskDetailPanel />
+            <TaskDetailPanel
+              isPinned={isDetailPinned}
+              onTogglePin={() => setIsDetailPinned((s) => !s)}
+            />
           </Suspense>
         </PanelGroup>
       </div>

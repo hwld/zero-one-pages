@@ -5,6 +5,7 @@ import {
   CircleDotIcon,
   CopyIcon,
   PinIcon,
+  PinOffIcon,
   TrashIcon,
   XIcon,
 } from "lucide-react";
@@ -20,12 +21,16 @@ import { TaskCommentSection } from "./task-comment-section";
 
 type Props = {
   taskId: string;
+  isPinned: boolean;
+  onTogglePin: () => void;
   onClose: () => void;
 };
 
 export const TaskDetailPanelContent: React.FC<Props> = ({
   taskId,
   onClose,
+  isPinned,
+  onTogglePin,
 }) => {
   const { data: task, status } = useTask(taskId);
 
@@ -57,36 +62,41 @@ export const TaskDetailPanelContent: React.FC<Props> = ({
       );
     } else if (status === "success") {
       return (
-        <motion.div className="grid size-full grid-cols-[1fr,400px] grid-rows-[min-content,1fr]">
-          <div className="col-span-2 space-y-2 border-b border-neutral-600 p-4">
-            <div className="flex items-center justify-end gap-2">
-              <IconButton icon={PinIcon} />
-              <IconButton icon={XIcon} onClick={onClose} />
+        <div className="@container size-full">
+          <motion.div className="@3xl:grid-cols-[1fr,400px] grid size-full grid-cols-1 grid-rows-[min-content,1fr]">
+            <div className="@3xl:col-span-2 space-y-2 border-b border-neutral-600 p-4">
+              <div className="flex items-center justify-end gap-2">
+                <IconButton
+                  icon={isPinned ? PinOffIcon : PinIcon}
+                  onClick={onTogglePin}
+                />
+                <IconButton icon={XIcon} onClick={onClose} />
+              </div>
+              <TaskTitleSection task={task} />
             </div>
-            <TaskTitleSection task={task} />
-          </div>
-          <div className="overflow-auto border-r border-neutral-600 p-4">
-            <TaskCommentSection task={task} />
-          </div>
-          <div className="grid grid-rows-[min-content,1fr]">
-            <div className="space-y-2 border-b border-neutral-600 p-4">
-              <TaskDetailPanelMetaRow label="Assignees">
-                <button className="h-full w-full rounded px-2 text-start text-sm text-neutral-400 transition-colors hover:bg-white/15">
-                  Add assigness...
-                </button>
-              </TaskDetailPanelMetaRow>
-              <TaskDetailPanelMetaRow label="Status">
-                <UpdateTaskStatusMenuTrigger task={task} />
-              </TaskDetailPanelMetaRow>
+            <div className="@3xl:border-r @3xl:border-b-0 overflow-auto border-b border-neutral-600 p-4">
+              <TaskCommentSection task={task} />
             </div>
-            <div className="space-y-1 p-4">
-              <ListButton icon={CircleDotIcon} label="Convert to issue" />
-              <ListButton icon={CopyIcon} label="Copy link in project" />
-              <ListButton icon={ArchiveIcon} label="Archive" />
-              <ListButton red icon={TrashIcon} label="Delete from project" />
+            <div className="grid grid-rows-[min-content,1fr]">
+              <div className="space-y-2 border-b border-neutral-600 p-4">
+                <TaskDetailPanelMetaRow label="Assignees">
+                  <button className="h-full w-full rounded px-2 text-start text-sm text-neutral-400 transition-colors hover:bg-white/15">
+                    Add assigness...
+                  </button>
+                </TaskDetailPanelMetaRow>
+                <TaskDetailPanelMetaRow label="Status">
+                  <UpdateTaskStatusMenuTrigger task={task} />
+                </TaskDetailPanelMetaRow>
+              </div>
+              <div className="space-y-1 p-4">
+                <ListButton icon={CircleDotIcon} label="Convert to issue" />
+                <ListButton icon={CopyIcon} label="Copy link in project" />
+                <ListButton icon={ArchiveIcon} label="Archive" />
+                <ListButton red icon={TrashIcon} label="Delete from project" />
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       );
     }
   })();
