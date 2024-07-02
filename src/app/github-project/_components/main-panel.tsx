@@ -8,6 +8,7 @@ import { ViewColumn } from "./view-column";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Props = { view: View };
+
 export const MainPanel: React.FC<Props> = ({ view }) => {
   const [addingColumnId, setAddingColumnId] = useState<string | null>(null);
 
@@ -67,7 +68,7 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
   };
 
   return (
-    <div className="relative flex min-w-0 grow flex-col">
+    <div className="relative flex h-full min-w-0 grow flex-col">
       <div className="flex items-center gap-4 p-4">
         <div className="flex h-8 grow items-center rounded-md border border-neutral-600 bg-transparent pl-2 focus-within:border-blue-500">
           <ListFilterIcon size={16} className="text-neutral-400" />

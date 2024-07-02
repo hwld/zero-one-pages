@@ -17,6 +17,9 @@ import { ViewTabsPage } from "./view-tabs-page";
 import { useGitHubProjectCommands } from "./commands";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
+import { Panel, PanelGroup } from "react-resizable-panels";
+import { PanelResizeHandle } from "./_components/panel-resize-handle";
+import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
 const GitHubProjectPage: React.FC = () => {
   const bgColor = "bg-neutral-900";
@@ -28,7 +31,7 @@ const GitHubProjectPage: React.FC = () => {
     <>
       <div
         className={clsx(
-          "grid h-[100dvh] w-[100dvw] grid-rows-[var(--header-height)_48px_minmax(0,1fr)] overflow-hidden text-neutral-100",
+          "grid h-[100dvh] w-[100dvw] grid-rows-[var(--header-height)_minmax(0,1fr)] overflow-hidden text-neutral-100",
           bgColor,
         )}
         style={{
@@ -37,28 +40,41 @@ const GitHubProjectPage: React.FC = () => {
         }}
       >
         <AppHeader />
-        <div className="flex items-center justify-between px-8">
-          <div className="text-lg font-bold">zero-one-ui</div>
-          <div className="flex items-center gap-2">
-            <button className="h-5 rounded-full bg-neutral-700 px-2 text-xs font-bold text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200">
-              Add status update
-            </button>
-            <div className="flex items-center">
-              <Tooltip label="Insight">
-                <ButtonGroupItem position="left" icon={LineChartIcon} />
-              </Tooltip>
-              <Tooltip label="Project details">
-                <ButtonGroupItem icon={PanelRightOpenIcon} />
-              </Tooltip>
-              <ProjectMenuTrigger>
-                <ButtonGroupItem position="right" icon={MoreHorizontalIcon} />
-              </ProjectMenuTrigger>
+        <PanelGroup direction="horizontal" autoSaveId="persistence">
+          <Panel defaultSize={100}>
+            <div className="grid h-full grid-rows-[min-content,1fr] overflow-auto">
+              <div className="flex h-[48px] w-full items-center justify-between gap-4 px-8">
+                <div className="text-nowrap text-lg font-bold">zero-one-ui</div>
+                <div className="flex items-center gap-2">
+                  <button className="h-5 text-nowrap rounded-full bg-neutral-700 px-2 text-xs font-bold text-neutral-400 transition-colors hover:bg-neutral-600 hover:text-neutral-200">
+                    Add status update
+                  </button>
+                  <div className="flex items-center">
+                    <Tooltip label="Insight">
+                      <ButtonGroupItem position="left" icon={LineChartIcon} />
+                    </Tooltip>
+                    <Tooltip label="Project details">
+                      <ButtonGroupItem icon={PanelRightOpenIcon} />
+                    </Tooltip>
+                    <ProjectMenuTrigger>
+                      <ButtonGroupItem
+                        position="right"
+                        icon={MoreHorizontalIcon}
+                      />
+                    </ProjectMenuTrigger>
+                  </div>
+                </div>
+              </div>
+              <Suspense>
+                <ViewTabsPage />
+              </Suspense>
             </div>
-          </div>
-        </div>
-        <Suspense>
-          <ViewTabsPage />
-        </Suspense>
+          </Panel>
+          <PanelResizeHandle />
+          <Suspense>
+            <TaskDetailPanel />
+          </Suspense>
+        </PanelGroup>
       </div>
       <Toaster />
     </>

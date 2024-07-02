@@ -4,11 +4,12 @@ import { SlicerListItem } from "./item";
 import { SliceByMenuTrigger } from "./slice-by-menu-trigger";
 
 type Props = { columns: ViewColumn[] };
+
 export const SlicerPanel: React.FC<Props> = ({ columns }) => {
   return (
-    <div className="flex w-[350px] shrink-0 flex-col gap-2 overflow-auto border-r border-neutral-600 p-4">
+    <div className="flex h-full w-full shrink-0 flex-col gap-2 overflow-auto p-4">
       <SliceByMenuTrigger>
-        <button className="flex h-8 w-fit items-center gap-1 rounded-md px-2 text-sm hover:bg-white/10">
+        <button className="flex h-8 w-fit shrink-0 items-center gap-1 rounded-md px-2 text-sm hover:bg-white/10">
           <span>Status</span>
           <ChevronDownIcon size={16} />
         </button>

@@ -19,8 +19,8 @@ export const SlicerListItem: React.FC<Props> = ({ active = false, column }) => {
     >
       <button
         className={clsx(
-          "flex w-full items-start justify-between rounded-md px-2 py-2 transition-colors hover:bg-white/10",
-          column.status.description ? "h-14" : "",
+          "flex w-full items-start justify-between rounded-md px-2 py-2 text-start transition-colors hover:bg-white/10",
+          column.status.description ? "min-h-14" : "",
         )}
       >
         <div className="flex items-start gap-2">
