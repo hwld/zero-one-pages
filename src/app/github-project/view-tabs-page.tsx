@@ -93,7 +93,7 @@ export const ViewTabsPage: React.FC = () => {
       }
       content={
         <>
-          {view && <MainContent view={view} />}
+          {view && <MainContent key={view.id} view={view} />}
           <AnimatePresence>
             {viewStatus === "pending" && (
               <div className="absolute top-0 grid size-full place-content-center place-items-center">
@@ -143,12 +143,7 @@ const MainContent: React.FC<{ view: View }> = ({ view }) => {
   }, []);
 
   return (
-    <PanelGroup
-      id="content"
-      key={view.id}
-      direction="horizontal"
-      autoSaveId="content"
-    >
+    <PanelGroup id="content" direction="horizontal">
       <Panel
         ref={panelRef}
         minSize={20}
@@ -158,7 +153,7 @@ const MainContent: React.FC<{ view: View }> = ({ view }) => {
         <SlicerPanel columns={view.columns} />
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={100}>
+      <Panel defaultSize={80}>
         <MainPanel view={view} />
       </Panel>
     </PanelGroup>
