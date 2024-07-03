@@ -36,30 +36,9 @@ export const TaskDetailPanelContent: React.FC<Props> = ({
 
   const content = (() => {
     if (status === "pending") {
-      return (
-        <motion.div
-          key="loading"
-          className="grid size-full place-content-center place-items-center text-neutral-400"
-          exit={{ opacity: 0 }}
-        >
-          <LoadingAnimation />
-        </motion.div>
-      );
+      return <LoadingContent />;
     } else if (status === "error") {
-      return (
-        <div className="grid size-full place-content-center place-items-center gap-4 text-red-400">
-          <div className="flex flex-col items-center gap-2">
-            <AlertCircleIcon size={50} />
-            <p className="font-bold">タスクが存在しません</p>
-            <p className="text-sm">
-              このタスクはすでに削除されているか、URLが間違っている可能性があります。
-              <br />
-              ※このアプリでは、更新すると作成したすべてのタスクが削除されます。
-            </p>
-          </div>
-          <Button onClick={onClose}>詳細ページを閉じる</Button>
-        </div>
-      );
+      return <ErrorContent onClose={onClose} />;
     } else if (status === "success") {
       return (
         <div className="@container size-full">
@@ -102,4 +81,33 @@ export const TaskDetailPanelContent: React.FC<Props> = ({
   })();
 
   return <AnimatePresence mode="popLayout">{content}</AnimatePresence>;
+};
+
+const LoadingContent: React.FC = () => {
+  return (
+    <motion.div
+      key="loading"
+      className="grid size-full place-content-center place-items-center text-neutral-400"
+      exit={{ opacity: 0 }}
+    >
+      <LoadingAnimation />
+    </motion.div>
+  );
+};
+
+const ErrorContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  return (
+    <div className="grid size-full place-content-center place-items-center gap-4 text-red-400">
+      <div className="flex flex-col items-center gap-2">
+        <AlertCircleIcon size={50} />
+        <p className="font-bold">タスクが存在しません</p>
+        <p className="text-sm">
+          このタスクはすでに削除されているか、URLが間違っている可能性があります。
+          <br />
+          ※このアプリでは、更新すると作成したすべてのタスクが削除されます。
+        </p>
+      </div>
+      <Button onClick={onClose}>詳細ページを閉じる</Button>
+    </div>
+  );
 };

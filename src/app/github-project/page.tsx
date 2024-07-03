@@ -26,7 +26,6 @@ const GitHubProjectPage: React.FC = () => {
   const [isDetailPinned, setIsDetailPinned] = useState(false);
 
   useBodyBgColor(bgColor);
-
   useGitHubProjectCommands();
 
   return (

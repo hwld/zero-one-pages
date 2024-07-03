@@ -37,11 +37,41 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
     router.push(Routes.home({ viewId: searchParams.viewId }));
   };
 
+  if (isPinned && taskId) {
+    return (
+      <>
+        <PanelResizeHandle />
+        <Panel minSize={30}>
+          <TaskDetailPanelContent
+            taskId={taskId}
+            onClose={closePanel}
+            isPinned={isPinned}
+            onTogglePin={onTogglePin}
+          />
+        </Panel>
+      </>
+    );
+  }
+
+  return (
+    <TaskDetailPanelDialog
+      onTogglePin={onTogglePin}
+      taskId={taskId}
+      onClose={closePanel}
+    />
+  );
+};
+
+const TaskDetailPanelDialog: React.FC<{
+  onTogglePin: () => void;
+  taskId: string | undefined;
+  onClose: () => void;
+}> = ({ onTogglePin, taskId, onClose }) => {
   const { refs, context } = useFloating({
     open: !!taskId,
     onOpenChange: (open) => {
       if (!open) {
-        closePanel();
+        onClose();
       }
     },
   });
@@ -59,22 +89,6 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
   });
 
   const { getFloatingProps } = useInteractions([dismiss]);
-
-  if (isPinned && taskId) {
-    return (
-      <>
-        <PanelResizeHandle />
-        <Panel minSize={30}>
-          <TaskDetailPanelContent
-            taskId={taskId}
-            onClose={closePanel}
-            isPinned={isPinned}
-            onTogglePin={onTogglePin}
-          />
-        </Panel>
-      </>
-    );
-  }
 
   return (
     <FloatingPortal>
@@ -103,8 +117,8 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
                 >
                   <TaskDetailPanelContent
                     taskId={taskId}
-                    onClose={closePanel}
-                    isPinned={isPinned}
+                    onClose={onClose}
+                    isPinned={false}
                     onTogglePin={onTogglePin}
                   />
                 </motion.div>
