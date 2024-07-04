@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
 import { useSearchParams } from "../../use-search-params";
-import { DetailSearchParamsSchema, Routes } from "../../routes";
+import { HomeSearchParamsSchema, Routes } from "../../routes";
 import { Panel } from "react-resizable-panels";
 import { PanelResizeHandle } from "../panel-resize-handle";
 
@@ -21,7 +21,7 @@ type Props = { isPinned: boolean; onTogglePin: () => void };
 
 export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
   const router = useRouter();
-  const searchParams = useSearchParams(DetailSearchParamsSchema);
+  const searchParams = useSearchParams(HomeSearchParamsSchema);
 
   const taskId = useMemo(() => {
     const { taskId, panel } = searchParams;

@@ -134,7 +134,7 @@ export const ViewTaskCard: React.FC<Props> = ({
         </div>
         <Link
           className="w-fit text-sm hover:text-sky-500 hover:underline"
-          href={Routes.detail({ viewId, taskId: task.id })}
+          href={Routes.home({ viewId, panel: "detail", taskId: task.id })}
         >
           {task.title}
         </Link>
