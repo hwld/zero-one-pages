@@ -2,7 +2,6 @@
 import { GhostIcon, PlusIcon } from "lucide-react";
 import React, { ReactNode, useLayoutEffect, useRef } from "react";
 import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
-import { useSearchParams } from "next/navigation";
 import { useViewSummaries } from "./_queries/use-view-summaries";
 import { useView } from "./_queries/use-view";
 import { ButtonLink } from "./_components/button";
@@ -11,7 +10,7 @@ import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
 import { CreateViewDialogTrigger } from "./_components/create-view-dialog";
-import { Routes } from "./routes";
+import { HomeSearchParamsSchema, Routes } from "./routes";
 import {
   ImperativePanelHandle,
   Panel,
@@ -21,6 +20,7 @@ import {
 } from "react-resizable-panels";
 import { PanelResizeHandle } from "./_components/panel-resize-handle";
 import { View } from "./_backend/view/api";
+import { useSearchParams } from "./use-search-params";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
   tabs,
@@ -42,8 +42,10 @@ export const ViewTabsPage: React.FC = () => {
   const { data: viewSummaries, status: viewSummariesStatus } =
     useViewSummaries();
 
+  const searchParams = useSearchParams(HomeSearchParamsSchema);
+
   const firstViewId = viewSummaries ? viewSummaries[0].id : undefined;
-  const viewId = useSearchParams().get("viewId") ?? firstViewId;
+  const viewId = searchParams.viewId ?? firstViewId;
   const { data: view, status: viewStatus } = useView(viewId);
 
   if (viewSummariesStatus === "error" || viewStatus === "error") {
@@ -77,7 +79,7 @@ export const ViewTabsPage: React.FC = () => {
               return (
                 <ViewTabLink
                   viewSummary={summary}
-                  href={Routes.home({ viewId: summary.id })}
+                  href={Routes.home({ ...searchParams, viewId: summary.id })}
                   key={summary.id}
                   active={viewId === summary.id}
                 >

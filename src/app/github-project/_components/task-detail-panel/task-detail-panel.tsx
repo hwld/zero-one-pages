@@ -24,13 +24,11 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
   const searchParams = useSearchParams(HomeSearchParamsSchema);
 
   const taskId = useMemo(() => {
-    const { taskId, panel } = searchParams;
-
-    if (panel === "detail" && typeof taskId === "string" && taskId !== "") {
-      return taskId;
+    if (!searchParams.panel) {
+      return undefined;
     }
 
-    return undefined;
+    return searchParams.taskId;
   }, [searchParams]);
 
   const closePanel = () => {
