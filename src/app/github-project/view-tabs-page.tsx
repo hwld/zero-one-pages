@@ -1,10 +1,10 @@
 "use client";
-import { GhostIcon, PlusIcon } from "lucide-react";
+import { GhostIcon, InboxIcon, PlusIcon } from "lucide-react";
 import React, { ReactNode, useLayoutEffect, useRef } from "react";
 import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
 import { useViewSummaries } from "./_queries/use-view-summaries";
 import { useView } from "./_queries/use-view";
-import { ButtonLink } from "./_components/button";
+import { Button, ButtonLink } from "./_components/button";
 import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
@@ -19,10 +19,9 @@ import {
   getPanelGroupElement,
 } from "react-resizable-panels";
 import { PanelResizeHandle } from "./_components/panel-resize-handle";
-import { View } from "./_backend/view/api";
 import { useSearchParams } from "./use-search-params";
 
-const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
+const PageLayout: React.FC<{ tabs?: ReactNode; content?: ReactNode }> = ({
   tabs,
   content,
 }) => {
@@ -39,79 +38,101 @@ const PageLayout: React.FC<{ tabs?: ReactNode; content: ReactNode }> = ({
 };
 
 export const ViewTabsPage: React.FC = () => {
+  const searchParams = useSearchParams(HomeSearchParamsSchema);
+
   const { data: viewSummaries, status: viewSummariesStatus } =
     useViewSummaries();
 
-  const searchParams = useSearchParams(HomeSearchParamsSchema);
-
-  const firstViewId = viewSummaries ? viewSummaries[0].id : undefined;
-  const viewId = searchParams.viewId ?? firstViewId;
-  const { data: view, status: viewStatus } = useView(viewId);
-
-  if (viewSummariesStatus === "error" || viewStatus === "error") {
-    return (
-      <PageLayout
-        content={
-          <div className="grid h-full min-h-fit w-full place-content-center place-items-center gap-6">
-            <div className="flex flex-col items-center justify-center gap-2">
-              <GhostIcon size={150} />
-              <div className="text-center text-sm text-neutral-100">
-                データ読み込みに
-                <br />
-                失敗しました
-              </div>
-            </div>
-            <ButtonLink external color="primary" href={Routes.home({})}>
-              ホームに戻る
-            </ButtonLink>
-          </div>
-        }
-      />
-    );
+  if (viewSummariesStatus === "error") {
+    return <PageLayout content={<ErrorContent />} />;
   }
+
+  if (viewSummariesStatus === "pending") {
+    return <PageLayout content={<LoadingContent />} />;
+  }
+
+  const firstViewId = viewSummaries.at(0)?.id;
+  const viewId = searchParams.viewId ?? firstViewId;
 
   return (
     <PageLayout
       tabs={
-        viewSummariesStatus === "pending" ? undefined : (
-          <>
-            {viewSummaries.map((summary) => {
-              return (
-                <ViewTabLink
-                  viewSummary={summary}
-                  href={Routes.home({ ...searchParams, viewId: summary.id })}
-                  key={summary.id}
-                  active={viewId === summary.id}
-                >
-                  {summary.name}
-                </ViewTabLink>
-              );
-            })}
-            <CreateViewDialogTrigger>
-              <ViewTabButton icon={PlusIcon}>New view</ViewTabButton>
-            </CreateViewDialogTrigger>
-          </>
-        )
+        <>
+          {viewSummaries.map((summary) => {
+            return (
+              <ViewTabLink
+                viewSummary={summary}
+                href={Routes.home({ ...searchParams, viewId: summary.id })}
+                key={summary.id}
+                active={viewId === summary.id}
+              >
+                {summary.name}
+              </ViewTabLink>
+            );
+          })}
+          <CreateViewDialogTrigger>
+            <ViewTabButton icon={PlusIcon}>New view</ViewTabButton>
+          </CreateViewDialogTrigger>
+        </>
       }
       content={
-        <>
-          {view && <MainContent key={view.id} view={view} />}
-          <AnimatePresence>
-            {viewStatus === "pending" && (
-              <div className="absolute top-0 grid size-full place-content-center place-items-center">
-                <motion.div exit={{ opacity: 0 }}>
-                  <LoadingAnimation />
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-        </>
+        viewId ? (
+          <MainContent key={viewId} viewId={viewId} />
+        ) : (
+          <NoViewContent />
+        )
       }
     />
   );
 };
 
-const MainContent: React.FC<{ view: View }> = ({ view }) => {
+const ErrorContent: React.FC = () => {
+  return (
+    <div className="grid h-full min-h-fit w-full place-content-center place-items-center gap-6">
+      <div className="flex flex-col items-center justify-center gap-2">
+        <GhostIcon size={150} />
+        <div className="text-center text-sm text-neutral-100">
+          データ読み込みに
+          <br />
+          失敗しました
+        </div>
+      </div>
+      <ButtonLink external color="primary" href={Routes.home({})}>
+        ホームに戻る
+      </ButtonLink>
+    </div>
+  );
+};
+
+const LoadingContent: React.FC = () => {
+  return (
+    <div className="absolute top-0 grid size-full place-content-center place-items-center">
+      <motion.div exit={{ opacity: 0 }}>
+        <LoadingAnimation />
+      </motion.div>
+    </div>
+  );
+};
+
+const NoViewContent: React.FC = () => {
+  return (
+    <div className="grid h-full min-h-fit w-full place-content-center place-items-center gap-6">
+      <div className="flex flex-col items-center justify-center gap-2">
+        <InboxIcon size={150} />
+        <div className="text-center text-sm text-neutral-100">
+          Viewが存在しません
+        </div>
+      </div>
+      <CreateViewDialogTrigger>
+        <Button color="primary">Viewを作成</Button>
+      </CreateViewDialogTrigger>
+    </div>
+  );
+};
+
+const MainContent: React.FC<{ viewId: string }> = ({ viewId }) => {
+  const { data: view, status: viewStatus } = useView(viewId);
+
   const panelRef = useRef<ImperativePanelHandle>(null);
 
   const panelSizePx = useRef(0);
@@ -144,20 +165,31 @@ const MainContent: React.FC<{ view: View }> = ({ view }) => {
     };
   }, []);
 
+  if (viewStatus === "error") {
+    return <ErrorContent />;
+  }
+
   return (
-    <PanelGroup id="content" direction="horizontal">
-      <Panel
-        ref={panelRef}
-        minSize={20}
-        defaultSize={20}
-        onResize={handleResizePanel}
-      >
-        <SlicerPanel columns={view.columns} />
-      </Panel>
-      <PanelResizeHandle />
-      <Panel defaultSize={80}>
-        <MainPanel view={view} />
-      </Panel>
-    </PanelGroup>
+    <>
+      {view && (
+        <PanelGroup id="content" direction="horizontal">
+          <Panel
+            ref={panelRef}
+            minSize={20}
+            defaultSize={20}
+            onResize={handleResizePanel}
+          >
+            <SlicerPanel columns={view.columns} />
+          </Panel>
+          <PanelResizeHandle />
+          <Panel defaultSize={80}>
+            <MainPanel view={view} />
+          </Panel>
+        </PanelGroup>
+      )}
+      <AnimatePresence>
+        {viewStatus === "pending" && <LoadingContent />}
+      </AnimatePresence>
+    </>
   );
 };
