@@ -20,12 +20,12 @@ import clsx from "clsx";
 import { Panel, PanelGroup } from "react-resizable-panels";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 
-const bgColor = "bg-neutral-900";
+export const GithubProjectBgColorClass = "bg-neutral-900";
 
 const GitHubProjectPage: React.FC = () => {
   const [isDetailPinned, setIsDetailPinned] = useState(false);
 
-  useBodyBgColor(bgColor);
+  useBodyBgColor(GithubProjectBgColorClass);
   useGitHubProjectCommands();
 
   return (
@@ -33,7 +33,7 @@ const GitHubProjectPage: React.FC = () => {
       <div
         className={clsx(
           "grid h-[100dvh] w-[100dvw] grid-rows-[var(--header-height)_minmax(0,1fr)] overflow-hidden text-neutral-100",
-          bgColor,
+          GithubProjectBgColorClass,
         )}
         style={{
           colorScheme: "dark",
