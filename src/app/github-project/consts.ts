@@ -1,5 +1,7 @@
 import { TaskStatus } from "./_backend/task-status/store";
 
+export const BG_COLOR_CLASS = "bg-neutral-900";
+
 export const DRAG_TYPE = {
   task: "application/task",
   column: "application/column",

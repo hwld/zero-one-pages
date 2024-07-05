@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { SearchParamsError } from "./use-search-params";
-import { GithubProjectBgColorClass } from "./page";
+import { BG_COLOR_CLASS } from "./consts";
 import { ButtonLink } from "./_components/button";
 import { Routes } from "./routes";
 
@@ -13,7 +13,7 @@ const ErrorPage = ({ error }: { error: Error }) => {
     <div
       className={clsx(
         "grid h-dvh w-dvw place-content-center place-items-center gap-4 text-sm text-neutral-100",
-        GithubProjectBgColorClass,
+        BG_COLOR_CLASS,
       )}
     >
       {isSearchParamsError ? (
