@@ -12,8 +12,7 @@ import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
 import { useSearchParams } from "../../use-search-params";
 import { HomeSearchParamsSchema, Routes } from "../../routes";
-import { Panel } from "react-resizable-panels";
-import { PanelResizeHandle } from "../panel-resize-handle";
+import { ResizablePanel } from "../resizable-panel";
 
 const overlayClass = "detail-panel-overlay";
 
@@ -37,17 +36,18 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
 
   if (isPinned && taskId) {
     return (
-      <>
-        <PanelResizeHandle />
-        <Panel minSize={30}>
-          <TaskDetailPanelContent
-            taskId={taskId}
-            onClose={closePanel}
-            isPinned={isPinned}
-            onTogglePin={onTogglePin}
-          />
-        </Panel>
-      </>
+      <ResizablePanel
+        direction="left"
+        minWidth={300}
+        defaultSize={{ width: 700 }}
+      >
+        <TaskDetailPanelContent
+          taskId={taskId}
+          onClose={closePanel}
+          isPinned={isPinned}
+          onTogglePin={onTogglePin}
+        />
+      </ResizablePanel>
     );
   }
 

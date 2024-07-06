@@ -1,6 +1,6 @@
 "use client";
 import { GhostIcon, InboxIcon, PlusIcon } from "lucide-react";
-import React, { ReactNode, useLayoutEffect, useRef } from "react";
+import React, { ReactNode } from "react";
 import { ViewTabButton, ViewTabLink } from "./_components/view-tab";
 import { useViewSummaries } from "./_queries/use-view-summaries";
 import { useView } from "./_queries/use-view";
@@ -11,16 +11,8 @@ import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
 import { CreateViewDialogTrigger } from "./_components/create-view-dialog";
 import { HomeSearchParamsSchema, Routes } from "./routes";
-import {
-  ImperativePanelHandle,
-  Panel,
-  PanelGroup,
-  PanelOnResize,
-  getPanelGroupElement,
-} from "react-resizable-panels";
-import { PanelResizeHandle } from "./_components/panel-resize-handle";
 import { useSearchParams } from "./use-search-params";
-import { View } from "./_backend/view/api";
+import { ResizablePanel } from "./_components/resizable-panel";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content?: ReactNode }> = ({
   tabs,
@@ -140,63 +132,21 @@ const ViewContent: React.FC<{ viewId: string }> = ({ viewId }) => {
 
   return (
     <>
-      {view && <ViewPanelGroup view={view} />}
+      {view && (
+        <div className="grid grid-cols-[auto,1fr] grid-rows-1">
+          <ResizablePanel
+            direction="right"
+            minWidth={200}
+            defaultSize={{ width: 400 }}
+          >
+            <SlicerPanel columns={view.columns} />
+          </ResizablePanel>
+          <MainPanel view={view} />
+        </div>
+      )}
       <AnimatePresence>
         {viewStatus === "pending" && <LoadingContent />}
       </AnimatePresence>
     </>
-  );
-};
-
-const ViewPanelGroup: React.FC<{ view: View }> = ({ view }) => {
-  const viewPanelGroupId = "view-panel";
-
-  const panelRef = useRef<ImperativePanelHandle>(null);
-
-  const panelSizePx = useRef(0);
-  const timerId = useRef(0);
-  const handleResizePanel: PanelOnResize = (size) => {
-    window.clearTimeout(timerId.current);
-    timerId.current = window.setTimeout(() => {
-      const group = getPanelGroupElement(viewPanelGroupId);
-      if (!group) {
-        return;
-      }
-      panelSizePx.current = group.offsetWidth * (size / 100);
-    }, 100);
-  };
-
-  useLayoutEffect(() => {
-    const group = getPanelGroupElement(viewPanelGroupId);
-    if (!group) {
-      return;
-    }
-
-    const observer = new ResizeObserver(() => {
-      const size = (panelSizePx.current / group.offsetWidth) * 100;
-      panelRef.current?.resize(size);
-    });
-
-    observer.observe(group);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <PanelGroup id={viewPanelGroupId} direction="horizontal">
-      <Panel
-        ref={panelRef}
-        minSize={20}
-        defaultSize={20}
-        onResize={handleResizePanel}
-      >
-        <SlicerPanel columns={view.columns} />
-      </Panel>
-      <PanelResizeHandle />
-      <Panel defaultSize={80}>
-        <MainPanel view={view} />
-      </Panel>
-    </PanelGroup>
   );
 };
