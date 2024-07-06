@@ -20,6 +20,7 @@ import {
 } from "react-resizable-panels";
 import { PanelResizeHandle } from "./_components/panel-resize-handle";
 import { useSearchParams } from "./use-search-params";
+import { View } from "./_backend/view/api";
 
 const PageLayout: React.FC<{ tabs?: ReactNode; content?: ReactNode }> = ({
   tabs,
@@ -77,7 +78,7 @@ export const ViewTabsPage: React.FC = () => {
       }
       content={
         viewId ? (
-          <MainContent key={viewId} viewId={viewId} />
+          <ViewContent key={viewId} viewId={viewId} />
         ) : (
           <NoViewContent />
         )
@@ -130,8 +131,25 @@ const NoViewContent: React.FC = () => {
   );
 };
 
-const MainContent: React.FC<{ viewId: string }> = ({ viewId }) => {
+const ViewContent: React.FC<{ viewId: string }> = ({ viewId }) => {
   const { data: view, status: viewStatus } = useView(viewId);
+
+  if (viewStatus === "error") {
+    return <ErrorContent />;
+  }
+
+  return (
+    <>
+      {view && <ViewPanelGroup view={view} />}
+      <AnimatePresence>
+        {viewStatus === "pending" && <LoadingContent />}
+      </AnimatePresence>
+    </>
+  );
+};
+
+const ViewPanelGroup: React.FC<{ view: View }> = ({ view }) => {
+  const viewPanelGroupId = "view-panel";
 
   const panelRef = useRef<ImperativePanelHandle>(null);
 
@@ -140,7 +158,7 @@ const MainContent: React.FC<{ viewId: string }> = ({ viewId }) => {
   const handleResizePanel: PanelOnResize = (size) => {
     window.clearTimeout(timerId.current);
     timerId.current = window.setTimeout(() => {
-      const group = getPanelGroupElement("content");
+      const group = getPanelGroupElement(viewPanelGroupId);
       if (!group) {
         return;
       }
@@ -149,7 +167,7 @@ const MainContent: React.FC<{ viewId: string }> = ({ viewId }) => {
   };
 
   useLayoutEffect(() => {
-    const group = getPanelGroupElement("content");
+    const group = getPanelGroupElement(viewPanelGroupId);
     if (!group) {
       return;
     }
@@ -165,31 +183,20 @@ const MainContent: React.FC<{ viewId: string }> = ({ viewId }) => {
     };
   }, []);
 
-  if (viewStatus === "error") {
-    return <ErrorContent />;
-  }
-
   return (
-    <>
-      {view && (
-        <PanelGroup id="content" direction="horizontal">
-          <Panel
-            ref={panelRef}
-            minSize={20}
-            defaultSize={20}
-            onResize={handleResizePanel}
-          >
-            <SlicerPanel columns={view.columns} />
-          </Panel>
-          <PanelResizeHandle />
-          <Panel defaultSize={80}>
-            <MainPanel view={view} />
-          </Panel>
-        </PanelGroup>
-      )}
-      <AnimatePresence>
-        {viewStatus === "pending" && <LoadingContent />}
-      </AnimatePresence>
-    </>
+    <PanelGroup id={viewPanelGroupId} direction="horizontal">
+      <Panel
+        ref={panelRef}
+        minSize={20}
+        defaultSize={20}
+        onResize={handleResizePanel}
+      >
+        <SlicerPanel columns={view.columns} />
+      </Panel>
+      <PanelResizeHandle />
+      <Panel defaultSize={80}>
+        <MainPanel view={view} />
+      </Panel>
+    </PanelGroup>
   );
 };
