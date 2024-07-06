@@ -1,12 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Resizable, ResizableProps } from "re-resizable";
+import { LegacyRef } from "react";
 
 type Props = Omit<
   ResizableProps,
   "handleClasses" | "handleComponent" | "enable" | "className"
-> & { direction: "left" | "right" };
+> & { direction: "left" | "right"; resizableRef?: LegacyRef<Resizable> };
 
-export const ResizablePanel: React.FC<Props> = ({ direction, ...props }) => {
+export const ResizablePanel: React.FC<Props> = ({
+  direction,
+  resizableRef,
+  ...props
+}) => {
   const directionClass = { left: "border-l", right: "border-r" };
 
   const handleClass = "z-[100] flex justify-center group";
@@ -16,6 +21,7 @@ export const ResizablePanel: React.FC<Props> = ({ direction, ...props }) => {
 
   return (
     <Resizable
+      ref={resizableRef}
       enable={{ right: direction === "right", left: direction === "left" }}
       handleClasses={{ right: handleClass, left: handleClass }}
       handleComponent={{ right: handle, left: handle }}

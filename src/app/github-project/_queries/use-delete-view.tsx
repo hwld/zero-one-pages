@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../_components/toast/use-toast";
 import { deleteView } from "../_backend/view/api";
 import { viewQueryOption } from "./use-view";
+import { SlicerPanelWidthStorage } from "../_lib/slicer-panel-width-storage";
 
 type UseDeleteViewArgs = {
   // 使用する側で、mutation.mutate(data, { onSuccess })使用すると、コンポーネントがアンマウントされたときに実行されない。
@@ -25,6 +26,7 @@ export const useDeleteView = ({ onSuccess }: UseDeleteViewArgs) => {
         queryKey: viewQueryOption(id).queryKey,
         exact: true,
       });
+      SlicerPanelWidthStorage.remove(id);
       onSuccess?.();
     },
 
