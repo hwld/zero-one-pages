@@ -4,7 +4,7 @@ import {
   MoreHorizontalIcon,
   PanelRightOpenIcon,
 } from "lucide-react";
-import React, { Suspense, useState } from "react";
+import React, { Suspense } from "react";
 import { Tooltip } from "./_components/tooltip";
 import {
   AppHeader,
@@ -19,9 +19,18 @@ import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 import { BG_COLOR_CLASS } from "./consts";
+import { useLocalStorage } from "@mantine/hooks";
 
 const GitHubProjectPage: React.FC = () => {
-  const [isDetailPinned, setIsDetailPinned] = useState(false);
+  const [isDetailPinned, setIsDetailPinned] = useLocalStorage({
+    key: "is-detail-pinned",
+    defaultValue: false,
+  });
+
+  const handleTogglePin = () => {
+    // setIsDetailPinned(s => !s) を使うと、複数回呼ばれて(?)期待しない値になる
+    setIsDetailPinned(!isDetailPinned);
+  };
 
   useBodyBgColor(BG_COLOR_CLASS);
   useGitHubProjectCommands();
@@ -70,7 +79,7 @@ const GitHubProjectPage: React.FC = () => {
           <Suspense>
             <TaskDetailPanel
               isPinned={isDetailPinned}
-              onTogglePin={() => setIsDetailPinned((s) => !s)}
+              onTogglePin={handleTogglePin}
             />
           </Suspense>
         </div>
