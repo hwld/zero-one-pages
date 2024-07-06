@@ -137,7 +137,7 @@ const ViewContent: React.FC<{ viewId: string }> = ({ viewId }) => {
     <>
       {view && (
         <div className="grid grid-cols-[auto,1fr] grid-rows-1">
-          <ViewSlicerPanel view={view} />
+          <ResizableViewSlicerPanel view={view} />
           <MainPanel view={view} />
         </div>
       )}
@@ -148,10 +148,10 @@ const ViewContent: React.FC<{ viewId: string }> = ({ viewId }) => {
   );
 };
 
-const ViewSlicerPanel: React.FC<{ view: View }> = ({ view }) => {
+const ResizableViewSlicerPanel: React.FC<{ view: View }> = ({ view }) => {
   const slicerPanelRef = useRef<Resizable>(null);
 
-  const handleResizeSlicerPanel: ResizeCallback = (_, __, element) => {
+  const handleResize: ResizeCallback = (_, __, element) => {
     SlicerPanelWidthStorage.set({
       viewId: view.id,
       width: element.offsetWidth,
@@ -172,7 +172,7 @@ const ViewSlicerPanel: React.FC<{ view: View }> = ({ view }) => {
       direction="right"
       minWidth={200}
       defaultSize={{ width: 400 }}
-      onResizeStop={handleResizeSlicerPanel}
+      onResizeStop={handleResize}
     >
       <SlicerPanel columns={view.columns} />
     </ResizablePanel>

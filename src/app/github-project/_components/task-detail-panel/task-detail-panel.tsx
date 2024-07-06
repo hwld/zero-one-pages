@@ -7,12 +7,14 @@ import {
 } from "@floating-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { appHeaderHeightPx } from "../app-header/app-header";
 import { TaskDetailPanelContent } from "./panel-content";
 import { useSearchParams } from "../../use-search-params";
 import { HomeSearchParamsSchema, Routes } from "../../routes";
 import { ResizablePanel } from "../resizable-panel";
+import { Resizable, ResizeCallback } from "re-resizable";
+import { TaskDetailPanelWidthStorage } from "../../_lib/task-detail-panel-width-storage";
 
 const overlayClass = "detail-panel-overlay";
 
@@ -36,18 +38,12 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
 
   if (isPinned && taskId) {
     return (
-      <ResizablePanel
-        direction="left"
-        minWidth={300}
-        defaultSize={{ width: 700 }}
-      >
-        <TaskDetailPanelContent
-          taskId={taskId}
-          onClose={closePanel}
-          isPinned={isPinned}
-          onTogglePin={onTogglePin}
-        />
-      </ResizablePanel>
+      <ResizableTaskDetailPanel
+        taskId={taskId}
+        onClose={closePanel}
+        isPinned={isPinned}
+        onTogglePin={onTogglePin}
+      />
     );
   }
 
@@ -57,6 +53,43 @@ export const TaskDetailPanel: React.FC<Props> = ({ isPinned, onTogglePin }) => {
       taskId={taskId}
       onClose={closePanel}
     />
+  );
+};
+
+const ResizableTaskDetailPanel: React.FC<{
+  taskId: string;
+  onClose: () => void;
+  isPinned: boolean;
+  onTogglePin: () => void;
+}> = ({ taskId, onClose, isPinned, onTogglePin }) => {
+  const resizableRef = useRef<Resizable>(null);
+
+  const handleResize: ResizeCallback = (_, __, element) => {
+    TaskDetailPanelWidthStorage.set(element.offsetWidth);
+  };
+
+  useLayoutEffect(() => {
+    const width = TaskDetailPanelWidthStorage.get();
+    if (width) {
+      resizableRef.current?.updateSize({ width });
+    }
+  }, []);
+
+  return (
+    <ResizablePanel
+      resizableRef={resizableRef}
+      direction="left"
+      minWidth={300}
+      defaultSize={{ width: 700 }}
+      onResizeStop={handleResize}
+    >
+      <TaskDetailPanelContent
+        taskId={taskId}
+        onClose={onClose}
+        isPinned={isPinned}
+        onTogglePin={onTogglePin}
+      />
+    </ResizablePanel>
   );
 };
 
