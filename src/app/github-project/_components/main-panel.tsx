@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { View } from "../_backend/view/api";
 import { useMoveTask } from "../_queries/use-move-task";
 import { Button } from "./button";
-import { CreateTaskBar } from "./create-task-bar";
+import { TaskCreateBar } from "./task-create-bar";
 import { ListFilterIcon } from "lucide-react";
 import { ViewColumn } from "./view-column";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,7 +17,7 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
     scrollColumnBottomRefMap.current.set(id, div);
   };
 
-  const [createTaskBarState, setCreateTaskBarState] = useState({
+  const [taskCreateBarState, setTaskCreateBarState] = useState({
     isOpen: false,
     statusId: "",
   });
@@ -45,17 +45,17 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
       ref.scrollIntoView({ block: "end", inline: "center" });
     }
     setAddingColumnId(statusId);
-    setCreateTaskBarState({
+    setTaskCreateBarState({
       isOpen: true,
       statusId,
     });
   };
 
-  const handleCreateTaskBarOpenChange = (open: boolean) => {
+  const handleTaskCreateBarOpenChange = (open: boolean) => {
     if (!open) {
       setAddingColumnId(null);
     }
-    setCreateTaskBarState((s) => ({ ...s, isOpen: open }));
+    setTaskCreateBarState((s) => ({ ...s, isOpen: open }));
   };
 
   const handleAfterCreateTask = (statusId: string) => {
@@ -110,10 +110,10 @@ export const MainPanel: React.FC<Props> = ({ view }) => {
           })}
         </AnimatePresence>
       </div>
-      <CreateTaskBar
-        isOpen={createTaskBarState.isOpen}
-        statusId={createTaskBarState.statusId}
-        onOpenChange={handleCreateTaskBarOpenChange}
+      <TaskCreateBar
+        isOpen={taskCreateBarState.isOpen}
+        statusId={taskCreateBarState.statusId}
+        onOpenChange={handleTaskCreateBarOpenChange}
         onAfterCreate={handleAfterCreateTask}
       />
     </div>

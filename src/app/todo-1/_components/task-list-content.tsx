@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { EmptyTask } from "./empty-task";
-import { ErrorTasks } from "./error-tasks";
-import { LoadingTasks } from "./loading-tasks";
+import { TaskListEmpty } from "./task-list-empty";
+import { TaskListError } from "./task-list-error";
+import { TaskListLoading } from "./task-list-loading";
 import { TaskCard } from "./task-card/task-card";
 import { useMemo } from "react";
 import { Task } from "../_backend/task-store";
@@ -13,7 +13,7 @@ export const TaskListContent: React.FC<Props> = ({ tasks, status }) => {
     if (status === "error") {
       return (
         <div className="absolute w-full">
-          <ErrorTasks />
+          <TaskListError />
         </div>
       );
     }
@@ -21,7 +21,7 @@ export const TaskListContent: React.FC<Props> = ({ tasks, status }) => {
     if (status === "pending") {
       return (
         <div className="absolute w-full">
-          <LoadingTasks />
+          <TaskListLoading />
         </div>
       );
     }
@@ -29,7 +29,7 @@ export const TaskListContent: React.FC<Props> = ({ tasks, status }) => {
     if (tasks.length === 0) {
       return (
         <div className="absolute w-full">
-          <EmptyTask />
+          <TaskListEmpty />
         </div>
       );
     }

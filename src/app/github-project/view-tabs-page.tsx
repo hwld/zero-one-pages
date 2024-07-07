@@ -9,7 +9,7 @@ import { SlicerPanel } from "./_components/slicer-panel/slicer-panel";
 import { MainPanel } from "./_components/main-panel";
 import { LoadingAnimation } from "./_components/loading-animation";
 import { AnimatePresence, motion } from "framer-motion";
-import { CreateViewDialogTrigger } from "./_components/create-view-dialog";
+import { ViewCreateDialogTrigger } from "./_components/view-create-dialog";
 import { HomeSearchParamsSchema, Routes } from "./routes";
 import { useSearchParams } from "./use-search-params";
 import { ResizablePanel } from "./_components/resizable-panel";
@@ -66,9 +66,9 @@ export const ViewTabsPage: React.FC = () => {
               </ViewTabLink>
             );
           })}
-          <CreateViewDialogTrigger>
+          <ViewCreateDialogTrigger>
             <ViewTabButton icon={PlusIcon}>New view</ViewTabButton>
-          </CreateViewDialogTrigger>
+          </ViewCreateDialogTrigger>
         </>
       }
       content={
@@ -119,9 +119,9 @@ const NoViewContent: React.FC = () => {
           Viewが存在しません
         </div>
       </div>
-      <CreateViewDialogTrigger>
+      <ViewCreateDialogTrigger>
         <Button color="primary">Viewを作成</Button>
-      </CreateViewDialogTrigger>
+      </ViewCreateDialogTrigger>
     </div>
   );
 };

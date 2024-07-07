@@ -7,9 +7,9 @@ import {
   PencilIcon,
   TrashIcon,
 } from "lucide-react";
-import { EditableTaskTitle } from "../editable-task-title";
+import { TaskEditableTitle } from "../task-editable-title";
 import { TaskCardButton } from "./task-card-button";
-import { ConfirmTaskDeleteDialog } from "../confirm-task-delete-dialog";
+import { TaskDeleteConfirmDialog } from "../task-delete-confirm-dialog";
 import { Task } from "../../_backend/task-store";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import { useDeleteTask } from "../../_queries/use-delete-task";
@@ -62,7 +62,7 @@ export const TaskCard: React.FC<{
               <CheckIcon size="80%" />
             </div>
           </div>
-          <EditableTaskTitle
+          <TaskEditableTitle
             key={`${task.title}-${editable}`}
             ref={titleInputRef}
             task={task}
@@ -93,7 +93,7 @@ export const TaskCard: React.FC<{
             onClick={() => setIsConfirmDeleteOpen(true)}
             icon={<TrashIcon />}
           />
-          <ConfirmTaskDeleteDialog
+          <TaskDeleteConfirmDialog
             task={task}
             isOpen={isConfirmDeleteOpen}
             onOpenChange={setIsConfirmDeleteOpen}

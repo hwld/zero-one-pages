@@ -6,7 +6,7 @@ import { TaskDescriptionForm } from "./task-description-form";
 import { useUpdateTask } from "../../_queries/use-update-task";
 import { forwardRef, useMemo } from "react";
 import { useTask } from "../../_queries/use-task";
-import { BounceDot } from "../loading-tasks";
+import { BounceDot } from "../task-list-loading";
 
 type Props = {
   taskId: string;

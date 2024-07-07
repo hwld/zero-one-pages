@@ -2,7 +2,7 @@ import { TrashIcon } from "lucide-react";
 import { DropdownItem } from "../dropdown/item";
 import { ViewSummary } from "../../_backend/view/api";
 import { useDeleteView } from "../../_queries/use-delete-view";
-import { DeleteViewConfirmDialogTrigger } from "../delete-view-confirm-dialog";
+import { ViewDeleteConfirmDialogTrigger } from "../view-delete-confirm-dialog";
 import { useRouter } from "next/navigation";
 import { Routes } from "../../routes";
 
@@ -21,7 +21,7 @@ export const DeleteViewItem: React.FC<Props> = ({ viewSummary }) => {
   };
 
   return (
-    <DeleteViewConfirmDialogTrigger
+    <ViewDeleteConfirmDialogTrigger
       onDelete={handleDeleteView}
       isDeleting={deleteViewMutation.isPending}
     >
@@ -31,6 +31,6 @@ export const DeleteViewItem: React.FC<Props> = ({ viewSummary }) => {
         red
         disabled={deleteViewMutation.isPending}
       />
-    </DeleteViewConfirmDialogTrigger>
+    </ViewDeleteConfirmDialogTrigger>
   );
 };

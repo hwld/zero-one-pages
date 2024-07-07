@@ -1,9 +1,9 @@
 import { BoxSelectIcon } from "lucide-react";
-import { TaskListStatusCard } from "./task-list-status-card";
+import { TaskListStateCard } from "./task-list-state-card";
 
-export const EmptyTask: React.FC = () => {
+export const TaskListEmpty: React.FC = () => {
   return (
-    <TaskListStatusCard>
+    <TaskListStateCard>
       <BoxSelectIcon size={80} />
       <div className="space-y-2 text-center">
         <div className="font-bold">タスクが存在しません</div>
@@ -13,6 +13,6 @@ export const EmptyTask: React.FC = () => {
           タスクを追加できます
         </div>
       </div>
-    </TaskListStatusCard>
+    </TaskListStateCard>
   );
 };

@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
-import { TaskListStatusCard } from "./task-list-status-card";
+import { TaskListStateCard } from "./task-list-state-card";
 
-export const LoadingTasks: React.FC = () => {
+export const TaskListLoading: React.FC = () => {
   return (
-    <TaskListStatusCard>
+    <TaskListStateCard>
       <div className="flex h-min items-center gap-2">
         <BounceDot delay={0} />
         <BounceDot delay={0.2} />
         <BounceDot delay={0.4} />
       </div>
-    </TaskListStatusCard>
+    </TaskListStateCard>
   );
 };
 

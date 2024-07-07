@@ -7,7 +7,7 @@ import { Button } from "./button";
 
 type Props = { children: ReactNode; viewSummary: ViewSummary };
 
-export const UpdateViewDialogTrigger: React.FC<Props> = ({
+export const ViewUpdateDialogTrigger: React.FC<Props> = ({
   children,
   viewSummary,
 }) => {

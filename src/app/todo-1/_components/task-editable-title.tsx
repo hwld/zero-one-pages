@@ -8,7 +8,7 @@ import { AlertCircleIcon } from "lucide-react";
 import { Task } from "../_backend/task-store";
 import { UpdateTaskInput, updateTaskInputSchema } from "../_backend/api";
 
-export const EditableTaskTitle = forwardRef<
+export const TaskEditableTitle = forwardRef<
   HTMLInputElement,
   {
     task: Task;

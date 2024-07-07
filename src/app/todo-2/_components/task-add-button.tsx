@@ -3,7 +3,7 @@ import { TaskAddDialog } from "./task-add-dialog";
 import { useEffect, useState } from "react";
 import { Button } from "./button";
 
-export const AddTaskButton: React.FC = () => {
+export const TaskAddButton: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleAddTask = () => {

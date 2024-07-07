@@ -1,9 +1,9 @@
 import { CircleAlertIcon } from "lucide-react";
-import { TaskListStatusCard } from "./task-list-status-card";
+import { TaskListStateCard } from "./task-list-state-card";
 
-export const ErrorTasks: React.FC = () => {
+export const TaskListError: React.FC = () => {
   return (
-    <TaskListStatusCard>
+    <TaskListStateCard>
       <CircleAlertIcon size={80} className="text-red-500" />
       <div className="space-y-2 text-center">
         <div className="font-bold">
@@ -18,6 +18,6 @@ export const ErrorTasks: React.FC = () => {
           更新する
         </button>
       </div>
-    </TaskListStatusCard>
+    </TaskListStateCard>
   );
 };

@@ -14,7 +14,7 @@ import { useDeleteTask } from "../../_queries/use-delete-task";
 import { Divider } from "../divider";
 import { DropdownCard } from "../dropdown/card";
 import { DropdownItemList, DropdownItem } from "../dropdown/item";
-import { DeleteTaskConfirmDialogTrigger } from "../delete-task-confirm-dialog";
+import { TaskDeleteConfirmDialogTrigger } from "../task-delete-confirm-dialog";
 
 type Props = {
   task: ViewTask;
@@ -64,7 +64,7 @@ export const ViewTaskCardMenu = forwardRef<HTMLDivElement, Props>(
         <Divider />
         <DropdownItemList>
           <DropdownItem icon={ArchiveIcon} label="Archive" />
-          <DeleteTaskConfirmDialogTrigger
+          <TaskDeleteConfirmDialogTrigger
             onDelete={handleDeleteTask}
             isDeleting={deleteTaskMutation.isPending}
           >
@@ -74,7 +74,7 @@ export const ViewTaskCardMenu = forwardRef<HTMLDivElement, Props>(
               red
               disabled={deleteTaskMutation.isPending}
             />
-          </DeleteTaskConfirmDialogTrigger>
+          </TaskDeleteConfirmDialogTrigger>
         </DropdownItemList>
       </DropdownCard>
     );

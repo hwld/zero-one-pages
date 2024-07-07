@@ -8,7 +8,7 @@ type Props = {
   isDeleting: boolean;
 };
 
-export const DeleteViewConfirmDialogTrigger: React.FC<Props> = ({
+export const ViewDeleteConfirmDialogTrigger: React.FC<Props> = ({
   children,
   onDelete,
   isDeleting,

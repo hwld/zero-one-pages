@@ -7,7 +7,7 @@ import { CreateViewInput } from "../_backend/view/api";
 
 type Props = { children: ReactNode };
 
-export const CreateViewDialogTrigger: React.FC<Props> = ({ children }) => {
+export const ViewCreateDialogTrigger: React.FC<Props> = ({ children }) => {
   const createViewMutation = useCreateView();
   const [isOpen, setIsOpen] = useState(false);
 

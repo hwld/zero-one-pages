@@ -1,7 +1,7 @@
 import { Task } from "../_backend/task-store";
 import { Dialog } from "./dialog";
 
-export const ConfirmTaskDeleteDialog: React.FC<{
+export const TaskDeleteConfirmDialog: React.FC<{
   task: Task;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;

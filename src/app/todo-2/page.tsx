@@ -3,9 +3,9 @@
 import { IconHome } from "@tabler/icons-react";
 import { NextPage } from "next";
 import { TaskTable } from "./_components/task-table/task-table";
-import { AddTaskButton } from "./_components/add-task-button";
+import { TaskAddButton } from "./_components/task-add-button";
 import { TaskTableFilter } from "./_components/task-table/filter";
-import { TaskSearch } from "./_components/task-search";
+import { TaskSearchForm } from "./_components/task-search-form";
 import { TaskSelectionMenu } from "./_components/task-selection-menu/task-selection-menu";
 import { Card } from "./_components/card";
 import { usePaginatedTasks } from "./_queries/use-paginated-tasks";
@@ -64,10 +64,10 @@ const Page: NextPage = () => {
           <div className="flex h-full grow flex-col gap-4">
             <div className="flex items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <TaskSearch />
+                <TaskSearchForm />
                 <TaskTableFilter />
               </div>
-              <AddTaskButton />
+              <TaskAddButton />
             </div>
             {content}
           </div>

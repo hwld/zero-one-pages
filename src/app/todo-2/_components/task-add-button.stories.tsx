@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { defaultStoryMeta } from "../story-meta";
 import { expect, fn, userEvent, within } from "@storybook/test";
-import { AddTaskButton } from "./add-task-button";
+import { TaskAddButton } from "./task-add-button";
 import { Todo2API } from "../_backend/api";
 import { HttpResponse, http } from "msw";
 import { initialTasks } from "../_backend/data";
@@ -11,9 +11,9 @@ const dummyTask = initialTasks[0];
 
 const meta = {
   ...defaultStoryMeta,
-  title: "Todo2/AddTaskButton",
-  component: AddTaskButton,
-} satisfies Meta<typeof AddTaskButton>;
+  title: "Todo2/TaskAddButton",
+  component: TaskAddButton,
+} satisfies Meta<typeof TaskAddButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

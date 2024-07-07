@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "./button";
 import { useTaskTableSearch } from "./task-table/search-provider";
 
-export const TaskSearch: React.FC = () => {
+export const TaskSearchForm: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const { search } = useTaskTableSearch();
 

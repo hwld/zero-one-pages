@@ -17,7 +17,8 @@ type Props = {
   statusId: string;
   onAfterCreate?: (statusId: string) => void;
 };
-export const CreateTaskBar: React.FC<Props> = ({
+
+export const TaskCreateBar: React.FC<Props> = ({
   isOpen,
   onOpenChange,
   statusId,
