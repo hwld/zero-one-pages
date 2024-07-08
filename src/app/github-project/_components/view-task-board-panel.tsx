@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 type Props = { view: View };
 
-export const MainPanel: React.FC<Props> = ({ view }) => {
+export const ViewTaskBoardPanel: React.FC<Props> = ({ view }) => {
   const [addingColumnId, setAddingColumnId] = useState<string | null>(null);
 
   const scrollColumnBottomRefMap = useRef(new Map<string, HTMLDivElement>());

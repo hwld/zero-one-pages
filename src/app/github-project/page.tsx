@@ -13,7 +13,7 @@ import {
 import { ButtonGroupItem } from "./_components/button-group-item";
 import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { Toaster } from "./_components/toast/toaster";
-import { ViewTabsPage } from "./view-tabs-page";
+import { ViewTabs } from "./_components/view-tabs/view-tabs";
 import { useGitHubProjectCommands } from "./commands";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
@@ -73,7 +73,7 @@ const GitHubProjectPage: React.FC = () => {
               </div>
             </div>
             <Suspense>
-              <ViewTabsPage />
+              <ViewTabs />
             </Suspense>
           </div>
           <Suspense>
