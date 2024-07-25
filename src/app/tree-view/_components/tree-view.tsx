@@ -4,6 +4,7 @@ import {
   createContext,
   KeyboardEvent,
   ReactNode,
+  SyntheticEvent,
   useContext,
   useState,
 } from "react";
@@ -19,14 +20,16 @@ import {
   RovingTabindexRoot,
   useRovingTabindex,
 } from "./roving-tabindex";
+import { cn } from "@/lib/utils";
 
-export type TreeViewState = Map<string, boolean>;
+export type NodeStates = Map<string, boolean>;
 
 export type TreeViewContextType = {
-  open: TreeViewState;
+  nodeStates: NodeStates;
   toggleNode: (id: string, isOpen: boolean) => void;
   selectedId: string | null;
   selectId: (id: string) => void;
+  expandOnlyOnIconClick: boolean;
 };
 
 export const TreeViewContext = createContext<TreeViewContextType | undefined>(
@@ -42,16 +45,15 @@ const useTreeViewContext = () => {
 };
 
 const useTreeViewNodeState = () => {
-  // TODO
-  const [nodeState, setNodeState] = useState<TreeViewState>(new Map());
+  const [nodeStates, setNodeStates] = useState<NodeStates>(new Map());
 
   const toggleNode = (id: string, isOpen: boolean) => {
-    setNodeState((map) => {
+    setNodeStates((map) => {
       return new Map(map).set(id, isOpen);
     });
   };
 
-  return { nodeState, toggleNode };
+  return { nodeStates, toggleNode };
 };
 
 type TreeViewProps = {
@@ -60,6 +62,7 @@ type TreeViewProps = {
   value: string | null;
   onChange: (id: string) => void;
   label: string;
+  expandOnlyOnIconClick?: boolean;
 };
 
 export const TreeView: React.FC<TreeViewProps> = ({
@@ -68,16 +71,18 @@ export const TreeView: React.FC<TreeViewProps> = ({
   value,
   onChange,
   label,
+  expandOnlyOnIconClick = false,
 }) => {
-  const { nodeState, toggleNode } = useTreeViewNodeState();
+  const { nodeStates, toggleNode } = useTreeViewNodeState();
 
   return (
     <TreeViewContext.Provider
       value={{
-        open: nodeState,
+        nodeStates,
         toggleNode,
         selectedId: value,
         selectId: onChange,
+        expandOnlyOnIconClick,
       }}
     >
       <RovingTabindexRoot
@@ -124,15 +129,42 @@ export function Arrow({ open, className }: IconProps) {
 
 type TreeViewNodeProps = {
   node: TreeNodeType;
+  classNames: {
+    selected: string;
+    groupFocus: string;
+    hover: string;
+    hoverIcon?: string;
+  };
 };
 
 export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
+  classNames,
   node: { id, children, name },
 }) => {
-  const { open, toggleNode, selectId, selectedId } = useTreeViewContext();
+  const {
+    nodeStates,
+    toggleNode,
+    selectId,
+    selectedId,
+    expandOnlyOnIconClick,
+  } = useTreeViewContext();
   const { isFocusable, getRovingProps, getOrderedItems } =
     useRovingTabindex(id);
-  const isOpen = open.get(id);
+  const isOpen = nodeStates.get(id);
+
+  const handleClickNode = () => {
+    if (!expandOnlyOnIconClick) {
+      toggleNode(id, !isOpen);
+    }
+    selectId(id);
+  };
+
+  const handleClickIcon = (e: SyntheticEvent) => {
+    if (expandOnlyOnIconClick) {
+      e.stopPropagation();
+      toggleNode(id, !isOpen);
+    }
+  };
 
   return (
     <li
@@ -190,23 +222,41 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
       >
         <div
           className={clsx(
-            "flex items-center space-x-2 border-[1.5px] border-transparent px-1 font-mono font-medium",
-            isFocusable && "group-focus:border-slate-500",
-            selectedId === id ? "bg-slate-200" : "bg-transparent",
+            "overflow-hidden rounded transition-colors duration-75",
+            selectedId === id ? classNames.selected : "bg-transparent",
           )}
-          onClick={() => {
-            toggleNode(id, !isOpen);
-            selectId(id);
-          }}
         >
-          {children?.length ? (
-            <Arrow className="h-4 w-4 shrink-0" open={isOpen} />
-          ) : (
-            <span className="h-4 w-4" />
-          )}
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-            {name}
-          </span>
+          <div
+            className={clsx(
+              "transition-colors duration-75",
+              isFocusable && classNames.groupFocus,
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center px-1 font-mono font-medium transition-colors duration-75",
+                classNames.hover,
+              )}
+              onClick={handleClickNode}
+            >
+              {children?.length ? (
+                <button
+                  className={clsx(
+                    "toggle-button grid size-5 place-items-center rounded transition-all duration-75",
+                    expandOnlyOnIconClick && classNames.hoverIcon,
+                  )}
+                  onClick={handleClickIcon}
+                >
+                  <Arrow className="size-4 shrink-0" open={isOpen} />
+                </button>
+              ) : (
+                <span className="size-5" />
+              )}
+              <span className="grow overflow-hidden text-ellipsis whitespace-nowrap pl-2">
+                {name}
+              </span>
+            </div>
+          </div>
         </div>
         <AnimatePresence initial={false}>
           {children?.length && isOpen && (
@@ -245,7 +295,11 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
               className="relative pl-4"
             >
               {children.map((node) => (
-                <TreeViewNode node={node} key={node.id} />
+                <TreeViewNode
+                  classNames={classNames}
+                  node={node}
+                  key={node.id}
+                />
               ))}
             </motion.ul>
           )}
@@ -254,5 +308,3 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
     </li>
   );
 };
-
-export const Treeview = { Root: TreeView, Node: TreeViewNode };

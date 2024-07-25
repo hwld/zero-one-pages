@@ -1,7 +1,7 @@
 "use client";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
-import { TreeNodeType, Treeview } from "./_components/tree-view";
+import { TreeNodeType, TreeView, TreeViewNode } from "./_components/tree-view";
 import { useState } from "react";
 
 const bgClass = "bg-slate-50";
@@ -10,14 +10,45 @@ const Page = () => {
   useBodyBgColor(bgClass);
 
   const [selected, setSelected] = useState<string | null>(null);
+  const [expandOnlyOnIconClick, setExpandOnlyOnIconClick] = useState(false);
+
   return (
     <div className={clsx(bgClass, "grid h-screen place-items-center")}>
-      <div className="h-[500px] w-[300px] overflow-auto rounded border border-slate-400 p-3">
-        <Treeview.Root label="??" value={selected} onChange={setSelected}>
-          {data.map((node) => (
-            <Treeview.Node node={node} key={node.id} />
-          ))}
-        </Treeview.Root>
+      <div className="space-y-2">
+        <div className="h-[500px] w-[300px] overflow-auto rounded border border-slate-300 p-3">
+          <TreeView
+            label="tree"
+            value={selected}
+            onChange={setSelected}
+            expandOnlyOnIconClick={expandOnlyOnIconClick}
+          >
+            {data.map((node) => (
+              <TreeViewNode
+                key={node.id}
+                classNames={{
+                  selected: "bg-blue-300",
+                  groupFocus: "group-focus:bg-blue-300/50",
+                  hover: "hover:bg-blue-300/20",
+                  hoverIcon:
+                    "hover:bg-blue-700/20 hover:border border-blue-500",
+                }}
+                node={node}
+              />
+            ))}
+          </TreeView>
+        </div>
+        <div className="flex gap-1">
+          <input
+            type="checkbox"
+            id="1"
+            className="size-4"
+            checked={expandOnlyOnIconClick}
+            onChange={(e) => setExpandOnlyOnIconClick(e.target.checked)}
+          />
+          <label htmlFor="1" className="select-none text-sm">
+            アイコンクリックでのみ開閉する
+          </label>
+        </div>
       </div>
     </div>
   );
