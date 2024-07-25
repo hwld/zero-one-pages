@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { AnimatePresence, motion, MotionConfig } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig, Variants } from "framer-motion";
 import {
   createContext,
   KeyboardEvent,
@@ -61,7 +61,7 @@ type TreeViewProps = {
   className?: string;
   value: string | null;
   onChange: (id: string) => void;
-  label: string;
+  label?: string;
   expandOnlyOnIconClick?: boolean;
 };
 
@@ -126,8 +126,39 @@ export function Arrow({ open, className }: IconProps) {
     </motion.svg>
   );
 }
+const treeAnimation: Variants = {
+  initial: {
+    height: 0,
+    opacity: 0,
+  },
+  animate: {
+    height: "auto",
+    opacity: 1,
+    transition: {
+      height: {
+        duration: 0.25,
+      },
+      opacity: {
+        duration: 0.2,
+        delay: 0.05,
+      },
+    },
+  },
+  exit: {
+    height: 0,
+    opacity: 0,
+    transition: {
+      height: {
+        duration: 0.25,
+      },
+      opacity: {
+        duration: 0.2,
+      },
+    },
+  },
+};
 
-type TreeViewNodeProps = {
+export type TreeViewNodeProps = {
   node: TreeNodeType;
   classNames: {
     selected: string;
@@ -228,7 +259,7 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
         >
           <div
             className={clsx(
-              "transition-colors duration-75",
+              "rounded border border-transparent transition-colors duration-75",
               isFocusable && classNames.groupFocus,
             )}
           >
@@ -242,7 +273,7 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
               {children?.length ? (
                 <button
                   className={clsx(
-                    "toggle-button grid size-5 place-items-center rounded transition-all duration-75",
+                    "grid size-5 shrink-0 place-items-center rounded transition-all duration-75",
                     expandOnlyOnIconClick && classNames.hoverIcon,
                   )}
                   onClick={handleClickIcon}
@@ -261,35 +292,7 @@ export const TreeViewNode: React.FC<TreeViewNodeProps> = ({
         <AnimatePresence initial={false}>
           {children?.length && isOpen && (
             <motion.ul
-              initial={{
-                height: 0,
-                opacity: 0,
-              }}
-              animate={{
-                height: "auto",
-                opacity: 1,
-                transition: {
-                  height: {
-                    duration: 0.25,
-                  },
-                  opacity: {
-                    duration: 0.2,
-                    delay: 0.05,
-                  },
-                },
-              }}
-              exit={{
-                height: 0,
-                opacity: 0,
-                transition: {
-                  height: {
-                    duration: 0.25,
-                  },
-                  opacity: {
-                    duration: 0.2,
-                  },
-                },
-              }}
+              {...treeAnimation}
               key={"ul"}
               role="group"
               className="relative pl-4"

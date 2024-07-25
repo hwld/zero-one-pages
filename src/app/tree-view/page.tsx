@@ -1,47 +1,67 @@
 "use client";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
-import { TreeNodeType, TreeView, TreeViewNode } from "./_components/tree-view";
-import { useState } from "react";
+import {
+  TreeNodeType,
+  TreeView,
+  TreeViewNode,
+  TreeViewNodeProps,
+} from "./_components/tree-view";
+import { ComponentPropsWithoutRef, useState } from "react";
+import { createData } from "./_lib/data";
+import { cn } from "@/lib/utils";
 
 const bgClass = "bg-slate-50";
+
+type TreeViewCardProps = {
+  expandOnlyOnIconClick: boolean;
+  data: TreeNodeType[];
+  classNames: TreeViewNodeProps["classNames"];
+} & ComponentPropsWithoutRef<"div">;
+
+const TreeViewCard: React.FC<TreeViewCardProps> = ({
+  expandOnlyOnIconClick,
+  data,
+  classNames,
+  className,
+  ...props
+}) => {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  return (
+    <div
+      className={cn("h-[500px] w-[300px] overflow-auto rounded p-3", className)}
+      {...props}
+    >
+      <TreeView
+        value={selected}
+        onChange={setSelected}
+        expandOnlyOnIconClick={expandOnlyOnIconClick}
+      >
+        {data.map((node) => (
+          <TreeViewNode key={node.id} classNames={classNames} node={node} />
+        ))}
+      </TreeView>
+    </div>
+  );
+};
+
+const data1 = createData();
+const data2 = createData();
 
 const Page = () => {
   useBodyBgColor(bgClass);
 
-  const [selected, setSelected] = useState<string | null>(null);
   const [expandOnlyOnIconClick, setExpandOnlyOnIconClick] = useState(false);
 
   return (
-    <div className={clsx(bgClass, "grid h-screen place-items-center")}>
-      <div className="space-y-2">
-        <div className="h-[500px] w-[300px] overflow-auto rounded border border-slate-300 p-3">
-          <TreeView
-            label="tree"
-            value={selected}
-            onChange={setSelected}
-            expandOnlyOnIconClick={expandOnlyOnIconClick}
-          >
-            {data.map((node) => (
-              <TreeViewNode
-                key={node.id}
-                classNames={{
-                  selected: "bg-blue-300",
-                  groupFocus: "group-focus:bg-blue-300/50",
-                  hover: "hover:bg-blue-300/20",
-                  hoverIcon:
-                    "hover:bg-blue-700/20 hover:border border-blue-500",
-                }}
-                node={node}
-              />
-            ))}
-          </TreeView>
-        </div>
-        <div className="flex gap-1">
+    <div className={clsx(bgClass, "grid h-screen place-items-center ")}>
+      <div className="space-y-4">
+        <div className="flex w-full items-center gap-1 rounded border  border-slate-300 p-2">
           <input
             type="checkbox"
             id="1"
-            className="size-4"
+            className="size-4 accent-slate-700"
             checked={expandOnlyOnIconClick}
             onChange={(e) => setExpandOnlyOnIconClick(e.target.checked)}
           />
@@ -49,228 +69,34 @@ const Page = () => {
             アイコンクリックでのみ開閉する
           </label>
         </div>
+        <div className="flex gap-4">
+          <TreeViewCard
+            data={data1}
+            expandOnlyOnIconClick={expandOnlyOnIconClick}
+            className="border border-slate-300 bg-slate-100 text-slate-900"
+            classNames={{
+              selected: "bg-slate-300",
+              groupFocus: "group-focus:border-slate-400",
+              hover: "hover:bg-slate-300/40",
+              hoverIcon: "hover:outline outline-1 outline-slate-500",
+            }}
+          />
+          <TreeViewCard
+            data={data2}
+            expandOnlyOnIconClick={expandOnlyOnIconClick}
+            className="bg-slate-900 text-slate-100"
+            style={{ colorScheme: "dark" }}
+            classNames={{
+              selected: "bg-slate-600",
+              groupFocus: "group-focus:border-slate-500",
+              hover: "hover:bg-slate-600/40",
+              hoverIcon: "hover:outline outline-1 outline-slate-300",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
 export default Page;
-
-export const data: TreeNodeType[] = [
-  {
-    id: crypto.randomUUID(),
-    name: "components",
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: "toggle-group",
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: "index.ts",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "toggle-group.tsx",
-          },
-        ],
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "treeview",
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: "icons.tsx",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "index.tsx",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "treeview.tsx",
-          },
-        ],
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "long-component-folder-name-that-overflows",
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: "index.tsx",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "long-component.tsx",
-          },
-        ],
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "index.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "long-util-file-name-that-overflows.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "roving-tabindex.tsx",
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "lib",
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: "treeview",
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: "index.ts",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "initialValue.ts",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "tree-state.tsx",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "useTreeNode.tsx",
-          },
-        ],
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "utils",
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: "chainable-map.ts",
-          },
-          {
-            id: crypto.randomUUID(),
-            name: "index.ts",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "pages",
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: "_app.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "_document.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "index.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "toggle-group.tsx",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "treeview.tsx",
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "public",
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: "favicon.ico",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "file.png",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "folder.png",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "next.svg",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "thirteen.svg",
-      },
-      {
-        id: crypto.randomUUID(),
-        name: "vercel.svg",
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "styles",
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: "global.css",
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    name: ".eslintrc.json",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: ".gitignore",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: ".prettierrc.js",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "next-env.d.ts",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "next.config.js",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "package.json",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "postcss.config.js",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "README.md",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "tailwind.config.js",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "tsconfig.json",
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "yarn.lock",
-  },
-];
