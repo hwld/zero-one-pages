@@ -4,6 +4,7 @@ import {
   FullscreenIcon,
   KanbanSquareIcon,
   LayoutListIcon,
+  ListTreeIcon,
   LucideIcon,
   MessageSquareMoreIcon,
   PlayCircleIcon,
@@ -22,7 +23,8 @@ export type PageLink =
   | "/continuty-transition"
   | "/github-project"
   | "/audio-player"
-  | "/calendar";
+  | "/calendar"
+  | "/tree-view";
 
 export type Page = {
   icon: LucideIcon;
@@ -67,7 +69,7 @@ export const pages: Page[] = [
   {
     icon: RectangleEllipsisIcon,
     href: "/dynamic-island",
-    title: "変形するメニュー2",
+    title: "Dynamic Island",
     description:
       "Dynamic Islandみたいなメニュー。\nframer-motionでspring animationを使ってみた。",
     tags: ["PC", "MOBILE", "PART"],
@@ -103,5 +105,13 @@ export const pages: Page[] = [
     description:
       "Google Calendarみたいなカレンダー。メインのカレンダーには日付操作ライブラリだけ使った。",
     tags: ["PC", "LAYOUT", "PRIME"],
+  },
+  {
+    icon: ListTreeIcon,
+    href: "/tree-view",
+    title: "TreeView",
+    description:
+      "階層構造のデータを視覚的に表示するためのTreeViewコンポーネント。",
+    tags: ["PC", "PART"],
   },
 ];
