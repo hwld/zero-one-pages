@@ -2,7 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { fetchAllTaskStatus } from "../_backend/task-status/api";
 import { useMswState } from "@/app/_providers/msw-provider";
 
-export const allTaskStatusQueryOption = () =>
+const allTaskStatusQueryOption = () =>
   queryOptions({
     queryKey: ["allTaskStatus"],
     queryFn: () => {

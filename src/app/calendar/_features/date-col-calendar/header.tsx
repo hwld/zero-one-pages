@@ -18,7 +18,7 @@ import { DATE_EVENT_MIN_HEIGHT } from "../event-in-col/utils";
 import { useOptimisticEventsInRow } from "../event-in-row/use-optimistic-events-in-row";
 import { useMinuteClock } from "../../_components/use-minute-clock";
 
-export const DAY_TITLE_HEIGHT = 28;
+const DAY_TITLE_HEIGHT = 28;
 
 type Props = {
   calendarYearMonth: Date;

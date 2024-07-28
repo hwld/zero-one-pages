@@ -176,7 +176,7 @@ type FilterItemProps = {
   isSelected: boolean;
   onSelect: () => void;
 };
-export const FilterItem: React.FC<FilterItemProps> = ({
+const FilterItem: React.FC<FilterItemProps> = ({
   label,
   icon: Icon,
   isSelected = true,

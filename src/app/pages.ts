@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 type Tag = "PC" | "MOBILE" | "LAYOUT" | "PART" | "WIP" | "PRIME";
-export type PageLink =
+type PageLink =
   | "/"
   | "/todo-1"
   | "/todo-2"

@@ -4,7 +4,7 @@ import { Event, eventSchema, eventStore } from "./event-store";
 import { fetcher } from "@/lib/fetcher";
 import { isSameMinute } from "date-fns";
 
-export const CalendarAPI = {
+const CalendarAPI = {
   base: "/calendar/api",
   events: () => `${CalendarAPI.base}/events`,
   event: (id?: string) => `${CalendarAPI.events()}/${id ?? ":id"}`,
@@ -46,10 +46,10 @@ export const eventInputSchema = z
   );
 export type EventInput = z.infer<typeof eventInputSchema>;
 
-export const createEventInputSchema = eventInputSchema;
+const createEventInputSchema = eventInputSchema;
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 
-export const updateEventInputSchema = eventInputSchema;
+const updateEventInputSchema = eventInputSchema;
 export type UpdateEventInput = z.infer<typeof updateEventInputSchema>;
 
 export const fetchEvents = async (): Promise<Event[]> => {
@@ -58,14 +58,6 @@ export const fetchEvents = async (): Promise<Event[]> => {
   const events = z.array(eventSchema).parse(json);
 
   return events;
-};
-
-export const fetchEvent = async (id: string): Promise<Event> => {
-  const res = await fetcher.get(CalendarAPI.event(id));
-  const json = await res.json();
-  const event = eventSchema.parse(json);
-
-  return event;
 };
 
 export const createEvent = async (input: CreateEventInput): Promise<Event> => {

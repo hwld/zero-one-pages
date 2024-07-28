@@ -5,10 +5,10 @@ import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./task-store";
 import { fetcher } from "@/lib/fetcher";
 
-export const sortOrderSchema = z.union([z.literal("asc"), z.literal("desc")]);
+const sortOrderSchema = z.union([z.literal("asc"), z.literal("desc")]);
 export type SortOrder = z.infer<typeof sortOrderSchema>;
 
-export const sortEntrySchema = z.object({
+const sortEntrySchema = z.object({
   field: z.union([
     z.literal("title"),
     z.literal("createdAt"),
@@ -18,13 +18,12 @@ export const sortEntrySchema = z.object({
 });
 export type SortEntry = z.infer<typeof sortEntrySchema>;
 
-export const paginationEntrySchema = z.object({
+const paginationEntrySchema = z.object({
   page: z.number(),
   limit: z.number(),
 });
-export type PaginationEntry = z.infer<typeof paginationEntrySchema>;
 
-export const fieldFilterSchema = z.union([
+const fieldFilterSchema = z.union([
   z.object({
     id: z.string(),
     type: z.literal("field"),
@@ -40,7 +39,7 @@ export const fieldFilterSchema = z.union([
 ]);
 export type FieldFilter = z.infer<typeof fieldFilterSchema>;
 
-export const selectionFilterSchema = z
+const selectionFilterSchema = z
   .union([z.literal("selected"), z.literal("unselected")])
   .nullable();
 export type SelectionFilter = z.infer<typeof selectionFilterSchema>;

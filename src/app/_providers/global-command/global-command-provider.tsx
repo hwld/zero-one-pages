@@ -91,9 +91,10 @@ export const GlobalCommandProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export type GlobalCommandConfig = {
+type GlobalCommandConfig = {
   newCommands: Omit<CommandItem, "id">[];
 };
+
 export const useGlobalCommandConfig = ({
   newCommands,
 }: GlobalCommandConfig) => {

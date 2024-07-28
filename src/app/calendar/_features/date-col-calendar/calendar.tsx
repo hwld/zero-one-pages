@@ -40,7 +40,7 @@ import {
   useScrollableElement,
 } from "../event-in-col/scrollable-provider";
 
-export const DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE = 75;
+const DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE = 75;
 export const DATE_COLUMN_CALENDAR_GRID_TEMPLATE_COLUMNS = (cols: number) =>
   `${DATE_COLUMN_CALENDAR_GRID_FIRST_COL_SIZE}px repeat(${cols},1fr)`;
 
@@ -50,7 +50,7 @@ type DateColCalendarProps = {
   cols: number;
 };
 
-export const DateColCalendarImpl: React.FC<DateColCalendarProps> = ({
+const DateColCalendarImpl: React.FC<DateColCalendarProps> = ({
   cols,
   viewDate,
   events,

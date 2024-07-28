@@ -35,14 +35,14 @@ export const viewFormSchema = z.object({
 });
 export type ViewFormData = z.infer<typeof viewFormSchema>;
 
-export const createViewInputSchema = viewFormSchema;
+const createViewInputSchema = viewFormSchema;
 export type CreateViewInput = z.infer<typeof createViewInputSchema>;
 
 export const createView = async (input: CreateViewInput): Promise<void> => {
   await fetcher.post(GitHubProjectAPI.views(), { body: input });
 };
 
-export const updateViewInputSchema = viewFormSchema;
+const updateViewInputSchema = viewFormSchema;
 export type UpdateViewInput = z.infer<typeof updateViewInputSchema>;
 
 export const updateView = async ({
@@ -72,7 +72,7 @@ export const fetchViewSummaries = async (): Promise<ViewSummary[]> => {
   return viewSummaries;
 };
 
-export const moveTaskInputSchema = z.object({
+const moveTaskInputSchema = z.object({
   taskId: z.string(),
   statusId: z.string(),
   newOrder: z.coerce.number(),
@@ -86,7 +86,7 @@ export const moveTask = async ({
   await fetcher.post(GitHubProjectAPI.moveTask(viewId), { body });
 };
 
-export const moveColumnInputSchema = z.object({
+const moveColumnInputSchema = z.object({
   statusId: z.string(),
   newOrder: z.coerce.number(),
 });

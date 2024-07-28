@@ -21,9 +21,9 @@ export const viewRecordSchema = z.object({
   taskRecords: z.array(viewTaskRecordSchema),
 });
 
-export type ViewColumnRecord = z.infer<typeof viewColumnRecordSchema>;
-export type ViewTaskRecord = z.infer<typeof viewTaskRecordSchema>;
-export type ViewRecord = z.infer<typeof viewRecordSchema>;
+type ViewColumnRecord = z.infer<typeof viewColumnRecordSchema>;
+type ViewTaskRecord = z.infer<typeof viewTaskRecordSchema>;
+type ViewRecord = z.infer<typeof viewRecordSchema>;
 
 class ViewRecordStore {
   private viewRecords = [...new Array(3)].map((_, i): ViewRecord => {

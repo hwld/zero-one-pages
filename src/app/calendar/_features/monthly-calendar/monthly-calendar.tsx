@@ -17,7 +17,7 @@ type Props = {
   events: Event[];
 };
 
-export const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
+const MonthlyCalendarImpl: React.FC<Props> = ({ yearMonth, events }) => {
   const year = useMemo(() => {
     return yearMonth.getFullYear();
   }, [yearMonth]);

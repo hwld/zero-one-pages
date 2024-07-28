@@ -8,7 +8,7 @@ import { DropdownTrigger } from "../dropdown/trigger";
 import { ViewTaskCardMenu } from "./menu";
 import { TaskStatusSelectionMenu } from "./task-status-selection-menu/menu";
 
-export type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
+type ViewTaskMenuMode = "close" | "main" | "moveToColumn";
 
 type Props = {
   columns: ViewColumn[];

@@ -7,7 +7,7 @@ import {
   useRef,
 } from "react";
 
-export type ScrollableRootContext = {
+type ScrollableRootContext = {
   scrollableRootRef: RefObject<HTMLDivElement>;
 };
 

@@ -15,7 +15,8 @@ export const taskSchema = z.object({
 
 export type Task = z.infer<typeof taskSchema>;
 
-export type TaskStoreErrorSimulationScope = "getAll" | "mutation";
+type TaskStoreErrorSimulationScope = "getAll" | "mutation";
+
 class TaskStore {
   private tasks: Task[] = initialTasks;
   private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();

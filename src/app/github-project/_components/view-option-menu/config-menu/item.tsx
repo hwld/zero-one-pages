@@ -19,6 +19,6 @@ export const ConfigMenuItem = forwardRef<HTMLButtonElement, Props>(
   },
 );
 
-export const SelectedIcon: IconComponent = () => {
+const SelectedIcon: IconComponent = () => {
   return <CheckIcon size={20} className="text-neutral-100" />;
 };

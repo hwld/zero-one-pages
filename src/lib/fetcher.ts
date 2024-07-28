@@ -1,5 +1,5 @@
 type Resource = Parameters<typeof fetch>[0];
-export type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
+type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
 
 type Args = [Resource, FetchOptions?];
 

@@ -37,7 +37,7 @@ export const DAILY_CALENDAR_TYPE = {
   days: 1,
 } as const satisfies CalendarType;
 
-export type CalendarInfo = {
+type CalendarInfo = {
   selectedDate: Date;
   viewDates: Date[];
   type: CalendarType;

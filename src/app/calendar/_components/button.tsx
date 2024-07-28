@@ -8,7 +8,7 @@ type ButtonBaseProps = {
   isPending?: boolean;
 } & ComponentPropsWithoutRef<"button">;
 
-export const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
+const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
   function ButtonBase(
     { className, children, isPending = false, ...props },
     ref,
@@ -34,7 +34,7 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
   },
 );
 
-export type ButtonProps = {
+type ButtonProps = {
   variant?: "default" | "ghost";
   size?: "md" | "sm";
   active?: boolean;

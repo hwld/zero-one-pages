@@ -22,9 +22,9 @@ import {
 } from "./roving-tabindex";
 import { cn } from "@/lib/utils";
 
-export type NodeStates = Map<string, boolean>;
+type NodeStates = Map<string, boolean>;
 
-export type TreeViewContextType = {
+type TreeViewContextType = {
   nodeStates: NodeStates;
   toggleNode: (id: string, isOpen: boolean) => void;
   selectedId: string | null;
@@ -32,7 +32,7 @@ export type TreeViewContextType = {
   expandOnlyOnIconClick: boolean;
 };
 
-export const TreeViewContext = createContext<TreeViewContextType | undefined>(
+const TreeViewContext = createContext<TreeViewContextType | undefined>(
   undefined,
 );
 
@@ -107,7 +107,7 @@ export type TreeNodeType = {
 
 type IconProps = { open?: boolean; className?: string };
 
-export function Arrow({ open, className }: IconProps) {
+function Arrow({ open, className }: IconProps) {
   return (
     <motion.svg
       xmlns="http://www.w3.org/2000/svg"

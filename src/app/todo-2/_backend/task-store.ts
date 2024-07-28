@@ -26,7 +26,8 @@ export const getTaskStatusLabel = (status: Task["status"]) => {
   }
 };
 
-export type TaskStoreErrorSimulationScope = "getAll" | "get";
+type TaskStoreErrorSimulationScope = "getAll" | "get";
+
 class TaskStore {
   private allTasks: Task[] = initialTasks;
   private errorSimulationScopes: Set<TaskStoreErrorSimulationScope> = new Set();

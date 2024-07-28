@@ -109,7 +109,7 @@ export const calcEventInColCardStyle = ({
   return { top, left: `${left}%`, width: `${width}%`, height };
 };
 
-export const isSameAmPm = (date1: Date, date2: Date) => {
+const isSameAmPm = (date1: Date, date2: Date) => {
   const h1 = getHours(date1);
   const h2 = getHours(date2);
   const isAm1 = h1 >= 0 && h1 < 12;
