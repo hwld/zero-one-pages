@@ -1,5 +1,6 @@
 import {
   CalendarIcon,
+  CircleCheckIcon,
   CircleEllipsisIcon,
   FullscreenIcon,
   KanbanSquareIcon,
@@ -24,7 +25,8 @@ export type PageLink =
   | "/github-project"
   | "/audio-player"
   | "/calendar"
-  | "/tree-view";
+  | "/tree-view"
+  | "/todoist";
 
 export type Page = {
   icon: LucideIcon;
@@ -113,5 +115,12 @@ export const pages: Page[] = [
     description:
       "階層構造のデータを視覚的に表示するためのTreeViewコンポーネント。",
     tags: ["PC", "PART"],
+  },
+  {
+    icon: CircleCheckIcon,
+    href: "/todoist",
+    title: "Todoist",
+    description: "TodoistのUIを作ってみた。",
+    tags: ["PC", "PART", "WIP"],
   },
 ];
