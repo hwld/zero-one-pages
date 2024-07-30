@@ -5,7 +5,9 @@ import {
   useNavigation,
   DayPicker as ReactDayPicker,
 } from "react-day-picker";
-import { TbArrowBackUp, TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { TbArrowBackUp } from "@react-icons/all-files/tb/TbArrowBackUp";
+import { TbChevronRight } from "@react-icons/all-files/tb/TbChevronRight";
+import { TbChevronLeft } from "@react-icons/all-files/tb/TbChevronLeft";
 import { WEEK_DAY_LABELS } from "../consts";
 import { IconButton } from "./button";
 

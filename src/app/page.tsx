@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { pages } from "./pages";
-import { IoLogoGithub } from "react-icons/io";
+import { IoLogoGithub } from "@react-icons/all-files/io/IoLogoGithub";
 import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { PageCard } from "./page-card";
 

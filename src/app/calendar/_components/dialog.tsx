@@ -9,7 +9,7 @@ import {
 } from "@floating-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
-import { TbX } from "react-icons/tb";
+import { TbX } from "@react-icons/all-files/tb/TbX";
 import { IconButton } from "./button";
 
 type Props = {

@@ -1,18 +1,16 @@
-import {
-  TbDevices,
-  TbList,
-  TbPlayerPauseFilled,
-  TbPlayerPlayFilled,
-  TbPlayerSkipBackFilled,
-  TbPlayerSkipForwardFilled,
-  TbPlayerTrackNextFilled,
-  TbPlayerTrackPrevFilled,
-  TbQuestionMark,
-  TbRewindBackward10,
-  TbRewindForward10,
-  TbVolume,
-  TbVolumeOff,
-} from "react-icons/tb";
+import { TbDevices } from "@react-icons/all-files/tb/TbDevices";
+import { TbList } from "@react-icons/all-files/tb/TbList";
+import { TbPlayerPauseFilled } from "@react-icons/all-files/tb/TbPlayerPauseFilled";
+import { TbPlayerPlayFilled } from "@react-icons/all-files/tb/TbPlayerPlayFilled";
+import { TbPlayerSkipBackFilled } from "@react-icons/all-files/tb/TbPlayerSkipBackFilled";
+import { TbPlayerSkipForwardFilled } from "@react-icons/all-files/tb/TbPlayerSkipForwardFilled";
+import { TbPlayerTrackNextFilled } from "@react-icons/all-files/tb/TbPlayerTrackNextFilled";
+import { TbPlayerTrackPrevFilled } from "@react-icons/all-files/tb/TbPlayerTrackPrevFilled";
+import { TbQuestionMark } from "@react-icons/all-files/tb/TbQuestionMark";
+import { TbRewindBackward10 } from "@react-icons/all-files/tb/TbRewindBackward10";
+import { TbRewindForward10 } from "@react-icons/all-files/tb/TbRewindForward10";
+import { TbVolume } from "@react-icons/all-files/tb/TbVolume";
+import { TbVolumeOff } from "@react-icons/all-files/tb/TbVolumeOff";
 import { Card } from "./card";
 import { SubButton } from "./sub-button";
 import { Slider } from "./slider";

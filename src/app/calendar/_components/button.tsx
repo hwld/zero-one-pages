@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { IconType } from "react-icons/lib";
-import { TbLoader2 } from "react-icons/tb";
+import { IconType } from "@react-icons/all-files/lib";
+import { TbLoader2 } from "@react-icons/all-files/tb/TbLoader2";
 
 type ButtonBaseProps = {
   isPending?: boolean;

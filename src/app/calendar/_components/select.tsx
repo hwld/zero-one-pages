@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./button";
-import { TbCheck, TbChevronDown } from "react-icons/tb";
+import { TbCheck } from "@react-icons/all-files/tb/TbCheck";
+import { TbChevronDown } from "@react-icons/all-files/tb/TbChevronDown";
 import {
   ComponentPropsWithoutRef,
   ForwardedRef,

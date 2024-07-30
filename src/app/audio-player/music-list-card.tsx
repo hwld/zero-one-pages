@@ -1,4 +1,4 @@
-import { TbMusicPlus } from "react-icons/tb";
+import { TbMusicPlus } from "@react-icons/all-files/tb/TbMusicPlus";
 import { Card } from "./card";
 import { MusicFile } from "./music-file";
 import { Music } from "./page";

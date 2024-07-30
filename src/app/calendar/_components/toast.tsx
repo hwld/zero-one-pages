@@ -9,7 +9,9 @@ import {
 } from "react";
 import * as RxToast from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
-import { TbAlertCircle, TbInfoCircle, TbX } from "react-icons/tb";
+import { TbAlertCircle } from "@react-icons/all-files/tb/TbAlertCircle";
+import { TbInfoCircle } from "@react-icons/all-files/tb/TbInfoCircle";
+import { TbX } from "@react-icons/all-files/tb/TbX";
 import { Button, IconButton } from "./button";
 import { OmitDistributive } from "../utils";
 import clsx from "clsx";

@@ -1,7 +1,6 @@
 "use client";
 import React, {
   ComponentPropsWithoutRef,
-  ComponentPropsWithRef,
   forwardRef,
   Suspense,
   useMemo,
@@ -9,22 +8,20 @@ import React, {
 import { AnimatePresence, motion } from "framer-motion";
 import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
-import {
-  PiBellSimple,
-  PiCalendarDotsFill,
-  PiCalendarDotsLight,
-  PiCalendarFill,
-  PiCalendarLight,
-  PiCaretDownLight,
-  PiMagnifyingGlassLight,
-  PiPlusCircleFill,
-  PiSidebarSimple,
-  PiSquaresFourFill,
-  PiSquaresFourLight,
-  PiTrayFill,
-  PiTrayLight,
-} from "react-icons/pi";
-import { IconType } from "react-icons/lib";
+import { PiBellSimple } from "@react-icons/all-files/pi/PiBellSimple";
+import { PiCalendarDotsFill } from "@react-icons/all-files/pi/PiCalendarDotsFill";
+import { PiCalendarDotsLight } from "@react-icons/all-files/pi/PiCalendarDotsLight";
+import { PiCalendarFill } from "@react-icons/all-files/pi/PiCalendarFill";
+import { PiCalendarLight } from "@react-icons/all-files/pi/PiCalendarLight";
+import { PiCaretDownLight } from "@react-icons/all-files/pi/PiCaretDownLight";
+import { PiMagnifyingGlassLight } from "@react-icons/all-files/pi/PiMagnifyingGlassLight";
+import { PiPlusCircleFill } from "@react-icons/all-files/pi/PiPlusCircleFill";
+import { PiSidebarSimple } from "@react-icons/all-files/pi/PiSidebarSimple";
+import { PiSquaresFourFill } from "@react-icons/all-files/pi/PiSquaresFourFill";
+import { PiSquaresFourLight } from "@react-icons/all-files/pi/PiSquaresFourLight";
+import { PiTrayLight } from "@react-icons/all-files/pi/PiTrayLight";
+import { PiTrayFill } from "@react-icons/all-files/pi/PiTrayFill";
+import { IconType } from "@react-icons/all-files/lib";
 import { MyProjectListItem, MyProjectList } from "./my-project-list";
 import { SidebarListButton, SidebarListLink } from "./list-item";
 import { Routes } from "../../_utils/routes";

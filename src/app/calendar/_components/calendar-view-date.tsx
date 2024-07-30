@@ -1,4 +1,5 @@
-import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
+import { TbChevronLeft } from "@react-icons/all-files/tb/TbChevronLeft";
+import { TbChevronRight } from "@react-icons/all-files/tb/TbChevronRight";
 import { IconButton } from "./button";
 import { useAppState } from "./use-app-state";
 import { useMemo } from "react";

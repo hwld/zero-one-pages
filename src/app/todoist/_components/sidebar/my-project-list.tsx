@@ -1,6 +1,8 @@
 import clsx from "clsx";
-import { IconType } from "react-icons/lib";
-import { PiCaretRightLight, PiHashLight, PiPlusLight } from "react-icons/pi";
+import { IconType } from "@react-icons/all-files/lib";
+import { PiCaretRightLight } from "@react-icons/all-files/pi/PiCaretRightLight";
+import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
+import { PiPlusLight } from "@react-icons/all-files/pi/PiPlusLight";
 import { SidebarListLink } from "./list-item";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";

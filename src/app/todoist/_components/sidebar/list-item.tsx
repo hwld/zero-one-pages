@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Link, { LinkProps } from "next/link";
 import { ReactNode, ComponentPropsWithoutRef, forwardRef } from "react";
-import { IconType } from "react-icons/lib";
+import { IconType } from "@react-icons/all-files/lib";
 
 const mutedTextClass = "text-stone-500";
 const activeTextClass = "text-rose-700";

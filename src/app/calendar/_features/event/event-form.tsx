@@ -8,8 +8,10 @@ import {
   SetStateAction,
   useState,
 } from "react";
-import { IconType } from "react-icons/lib";
-import { TbTextCaption, TbClockHour5, TbAlertCircle } from "react-icons/tb";
+import { IconType } from "@react-icons/all-files/lib";
+import { TbTextCaption } from "@react-icons/all-files/tb/TbTextCaption";
+import { TbClockHour5 } from "@react-icons/all-files/tb/TbClockHour5";
+import { TbAlertCircle } from "@react-icons/all-files/tb/TbAlertCircle";
 import { EventInput, eventInputSchema } from "../../_backend/api";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

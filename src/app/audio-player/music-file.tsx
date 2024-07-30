@@ -1,14 +1,12 @@
 "use client";
-import {
-  TbMusic,
-  TbPlayerPauseFilled,
-  TbPlayerPlayFilled,
-  TbX,
-} from "react-icons/tb";
+import { TbMusic } from "@react-icons/all-files/tb/TbMusic";
+import { TbX } from "@react-icons/all-files/tb/TbX";
+import { TbPlayerPlayFilled } from "@react-icons/all-files/tb/TbPlayerPlayFilled";
+import { TbPlayerPauseFilled } from "@react-icons/all-files/tb/TbPlayerPauseFilled";
 import { MusicWavesIndicator } from "./music-waves-indicator";
 import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react";
 import clsx from "clsx";
-import { IconType } from "react-icons/lib";
+import { IconType } from "@react-icons/all-files/lib";
 
 type Props = {
   id: string;

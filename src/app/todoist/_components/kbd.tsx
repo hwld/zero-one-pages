@@ -1,5 +1,5 @@
-import {  useMemo } from "react";
-import { PiCommand } from "react-icons/pi";
+import { useMemo } from "react";
+import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 
 type Props = { children: KeyboardKey };
 
