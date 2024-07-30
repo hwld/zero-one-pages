@@ -1,47 +1,95 @@
 import clsx from "clsx";
+import Link, { LinkProps } from "next/link";
 import { ReactNode, ComponentPropsWithoutRef } from "react";
 import { IconType } from "react-icons/lib";
 
-type Props = {
+const mutedTextClass = "text-stone-500";
+const activeTextClass = "text-rose-700";
+const listItemClass = (active?: boolean) =>
+  clsx(
+    "flex h-9 w-full items-center justify-between gap-2 rounded px-2 transition-colors",
+    active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
+  );
+
+type ContentProps = {
   icon: IconType;
   active?: boolean;
   right?: ReactNode;
-} & ComponentPropsWithoutRef<"button">;
+  children: ReactNode;
+};
 
-export const SidebarListItem: React.FC<Props> = ({
+export const SidebarListItemContent: React.FC<ContentProps> = ({
   icon: Icon,
   right,
   active,
   children,
+}) => {
+  return (
+    <>
+      <span className="flex min-w-0 items-center gap-1">
+        <span className="grid size-7 place-items-center">
+          <Icon
+            className={clsx(
+              "size-6 shrink-0",
+              active ? activeTextClass : mutedTextClass,
+            )}
+          />
+        </span>
+        <div className="truncate">{children}</div>
+      </span>
+      <span className={clsx(active ? activeTextClass : mutedTextClass)}>
+        {right}
+      </span>
+    </>
+  );
+};
+
+type ListButtonProps = ContentProps & ComponentPropsWithoutRef<"button">;
+
+export const SidebarListButton: React.FC<ListButtonProps> = ({
+  icon,
+  active,
+  right,
+  children,
   ...props
 }) => {
-  const mutedTextClass = "text-stone-500";
-  const activeTextClass = "text-rose-700";
+  return (
+    <li>
+      <button {...props} className={listItemClass(active)}>
+        <SidebarListItemContent icon={icon} active={active} right={right}>
+          {children}
+        </SidebarListItemContent>
+      </button>
+    </li>
+  );
+};
+
+type ListLinkProps = LinkProps & {
+  icon: IconType;
+  right?: ReactNode;
+  children: ReactNode;
+  activeIcon?: IconType;
+  currentRoute: string;
+};
+
+export const SidebarListLink: React.FC<ListLinkProps> = ({
+  icon,
+  activeIcon,
+  currentRoute,
+  right,
+  children,
+  ...props
+}) => {
+  const active = currentRoute === props.href;
+  const actualIcon = (active ? activeIcon : icon) ?? icon;
 
   return (
     <li>
-      <button
-        {...props}
-        className={clsx(
-          "flex h-9 w-full items-center justify-between gap-2 rounded px-2 transition-colors",
-          active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
-        )}
-      >
-        <span className="flex min-w-0 items-center gap-1">
-          <span className="grid size-7 place-items-center">
-            <Icon
-              className={clsx(
-                "size-6 shrink-0",
-                active ? activeTextClass : mutedTextClass,
-              )}
-            />
-          </span>
-          <div className="truncate">{children}</div>
-        </span>
-        <span className={clsx(active ? activeTextClass : mutedTextClass)}>
-          {right}
-        </span>
-      </button>
+      <Link {...props} className={listItemClass(active)}>
+        <SidebarListItemContent icon={actualIcon} active={active} right={right}>
+          {children}
+        </SidebarListItemContent>
+      </Link>
     </li>
   );
 };

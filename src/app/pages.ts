@@ -26,7 +26,7 @@ type PageLink =
   | "/audio-player"
   | "/calendar"
   | "/tree-view"
-  | "/todoist";
+  | "/todoist/inbox";
 
 export type Page = {
   icon: LucideIcon;
@@ -118,7 +118,7 @@ export const pages: Page[] = [
   },
   {
     icon: CircleCheckIcon,
-    href: "/todoist",
+    href: "/todoist/inbox",
     title: "Todoist",
     description: "TodoistのUIを作ってみた。",
     tags: ["PC", "PART", "WIP"],

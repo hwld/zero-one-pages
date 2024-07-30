@@ -1,5 +1,4 @@
 "use client";
-
 import React, { ComponentPropsWithoutRef, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Resizable } from "re-resizable";
@@ -21,9 +20,25 @@ import {
 } from "react-icons/pi";
 import { IconType } from "react-icons/lib";
 import { MyProjectListItem, MyProjectList } from "./my-project-list";
-import { SidebarListItem } from "./list-item";
+import { SidebarListButton, SidebarListLink } from "./list-item";
+import { Routes } from "../../_utils/routes";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export const Sidebar: React.FC = () => {
+  const paths = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentRoute = useMemo(() => {
+    if (paths === Routes.myProject()) {
+      const id = searchParams.get("id");
+      if (id) {
+        return Routes.myProject(id);
+      }
+    }
+
+    return paths;
+  }, [paths, searchParams]);
+
   const resizableRef = useRef<Resizable>(null);
 
   const [isOpen, setIsOpen] = useState(true);
@@ -40,9 +55,6 @@ export const Sidebar: React.FC = () => {
   const handle = (
     <div className="h-full w-1 transition-colors group-hover:bg-black/10 group-active:bg-black/20" />
   );
-
-  // TODO:
-  const [activeId, setActiveId] = useState(0);
 
   return (
     <motion.div className="flex" animate={{ marginLeft }}>
@@ -97,71 +109,58 @@ export const Sidebar: React.FC = () => {
           <TaskCreateButton />
 
           <ul>
-            <SidebarListItem icon={PiMagnifyingGlassLight}>
+            <SidebarListButton icon={PiMagnifyingGlassLight}>
               検索
-            </SidebarListItem>
-            <SidebarListItem
+            </SidebarListButton>
+            <SidebarListLink
+              href={Routes.inbox()}
+              currentRoute={currentRoute}
+              icon={PiTrayLight}
+              activeIcon={PiTrayFill}
               right={3}
-              active={activeId === 0}
-              icon={activeId === 0 ? PiTrayFill : PiTrayLight}
-              onClick={() => setActiveId(0)}
             >
               インボックス
-            </SidebarListItem>
-            <SidebarListItem
+            </SidebarListLink>
+            <SidebarListLink
+              href={Routes.today()}
+              currentRoute={currentRoute}
+              icon={PiCalendarLight}
+              activeIcon={PiCalendarFill}
               right={10}
-              active={activeId === 1}
-              icon={activeId === 1 ? PiCalendarFill : PiCalendarLight}
-              onClick={() => setActiveId(1)}
             >
               今日
-            </SidebarListItem>
-            <SidebarListItem
-              active={activeId === 2}
-              icon={activeId === 2 ? PiCalendarDotsFill : PiCalendarDotsLight}
-              onClick={() => setActiveId(2)}
+            </SidebarListLink>
+            <SidebarListLink
+              href={Routes.upcoming()}
+              currentRoute={currentRoute}
+              icon={PiCalendarDotsLight}
+              activeIcon={PiCalendarDotsFill}
             >
               近日予定
-            </SidebarListItem>
-            <SidebarListItem
-              active={activeId === 3}
-              icon={activeId === 3 ? PiSquaresFourFill : PiSquaresFourLight}
-              onClick={() => setActiveId(3)}
+            </SidebarListLink>
+            <SidebarListLink
+              href={Routes.filtersLabels()}
+              currentRoute={currentRoute}
+              icon={PiSquaresFourLight}
+              activeIcon={PiSquaresFourFill}
             >
               フィルター & ラベル
-            </SidebarListItem>
+            </SidebarListLink>
           </ul>
 
           <MyProjectList
-            isHeaderActive={activeId === 4}
-            onClickHeader={() => setActiveId(4)}
+            isHeaderActive={currentRoute === Routes.myProjectList()}
           >
-            <MyProjectListItem
-              todos={0}
-              active={activeId === 5}
-              onClick={() => setActiveId(5)}
-            >
+            <MyProjectListItem currentRoute={currentRoute} id="1" todos={0}>
               project 1
             </MyProjectListItem>
-            <MyProjectListItem
-              todos={4}
-              active={activeId === 6}
-              onClick={() => setActiveId(6)}
-            >
+            <MyProjectListItem currentRoute={currentRoute} id="2" todos={4}>
               project 2
             </MyProjectListItem>
-            <MyProjectListItem
-              todos={0}
-              active={activeId === 7}
-              onClick={() => setActiveId(7)}
-            >
+            <MyProjectListItem currentRoute={currentRoute} id="3" todos={0}>
               project 3
             </MyProjectListItem>
-            <MyProjectListItem
-              todos={9}
-              active={activeId === 8}
-              onClick={() => setActiveId(8)}
-            >
+            <MyProjectListItem currentRoute={currentRoute} id="4" todos={9}>
               project 4
             </MyProjectListItem>
           </MyProjectList>

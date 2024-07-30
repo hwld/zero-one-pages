@@ -1,19 +1,19 @@
 import clsx from "clsx";
 import { IconType } from "react-icons/lib";
 import { PiCaretRightLight, PiHashLight, PiPlusLight } from "react-icons/pi";
-import { SidebarListItem } from "./list-item";
+import { SidebarListLink } from "./list-item";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Routes } from "../../_utils/routes";
+import Link from "next/link";
 
 type Props = {
   isHeaderActive?: boolean;
-  onClickHeader?: () => void;
   children: ReactNode;
 };
 
 export const MyProjectList: React.FC<Props> = ({
   isHeaderActive,
-  onClickHeader,
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,15 +26,15 @@ export const MyProjectList: React.FC<Props> = ({
           isHeaderActive ? "bg-rose-100" : "hover:bg-black/5",
         )}
       >
-        <button
-          onClick={onClickHeader}
+        <Link
+          href={Routes.myProjectList()}
           className={clsx(
             "w-full py-2 pl-2 text-start font-bold",
             isHeaderActive ? "text-rose-700" : "text-stone-500",
           )}
         >
           マイプロジェクト
-        </button>
+        </Link>
         <div className="flex h-full items-center gap-1 pr-2">
           <IconButton>
             <Icon icon={PiPlusLight} />
@@ -83,19 +83,19 @@ const Icon: React.FC<{ icon: IconType }> = ({ icon: Icon }) => {
 };
 
 export const MyProjectListItem: React.FC<{
-  active?: boolean;
+  id: string;
+  currentRoute: string;
   todos: number;
   children: ReactNode;
-  onClick?: () => void;
-}> = ({ active, todos, children, onClick }) => {
+}> = ({ id, currentRoute, todos, children }) => {
   return (
-    <SidebarListItem
-      active={active}
+    <SidebarListLink
+      href={Routes.myProject(id)}
+      currentRoute={currentRoute}
       icon={PiHashLight}
       right={todos > 0 ? todos : undefined}
-      onClick={onClick}
     >
       {children}
-    </SidebarListItem>
+    </SidebarListLink>
   );
 };
