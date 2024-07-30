@@ -1,9 +1,10 @@
 "use client";
-import { Sidebar } from "./_components/sidebar";
+
+import { Sidebar } from "./_components/sidebar/sidebar";
 
 const Page: React.FC = () => {
   return (
-    <div className="flex h-[100dvh] bg-stone-50 text-sm text-neutral-700">
+    <div className="text-neutral-00 flex h-[100dvh] bg-stone-50 text-sm">
       <Sidebar />
       <div></div>
     </div>

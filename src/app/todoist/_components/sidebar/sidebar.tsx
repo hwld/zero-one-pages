@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ComponentPropsWithoutRef, ReactNode, useMemo } from "react";
+import React, { ComponentPropsWithoutRef, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
@@ -10,8 +10,9 @@ import {
   PiCalendarDotsLight,
   PiCalendarFill,
   PiCalendarLight,
-  PiCaretDown,
+  PiCaretDownLight,
   PiMagnifyingGlassLight,
+  PiPlusCircleFill,
   PiSidebarSimple,
   PiSquaresFourFill,
   PiSquaresFourLight,
@@ -19,7 +20,8 @@ import {
   PiTrayLight,
 } from "react-icons/pi";
 import { IconType } from "react-icons/lib";
-import clsx from "clsx";
+import { MyProjectListItem, MyProjectList } from "./my-project-list";
+import { SidebarListItem } from "./list-item";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -54,12 +56,12 @@ export const Sidebar: React.FC = () => {
         defaultSize={{ width: 250 }}
         maxWidth={420}
       >
-        <div className="relative flex size-full flex-col  p-4">
-          <div className="mb-4 flex h-min w-full justify-between">
-            <button className="group flex h-8 items-center gap-2 rounded p-2 transition-colors hover:bg-black/5">
-              <div className="size-6 rounded-full bg-rose-700" />
-              <div className="font-bold">User</div>
-              <PiCaretDown className="text-stone-600 group-hover:text-stone-900" />
+        <div className="group/sidebar relative flex size-full flex-col gap-4 p-3">
+          <div className="flex h-min w-full justify-between">
+            <button className="group/usermenu flex h-8 items-center gap-2 rounded p-2 transition-colors hover:bg-black/5">
+              <span className="size-6 rounded-full bg-stone-700" />
+              <span className="font-bold">User</span>
+              <PiCaretDownLight className="text-stone-600 group-hover/usermenu:text-stone-900" />
             </button>
             <div className="flex items-center gap-1">
               <SidebarIconButton icon={PiBellSimple} />
@@ -89,6 +91,10 @@ export const Sidebar: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          <div className="h-[1px] w-full bg-stone-200" />
+
+          <TaskCreateButton />
 
           <ul>
             <SidebarListItem icon={PiMagnifyingGlassLight}>
@@ -125,6 +131,40 @@ export const Sidebar: React.FC = () => {
               フィルター & ラベル
             </SidebarListItem>
           </ul>
+
+          <MyProjectList
+            isHeaderActive={activeId === 4}
+            onClickHeader={() => setActiveId(4)}
+          >
+            <MyProjectListItem
+              todos={0}
+              active={activeId === 5}
+              onClick={() => setActiveId(5)}
+            >
+              project 1
+            </MyProjectListItem>
+            <MyProjectListItem
+              todos={4}
+              active={activeId === 6}
+              onClick={() => setActiveId(6)}
+            >
+              project 2
+            </MyProjectListItem>
+            <MyProjectListItem
+              todos={0}
+              active={activeId === 7}
+              onClick={() => setActiveId(7)}
+            >
+              project 3
+            </MyProjectListItem>
+            <MyProjectListItem
+              todos={9}
+              active={activeId === 8}
+              onClick={() => setActiveId(8)}
+            >
+              project 4
+            </MyProjectListItem>
+          </MyProjectList>
         </div>
       </Resizable>
     </motion.div>
@@ -144,38 +184,13 @@ const SidebarIconButton: React.FC<
   );
 };
 
-const SidebarListItem: React.FC<
-  {
-    icon: IconType;
-    active?: boolean;
-    right?: ReactNode;
-  } & ComponentPropsWithoutRef<"button">
-> = ({ icon: Icon, right, active, children, ...props }) => {
-  const mutedTextClass = "text-stone-500";
-  const activeTextClass = "text-rose-700";
-
+const TaskCreateButton: React.FC = () => {
   return (
-    <li>
-      <button
-        {...props}
-        className={clsx(
-          "group flex h-9 w-full items-center justify-between gap-2 rounded px-2 transition-colors",
-          active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
-        )}
-      >
-        <div className="flex min-w-0 items-center gap-1">
-          <Icon
-            className={clsx(
-              "size-6 shrink-0 text-stone-500",
-              active ? activeTextClass : mutedTextClass,
-            )}
-          />
-          <div className="truncate">{children}</div>
-        </div>
-        <div className={clsx(active ? activeTextClass : mutedTextClass)}>
-          {right}
-        </div>
-      </button>
-    </li>
+    <button className="flex h-9 w-full items-center gap-1 rounded p-2 text-rose-700 transition-colors hover:bg-black/5">
+      <div className="grid size-7 place-items-center">
+        <PiPlusCircleFill className="size-7" />
+      </div>
+      <div className="font-bold">タスクを作成</div>
+    </button>
   );
 };
