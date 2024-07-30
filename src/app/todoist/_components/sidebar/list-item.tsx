@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Link, { LinkProps } from "next/link";
-import { ReactNode, ComponentPropsWithoutRef } from "react";
+import { ReactNode, ComponentPropsWithoutRef, forwardRef } from "react";
 import { IconType } from "react-icons/lib";
 
 const mutedTextClass = "text-stone-500";
@@ -46,23 +46,19 @@ export const SidebarListItemContent: React.FC<ContentProps> = ({
 
 type ListButtonProps = ContentProps & ComponentPropsWithoutRef<"button">;
 
-export const SidebarListButton: React.FC<ListButtonProps> = ({
-  icon,
-  active,
-  right,
-  children,
-  ...props
-}) => {
-  return (
-    <li>
-      <button {...props} className={listItemClass(active)}>
-        <SidebarListItemContent icon={icon} active={active} right={right}>
-          {children}
-        </SidebarListItemContent>
-      </button>
-    </li>
-  );
-};
+export const SidebarListButton = forwardRef<HTMLButtonElement, ListButtonProps>(
+  function SidebarListButton({ icon, active, right, children, ...props }, ref) {
+    return (
+      <li>
+        <button ref={ref} {...props} className={listItemClass(active)}>
+          <SidebarListItemContent icon={icon} active={active} right={right}>
+            {children}
+          </SidebarListItemContent>
+        </button>
+      </li>
+    );
+  },
+);
 
 type ListLinkProps = LinkProps & {
   icon: IconType;
@@ -72,24 +68,26 @@ type ListLinkProps = LinkProps & {
   currentRoute: string;
 };
 
-export const SidebarListLink: React.FC<ListLinkProps> = ({
-  icon,
-  activeIcon,
-  currentRoute,
-  right,
-  children,
-  ...props
-}) => {
-  const active = currentRoute === props.href;
-  const actualIcon = (active ? activeIcon : icon) ?? icon;
+export const SidebarListLink = forwardRef<HTMLAnchorElement, ListLinkProps>(
+  function SidebarListLink(
+    { icon, activeIcon, currentRoute, right, children, ...props },
+    ref,
+  ) {
+    const active = currentRoute === props.href;
+    const actualIcon = (active ? activeIcon : icon) ?? icon;
 
-  return (
-    <li>
-      <Link {...props} className={listItemClass(active)}>
-        <SidebarListItemContent icon={actualIcon} active={active} right={right}>
-          {children}
-        </SidebarListItemContent>
-      </Link>
-    </li>
-  );
-};
+    return (
+      <li>
+        <Link ref={ref} {...props} className={listItemClass(active)}>
+          <SidebarListItemContent
+            icon={actualIcon}
+            active={active}
+            right={right}
+          >
+            {children}
+          </SidebarListItemContent>
+        </Link>
+      </li>
+    );
+  },
+);

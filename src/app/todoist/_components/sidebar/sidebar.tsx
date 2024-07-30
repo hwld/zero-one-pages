@@ -1,5 +1,11 @@
 "use client";
-import React, { ComponentPropsWithoutRef, useMemo } from "react";
+import React, {
+  ComponentPropsWithoutRef,
+  ComponentPropsWithRef,
+  forwardRef,
+  Suspense,
+  useMemo,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
@@ -23,22 +29,9 @@ import { MyProjectListItem, MyProjectList } from "./my-project-list";
 import { SidebarListButton, SidebarListLink } from "./list-item";
 import { Routes } from "../../_utils/routes";
 import { usePathname, useSearchParams } from "next/navigation";
+import { Tooltip, TooltipDelayGroup } from "../tooltip";
 
 export const Sidebar: React.FC = () => {
-  const paths = usePathname();
-  const searchParams = useSearchParams();
-
-  const currentRoute = useMemo(() => {
-    if (paths === Routes.myProject()) {
-      const id = searchParams.get("id");
-      if (id) {
-        return Routes.myProject(id);
-      }
-    }
-
-    return paths;
-  }, [paths, searchParams]);
-
   const resizableRef = useRef<Resizable>(null);
 
   const [isOpen, setIsOpen] = useState(true);
@@ -68,50 +61,100 @@ export const Sidebar: React.FC = () => {
         defaultSize={{ width: 250 }}
         maxWidth={420}
       >
-        <div className="group/sidebar relative flex size-full flex-col gap-4 p-3">
-          <div className="flex h-min w-full justify-between">
-            <button className="group/usermenu flex h-8 items-center gap-2 rounded p-2 transition-colors hover:bg-black/5">
-              <span className="size-6 rounded-full bg-stone-700" />
-              <span className="font-bold">User</span>
-              <PiCaretDownLight className="text-stone-600 group-hover/usermenu:text-stone-900" />
-            </button>
-            <div className="flex items-center gap-1">
+        <Suspense>
+          <SidebarContent isOpen={isOpen} onChangeOpen={setIsOpen} />
+        </Suspense>
+      </Resizable>
+    </motion.div>
+  );
+};
+
+type ContentProps = { isOpen: boolean; onChangeOpen: (open: boolean) => void };
+
+const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
+  const paths = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentRoute = useMemo(() => {
+    if (paths === Routes.myProject()) {
+      const id = searchParams.get("id");
+      if (id) {
+        return Routes.myProject(id);
+      }
+    }
+
+    return paths;
+  }, [paths, searchParams]);
+
+  return (
+    <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
+      <div className="flex h-min w-full justify-between">
+        <button className="group/usermenu flex h-8 items-center gap-2 rounded p-2 transition-colors hover:bg-black/5">
+          <span className="size-6 rounded-full bg-stone-700" />
+          <span className="font-bold">User</span>
+          <PiCaretDownLight className="text-stone-600 group-hover/usermenu:text-stone-900" />
+        </button>
+        <div className="flex items-center gap-1">
+          <TooltipDelayGroup>
+            <Tooltip label="通知を開く" keys={["O", "N"]}>
               <SidebarIconButton icon={PiBellSimple} />
+            </Tooltip>
+            <Tooltip label="サイドバーを閉じる" keys={["M"]}>
               <SidebarIconButton
                 icon={PiSidebarSimple}
                 onClick={() => {
-                  setIsOpen(false);
+                  onChangeOpen(false);
                 }}
                 style={{ opacity: isOpen ? 1 : 0 }}
               />
-            </div>
-          </div>
-          <AnimatePresence>
-            {isOpen ? null : (
-              <motion.div
-                className="absolute left-full ml-4"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-              >
-                <SidebarIconButton
-                  icon={PiSidebarSimple}
-                  onClick={() => {
-                    setIsOpen(true);
-                  }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </Tooltip>
+          </TooltipDelayGroup>
+        </div>
+      </div>
+      <AnimatePresence>
+        {isOpen ? null : (
+          <motion.div
+            className="absolute left-full ml-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+          >
+            <Tooltip
+              label="サイドバーを開く"
+              keys={["M"]}
+              placement="bottom-start"
+            >
+              <SidebarIconButton
+                icon={PiSidebarSimple}
+                onClick={() => {
+                  onChangeOpen(true);
+                }}
+              />
+            </Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          <div className="h-[1px] w-full bg-stone-200" />
-
-          <TaskCreateButton />
-
-          <ul>
+      <TooltipDelayGroup>
+        <ul>
+          <Tooltip label="タスクを追加" keys={["Q"]} placement="right">
+            <TaskCreateButton />
+          </Tooltip>
+          <Tooltip
+            label="クイック検索を開く"
+            keys={["Cmd", "K"]}
+            placement="right"
+          >
             <SidebarListButton icon={PiMagnifyingGlassLight}>
               検索
             </SidebarListButton>
+          </Tooltip>
+
+          <Tooltip
+            label="インボックスに移動"
+            keys={["G", "I"]}
+            placement="right"
+          >
             <SidebarListLink
               href={Routes.inbox()}
               currentRoute={currentRoute}
@@ -121,6 +164,9 @@ export const Sidebar: React.FC = () => {
             >
               インボックス
             </SidebarListLink>
+          </Tooltip>
+
+          <Tooltip label="今日に移動" keys={["G", "T"]} placement="right">
             <SidebarListLink
               href={Routes.today()}
               currentRoute={currentRoute}
@@ -130,6 +176,9 @@ export const Sidebar: React.FC = () => {
             >
               今日
             </SidebarListLink>
+          </Tooltip>
+
+          <Tooltip label="近日予定に移動" keys={["G", "U"]} placement="right">
             <SidebarListLink
               href={Routes.upcoming()}
               currentRoute={currentRoute}
@@ -138,6 +187,13 @@ export const Sidebar: React.FC = () => {
             >
               近日予定
             </SidebarListLink>
+          </Tooltip>
+
+          <Tooltip
+            label="フィルター&ラベルに移動"
+            keys={["G", "V"]}
+            placement="right"
+          >
             <SidebarListLink
               href={Routes.filtersLabels()}
               currentRoute={currentRoute}
@@ -146,50 +202,59 @@ export const Sidebar: React.FC = () => {
             >
               フィルター & ラベル
             </SidebarListLink>
-          </ul>
+          </Tooltip>
+        </ul>
+      </TooltipDelayGroup>
 
-          <MyProjectList
-            isHeaderActive={currentRoute === Routes.myProjectList()}
-          >
-            <MyProjectListItem currentRoute={currentRoute} id="1" todos={0}>
-              project 1
-            </MyProjectListItem>
-            <MyProjectListItem currentRoute={currentRoute} id="2" todos={4}>
-              project 2
-            </MyProjectListItem>
-            <MyProjectListItem currentRoute={currentRoute} id="3" todos={0}>
-              project 3
-            </MyProjectListItem>
-            <MyProjectListItem currentRoute={currentRoute} id="4" todos={9}>
-              project 4
-            </MyProjectListItem>
-          </MyProjectList>
+      <MyProjectList isHeaderActive={currentRoute === Routes.myProjectList()}>
+        <MyProjectListItem currentRoute={currentRoute} id="1" todos={0}>
+          project 1
+        </MyProjectListItem>
+        <MyProjectListItem currentRoute={currentRoute} id="2" todos={4}>
+          project 2
+        </MyProjectListItem>
+        <MyProjectListItem currentRoute={currentRoute} id="3" todos={0}>
+          project 3
+        </MyProjectListItem>
+        <MyProjectListItem currentRoute={currentRoute} id="4" todos={9}>
+          project 4
+        </MyProjectListItem>
+      </MyProjectList>
+    </div>
+  );
+};
+
+type SidebarIconButtonProps = {
+  icon: IconType;
+} & ComponentPropsWithoutRef<"button">;
+
+const SidebarIconButton = forwardRef<HTMLButtonElement, SidebarIconButtonProps>(
+  function SidebarIconButton({ icon: Icon, ...props }, ref) {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        className="grid size-8 place-items-center rounded text-stone-600 transition-colors hover:bg-black/5 hover:text-stone-900"
+      >
+        <Icon className="size-5" />
+      </button>
+    );
+  },
+);
+
+const TaskCreateButton: React.FC = forwardRef<HTMLButtonElement>(
+  function TaskCreateButton(props, ref) {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        className="flex h-9 w-full items-center gap-1 rounded p-2 text-rose-700 transition-colors hover:bg-black/5"
+      >
+        <div className="grid size-7 place-items-center">
+          <PiPlusCircleFill className="size-7" />
         </div>
-      </Resizable>
-    </motion.div>
-  );
-};
-
-const SidebarIconButton: React.FC<
-  { icon: IconType } & ComponentPropsWithoutRef<"button">
-> = ({ icon: Icon, ...props }) => {
-  return (
-    <button
-      {...props}
-      className="grid size-8 place-items-center rounded text-stone-600 transition-colors hover:bg-black/5 hover:text-stone-900"
-    >
-      <Icon className="size-5" />
-    </button>
-  );
-};
-
-const TaskCreateButton: React.FC = () => {
-  return (
-    <button className="flex h-9 w-full items-center gap-1 rounded p-2 text-rose-700 transition-colors hover:bg-black/5">
-      <div className="grid size-7 place-items-center">
-        <PiPlusCircleFill className="size-7" />
-      </div>
-      <div className="font-bold">タスクを作成</div>
-    </button>
-  );
-};
+        <div className="font-bold">タスクを作成</div>
+      </button>
+    );
+  },
+);
