@@ -5,6 +5,7 @@ import { IconType } from "@react-icons/all-files/lib";
 
 const mutedTextClass = "text-stone-500";
 const activeTextClass = "text-rose-700";
+const wrapperChildClass = "flex h-full w-full items-center pl-[--padding-x]";
 
 type WrapperProps = {
   active?: boolean;
@@ -12,6 +13,7 @@ type WrapperProps = {
   children: ReactNode;
 };
 
+// buttonやa要素の中にbuttonやa要素を含めることができないので、一つ上にWrapperを作って、兄弟としてレンダリングする
 export const ItemWrapper: React.FC<WrapperProps> = ({
   right,
   active,
@@ -20,14 +22,18 @@ export const ItemWrapper: React.FC<WrapperProps> = ({
   return (
     <div
       className={clsx(
-        "flex h-9 w-full items-center justify-between rounded px-2 transition-colors",
+        "flex h-9 w-full items-center justify-between rounded transition-colors",
         active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
       )}
+      style={{ ["--padding-x" as string]: "8px" }}
     >
       {children}
       {right && (
         <span
-          className={clsx("pl-1", active ? activeTextClass : mutedTextClass)}
+          className={clsx(
+            "pl-1 pr-[--padding-x]",
+            active ? activeTextClass : mutedTextClass,
+          )}
         >
           {right}
         </span>
@@ -74,7 +80,7 @@ export const SidebarListButton = forwardRef<HTMLLIElement, ListButtonProps>(
     return (
       <li ref={ref}>
         <ItemWrapper right={right}>
-          <button {...props} className="w-full">
+          <button {...props} className={wrapperChildClass}>
             <ItemContent icon={icon}>{children}</ItemContent>
           </button>
         </ItemWrapper>
@@ -91,8 +97,6 @@ type ListLinkProps = LinkProps & {
   currentRoute: string;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
 } & Omit<ComponentPropsWithoutRef<"a">, "onPointerEnter" | "onPointerLeave">;
 
 export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
@@ -119,7 +123,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
         onPointerLeave={onPointerLeave}
       >
         <ItemWrapper active={active} right={right}>
-          <Link {...props} className="w-full">
+          <Link {...props} className={wrapperChildClass}>
             <ItemContent icon={actualIcon} active={active}>
               {children}
             </ItemContent>
