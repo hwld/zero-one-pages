@@ -23,7 +23,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Slot } from "@radix-ui/react-slot";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import {
   HTMLProps,
   useState,
@@ -35,6 +35,8 @@ import {
   forwardRef,
   useContext,
   useRef,
+  useCallback,
+  useMemo,
 } from "react";
 
 type MenuContext = {
@@ -56,11 +58,32 @@ export const MenuContext = createContext<MenuContext>({
 type MenuComponentProps = {
   trigger: ReactNode;
   children?: ReactNode;
+  onOpenChange?: (open: boolean) => void;
+  placement?: "bottom-start" | "right-start";
+  width?: number;
 } & HTMLProps<HTMLButtonElement>;
 
 export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
-  function MenuComponent({ children, trigger, ...props }, forwardedRef) {
+  function MenuComponent(
+    {
+      children,
+      trigger,
+      onOpenChange,
+      placement = "bottom-start",
+      width = 280,
+      ...props
+    },
+    forwardedRef,
+  ) {
     const [isOpen, setIsOpen] = useState(false);
+    const handleOpenChange = useCallback(
+      (open: boolean) => {
+        onOpenChange?.(open);
+        setIsOpen(open);
+      },
+      [onOpenChange],
+    );
+
     const [hasFocusInside, setHasFocusInside] = useState(false);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -77,11 +100,29 @@ export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
     const { floatingStyles, refs, context } = useFloating<HTMLButtonElement>({
       nodeId,
       open: isOpen,
-      onOpenChange: setIsOpen,
-      placement: isNested ? "right-start" : "bottom-start",
-      middleware: [offset({ mainAxis: 4 }), flip(), shift()],
+      onOpenChange: handleOpenChange,
+      placement: isNested ? "right-start" : placement,
+      middleware: [offset({ mainAxis: 4 }), flip(), shift({ padding: 16 })],
       whileElementsMounted: autoUpdate,
     });
+
+    const menuAnimation = useMemo((): Variants => {
+      const fromLeft = isNested || placement === "right-start";
+
+      return {
+        initial: {
+          opacity: 0,
+          y: fromLeft ? 0 : -5,
+          x: fromLeft ? -5 : 0,
+        },
+        animate: { opacity: 1, y: 0, x: 0 },
+        exit: {
+          opacity: 0,
+          y: fromLeft ? 0 : -5,
+          x: fromLeft ? -5 : 0,
+        },
+      };
+    }, [isNested, placement]);
 
     const hover = useHover(context, {
       enabled: isNested,
@@ -112,12 +153,12 @@ export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
       if (!tree) return;
 
       function handleTreeClick() {
-        setIsOpen(false);
+        handleOpenChange(false);
       }
 
       function onSubMenuOpen(event: { nodeId: string; parentId: string }) {
         if (event.nodeId !== nodeId && event.parentId === parentId) {
-          setIsOpen(false);
+          handleOpenChange(false);
         }
       }
 
@@ -128,7 +169,7 @@ export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
         tree.events.off("click", handleTreeClick);
         tree.events.off("menuopen", onSubMenuOpen);
       };
-    }, [tree, nodeId, parentId]);
+    }, [tree, nodeId, parentId, handleOpenChange]);
 
     useEffect(() => {
       if (isOpen && tree) {
@@ -187,19 +228,10 @@ export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
                       {...getFloatingProps()}
                     >
                       <motion.div
-                        className="flex w-[280px] flex-col rounded-lg border border-stone-200 bg-stone-50 py-2 text-sm text-stone-700 shadow-md"
-                        initial={{
-                          opacity: 0,
-                          y: isNested ? 0 : -5,
-                          x: isNested ? -5 : 0,
-                        }}
-                        animate={{ opacity: 1, y: 0, x: 0 }}
-                        exit={{
-                          opacity: 0,
-                          y: isNested ? 0 : -5,
-                          x: isNested ? -5 : 0,
-                        }}
+                        className="flex flex-col rounded-lg border border-stone-200 bg-stone-50 py-2 text-sm text-stone-700 shadow-md"
+                        {...menuAnimation}
                         transition={{ duration: 0.1 }}
+                        style={{ width }}
                       >
                         {children}
                       </motion.div>

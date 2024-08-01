@@ -15,9 +15,10 @@ import { cn } from "@/lib/utils";
 
 type ContentProps = {
   icon: IconType;
-  label: string;
+  label: ReactNode;
   description?: string;
   right?: ReactNode;
+  variant?: "destructive" | "green" | "default";
 };
 
 const MenuItemContent: React.FC<ContentProps> = ({
@@ -25,18 +26,33 @@ const MenuItemContent: React.FC<ContentProps> = ({
   label,
   description,
   right,
+  variant = "default",
 }) => {
+  const variantClass = {
+    destructive: "text-red-700",
+    green: "bg-green-500/10 text-green-700",
+    default: "",
+  };
+
   return (
     <div
       className={clsx(
         "flex min-h-8 items-center justify-between gap-2 px-2",
         description && "py-2",
+        variantClass[variant],
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         <Icon className={clsx("size-5", description && "self-start")} />
-        <div className="flex flex-col items-start gap-1">
-          <div className={clsx(description && "font-bold")}>{label}</div>
+        <div className="flex min-w-0 flex-col items-start gap-1">
+          <div
+            className={clsx(
+              "flex w-full items-start truncate text-nowrap",
+              description && "font-bold",
+            )}
+          >
+            {label}
+          </div>
           {description ? (
             <div className="text-xs text-stone-500">{description}</div>
           ) : null}
@@ -89,6 +105,7 @@ export const MenuButtonItem: React.FC<ButtonItemProps> = ({
   label,
   description,
   right,
+  variant,
   ...props
 }) => {
   return (
@@ -99,6 +116,7 @@ export const MenuButtonItem: React.FC<ButtonItemProps> = ({
           label={label}
           description={description}
           right={right}
+          variant={variant}
         />
       </button>
     </MenuItemWrapper>
@@ -112,6 +130,7 @@ export const MenuLinkItem: React.FC<LinkItemProps> = ({
   label,
   description,
   right,
+  variant,
   ...props
 }) => {
   return (
@@ -122,6 +141,7 @@ export const MenuLinkItem: React.FC<LinkItemProps> = ({
           label={label}
           description={description}
           right={right}
+          variant={variant}
         />
       </Link>
     </MenuItemWrapper>
@@ -133,7 +153,7 @@ type SubMenuTrigger = Omit<ContentProps, "right"> &
 
 export const SubMenuTrigger = forwardRef<HTMLButtonElement, SubMenuTrigger>(
   function SubMenuTrigger(
-    { icon, label, description, className, ...props },
+    { icon, label, description, className, variant, ...props },
     ref,
   ) {
     return (
@@ -142,6 +162,7 @@ export const SubMenuTrigger = forwardRef<HTMLButtonElement, SubMenuTrigger>(
           icon={icon}
           label={label}
           description={description}
+          variant={variant}
           right={<PiCaretRightBold />}
         />
       </button>

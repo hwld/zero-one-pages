@@ -33,7 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/github-project/_components/create-view-dialog"
   ],
   "exclude": [
     "node_modules"
