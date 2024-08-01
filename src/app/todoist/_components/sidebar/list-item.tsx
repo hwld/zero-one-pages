@@ -95,6 +95,7 @@ type ListLinkProps = LinkProps & {
   children: ReactNode;
   activeIcon?: IconType;
   currentRoute: string;
+  subList?: ReactNode;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
 } & Omit<ComponentPropsWithoutRef<"a">, "onPointerEnter" | "onPointerLeave">;
@@ -106,6 +107,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
       activeIcon,
       currentRoute,
       right,
+      subList,
       children,
       onPointerEnter,
       onPointerLeave,
@@ -129,6 +131,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
             </ItemContent>
           </Link>
         </ItemWrapper>
+        {subList}
       </li>
     );
   },

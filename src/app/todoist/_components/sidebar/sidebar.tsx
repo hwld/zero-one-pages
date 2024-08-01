@@ -38,7 +38,11 @@ import { PiGraduationCapLight } from "@react-icons/all-files/pi/PiGraduationCapL
 import { PiDeviceMobileLight } from "@react-icons/all-files/pi/PiDeviceMobileLight";
 import { PiDotFill } from "@react-icons/all-files/pi/PiDotFill";
 import { IconType } from "@react-icons/all-files/lib";
-import { MyProjectListItem, MyProjectList } from "./my-project-list";
+import {
+  MyProjectListItem,
+  MyProjectList,
+  Project,
+} from "./my-project-list/my-project-list";
 import { SidebarListButton, SidebarListLink } from "./list-item";
 import { Routes } from "../../_utils/routes";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -105,6 +109,27 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
     return paths;
   }, [paths, searchParams]);
+
+  const projects: Project[] = [
+    {
+      id: "1",
+      label: "project 1",
+      todos: 0,
+      subProjects: [
+        {
+          id: "1-2",
+          label: "project 1-2",
+          todos: 0,
+          subProjects: [
+            { id: "1-2-1", label: "project 1-2-1", todos: 10, subProjects: [] },
+          ],
+        },
+      ],
+    },
+    { id: "2", label: "project 2", todos: 4, subProjects: [] },
+    { id: "3", label: "project 3", todos: 0, subProjects: [] },
+    { id: "4", label: "project 4", todos: 9, subProjects: [] },
+  ];
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
@@ -223,9 +248,11 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
       </AnimatePresence>
 
       <ul>
-        <Tooltip label="タスクを追加" keys={["Q"]} placement="right">
-          <TaskCreateButton />
-        </Tooltip>
+        <li>
+          <Tooltip label="タスクを追加" keys={["Q"]} placement="right">
+            <TaskCreateButton />
+          </Tooltip>
+        </li>
         <Tooltip
           label="クイック検索を開く"
           keys={["Cmd", "K"]}
@@ -288,18 +315,15 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
       </ul>
 
       <MyProjectList isHeaderActive={currentRoute === Routes.myProjectList()}>
-        <MyProjectListItem currentRoute={currentRoute} id="1" todos={0}>
-          project 1
-        </MyProjectListItem>
-        <MyProjectListItem currentRoute={currentRoute} id="2" todos={4}>
-          project 2
-        </MyProjectListItem>
-        <MyProjectListItem currentRoute={currentRoute} id="3" todos={0}>
-          project 3
-        </MyProjectListItem>
-        <MyProjectListItem currentRoute={currentRoute} id="4" todos={9}>
-          project 4
-        </MyProjectListItem>
+        {projects.map((project) => {
+          return (
+            <MyProjectListItem
+              key={project.id}
+              currentRoute={currentRoute}
+              project={project}
+            />
+          );
+        })}
       </MyProjectList>
     </div>
   );
