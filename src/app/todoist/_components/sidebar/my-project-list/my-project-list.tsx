@@ -159,7 +159,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
       onBlur={() => setFocus(false)}
       right={
         <div className="flex items-center gap-1">
-          {rightNode}
+          <div className="grid size-6 place-items-center">{rightNode}</div>
           {project.subProjects.length ? (
             <TreeToggleIconButton
               isOpen={isSubListOpen}

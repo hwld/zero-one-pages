@@ -11,16 +11,18 @@ type WrapperProps = {
   active?: boolean;
   right?: ReactNode;
   children: ReactNode;
-};
+} & ComponentPropsWithoutRef<"div">;
 
 // buttonやa要素の中にbuttonやa要素を含めることができないので、一つ上にWrapperを作って、兄弟としてレンダリングする
 export const ItemWrapper: React.FC<WrapperProps> = ({
   right,
   active,
   children,
+  ...props
 }) => {
   return (
     <div
+      {...props}
       className={clsx(
         "flex h-9 w-full items-center justify-between rounded transition-colors",
         active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
@@ -119,12 +121,13 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
     const actualIcon = (active ? activeIcon : icon) ?? icon;
 
     return (
-      <li
-        ref={ref}
-        onPointerEnter={onPointerEnter}
-        onPointerLeave={onPointerLeave}
-      >
-        <ItemWrapper active={active} right={right}>
+      <li ref={ref}>
+        <ItemWrapper
+          active={active}
+          right={right}
+          onPointerEnter={onPointerEnter}
+          onPointerLeave={onPointerLeave}
+        >
           <Link {...props} className={wrapperChildClass}>
             <ItemContent icon={actualIcon} active={active}>
               {children}
