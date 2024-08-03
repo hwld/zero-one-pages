@@ -21,6 +21,7 @@ import { Menu } from "../../menu/menu";
 import { MenuButtonItem } from "../../menu/item";
 import { cn } from "@/lib/utils";
 import { MyProjectMenu } from "./project-menu";
+import { Project } from "@/app/todoist/_utils/project";
 
 type Props = {
   isHeaderActive?: boolean;
@@ -88,24 +89,18 @@ export const MyProjectList: React.FC<Props> = ({
   );
 };
 
-export type Project = {
-  id: string;
-  label: string;
-  todos: number;
-  subProjects: Project[];
-};
-
 type MyProjectListItemProps = {
   currentRoute: string;
   project: Project;
+  onChangeExpanded: (id: string, expanded: boolean) => void;
 };
 
 export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   currentRoute,
   project,
+  onChangeExpanded,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSubListOpen, setIsSubListOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
 
   const timer = useRef(0);
@@ -154,7 +149,9 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
       currentRoute={currentRoute}
       icon={PiHashLight}
       onPointerEnter={() => setFocus(true)}
-      onPointerLeave={() => setFocus(false)}
+      onPointerLeave={() => {
+        setFocus(false);
+      }}
       onFocus={() => setFocus(true)}
       onBlur={() => setFocus(false)}
       right={
@@ -162,15 +159,15 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
           <div className="grid size-6 place-items-center">{rightNode}</div>
           {project.subProjects.length ? (
             <TreeToggleIconButton
-              isOpen={isSubListOpen}
-              onOpenChange={setIsSubListOpen}
+              isOpen={project.expanded}
+              onOpenChange={(open) => onChangeExpanded(project.id, open)}
             />
           ) : null}
         </div>
       }
       subList={
         <AnimatePresence>
-          {project.subProjects.length && isSubListOpen ? (
+          {project.subProjects.length && project.expanded ? (
             <motion.ul
               className="pl-4"
               initial={{ opacity: 0, height: 0 }}
@@ -184,6 +181,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
                     key={subProject.id}
                     project={subProject}
                     currentRoute={currentRoute}
+                    onChangeExpanded={onChangeExpanded}
                   />
                 );
               })}

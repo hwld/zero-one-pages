@@ -41,7 +41,6 @@ import { IconType } from "@react-icons/all-files/lib";
 import {
   MyProjectListItem,
   MyProjectList,
-  Project,
 } from "./my-project-list/my-project-list";
 import { SidebarListButton, SidebarListLink } from "./list-item";
 import { Routes } from "../../_utils/routes";
@@ -52,6 +51,7 @@ import { PiGearLight } from "@react-icons/all-files/pi/PiGearLight";
 import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
+import { Project, updatedProjects } from "../../_utils/project";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -110,26 +110,48 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return paths;
   }, [paths, searchParams]);
 
-  const projects: Project[] = [
+  const [projects, setProjects] = useState<Project[]>([
     {
       id: "1",
       label: "project 1",
       todos: 0,
+      expanded: false,
       subProjects: [
+        {
+          id: "1-1",
+          label: "project 1-1",
+          todos: 0,
+          subProjects: [
+            {
+              id: "1-1-1",
+              label: "project 1-1-1",
+              todos: 10,
+              subProjects: [],
+              expanded: false,
+            },
+          ],
+          expanded: false,
+        },
         {
           id: "1-2",
           label: "project 1-2",
           todos: 0,
-          subProjects: [
-            { id: "1-2-1", label: "project 1-2-1", todos: 10, subProjects: [] },
-          ],
+          subProjects: [],
+          expanded: false,
         },
       ],
     },
-    { id: "2", label: "project 2", todos: 4, subProjects: [] },
-    { id: "3", label: "project 3", todos: 0, subProjects: [] },
-    { id: "4", label: "project 4", todos: 9, subProjects: [] },
-  ];
+    { id: "2", label: "project 2", todos: 4, subProjects: [], expanded: false },
+    { id: "3", label: "project 3", todos: 0, subProjects: [], expanded: false },
+    { id: "4", label: "project 4", todos: 9, subProjects: [], expanded: false },
+  ]);
+
+  const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
+    const newProjects = updatedProjects(projects, projectId, {
+      expanded: newExpanded,
+    });
+    setProjects(newProjects);
+  };
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
@@ -320,6 +342,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
             <MyProjectListItem
               key={project.id}
               currentRoute={currentRoute}
+              onChangeExpanded={handleChangeExpanded}
               project={project}
             />
           );
