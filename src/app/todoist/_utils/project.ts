@@ -70,7 +70,7 @@ export const toFlatProjects = (
   });
 };
 
-const toProjects = (flats: FlatProject[]): Project[] => {
+export const toProjects = (flats: FlatProject[]): Project[] => {
   const buildSubProjects = (flats: FlatProject[], depth: number): Project[] => {
     const result: Project[] = [];
 
@@ -212,4 +212,25 @@ export const insertedSubProject = (
   }
 
   return toProjects(newFlats);
+};
+
+export const moveProject = (
+  projects: FlatProject[],
+  fromId: string,
+  toId: string,
+): FlatProject[] => {
+  const fromIndex = projects.findIndex((p) => p.id === fromId);
+  const toIndex = projects.findIndex((p) => p.id === toId);
+  const to = projects[toIndex];
+
+  const newProjects = [...projects];
+  newProjects.splice(toIndex, 0, newProjects.splice(fromIndex, 1)[0]);
+
+  if (fromIndex < toIndex && to.subProjectCount && to.expanded) {
+    newProjects[toIndex].depth = to.depth + 1;
+  } else {
+    newProjects[toIndex].depth = to.depth;
+  }
+
+  return toFlatProjects(toProjects(newProjects));
 };

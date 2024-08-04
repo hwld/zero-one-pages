@@ -106,6 +106,12 @@ type ListLinkProps = LinkProps & {
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
   depth?: number;
+
+  isAnyDragging?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.PointerEvent) => void;
+  onDragLeave?: () => void;
+  onDragEnter?: () => void;
 } & Omit<ComponentPropsWithoutRef<"a">, "onPointerEnter" | "onPointerLeave">;
 
 export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
@@ -119,6 +125,11 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
       onPointerEnter,
       onPointerLeave,
       depth,
+      isAnyDragging,
+      onDragStart,
+      onDragOver,
+      onDragLeave,
+      onDragEnter,
       ...props
     },
     ref,
@@ -127,7 +138,29 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
     const actualIcon = (active ? activeIcon : icon) ?? icon;
 
     return (
-      <li ref={ref}>
+      <li
+        ref={ref}
+        onPointerMove={(e) => {
+          if (isAnyDragging) {
+            onDragOver?.(e);
+          }
+        }}
+        onDragStart={(e) => {
+          e.preventDefault();
+          onDragStart?.();
+        }}
+        onPointerLeave={(e) => {
+          e.preventDefault();
+          if (isAnyDragging) {
+            onDragLeave?.();
+          }
+        }}
+        onPointerEnter={() => {
+          if (isAnyDragging) {
+            onDragEnter?.();
+          }
+        }}
+      >
         <ItemWrapper
           active={active}
           right={right}

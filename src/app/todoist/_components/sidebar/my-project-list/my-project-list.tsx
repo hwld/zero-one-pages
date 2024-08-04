@@ -93,12 +93,18 @@ type MyProjectListItemProps = {
   currentRoute: string;
   project: FlatProject;
   onChangeExpanded: (id: string, expanded: boolean) => void;
+  draggingProjectId: null | string;
+  onDrag: (projectId: string) => void;
+  onSwapProjects: (fromId: string, toId: string) => void;
 };
 
 export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   currentRoute,
   project,
   onChangeExpanded,
+  draggingProjectId,
+  onDrag,
+  onSwapProjects,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
@@ -144,31 +150,42 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   }, [isFocus, isMenuOpen, project.todos]);
 
   return (
-    <SidebarListLink
-      href={Routes.myProject(project.id)}
-      currentRoute={currentRoute}
-      icon={PiHashLight}
-      onPointerEnter={() => setFocus(true)}
-      onPointerLeave={() => {
-        setFocus(false);
-      }}
-      onFocus={() => setFocus(true)}
-      onBlur={() => setFocus(false)}
-      right={
-        <div className="flex items-center gap-1">
-          <div className="grid size-6 place-items-center">{rightNode}</div>
-          {project.subProjectCount ? (
-            <TreeToggleIconButton
-              isOpen={project.expanded}
-              onOpenChange={(open) => onChangeExpanded(project.id, open)}
-            />
-          ) : null}
-        </div>
-      }
-      depth={project.depth}
-    >
-      {project.label}
-    </SidebarListLink>
+    <>
+      <SidebarListLink
+        href={Routes.myProject(project.id)}
+        currentRoute={currentRoute}
+        icon={PiHashLight}
+        onPointerEnter={() => setFocus(true)}
+        onPointerLeave={() => {
+          setFocus(false);
+        }}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        isAnyDragging={!!draggingProjectId}
+        onDragStart={() => {
+          onDrag(project.id);
+        }}
+        onDragEnter={() => {
+          if (draggingProjectId) {
+            onSwapProjects(draggingProjectId, project.id);
+          }
+        }}
+        right={
+          <div className="flex items-center gap-1">
+            <div className="grid size-6 place-items-center">{rightNode}</div>
+            {project.subProjectCount ? (
+              <TreeToggleIconButton
+                isOpen={project.expanded}
+                onOpenChange={(open) => onChangeExpanded(project.id, open)}
+              />
+            ) : null}
+          </div>
+        }
+        depth={project.depth}
+      >
+        {project.label}
+      </SidebarListLink>
+    </>
   );
 };
 

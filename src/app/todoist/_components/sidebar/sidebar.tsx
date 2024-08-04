@@ -3,6 +3,7 @@ import React, {
   ComponentPropsWithoutRef,
   forwardRef,
   Suspense,
+  useEffect,
   useMemo,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -51,7 +52,13 @@ import { PiGearLight } from "@react-icons/all-files/pi/PiGearLight";
 import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
-import { Project, toFlatProjects, updatedProjects } from "../../_utils/project";
+import {
+  FlatProject,
+  moveProject,
+  toFlatProjects,
+  toProjects,
+  updatedProjects,
+} from "../../_utils/project";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -110,49 +117,93 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return paths;
   }, [paths, searchParams]);
 
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: "1",
-      label: "project 1",
-      todos: 0,
-      expanded: false,
-      subProjects: [
-        {
-          id: "1-1",
-          label: "project 1-1",
-          todos: 0,
-          subProjects: [
-            {
-              id: "1-1-1",
-              label: "project 1-1-1",
-              todos: 10,
-              subProjects: [],
-              expanded: false,
-            },
-          ],
-          expanded: false,
-        },
-        {
-          id: "1-2",
-          label: "project 1-2",
-          todos: 0,
-          subProjects: [],
-          expanded: false,
-        },
-      ],
-    },
-    { id: "2", label: "project 2", todos: 4, subProjects: [], expanded: false },
-    { id: "3", label: "project 3", todos: 0, subProjects: [], expanded: false },
-    { id: "4", label: "project 4", todos: 9, subProjects: [], expanded: false },
-  ]);
-  const flatProjects = toFlatProjects(projects);
+  const [flatProjects, setFlatProjects] = useState<FlatProject[]>(
+    toFlatProjects([
+      {
+        id: "1",
+        label: "project 1",
+        todos: 0,
+        expanded: false,
+        subProjects: [
+          {
+            id: "1-1",
+            label: "project 1-1",
+            todos: 0,
+            subProjects: [
+              {
+                id: "1-1-1",
+                label: "project 1-1-1",
+                todos: 10,
+                subProjects: [],
+                expanded: false,
+              },
+            ],
+            expanded: false,
+          },
+          {
+            id: "1-2",
+            label: "project 1-2",
+            todos: 0,
+            subProjects: [],
+            expanded: false,
+          },
+        ],
+      },
+      {
+        id: "2",
+        label: "project 2",
+        todos: 4,
+        subProjects: [],
+        expanded: false,
+      },
+      {
+        id: "3",
+        label: "project 3",
+        todos: 0,
+        subProjects: [],
+        expanded: false,
+      },
+      {
+        id: "4",
+        label: "project 4",
+        todos: 9,
+        subProjects: [],
+        expanded: false,
+      },
+    ]),
+  );
 
   const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
-    const newProjects = updatedProjects(projects, projectId, {
-      expanded: newExpanded,
+    setFlatProjects((flats) => {
+      const projects = toProjects(flats);
+      return toFlatProjects(
+        updatedProjects(projects, projectId, { expanded: newExpanded }),
+      );
     });
-    setProjects(newProjects);
   };
+
+  const [draggingProjectId, setDraggingProjectId] = useState<null | string>(
+    null,
+  );
+
+  const handleSwapProjects = (draggingId: string, dragOverId: string) => {
+    setFlatProjects((projects) => {
+      return moveProject(projects, draggingId, dragOverId);
+    });
+  };
+
+  useEffect(() => {
+    const handlePointerUp = () => {
+      if (draggingProjectId) {
+        setDraggingProjectId(null);
+      }
+    };
+
+    document.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [draggingProjectId]);
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
@@ -350,8 +401,11 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                 >
                   <MyProjectListItem
                     currentRoute={currentRoute}
-                    onChangeExpanded={handleChangeExpanded}
                     project={project}
+                    onChangeExpanded={handleChangeExpanded}
+                    onDrag={setDraggingProjectId}
+                    draggingProjectId={draggingProjectId}
+                    onSwapProjects={handleSwapProjects}
                   />
                 </motion.div>
               ) : null}
