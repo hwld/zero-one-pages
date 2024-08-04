@@ -51,7 +51,7 @@ import { PiGearLight } from "@react-icons/all-files/pi/PiGearLight";
 import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
-import { Project, updatedProjects } from "../../_utils/project";
+import { Project, toFlatProjects, updatedProjects } from "../../_utils/project";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -145,6 +145,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     { id: "3", label: "project 3", todos: 0, subProjects: [], expanded: false },
     { id: "4", label: "project 4", todos: 9, subProjects: [], expanded: false },
   ]);
+  const flatProjects = toFlatProjects(projects);
 
   const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
     const newProjects = updatedProjects(projects, projectId, {
@@ -337,14 +338,24 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
       </ul>
 
       <MyProjectList isHeaderActive={currentRoute === Routes.myProjectList()}>
-        {projects.map((project) => {
+        {flatProjects.map((project) => {
           return (
-            <MyProjectListItem
-              key={project.id}
-              currentRoute={currentRoute}
-              onChangeExpanded={handleChangeExpanded}
-              project={project}
-            />
+            <AnimatePresence key={project.id}>
+              {project.visible ? (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <MyProjectListItem
+                    currentRoute={currentRoute}
+                    onChangeExpanded={handleChangeExpanded}
+                    project={project}
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           );
         })}
       </MyProjectList>

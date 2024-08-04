@@ -7,7 +7,7 @@ export type Project = {
   expanded: boolean;
 };
 
-type FlatProject = Omit<Project, "subProjects"> & {
+export type FlatProject = Omit<Project, "subProjects"> & {
   depth: number;
   visible: boolean;
   subProjectCount: number;
@@ -46,7 +46,7 @@ export const updatedProjects = (
   });
 };
 
-const toFlatProjects = (
+export const toFlatProjects = (
   projects: Project[],
   depth: number = 0,
   parentVisible: boolean = true,

@@ -21,7 +21,7 @@ import { Menu } from "../../menu/menu";
 import { MenuButtonItem } from "../../menu/item";
 import { cn } from "@/lib/utils";
 import { MyProjectMenu } from "./project-menu";
-import { Project } from "@/app/todoist/_utils/project";
+import { FlatProject } from "@/app/todoist/_utils/project";
 
 type Props = {
   isHeaderActive?: boolean;
@@ -91,7 +91,7 @@ export const MyProjectList: React.FC<Props> = ({
 
 type MyProjectListItemProps = {
   currentRoute: string;
-  project: Project;
+  project: FlatProject;
   onChangeExpanded: (id: string, expanded: boolean) => void;
 };
 
@@ -157,7 +157,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
       right={
         <div className="flex items-center gap-1">
           <div className="grid size-6 place-items-center">{rightNode}</div>
-          {project.subProjects.length ? (
+          {project.subProjectCount ? (
             <TreeToggleIconButton
               isOpen={project.expanded}
               onOpenChange={(open) => onChangeExpanded(project.id, open)}
@@ -165,30 +165,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
           ) : null}
         </div>
       }
-      subList={
-        <AnimatePresence>
-          {project.subProjects.length && project.expanded ? (
-            <motion.ul
-              className="pl-4"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.1 }}
-            >
-              {project.subProjects.map((subProject) => {
-                return (
-                  <MyProjectListItem
-                    key={subProject.id}
-                    project={subProject}
-                    currentRoute={currentRoute}
-                    onChangeExpanded={onChangeExpanded}
-                  />
-                );
-              })}
-            </motion.ul>
-          ) : undefined}
-        </AnimatePresence>
-      }
+      depth={project.depth}
     >
       {project.label}
     </SidebarListLink>

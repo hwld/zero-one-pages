@@ -5,12 +5,14 @@ import { IconType } from "@react-icons/all-files/lib";
 
 const mutedTextClass = "text-stone-500";
 const activeTextClass = "text-rose-700";
-const wrapperChildClass = "flex h-full w-full items-center pl-[--padding-x]";
+const wrapperChildClass =
+  "flex h-full w-full items-center pl-[--padding-x] overflow-hidden";
 
 type WrapperProps = {
   active?: boolean;
   right?: ReactNode;
   children: ReactNode;
+  depth?: number;
 } & ComponentPropsWithoutRef<"div">;
 
 // buttonやa要素の中にbuttonやa要素を含めることができないので、一つ上にWrapperを作って、兄弟としてレンダリングする
@@ -18,16 +20,20 @@ export const ItemWrapper: React.FC<WrapperProps> = ({
   right,
   active,
   children,
+  depth = 0,
   ...props
 }) => {
   return (
     <div
       {...props}
       className={clsx(
-        "flex h-9 w-full items-center justify-between rounded transition-colors",
+        "flex h-9 items-center justify-between rounded transition-colors",
         active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
       )}
-      style={{ ["--padding-x" as string]: "8px" }}
+      style={{
+        ["--padding-x" as string]: "8px",
+        marginLeft: `${16 * depth}px`,
+      }}
     >
       {children}
       {right && (
@@ -57,7 +63,7 @@ export const ItemContent: React.FC<ContentProps> = ({
 }) => {
   return (
     <span className="flex min-w-0 items-center gap-1">
-      <span className="grid size-7 place-items-center">
+      <span className="grid size-7 shrink-0 place-items-center">
         <Icon
           className={clsx(
             "size-6 shrink-0",
@@ -97,9 +103,9 @@ type ListLinkProps = LinkProps & {
   children: ReactNode;
   activeIcon?: IconType;
   currentRoute: string;
-  subList?: ReactNode;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
+  depth?: number;
 } & Omit<ComponentPropsWithoutRef<"a">, "onPointerEnter" | "onPointerLeave">;
 
 export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
@@ -109,10 +115,10 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
       activeIcon,
       currentRoute,
       right,
-      subList,
       children,
       onPointerEnter,
       onPointerLeave,
+      depth,
       ...props
     },
     ref,
@@ -125,6 +131,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
         <ItemWrapper
           active={active}
           right={right}
+          depth={depth}
           onPointerEnter={onPointerEnter}
           onPointerLeave={onPointerLeave}
         >
@@ -134,7 +141,6 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
             </ItemContent>
           </Link>
         </ItemWrapper>
-        {subList}
       </li>
     );
   },
