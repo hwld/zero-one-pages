@@ -53,6 +53,8 @@ import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
 import {
+  dragEnd,
+  dragStart,
   FlatProject,
   moveProject,
   toFlatProjects,
@@ -186,15 +188,29 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     null,
   );
 
+  const removedDescendantsRef = useRef<FlatProject[]>([]);
+
+  const handleDrag = (id: string) => {
+    const { results, removedDescendants } = dragStart(flatProjects, id);
+    removedDescendantsRef.current = removedDescendants;
+
+    setFlatProjects(results);
+    setDraggingProjectId(id);
+  };
+
   const handleSwapProjects = (draggingId: string, dragOverId: string) => {
     setFlatProjects((projects) => {
-      return moveProject(projects, draggingId, dragOverId);
+      const newProjects = moveProject(projects, draggingId, dragOverId);
+      return newProjects;
     });
   };
 
   useEffect(() => {
     const handlePointerUp = () => {
       if (draggingProjectId) {
+        setFlatProjects((flats) => {
+          return dragEnd(flats, draggingProjectId, removedDescendantsRef.current);
+        });
         setDraggingProjectId(null);
       }
     };
@@ -403,9 +419,9 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                     currentRoute={currentRoute}
                     project={project}
                     onChangeExpanded={handleChangeExpanded}
-                    onDrag={setDraggingProjectId}
+                    onDrag={handleDrag}
                     draggingProjectId={draggingProjectId}
-                    onSwapProjects={handleSwapProjects}
+                    onMoveProjects={handleSwapProjects}
                   />
                 </motion.div>
               ) : null}

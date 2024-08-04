@@ -108,7 +108,7 @@ type ListLinkProps = LinkProps & {
   depth?: number;
 
   isAnyDragging?: boolean;
-  onDragStart?: () => void;
+  onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.PointerEvent) => void;
   onDragLeave?: () => void;
   onDragEnter?: () => void;
@@ -147,7 +147,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
         }}
         onDragStart={(e) => {
           e.preventDefault();
-          onDragStart?.();
+          onDragStart?.(e);
         }}
         onPointerLeave={(e) => {
           e.preventDefault();

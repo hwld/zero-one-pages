@@ -10,6 +10,7 @@ import {
   ComponentPropsWithoutRef,
   forwardRef,
   ReactNode,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -95,7 +96,7 @@ type MyProjectListItemProps = {
   onChangeExpanded: (id: string, expanded: boolean) => void;
   draggingProjectId: null | string;
   onDrag: (projectId: string) => void;
-  onSwapProjects: (fromId: string, toId: string) => void;
+  onMoveProjects: (fromId: string, toId: string) => void;
 };
 
 export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
@@ -104,7 +105,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   onChangeExpanded,
   draggingProjectId,
   onDrag,
-  onSwapProjects,
+  onMoveProjects,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
@@ -149,6 +150,8 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
     );
   }, [isFocus, isMenuOpen, project.todos]);
 
+  const isDragging = draggingProjectId === project.id;
+
   return (
     <>
       <SidebarListLink
@@ -166,8 +169,8 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
           onDrag(project.id);
         }}
         onDragEnter={() => {
-          if (draggingProjectId) {
-            onSwapProjects(draggingProjectId, project.id);
+          if (draggingProjectId && !isDragging) {
+            onMoveProjects(draggingProjectId, project.id);
           }
         }}
         right={

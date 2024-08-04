@@ -10,6 +10,7 @@ export type Project = {
 export type FlatProject = Omit<Project, "subProjects"> & {
   depth: number;
   visible: boolean;
+  isDragging: boolean;
   subProjectCount: number;
 };
 
@@ -57,6 +58,7 @@ export const toFlatProjects = (
       depth,
       visible: parentVisible,
       subProjectCount: project.subProjects.length,
+      isDragging: false,
     };
 
     return [
@@ -71,12 +73,20 @@ export const toFlatProjects = (
 };
 
 export const toProjects = (flats: FlatProject[]): Project[] => {
-  const buildSubProjects = (flats: FlatProject[], depth: number): Project[] => {
+  const buildSubProjects = (
+    flats: FlatProject[],
+    depth: number,
+    index: number,
+  ): [Project[], number] => {
     const result: Project[] = [];
 
-    while (flats.length > 0 && flats[0].depth === depth) {
-      const flat = flats.shift()!;
-      const subProjects = buildSubProjects(flats, depth + 1);
+    while (index < flats.length && flats[index].depth === depth) {
+      const flat = flats[index];
+      const [subProjects, newIndex] = buildSubProjects(
+        flats,
+        depth + 1,
+        index + 1,
+      );
 
       result.push({
         id: flat.id,
@@ -85,12 +95,14 @@ export const toProjects = (flats: FlatProject[]): Project[] => {
         expanded: flat.expanded,
         subProjects: subProjects,
       });
+
+      index = newIndex;
     }
 
-    return result;
+    return [result, index];
   };
 
-  return buildSubProjects(flats, 0);
+  return buildSubProjects(flats, 0, 0)[0];
 };
 
 const countProjectDescendants = (project: Project): number => {
@@ -132,6 +144,7 @@ export const insertedBefore = (
     visible: true,
     depth: Math.max(baseFlatProject.depth, prevProject.depth),
     subProjectCount: newProject.subProjects.length,
+    isDragging: false,
   };
 
   const newFlats = [...flats];
@@ -166,6 +179,7 @@ export const insertedAfter = (
     depth: baseFlatProject.depth,
     visible: true,
     subProjectCount: newProject.subProjects.length,
+    isDragging: false,
   };
 
   const newFlats = [...flats];
@@ -193,6 +207,7 @@ export const insertedSubProject = (
     ...newProject,
     depth: baseFlatProject.depth + 1,
     subProjectCount: newProject.subProjects.length,
+    isDragging: false,
   };
   const newFlats = [...flats];
 
@@ -214,23 +229,93 @@ export const insertedSubProject = (
   return toProjects(newFlats);
 };
 
+// TODO: fromに含まれるサブプロジェクトがtoIdに来ることを想定していない
+// その制限を反映させたい
 export const moveProject = (
   projects: FlatProject[],
   fromId: string,
   toId: string,
 ): FlatProject[] => {
+  if (fromId === toId) {
+    return projects;
+  }
+
   const fromIndex = projects.findIndex((p) => p.id === fromId);
   const toIndex = projects.findIndex((p) => p.id === toId);
-  const to = projects[toIndex];
+  const toProject = projects[toIndex];
 
   const newProjects = [...projects];
   newProjects.splice(toIndex, 0, newProjects.splice(fromIndex, 1)[0]);
 
-  if (fromIndex < toIndex && to.subProjectCount && to.expanded) {
-    newProjects[toIndex].depth = to.depth + 1;
+  // 移動したプロジェクト (from)
+  const moved = newProjects[toIndex];
+
+  if (fromIndex < toIndex && toProject.subProjectCount && toProject.expanded) {
+    moved.depth = toProject.depth + 1;
   } else {
-    newProjects[toIndex].depth = to.depth;
+    moved.depth = toProject.depth;
   }
 
-  return toFlatProjects(toProjects(newProjects));
+  return toFlatProjects(toProjects(newProjects.flat()));
+};
+
+export const dragStart = (
+  projects: FlatProject[],
+  id: string,
+): { results: FlatProject[]; removedDescendants: FlatProject[] } => {
+  const targetIndex = projects.findIndex((p) => p.id === id);
+  const target = projects[targetIndex];
+  if (!target) {
+    throw new Error(`プロジェクトが存在しない: ${id}`);
+  }
+
+  const targetProject = findProject(toProjects(projects), id);
+  if (!targetProject) {
+    throw new Error(`プロジェクトが存在しない: ${id}`);
+  }
+
+  // ドラッグする要素の子孫をすべて削除する
+  const descendantCount = countProjectDescendants(targetProject);
+  const descendantsStartIndex = targetIndex + 1;
+  const descendantsEndIndex = targetIndex + descendantCount + 1;
+  const descendants = projects.slice(
+    descendantsStartIndex,
+    descendantsEndIndex,
+  );
+
+  const newProjects = [
+    ...projects.slice(0, descendantsStartIndex),
+    ...projects.slice(descendantsEndIndex),
+  ];
+
+  newProjects[targetIndex].isDragging = true;
+
+  return { results: newProjects, removedDescendants: descendants };
+};
+
+export const dragEnd = (
+  projects: FlatProject[],
+  id: string,
+  removedDescendants: FlatProject[],
+): FlatProject[] => {
+  const rawNewProjects = projects.flatMap((p) => {
+    if (p.id === id) {
+      return [
+        { ...p, isDragging: false },
+        ...removedDescendants.map((descendant) => {
+          const parentDepth = p.depth;
+          const descendantRootDepth = removedDescendants[0].depth;
+
+          return {
+            ...descendant,
+            depth: descendant.depth - descendantRootDepth + parentDepth + 1,
+          };
+        }),
+      ];
+    }
+    return p;
+  });
+
+  const newProjects = toFlatProjects(toProjects(rawNewProjects));
+  return newProjects;
 };
