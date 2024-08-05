@@ -112,6 +112,8 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
 
+  const itemRef = useRef<HTMLLIElement>(null);
+
   const timer = useRef(0);
 
   // Link -> IconButtonの順にfocusを当てるとき、LinkのonBlurですぐにhoverをfalseにすると、
@@ -156,7 +158,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
 
   const dragStartInfo = useRef({ x: 0, depth: 0 });
   useEffect(() => {
-    const handlePointerMove = (e: MouseEvent) => {
+    const handleChangeDepth = (e: MouseEvent) => {
       if (!isDragging) {
         return;
       }
@@ -168,15 +170,38 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
       onChangeProjectDepth(project.id, newDepth);
     };
 
-    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointermove", handleChangeDepth);
     return () => {
-      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointermove", handleChangeDepth);
     };
   }, [isDragging, onChangeProjectDepth, project.depth, project.id]);
+
+  // リストの外側のドラッグも処理できるように、poitnermoveイベントをハンドリングする
+  useEffect(() => {
+    const handleDragOver = (e: MouseEvent) => {
+      const itemEl = itemRef.current;
+      if (draggingProjectId == null || isDragging || !itemEl) {
+        return;
+      }
+
+      const itemRect = itemEl.getBoundingClientRect();
+      const isPointerOver =
+        e.clientY <= itemRect.bottom && e.clientY >= itemRect.top;
+      if (isPointerOver) {
+        onMoveProjects(draggingProjectId, project.id);
+      }
+    };
+
+    document.addEventListener("pointermove", handleDragOver);
+    return () => {
+      document.removeEventListener("pointermove", handleDragOver);
+    };
+  }, [draggingProjectId, isDragging, onMoveProjects, project.id]);
 
   return (
     <>
       <SidebarListLink
+        ref={itemRef}
         href={Routes.myProject(project.id)}
         currentRoute={currentRoute}
         icon={PiHashLight}
@@ -191,11 +216,11 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
           dragStartInfo.current = { x: e.clientX, depth: project.depth };
           onDrag(project.id);
         }}
-        onDragEnter={() => {
-          if (draggingProjectId && !isDragging) {
-            onMoveProjects(draggingProjectId, project.id);
-          }
-        }}
+        // onDragEnter={() => {
+        //   if (draggingProjectId && !isDragging) {
+        //     onMoveProjects(draggingProjectId, project.id);
+        //   }
+        // }}
         right={
           <div className="flex items-center gap-1">
             <div className="grid size-6 place-items-center">{rightNode}</div>
