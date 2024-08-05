@@ -175,8 +175,8 @@ export const updateProjectDepth = (
     newDepth = prevDepth + 1;
   }
 
-  // 次の要素とdepthが等しい場合、次の要素よりも小さくできない
-  if (targetDepth === nextDepth && newDepth < nextDepth) {
+  // 次の要素よりも小さくできない
+  if (newDepth < nextDepth) {
     newDepth = nextDepth;
   }
 
