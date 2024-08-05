@@ -241,10 +241,22 @@ export const moveProject = (
   }
 
   const fromIndex = projects.findIndex((p) => p.id === fromId);
-  const toIndex = projects.findIndex((p) => p.id === toId);
+  let toIndex = projects.findIndex((p) => p.id === toId);
   const toProject = projects[toIndex];
 
   const newProjects = [...projects];
+
+  if (fromIndex < toIndex && toProject.subProjectCount && !toProject.expanded) {
+    // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
+    // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
+    const to = findProject(toProjects(projects), toProject.id);
+    if (!to) {
+      throw new Error("移動対象のプロジェクトが存在しません");
+    }
+
+    toIndex = toIndex + countProjectDescendants(to);
+  }
+
   newProjects.splice(toIndex, 0, newProjects.splice(fromIndex, 1)[0]);
 
   // 移動したプロジェクト (from)
