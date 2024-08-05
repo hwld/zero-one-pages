@@ -97,6 +97,7 @@ type MyProjectListItemProps = {
   draggingProjectId: null | string;
   onDrag: (projectId: string) => void;
   onMoveProjects: (fromId: string, toId: string) => void;
+  onChangeProjectDepth: (projectId: string, depthChange: number) => void;
 };
 
 export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
@@ -106,6 +107,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
   draggingProjectId,
   onDrag,
   onMoveProjects,
+  onChangeProjectDepth,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
@@ -152,6 +154,26 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
 
   const isDragging = draggingProjectId === project.id;
 
+  const dragStartInfo = useRef({ x: 0, depth: 0 });
+  useEffect(() => {
+    const handlePointerMove = (e: MouseEvent) => {
+      if (!isDragging) {
+        return;
+      }
+
+      const newDepth =
+        dragStartInfo.current.depth +
+        Math.floor((e.clientX - dragStartInfo.current.x) / 16);
+
+      onChangeProjectDepth(project.id, newDepth);
+    };
+
+    document.addEventListener("pointermove", handlePointerMove);
+    return () => {
+      document.removeEventListener("pointermove", handlePointerMove);
+    };
+  }, [isDragging, onChangeProjectDepth, project.depth, project.id]);
+
   return (
     <>
       <SidebarListLink
@@ -165,7 +187,8 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
         isAnyDragging={!!draggingProjectId}
-        onDragStart={() => {
+        onDragStart={(e) => {
+          dragStartInfo.current = { x: e.clientX, depth: project.depth };
           onDrag(project.id);
         }}
         onDragEnter={() => {

@@ -53,6 +53,7 @@ import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
 import {
+  changeDepth,
   dragEnd,
   dragStart,
   FlatProject,
@@ -61,6 +62,7 @@ import {
   toProjects,
   updatedProjects,
 } from "../../_utils/project";
+import { setDefaultResultOrder } from "dns";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -198,10 +200,16 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     setDraggingProjectId(id);
   };
 
-  const handleSwapProjects = (draggingId: string, dragOverId: string) => {
+  const handleMoveProjects = (draggingId: string, dragOverId: string) => {
     setFlatProjects((projects) => {
       const newProjects = moveProject(projects, draggingId, dragOverId);
       return newProjects;
+    });
+  };
+
+  const handleChangeDepth = (projectId: string, newDepth: number) => {
+    setFlatProjects((projects) => {
+      return changeDepth(projects, projectId, newDepth);
     });
   };
 
@@ -209,7 +217,11 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     const handlePointerUp = () => {
       if (draggingProjectId) {
         setFlatProjects((flats) => {
-          return dragEnd(flats, draggingProjectId, removedDescendantsRef.current);
+          return dragEnd(
+            flats,
+            draggingProjectId,
+            removedDescendantsRef.current,
+          );
         });
         setDraggingProjectId(null);
       }
@@ -421,7 +433,8 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                     onChangeExpanded={handleChangeExpanded}
                     onDrag={handleDrag}
                     draggingProjectId={draggingProjectId}
-                    onMoveProjects={handleSwapProjects}
+                    onMoveProjects={handleMoveProjects}
+                    onChangeProjectDepth={handleChangeDepth}
                   />
                 </motion.div>
               ) : null}

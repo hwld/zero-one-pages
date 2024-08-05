@@ -259,6 +259,57 @@ export const moveProject = (
   return toFlatProjects(toProjects(newProjects.flat()));
 };
 
+export const changeDepth = (
+  projects: FlatProject[],
+  projectId: string,
+  newDepth: number,
+): FlatProject[] => {
+  const targetIndex = projects.findIndex((p) => p.id === projectId);
+  if (targetIndex === -1) {
+    throw new Error(`変更対象のプロジェクトが存在しない: ${projectId}`);
+  }
+
+  const targetDepth = projects[targetIndex].depth;
+  // 直近でvisibleがtrueのプロジェクトのdepth
+  const prevDepth =
+    projects.slice(0, targetIndex).findLast((p) => p.visible === true)?.depth ??
+    -1;
+  const nextDepth = projects[targetIndex + 1]?.depth ?? 0;
+
+  // 前の要素のdepth+1以上大きくはできない
+  if (newDepth > prevDepth + 1) {
+    newDepth = prevDepth + 1;
+  }
+
+  // 次の要素とdepthが等しい場合、次の要素よりも小さくできない
+  if (targetDepth === nextDepth && newDepth < nextDepth) {
+    newDepth = nextDepth;
+  }
+
+  if (newDepth < 0) {
+    newDepth = 0;
+  }
+
+  const newProjects = [...projects];
+  newProjects[targetIndex].depth = newDepth;
+
+  // targetが子でtargetの親プロジェクトのexpandがfalseであればtrueにする
+  if (newDepth > 0) {
+    const parent = newProjects
+      .slice(0, targetIndex)
+      .findLast((p) => p.depth === newDepth - 1);
+    if (!parent) {
+      throw new Error(`親プロジェクトが存在しない`);
+    }
+
+    if (parent.expanded === false) {
+      parent.expanded = true;
+    }
+  }
+
+  return newProjects;
+};
+
 export const dragStart = (
   projects: FlatProject[],
   id: string,
