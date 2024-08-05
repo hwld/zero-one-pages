@@ -84,13 +84,18 @@ type ListButtonProps = {
   right?: ReactNode;
   onClick?: () => void;
   children: ReactNode;
+  isDragging?: boolean;
+  depth?: number;
 };
 
 export const SidebarListButton = forwardRef<HTMLLIElement, ListButtonProps>(
-  function SidebarListButton({ icon, right, children, ...props }, ref) {
+  function SidebarListButton(
+    { icon, right, children, isDragging, depth, ...props },
+    ref,
+  ) {
     return (
       <li ref={ref}>
-        <ItemWrapper right={right}>
+        <ItemWrapper right={right} isDragging={isDragging} depth={depth}>
           <button {...props} className={wrapperChildClass}>
             <ItemContent icon={icon}>{children}</ItemContent>
           </button>

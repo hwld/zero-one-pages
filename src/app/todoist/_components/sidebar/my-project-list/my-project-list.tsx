@@ -5,7 +5,7 @@ import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { PiPlusLight } from "@react-icons/all-files/pi/PiPlusLight";
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiBrowsersLight } from "@react-icons/all-files/pi/PiBrowsersLight";
-import { SidebarListLink } from "../list-item";
+import { SidebarListButton, SidebarListLink } from "../list-item";
 import {
   ComponentPropsWithoutRef,
   forwardRef,
@@ -200,38 +200,48 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
 
   return (
     <>
-      <SidebarListLink
-        ref={itemRef}
-        href={Routes.myProject(project.id)}
-        currentRoute={currentRoute}
-        icon={PiHashLight}
-        onPointerEnter={() => setFocus(true)}
-        onPointerLeave={() => {
-          setFocus(false);
-        }}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-        isDragging={isDragging}
-        isAnyDragging={!!draggingProjectId}
-        onDragStart={(e) => {
-          dragStartInfo.current = { x: e.clientX, depth: project.depth };
-          onDrag(project.id);
-        }}
-        right={
-          <div className="flex items-center gap-1">
-            <div className="grid size-6 place-items-center">{rightNode}</div>
-            {project.subProjectCount ? (
-              <TreeToggleIconButton
-                isOpen={project.expanded}
-                onOpenChange={(open) => onChangeExpanded(project.id, open)}
-              />
-            ) : null}
-          </div>
-        }
-        depth={project.depth}
-      >
-        {project.label}
-      </SidebarListLink>
+      {isDragging ? (
+        <SidebarListButton
+          icon={PiHashLight}
+          isDragging={isDragging}
+          depth={project.depth}
+        >
+          {project.label}
+        </SidebarListButton>
+      ) : (
+        <SidebarListLink
+          ref={itemRef}
+          href={Routes.myProject(project.id)}
+          currentRoute={currentRoute}
+          icon={PiHashLight}
+          onPointerEnter={() => setFocus(true)}
+          onPointerLeave={() => {
+            setFocus(false);
+          }}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
+          isDragging={isDragging}
+          isAnyDragging={!!draggingProjectId}
+          onDragStart={(e) => {
+            dragStartInfo.current = { x: e.clientX, depth: project.depth };
+            onDrag(project.id);
+          }}
+          right={
+            <div className="flex items-center gap-1">
+              <div className="grid size-6 place-items-center">{rightNode}</div>
+              {project.subProjectCount ? (
+                <TreeToggleIconButton
+                  isOpen={project.expanded}
+                  onOpenChange={(open) => onChangeExpanded(project.id, open)}
+                />
+              ) : null}
+            </div>
+          }
+          depth={project.depth}
+        >
+          {project.label}
+        </SidebarListLink>
+      )}
     </>
   );
 };
