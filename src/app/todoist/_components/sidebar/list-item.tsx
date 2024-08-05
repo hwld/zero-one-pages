@@ -17,7 +17,7 @@ type WrapperProps = {
 } & ComponentPropsWithoutRef<"div">;
 
 // buttonやa要素の中にbuttonやa要素を含めることができないので、一つ上にWrapperを作って、兄弟としてレンダリングする
-export const ItemWrapper: React.FC<WrapperProps> = ({
+const ItemWrapper: React.FC<WrapperProps> = ({
   right,
   active,
   isDragging,
@@ -59,7 +59,7 @@ type ContentProps = {
   children: ReactNode;
 };
 
-export const ItemContent: React.FC<ContentProps> = ({
+const ItemContent: React.FC<ContentProps> = ({
   icon: Icon,
   active,
   children,

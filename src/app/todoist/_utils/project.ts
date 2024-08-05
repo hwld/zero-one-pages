@@ -1,4 +1,4 @@
-// subProjectsが空のときはexpandedがfalse担っている必要がある
+// subProjectsが空のときはexpandedがfalseになっている必要がある
 export type Project = {
   id: string;
   label: string;
@@ -7,7 +7,7 @@ export type Project = {
   expanded: boolean;
 };
 
-export type FlatProject = Omit<Project, "subProjects"> & {
+export type ProjectNode = Omit<Project, "subProjects"> & {
   depth: number;
   visible: boolean;
   isDragging: boolean;
@@ -31,29 +31,27 @@ const findProject = (projects: Project[], id: string): Project | undefined => {
 export const updatedProjects = (
   projects: Project[],
   id: string,
-  data: Partial<Omit<Project, "id">>,
-) => {
-  return projects.map((project): Project => {
-    if (project.id === id) {
-      return { ...project, ...data };
-    } else if (project.subProjects.length > 0) {
-      return {
-        ...project,
-        subProjects: updatedProjects(project.subProjects, id, data),
-      };
-    }
+  data: Partial<Omit<Project, "id" | "subProjects">>,
+): Project[] => {
+  const nodes = toProjectNodes(projects);
 
-    return project;
+  const newNodes = nodes.map((node): ProjectNode => {
+    if (node.id === id) {
+      return { ...node, ...data };
+    }
+    return node;
   });
+
+  return toProjects(newNodes);
 };
 
-export const toFlatProjects = (
+export const toProjectNodes = (
   projects: Project[],
   depth: number = 0,
   parentVisible: boolean = true,
-): FlatProject[] => {
-  return projects.flatMap((project): FlatProject[] => {
-    const flat: FlatProject = {
+): ProjectNode[] => {
+  return projects.flatMap((project): ProjectNode[] => {
+    const node: ProjectNode = {
       ...project,
       depth,
       visible: parentVisible,
@@ -62,8 +60,8 @@ export const toFlatProjects = (
     };
 
     return [
-      flat,
-      ...toFlatProjects(
+      node,
+      ...toProjectNodes(
         project.subProjects,
         depth + 1,
         parentVisible && project.expanded,
@@ -72,27 +70,27 @@ export const toFlatProjects = (
   });
 };
 
-export const toProjects = (flats: FlatProject[]): Project[] => {
+export const toProjects = (nodes: ProjectNode[]): Project[] => {
   const buildSubProjects = (
-    flats: FlatProject[],
+    nodes: ProjectNode[],
     depth: number,
     index: number,
   ): [Project[], number] => {
     const result: Project[] = [];
 
-    while (index < flats.length && flats[index].depth === depth) {
-      const flat = flats[index];
+    while (index < nodes.length && nodes[index].depth === depth) {
+      const node = nodes[index];
       const [subProjects, newIndex] = buildSubProjects(
-        flats,
+        nodes,
         depth + 1,
         index + 1,
       );
 
       result.push({
-        id: flat.id,
-        label: flat.label,
-        todos: flat.todos,
-        expanded: flat.expanded,
+        id: node.id,
+        label: node.label,
+        todos: node.todos,
+        expanded: node.expanded,
         subProjects: subProjects,
       });
 
@@ -102,7 +100,7 @@ export const toProjects = (flats: FlatProject[]): Project[] => {
     return [result, index];
   };
 
-  return buildSubProjects(flats, 0, 0)[0];
+  return buildSubProjects(nodes, 0, 0)[0];
 };
 
 const countProjectDescendants = (project: Project): number => {
@@ -111,182 +109,68 @@ const countProjectDescendants = (project: Project): number => {
   }, 0);
 };
 
-/**
- *   指定されたprojectsのなかのbaseProjectIdを持つ要素の一つ前にnewProjectを追加したProject[]を返す。
- *   projectsのexpandを考慮して、展開されているツリーの中での一つ前を計算する。
- */
-export const insertedBefore = (
-  projects: Project[],
-  baseProjectId: string,
-  newProject: Project,
-): Project[] => {
-  const flats = toFlatProjects(projects);
-
-  const baseFlatProject = flats.find((n) => n.id === baseProjectId);
-  if (!baseFlatProject) {
-    throw new Error("プロジェクトが存在しないｓ");
-  }
-  const baseProjectIndex = flats.indexOf(baseFlatProject);
-  if (baseProjectIndex === 0) {
-    return [newProject, ...projects];
-  }
-
-  let prevProject: FlatProject = flats[0];
-  for (let i = baseProjectIndex - 1; i >= 0; i--) {
-    if (flats[i].visible === true) {
-      prevProject = flats[i];
-      break;
-    }
-  }
-
-  const newFlat: FlatProject = {
-    ...newProject,
-    visible: true,
-    depth: Math.max(baseFlatProject.depth, prevProject.depth),
-    subProjectCount: newProject.subProjects.length,
-    isDragging: false,
-  };
-
-  const newFlats = [...flats];
-  newFlats.splice(baseProjectIndex, 0, newFlat);
-  return toProjects(newFlats);
-};
-
-/**
- *  projectsのなかのbaseProjectIdを持つ要素の一つ後ろにnewProjectを追加したProject[]を返す。
- *  projectsのexpandを考慮して、展開されているツリーの中での一つ後ろを計算する。
- */
-export const insertedAfter = (
-  projects: Project[],
-  baseProjectId: string,
-  newProject: Project,
-): Project[] => {
-  const flats = toFlatProjects(projects);
-
-  const baseFlatProject = flats.find((p) => p.id === baseProjectId);
-  const baseProject = findProject(projects, baseProjectId);
-  if (!baseFlatProject || !baseProject) {
-    throw new Error(`プロジェクトが存在しない: ${baseProjectId}`);
-  }
-
-  const baseProjectIndex = flats.indexOf(baseFlatProject);
-  const baseProjectDescendants = countProjectDescendants(baseProject);
-
-  const insertIndex = baseProjectIndex + baseProjectDescendants + 1;
-
-  const newFlat: FlatProject = {
-    ...newProject,
-    depth: baseFlatProject.depth,
-    visible: true,
-    subProjectCount: newProject.subProjects.length,
-    isDragging: false,
-  };
-
-  const newFlats = [...flats];
-  newFlats.splice(insertIndex, 0, newFlat);
-  return toProjects(newFlats);
-};
-
-/**
- *  projectsのなかのbaseProjectIdを持つ要素のsubProjectsのなかにnewProjectを追加したProject[]を返す。
- */
-export const insertedSubProject = (
-  projects: Project[],
-  baseProjectId: string,
-  newProject: Project,
-): Project[] => {
-  const flats = toFlatProjects(projects);
-
-  const baseFlatProject = flats.find((n) => n.id === baseProjectId);
-  if (!baseFlatProject) {
-    throw new Error("プロジェクトが存在しない");
-  }
-  const baseProjectIndex = flats.indexOf(baseFlatProject);
-
-  const newFlatProject: Omit<FlatProject, "visible"> = {
-    ...newProject,
-    depth: baseFlatProject.depth + 1,
-    subProjectCount: newProject.subProjects.length,
-    isDragging: false,
-  };
-  const newFlats = [...flats];
-
-  if (baseFlatProject.expanded) {
-    // 展開されていれば、baseProjectの後ろに追加する
-    newFlats.splice(baseProjectIndex + 1, 0, {
-      ...newFlatProject,
-      visible: true,
-    });
-  } else {
-    // 展開されていなければ、subProjectの一番最後に追加する
-    const subProjects = baseFlatProject.subProjectCount;
-    newFlats.splice(baseProjectIndex + subProjects + 1, 0, {
-      ...newFlatProject,
-      visible: subProjects === 0,
-    });
-  }
-
-  return toProjects(newFlats);
-};
-
 // TODO: fromに含まれるサブプロジェクトがtoIdに来ることを想定していない
 // その制限を反映させたい
 export const moveProject = (
-  projects: FlatProject[],
+  projects: Project[],
   fromId: string,
   toId: string,
-): FlatProject[] => {
+): Project[] => {
   if (fromId === toId) {
     return projects;
   }
 
-  const fromIndex = projects.findIndex((p) => p.id === fromId);
-  let toIndex = projects.findIndex((p) => p.id === toId);
-  const toProject = projects[toIndex];
+  const nodes = toProjectNodes(projects);
 
-  const newProjects = [...projects];
+  const fromIndex = nodes.findIndex((p) => p.id === fromId);
+  let toIndex = nodes.findIndex((p) => p.id === toId);
+  const toNode = nodes[toIndex];
 
-  if (fromIndex < toIndex && toProject.subProjectCount && !toProject.expanded) {
+  const newNodes = [...nodes];
+
+  if (fromIndex < toIndex && toNode.subProjectCount && !toNode.expanded) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
     // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
-    const to = findProject(toProjects(projects), toProject.id);
-    if (!to) {
+    const toProject = findProject(projects, toNode.id);
+    if (!toProject) {
       throw new Error("移動対象のプロジェクトが存在しません");
     }
 
-    toIndex = toIndex + countProjectDescendants(to);
+    toIndex = toIndex + countProjectDescendants(toProject);
   }
 
-  newProjects.splice(toIndex, 0, newProjects.splice(fromIndex, 1)[0]);
+  newNodes.splice(toIndex, 0, newNodes.splice(fromIndex, 1)[0]);
 
   // 移動したプロジェクト (from)
-  const moved = newProjects[toIndex];
+  const moved = newNodes[toIndex];
 
-  if (fromIndex < toIndex && toProject.subProjectCount && toProject.expanded) {
-    moved.depth = toProject.depth + 1;
+  if (fromIndex < toIndex && toNode.subProjectCount && toNode.expanded) {
+    moved.depth = toNode.depth + 1;
   } else {
-    moved.depth = toProject.depth;
+    moved.depth = toNode.depth;
   }
 
-  return toFlatProjects(toProjects(newProjects.flat()));
+  return toProjects(newNodes);
 };
 
-export const changeDepth = (
-  projects: FlatProject[],
+export const updateProjectDepth = (
+  projects: Project[],
   projectId: string,
   newDepth: number,
-): FlatProject[] => {
-  const targetIndex = projects.findIndex((p) => p.id === projectId);
+): Project[] => {
+  const nodes = toProjectNodes(projects);
+
+  const targetIndex = nodes.findIndex((p) => p.id === projectId);
   if (targetIndex === -1) {
     throw new Error(`変更対象のプロジェクトが存在しない: ${projectId}`);
   }
 
-  const targetDepth = projects[targetIndex].depth;
+  const targetDepth = nodes[targetIndex].depth;
   // 直近でvisibleがtrueのプロジェクトのdepth
   const prevDepth =
-    projects.slice(0, targetIndex).findLast((p) => p.visible === true)?.depth ??
+    nodes.slice(0, targetIndex).findLast((p) => p.visible === true)?.depth ??
     -1;
-  const nextDepth = projects[targetIndex + 1]?.depth ?? 0;
+  const nextDepth = nodes[targetIndex + 1]?.depth ?? 0;
 
   // 前の要素のdepth+1以上大きくはできない
   if (newDepth > prevDepth + 1) {
@@ -302,37 +186,37 @@ export const changeDepth = (
     newDepth = 0;
   }
 
-  const newProjects = [...projects];
-  newProjects[targetIndex].depth = newDepth;
+  const newNodes = [...nodes];
+  newNodes[targetIndex].depth = newDepth;
 
   // targetが子でtargetの親プロジェクトのexpandがfalseであればtrueにする
   if (newDepth > 0) {
-    const parent = newProjects
+    const parent = newNodes
       .slice(0, targetIndex)
       .findLast((p) => p.depth === newDepth - 1);
     if (!parent) {
       throw new Error(`親プロジェクトが存在しない`);
     }
 
-    if (parent.expanded === false) {
-      parent.expanded = true;
-    }
+    parent.expanded = true;
   }
 
-  return newProjects;
+  return toProjects(newNodes);
 };
 
-export const dragStart = (
-  projects: FlatProject[],
+export const dragProjectStart = (
+  projects: Project[],
   id: string,
-): { results: FlatProject[]; removedDescendants: FlatProject[] } => {
-  const targetIndex = projects.findIndex((p) => p.id === id);
-  const target = projects[targetIndex];
-  if (!target) {
+): { results: Project[]; removedDescendantNodes: ProjectNode[] } => {
+  const nodes = toProjectNodes(projects);
+
+  const targetIndex = nodes.findIndex((p) => p.id === id);
+  const targetNode = nodes[targetIndex];
+  if (!targetNode) {
     throw new Error(`プロジェクトが存在しない: ${id}`);
   }
 
-  const targetProject = findProject(toProjects(projects), id);
+  const targetProject = findProject(projects, id);
   if (!targetProject) {
     throw new Error(`プロジェクトが存在しない: ${id}`);
   }
@@ -341,32 +225,31 @@ export const dragStart = (
   const descendantCount = countProjectDescendants(targetProject);
   const descendantsStartIndex = targetIndex + 1;
   const descendantsEndIndex = targetIndex + descendantCount + 1;
-  const descendants = projects.slice(
-    descendantsStartIndex,
-    descendantsEndIndex,
-  );
+  const descendants = nodes.slice(descendantsStartIndex, descendantsEndIndex);
 
-  const newProjects = [
-    ...projects.slice(0, descendantsStartIndex),
-    ...projects.slice(descendantsEndIndex),
+  const newNodes = [
+    ...nodes.slice(0, descendantsStartIndex),
+    ...nodes.slice(descendantsEndIndex),
   ];
 
-  newProjects[targetIndex].isDragging = true;
+  newNodes[targetIndex].isDragging = true;
 
-  return { results: newProjects, removedDescendants: descendants };
+  return { results: toProjects(newNodes), removedDescendantNodes: descendants };
 };
 
-export const dragEnd = (
-  projects: FlatProject[],
+export const dragProjectEnd = (
+  projects: Project[],
   id: string,
-  removedDescendants: FlatProject[],
-): FlatProject[] => {
-  const rawNewProjects = projects.flatMap((p) => {
-    if (p.id === id) {
+  removedDescendants: ProjectNode[],
+): Project[] => {
+  const nodes = toProjectNodes(projects);
+
+  const newNodes = nodes.flatMap((node) => {
+    if (node.id === id) {
       return [
-        { ...p, isDragging: false },
+        { ...node, isDragging: false },
         ...removedDescendants.map((descendant) => {
-          const parentDepth = p.depth;
+          const parentDepth = node.depth;
           const descendantRootDepth = removedDescendants[0].depth;
 
           return {
@@ -376,9 +259,8 @@ export const dragEnd = (
         }),
       ];
     }
-    return p;
+    return node;
   });
 
-  const newProjects = toFlatProjects(toProjects(rawNewProjects));
-  return newProjects;
+  return toProjects(newNodes);
 };

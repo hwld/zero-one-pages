@@ -44,7 +44,7 @@ import {
   MyProjectList,
 } from "./my-project-list/my-project-list";
 import { SidebarListButton, SidebarListLink } from "./list-item";
-import { Routes } from "../../_utils/routes";
+import { Routes } from "../../routes";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Tooltip, TooltipDelayGroup } from "../tooltip";
 import { MenuButtonItem, SubMenuTrigger } from "../menu/item";
@@ -53,16 +53,15 @@ import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
 import { cn } from "@/lib/utils";
 import { Menu, MenuSeparator } from "../menu/menu";
 import {
-  changeDepth,
-  dragEnd,
-  dragStart,
-  FlatProject,
+  updateProjectDepth,
+  dragProjectEnd,
+  dragProjectStart,
+  ProjectNode,
   moveProject,
-  toFlatProjects,
-  toProjects,
+  toProjectNodes,
   updatedProjects,
+  Project,
 } from "../../_utils/project";
-import { setDefaultResultOrder } from "dns";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -121,68 +120,64 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return paths;
   }, [paths, searchParams]);
 
-  const [flatProjects, setFlatProjects] = useState<FlatProject[]>(
-    toFlatProjects([
-      {
-        id: "1",
-        label: "project 1",
-        todos: 0,
-        expanded: false,
-        subProjects: [
-          {
-            id: "1-1",
-            label: "project 1-1",
-            todos: 0,
-            subProjects: [
-              {
-                id: "1-1-1",
-                label: "project 1-1-1",
-                todos: 10,
-                subProjects: [],
-                expanded: false,
-              },
-            ],
-            expanded: false,
-          },
-          {
-            id: "1-2",
-            label: "project 1-2",
-            todos: 0,
-            subProjects: [],
-            expanded: false,
-          },
-        ],
-      },
-      {
-        id: "2",
-        label: "project 2",
-        todos: 4,
-        subProjects: [],
-        expanded: false,
-      },
-      {
-        id: "3",
-        label: "project 3",
-        todos: 0,
-        subProjects: [],
-        expanded: false,
-      },
-      {
-        id: "4",
-        label: "project 4",
-        todos: 9,
-        subProjects: [],
-        expanded: false,
-      },
-    ]),
-  );
+  const [projects, setProjects] = useState<Project[]>([
+    {
+      id: "1",
+      label: "project 1",
+      todos: 0,
+      expanded: false,
+      subProjects: [
+        {
+          id: "1-1",
+          label: "project 1-1",
+          todos: 0,
+          subProjects: [
+            {
+              id: "1-1-1",
+              label: "project 1-1-1",
+              todos: 10,
+              subProjects: [],
+              expanded: false,
+            },
+          ],
+          expanded: false,
+        },
+        {
+          id: "1-2",
+          label: "project 1-2",
+          todos: 0,
+          subProjects: [],
+          expanded: false,
+        },
+      ],
+    },
+    {
+      id: "2",
+      label: "project 2",
+      todos: 4,
+      subProjects: [],
+      expanded: false,
+    },
+    {
+      id: "3",
+      label: "project 3",
+      todos: 0,
+      subProjects: [],
+      expanded: false,
+    },
+    {
+      id: "4",
+      label: "project 4",
+      todos: 9,
+      subProjects: [],
+      expanded: false,
+    },
+  ]);
+  const projectNodes = toProjectNodes(projects);
 
   const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
-    setFlatProjects((flats) => {
-      const projects = toProjects(flats);
-      return toFlatProjects(
-        updatedProjects(projects, projectId, { expanded: newExpanded }),
-      );
+    setProjects((projects) => {
+      return updatedProjects(projects, projectId, { expanded: newExpanded });
     });
   };
 
@@ -190,35 +185,35 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     null,
   );
 
-  const removedDescendantsRef = useRef<FlatProject[]>([]);
+  const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
   const handleDrag = (id: string) => {
-    const { results, removedDescendants } = dragStart(flatProjects, id);
-    removedDescendantsRef.current = removedDescendants;
+    const { results, removedDescendantNodes } = dragProjectStart(projects, id);
+    removedDescendantsRef.current = removedDescendantNodes;
 
-    setFlatProjects(results);
+    setProjects(results);
     setDraggingProjectId(id);
   };
 
   const handleMoveProjects = (draggingId: string, dragOverId: string) => {
-    setFlatProjects((projects) => {
+    setProjects((projects) => {
       const newProjects = moveProject(projects, draggingId, dragOverId);
       return newProjects;
     });
   };
 
   const handleChangeDepth = (projectId: string, newDepth: number) => {
-    setFlatProjects((projects) => {
-      return changeDepth(projects, projectId, newDepth);
+    setProjects((projects) => {
+      return updateProjectDepth(projects, projectId, newDepth);
     });
   };
 
   useEffect(() => {
     const handlePointerUp = () => {
       if (draggingProjectId) {
-        setFlatProjects((flats) => {
-          return dragEnd(
-            flats,
+        setProjects((projects) => {
+          return dragProjectEnd(
+            projects,
             draggingProjectId,
             removedDescendantsRef.current,
           );
@@ -417,10 +412,10 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
       </ul>
 
       <MyProjectList isHeaderActive={currentRoute === Routes.myProjectList()}>
-        {flatProjects.map((project) => {
+        {projectNodes.map((projectNode) => {
           return (
-            <AnimatePresence key={project.id}>
-              {project.visible ? (
+            <AnimatePresence key={projectNode.id}>
+              {projectNode.visible ? (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
@@ -429,7 +424,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                 >
                   <MyProjectListItem
                     currentRoute={currentRoute}
-                    project={project}
+                    project={projectNode}
                     onChangeExpanded={handleChangeExpanded}
                     onDrag={handleDrag}
                     draggingProjectId={draggingProjectId}

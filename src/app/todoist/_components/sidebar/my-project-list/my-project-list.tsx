@@ -16,13 +16,13 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes } from "../../../_utils/routes";
+import { Routes } from "../../../routes";
 import Link from "next/link";
 import { Menu } from "../../menu/menu";
 import { MenuButtonItem } from "../../menu/item";
 import { cn } from "@/lib/utils";
 import { MyProjectMenu } from "./project-menu";
-import { FlatProject } from "@/app/todoist/_utils/project";
+import { ProjectNode } from "@/app/todoist/_utils/project";
 
 type Props = {
   isHeaderActive?: boolean;
@@ -92,7 +92,7 @@ export const MyProjectList: React.FC<Props> = ({
 
 type MyProjectListItemProps = {
   currentRoute: string;
-  project: FlatProject;
+  project: ProjectNode;
   onChangeExpanded: (id: string, expanded: boolean) => void;
   draggingProjectId: null | string;
   onDrag: (projectId: string) => void;

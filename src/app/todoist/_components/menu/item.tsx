@@ -69,34 +69,33 @@ type MenuItemWrapperProps = {
   children: ReactNode;
 };
 
-export const MenuItemWrapper = forwardRef<
-  HTMLButtonElement,
-  MenuItemWrapperProps
->(function MenuItem({ children }, forwardedRef) {
-  const menu = useContext(MenuContext);
-  const item = useListItem();
-  const tree = useFloatingTree();
-  const isActive = item.index === menu.activeIndex;
+const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
+  function MenuItem({ children }, forwardedRef) {
+    const menu = useContext(MenuContext);
+    const item = useListItem();
+    const tree = useFloatingTree();
+    const isActive = item.index === menu.activeIndex;
 
-  return (
-    <Slot
-      ref={useMergeRefs([item.ref, forwardedRef])}
-      role="menuitem"
-      className={itemClass}
-      tabIndex={isActive ? 0 : -1}
-      {...menu.getItemProps({
-        onClick() {
-          tree?.events.emit("click");
-        },
-        onFocus() {
-          menu.setHasFocusInside(true);
-        },
-      })}
-    >
-      {children}
-    </Slot>
-  );
-});
+    return (
+      <Slot
+        ref={useMergeRefs([item.ref, forwardedRef])}
+        role="menuitem"
+        className={itemClass}
+        tabIndex={isActive ? 0 : -1}
+        {...menu.getItemProps({
+          onClick() {
+            tree?.events.emit("click");
+          },
+          onFocus() {
+            menu.setHasFocusInside(true);
+          },
+        })}
+      >
+        {children}
+      </Slot>
+    );
+  },
+);
 
 type ButtonItemProps = ContentProps & ComponentPropsWithoutRef<"button">;
 

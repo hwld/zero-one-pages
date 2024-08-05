@@ -63,7 +63,7 @@ type MenuComponentProps = {
   width?: number;
 } & HTMLProps<HTMLButtonElement>;
 
-export const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
+const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
   function MenuComponent(
     {
       children,
