@@ -10,6 +10,7 @@ const wrapperChildClass =
 
 type WrapperProps = {
   active?: boolean;
+  isDragging?: boolean;
   right?: ReactNode;
   children: ReactNode;
   depth?: number;
@@ -19,6 +20,7 @@ type WrapperProps = {
 export const ItemWrapper: React.FC<WrapperProps> = ({
   right,
   active,
+  isDragging,
   children,
   depth = 0,
   ...props
@@ -29,6 +31,7 @@ export const ItemWrapper: React.FC<WrapperProps> = ({
       className={clsx(
         "flex h-9 items-center justify-between rounded transition-colors",
         active ? clsx("bg-rose-100", activeTextClass) : "hover:bg-black/5",
+        isDragging && "outline-dashed outline-2 outline-rose-400",
       )}
       style={{
         ["--padding-x" as string]: "8px",
@@ -107,6 +110,7 @@ type ListLinkProps = LinkProps & {
   onPointerLeave?: () => void;
   depth?: number;
 
+  isDragging?: boolean;
   isAnyDragging?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.PointerEvent) => void;
@@ -125,6 +129,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
       onPointerEnter,
       onPointerLeave,
       depth,
+      isDragging,
       isAnyDragging,
       onDragStart,
       onDragOver,
@@ -163,6 +168,7 @@ export const SidebarListLink = forwardRef<HTMLLIElement, ListLinkProps>(
       >
         <ItemWrapper
           active={active}
+          isDragging={isDragging}
           right={right}
           depth={depth}
           onPointerEnter={onPointerEnter}

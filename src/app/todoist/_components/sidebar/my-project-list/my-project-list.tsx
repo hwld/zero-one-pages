@@ -211,16 +211,12 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
         }}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
+        isDragging={isDragging}
         isAnyDragging={!!draggingProjectId}
         onDragStart={(e) => {
           dragStartInfo.current = { x: e.clientX, depth: project.depth };
           onDrag(project.id);
         }}
-        // onDragEnter={() => {
-        //   if (draggingProjectId && !isDragging) {
-        //     onMoveProjects(draggingProjectId, project.id);
-        //   }
-        // }}
         right={
           <div className="flex items-center gap-1">
             <div className="grid size-6 place-items-center">{rightNode}</div>
