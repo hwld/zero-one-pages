@@ -69,36 +69,32 @@ export const toProjectNodes = (
 };
 
 export const toProjects = (nodes: ProjectNode[]): Project[] => {
-  const buildSubProjects = (
-    nodes: ProjectNode[],
-    depth: number,
-    index: number,
-  ): [Project[], number] => {
-    const result: Project[] = [];
+  const stack: Project[] = [];
+  const result: Project[] = [];
 
-    while (index < nodes.length && nodes[index].depth === depth) {
-      const node = nodes[index];
-      const [subProjects, newIndex] = buildSubProjects(
-        nodes,
-        depth + 1,
-        index + 1,
-      );
-
-      result.push({
-        id: node.id,
-        label: node.label,
-        todos: node.todos,
-        expanded: node.expanded,
-        subProjects: subProjects,
-      });
-
-      index = newIndex;
+  for (const node of nodes) {
+    while (stack.length > node.depth) {
+      stack.pop();
     }
 
-    return [result, index];
-  };
+    const project: Project = {
+      id: node.id,
+      label: node.label,
+      todos: node.todos,
+      expanded: node.expanded,
+      subProjects: [],
+    };
 
-  return buildSubProjects(nodes, 0, 0)[0];
+    if (stack.length > 0) {
+      stack[stack.length - 1].subProjects.push(project);
+    } else {
+      result.push(project);
+    }
+
+    stack.push(project);
+  }
+
+  return result;
 };
 
 const countProjectDescendants = (project: Project): number => {
@@ -163,7 +159,6 @@ export const updateProjectDepth = (
     throw new Error(`変更対象のプロジェクトが存在しない: ${projectId}`);
   }
 
-  const targetDepth = nodes[targetIndex].depth;
   // 直近でvisibleがtrueのプロジェクトのdepth
   const prevDepth =
     nodes.slice(0, targetIndex).findLast((p) => p.visible === true)?.depth ??
