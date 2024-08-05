@@ -10,7 +10,6 @@ export type Project = {
 export type ProjectNode = Omit<Project, "subProjects"> & {
   depth: number;
   visible: boolean;
-  isDragging: boolean;
   subProjectCount: number;
 };
 
@@ -56,7 +55,6 @@ export const toProjectNodes = (
       depth,
       visible: parentVisible,
       subProjectCount: project.subProjects.length,
-      isDragging: false,
     };
 
     return [
@@ -189,18 +187,6 @@ export const updateProjectDepth = (
   const newNodes = [...nodes];
   newNodes[targetIndex].depth = newDepth;
 
-  // targetが子でtargetの親プロジェクトのexpandがfalseであればtrueにする
-  if (newDepth > 0) {
-    const parent = newNodes
-      .slice(0, targetIndex)
-      .findLast((p) => p.depth === newDepth - 1);
-    if (!parent) {
-      throw new Error(`親プロジェクトが存在しない`);
-    }
-
-    parent.expanded = true;
-  }
-
   return toProjects(newNodes);
 };
 
@@ -232,8 +218,6 @@ export const dragProjectStart = (
     ...nodes.slice(descendantsEndIndex),
   ];
 
-  newNodes[targetIndex].isDragging = true;
-
   return { results: toProjects(newNodes), removedDescendantNodes: descendants };
 };
 
@@ -244,23 +228,37 @@ export const dragProjectEnd = (
 ): Project[] => {
   const nodes = toProjectNodes(projects);
 
-  const newNodes = nodes.flatMap((node) => {
-    if (node.id === id) {
-      return [
-        { ...node, isDragging: false },
-        ...removedDescendants.map((descendant) => {
-          const parentDepth = node.depth;
-          const descendantRootDepth = removedDescendants[0].depth;
+  const targetIndex = nodes.findIndex((n) => n.id === id);
+  if (targetIndex === -1) {
+    throw new Error(`対象のプロジェクトが存在しない: ${id}`);
+  }
+  const targetNode = nodes[targetIndex];
 
-          return {
-            ...descendant,
-            depth: descendant.depth - descendantRootDepth + parentDepth + 1,
-          };
-        }),
-      ];
+  const newNodes = [
+    ...nodes.slice(0, targetIndex + 1),
+    ...removedDescendants.map((descendant) => {
+      const parentDepth = targetNode.depth;
+      const descendantRootDepth = removedDescendants[0].depth;
+
+      return {
+        ...descendant,
+        depth: descendant.depth - descendantRootDepth + parentDepth + 1,
+      };
+    }),
+    ...nodes.slice(targetIndex + 1),
+  ];
+
+  // ドラッグしたノードの親プロジェクトのexpandedをtrueにする
+  if (targetNode.depth > 0) {
+    const parent = newNodes
+      .slice(0, targetIndex)
+      .findLast((p) => p.depth === targetNode.depth - 1);
+    if (!parent) {
+      throw new Error(`親プロジェクトが存在しない`);
     }
-    return node;
-  });
+
+    parent.expanded = true;
+  }
 
   return toProjects(newNodes);
 };

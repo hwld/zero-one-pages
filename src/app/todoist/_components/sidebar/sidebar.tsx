@@ -415,7 +415,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
         {projectNodes.map((projectNode) => {
           return (
             <AnimatePresence key={projectNode.id}>
-              {projectNode.visible ? (
+              {projectNode.visible || draggingProjectId === projectNode.id ? (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
