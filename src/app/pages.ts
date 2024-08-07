@@ -120,7 +120,8 @@ export const pages: Page[] = [
     icon: CircleCheckIcon,
     href: "/todoist/inbox",
     title: "Todoist",
-    description: "TodoistのUIを作ってみた。",
+    description:
+      "TodoistのUIを作りたい。とりあえずDnDができるツリーのあるサイドバーだけ作った。",
     tags: ["PC", "PART", "WIP"],
   },
 ];
