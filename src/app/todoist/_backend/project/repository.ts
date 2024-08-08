@@ -16,7 +16,7 @@ class ProjectRepository {
   private projectRecords = initialData;
 
   public getAll(): ProjectSummary[] {
-    return ProjectRepository.recordToProject(this.projectRecords);
+    return ProjectRepository.recordsToSummaries(this.projectRecords);
   }
 
   public add(input: { parentId: string | null; label: string; order: number }) {
@@ -39,7 +39,7 @@ class ProjectRepository {
 
   private static imp() {}
 
-  private static recordToProject(
+  private static recordsToSummaries(
     projectRecords: ProjectRecord[],
   ): ProjectSummary[] {
     type ProjectId = string;

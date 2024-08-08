@@ -5,7 +5,7 @@ import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
 import { PiBellSimple } from "@react-icons/all-files/pi/PiBellSimple";
 import { PiSidebarSimple } from "@react-icons/all-files/pi/PiSidebarSimple";
-import { MyProjectList } from "./my-project-list/my-project-list";
+import { MyProjectNavList } from "../../_features/project/my-project-nav-list/list";
 import { Routes } from "../../routes";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Tooltip, TooltipDelayGroup } from "../tooltip";
@@ -22,7 +22,7 @@ import {
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
 import { SidebarIconButton } from "./icon-button";
-import { MyProjectListItem } from "./my-project-list/item";
+import { MyProjectNavLink } from "../../_features/project/my-project-nav-list/item";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -234,7 +234,9 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
       <SidebarNavList currentRoute={currentRoute} />
 
-      <MyProjectList isHeaderActive={currentRoute === Routes.myProjectList()}>
+      <MyProjectNavList
+        isHeaderActive={currentRoute === Routes.myProjectList()}
+      >
         {projectNodes.map((projectNode) => {
           return (
             <AnimatePresence key={projectNode.id}>
@@ -245,7 +247,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.1 }}
                 >
-                  <MyProjectListItem
+                  <MyProjectNavLink
                     currentRoute={currentRoute}
                     project={projectNode}
                     onChangeExpanded={handleChangeExpanded}
@@ -259,7 +261,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
             </AnimatePresence>
           );
         })}
-      </MyProjectList>
+      </MyProjectNavList>
     </div>
   );
 };

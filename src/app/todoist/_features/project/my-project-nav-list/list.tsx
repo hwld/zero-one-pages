@@ -6,8 +6,8 @@ import { ReactNode, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes } from "../../../routes";
 import Link from "next/link";
-import { Menu } from "../../menu/menu";
-import { MenuButtonItem } from "../../menu/item";
+import { Menu } from "../../../_components/menu/menu";
+import { MenuButtonItem } from "../../../_components/menu/item";
 import { Icon, IconButton, TreeToggleIconButton } from "./icon-button";
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
   children: ReactNode;
 };
 
-export const MyProjectList: React.FC<Props> = ({
+export const MyProjectNavList: React.FC<Props> = ({
   isHeaderActive,
   children,
 }) => {

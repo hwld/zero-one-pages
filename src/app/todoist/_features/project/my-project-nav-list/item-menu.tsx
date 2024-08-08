@@ -15,13 +15,16 @@ import { PiSelectionBackgroundLight } from "@react-icons/all-files/pi/PiSelectio
 import { PiShareLight } from "@react-icons/all-files/pi/PiShareLight";
 import { PiTrashLight } from "@react-icons/all-files/pi/PiTrashLight";
 import { PiUploadSimpleLight } from "@react-icons/all-files/pi/PiUploadSimpleLight";
-import { MenuButtonItem } from "../../menu/item";
-import { Menu, MenuSeparator } from "../../menu/menu";
+import { MenuButtonItem } from "../../../_components/menu/item";
+import { Menu, MenuSeparator } from "../../../_components/menu/menu";
 import { ReactNode } from "react";
 
 type Props = { trigger: ReactNode; onOpenChange: (open: boolean) => void };
 
-export const MyProjectMenu: React.FC<Props> = ({ trigger, onOpenChange }) => {
+export const MyProjectNavLinkMenu: React.FC<Props> = ({
+  trigger,
+  onOpenChange,
+}) => {
   return (
     <Menu
       width={300}

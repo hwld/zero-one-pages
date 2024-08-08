@@ -2,8 +2,11 @@ import { ProjectNode } from "@/app/todoist/project";
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { SidebarListButton, SidebarListLink } from "../item";
-import { MyProjectMenu } from "./project-menu";
+import {
+  SidebarListButton,
+  SidebarListLink,
+} from "../../../_components/sidebar/item";
+import { MyProjectNavLinkMenu } from "./item-menu";
 import { Routes } from "@/app/todoist/routes";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
 
@@ -17,7 +20,7 @@ type MyProjectListItemProps = {
   onChangeProjectDepth: (projectId: string, depthChange: number) => void;
 };
 
-export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
+export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   currentRoute,
   project,
   onChangeExpanded,
@@ -49,7 +52,7 @@ export const MyProjectListItem: React.FC<MyProjectListItemProps> = ({
     }
 
     return (
-      <MyProjectMenu
+      <MyProjectNavLinkMenu
         onOpenChange={(open) => {
           if (!open) {
             // Menuを閉じたときにIconBUttonにfocusを戻す時間を確保する

@@ -10,7 +10,7 @@ import { PiTrayLight } from "@react-icons/all-files/pi/PiTrayLight";
 import { Routes } from "../../routes";
 import { Tooltip } from "../tooltip";
 import { SidebarListButton, SidebarListLink } from "./item";
-import { TaskCreateButton } from "./task-create-button";
+import { TaskCreateButton } from "../../_features/task/task-create-button";
 
 type Props = { currentRoute: string };
 
