@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { initialData } from "./data";
-import { ProjectSummary } from "./model";
+import { Project } from "./model";
 
 export const projectRecordSchema = z.object({
   id: z.string(),
@@ -15,8 +15,8 @@ export type ProjectRecord = z.infer<typeof projectRecordSchema>;
 class ProjectRepository {
   private projectRecords = initialData;
 
-  public getAll(): ProjectSummary[] {
-    return ProjectRepository.recordsToSummaries(this.projectRecords);
+  public getAll(): Project[] {
+    return ProjectRepository.recordsToProjects(this.projectRecords);
   }
 
   public add(input: { parentId: string | null; label: string; order: number }) {
@@ -37,40 +37,36 @@ class ProjectRepository {
     throw new Error("未実装");
   }
 
-  private static imp() {}
-
-  private static recordsToSummaries(
-    projectRecords: ProjectRecord[],
-  ): ProjectSummary[] {
+  private static recordsToProjects(projectRecords: ProjectRecord[]): Project[] {
     type ProjectId = string;
-    const projectMap = new Map<ProjectId, ProjectSummary>();
+    const projectMap = new Map<ProjectId, Project>();
 
     // この配列の要素のsubProjectsをミュータブルに書き換えていく
-    const summaries = projectRecords.map(
-      (r): ProjectSummary => ({ ...r, subProjects: [] }),
+    const projects = projectRecords.map(
+      (r): Project => ({ ...r, subProjects: [], todos: 0 }),
     );
 
-    // すべてのSummaryをMapに詰める
-    summaries.forEach((summary) => projectMap.set(summary.id, summary));
+    // すべてのProjectをMapに詰める
+    projects.forEach((project) => projectMap.set(project.id, project));
 
-    summaries.forEach((summary) => {
-      if (!summary.parentId) {
+    projects.forEach((project) => {
+      if (!project.parentId) {
         return;
       }
 
-      const parent = projectMap.get(summary.parentId);
+      const parent = projectMap.get(project.parentId);
       if (!parent) {
         throw new Error(
-          `親プロジェクトが存在しない id:${summary.id}, parentId:${summary.parentId}`,
+          `親プロジェクトが存在しない id:${project.id}, parentId:${project.parentId}`,
         );
       }
 
-      parent.subProjects.push(summary);
+      parent.subProjects.push(project);
       parent.subProjects.sort((a, b) => a.order - b.order);
     });
 
-    const result = summaries
-      .filter((summary) => !summary.parentId)
+    const result = projects
+      .filter((project) => !project.parentId)
       .sort((a, b) => a.order - b.order);
 
     return result;

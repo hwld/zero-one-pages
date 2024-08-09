@@ -13,16 +13,17 @@ import {
   updateProjectDepth,
   dragProjectEnd,
   dragProjectStart,
-  ProjectNode,
   moveProject,
   toProjectNodes,
-  updatedProjects,
-  Project,
+  ProjectExpansionMap,
+  ProjectNode,
 } from "../../project";
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
 import { SidebarIconButton } from "./icon-button";
 import { MyProjectNavLink } from "../../_features/project/my-project-nav-list/item";
+import { useProjects } from "../../_features/project/use-projects";
+import { Project } from "../../_backend/project/model";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -81,64 +82,17 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return paths;
   }, [paths, searchParams]);
 
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: "1",
-      label: "project 1",
-      todos: 0,
-      expanded: false,
-      subProjects: [
-        {
-          id: "1-1",
-          label: "project 1-1",
-          todos: 0,
-          subProjects: [
-            {
-              id: "1-1-1",
-              label: "project 1-1-1",
-              todos: 10,
-              subProjects: [],
-              expanded: false,
-            },
-          ],
-          expanded: false,
-        },
-        {
-          id: "1-2",
-          label: "project 1-2",
-          todos: 0,
-          subProjects: [],
-          expanded: false,
-        },
-      ],
-    },
-    {
-      id: "2",
-      label: "project 2",
-      todos: 4,
-      subProjects: [],
-      expanded: false,
-    },
-    {
-      id: "3",
-      label: "project 3",
-      todos: 0,
-      subProjects: [],
-      expanded: false,
-    },
-    {
-      id: "4",
-      label: "project 4",
-      todos: 9,
-      subProjects: [],
-      expanded: false,
-    },
-  ]);
-  const projectNodes = toProjectNodes(projects);
+  const [_projects, setProjects] = useState<Project[]>([]);
+
+  // TODO:
+  const { data: projects = [] } = useProjects();
+  const [projectExpansionMap, setProjectExpansionMap] =
+    useState<ProjectExpansionMap>(new Map());
+  const projectNodes = toProjectNodes(projects, projectExpansionMap);
 
   const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
-    setProjects((projects) => {
-      return updatedProjects(projects, projectId, { expanded: newExpanded });
+    setProjectExpansionMap((m) => {
+      return new Map(m).set(projectId, newExpanded);
     });
   };
 
@@ -149,7 +103,11 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
   const handleDrag = (id: string) => {
-    const { results, removedDescendantNodes } = dragProjectStart(projects, id);
+    const { results, removedDescendantNodes } = dragProjectStart(
+      projects,
+      projectExpansionMap,
+      id,
+    );
     removedDescendantsRef.current = removedDescendantNodes;
 
     setProjects(results);
@@ -158,14 +116,24 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
   const handleMoveProjects = (draggingId: string, dragOverId: string) => {
     setProjects((projects) => {
-      const newProjects = moveProject(projects, draggingId, dragOverId);
+      const newProjects = moveProject(
+        projects,
+        projectExpansionMap,
+        draggingId,
+        dragOverId,
+      );
       return newProjects;
     });
   };
 
   const handleChangeDepth = (projectId: string, newDepth: number) => {
     setProjects((projects) => {
-      return updateProjectDepth(projects, projectId, newDepth);
+      return updateProjectDepth(
+        projects,
+        projectExpansionMap,
+        projectId,
+        newDepth,
+      );
     });
   };
 
@@ -175,9 +143,10 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
         setProjects((projects) => {
           return dragProjectEnd(
             projects,
+            projectExpansionMap,
             draggingProjectId,
             removedDescendantsRef.current,
-          );
+          )[0];
         });
         setDraggingProjectId(null);
       }
@@ -187,7 +156,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return () => {
       document.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [draggingProjectId]);
+  }, [draggingProjectId, projectExpansionMap]);
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
@@ -250,6 +219,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                   <MyProjectNavLink
                     currentRoute={currentRoute}
                     project={projectNode}
+                    expanded={!!projectExpansionMap.get(projectNode.id)}
                     onChangeExpanded={handleChangeExpanded}
                     onDrag={handleDrag}
                     draggingProjectId={draggingProjectId}

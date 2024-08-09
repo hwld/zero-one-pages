@@ -1,4 +1,3 @@
-import { ProjectNode } from "@/app/todoist/project";
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { useState, useRef, useMemo, useEffect } from "react";
@@ -9,10 +8,12 @@ import {
 import { MyProjectNavLinkMenu } from "./item-menu";
 import { Routes } from "@/app/todoist/routes";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
+import { ProjectNode } from "@/app/todoist/project";
 
 type MyProjectListItemProps = {
   currentRoute: string;
   project: ProjectNode;
+  expanded: boolean;
   onChangeExpanded: (id: string, expanded: boolean) => void;
   draggingProjectId: null | string;
   onDrag: (projectId: string) => void;
@@ -23,6 +24,7 @@ type MyProjectListItemProps = {
 export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   currentRoute,
   project,
+  expanded,
   onChangeExpanded,
   draggingProjectId,
   onDrag,
@@ -151,7 +153,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
               <div className="grid size-6 place-items-center">{rightNode}</div>
               {project.subProjectCount ? (
                 <TreeToggleIconButton
-                  isOpen={project.expanded}
+                  isOpen={expanded}
                   onOpenChange={(open) => onChangeExpanded(project.id, open)}
                 />
               ) : null}

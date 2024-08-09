@@ -1,16 +1,63 @@
-// subProjectsが空のときはexpandedがfalseになっている必要がある
-export type Project = {
-  id: string;
-  label: string;
-  todos: number;
-  subProjects: Project[];
-  expanded: boolean;
-};
+import { Project } from "./_backend/project/model";
+
+export type ProjectExpansionMap = Map<string, boolean>;
 
 export type ProjectNode = Omit<Project, "subProjects"> & {
   depth: number;
   visible: boolean;
   subProjectCount: number;
+};
+
+export const toProjectNodes = (
+  projects: Project[],
+  projectExpansionMap: ProjectExpansionMap,
+  depth: number = 0,
+  parentVisible: boolean = true,
+): ProjectNode[] => {
+  return projects.flatMap((project): ProjectNode[] => {
+    const node: ProjectNode = {
+      ...project,
+      depth,
+      visible: parentVisible,
+      subProjectCount: project.subProjects.length,
+    };
+
+    return [
+      node,
+      ...toProjectNodes(
+        project.subProjects,
+        projectExpansionMap,
+        depth + 1,
+        parentVisible && projectExpansionMap.get(project.id),
+      ),
+    ];
+  });
+};
+
+export const toProjects = (nodes: ProjectNode[]): Project[] => {
+  const stack: Project[] = [];
+  const result: Project[] = [];
+
+  for (const node of nodes) {
+    while (stack.length > node.depth) {
+      stack.pop();
+    }
+
+    const project: Project = {
+      ...node,
+      subProjects: [],
+    };
+
+    if (stack.length > 0) {
+      stack[stack.length - 1].subProjects.push(project);
+    } else {
+      result.push(project);
+    }
+
+    stack.push(project);
+  }
+
+  return result;
 };
 
 const findProject = (projects: Project[], id: string): Project | undefined => {
@@ -27,76 +74,6 @@ const findProject = (projects: Project[], id: string): Project | undefined => {
   return undefined;
 };
 
-export const updatedProjects = (
-  projects: Project[],
-  id: string,
-  data: Partial<Omit<Project, "id" | "subProjects">>,
-): Project[] => {
-  const nodes = toProjectNodes(projects);
-
-  const newNodes = nodes.map((node): ProjectNode => {
-    if (node.id === id) {
-      return { ...node, ...data };
-    }
-    return node;
-  });
-
-  return toProjects(newNodes);
-};
-
-export const toProjectNodes = (
-  projects: Project[],
-  depth: number = 0,
-  parentVisible: boolean = true,
-): ProjectNode[] => {
-  return projects.flatMap((project): ProjectNode[] => {
-    const node: ProjectNode = {
-      ...project,
-      depth,
-      visible: parentVisible,
-      subProjectCount: project.subProjects.length,
-    };
-
-    return [
-      node,
-      ...toProjectNodes(
-        project.subProjects,
-        depth + 1,
-        parentVisible && project.expanded,
-      ),
-    ];
-  });
-};
-
-export const toProjects = (nodes: ProjectNode[]): Project[] => {
-  const stack: Project[] = [];
-  const result: Project[] = [];
-
-  for (const node of nodes) {
-    while (stack.length > node.depth) {
-      stack.pop();
-    }
-
-    const project: Project = {
-      id: node.id,
-      label: node.label,
-      todos: node.todos,
-      expanded: node.expanded,
-      subProjects: [],
-    };
-
-    if (stack.length > 0) {
-      stack[stack.length - 1].subProjects.push(project);
-    } else {
-      result.push(project);
-    }
-
-    stack.push(project);
-  }
-
-  return result;
-};
-
 const countProjectDescendants = (project: Project): number => {
   return project.subProjects.reduce((acc, subProject) => {
     return acc + 1 + countProjectDescendants(subProject);
@@ -107,6 +84,7 @@ const countProjectDescendants = (project: Project): number => {
 // その制限を反映させたい
 export const moveProject = (
   projects: Project[],
+  projectExpansionMap: ProjectExpansionMap,
   fromId: string,
   toId: string,
 ): Project[] => {
@@ -114,7 +92,7 @@ export const moveProject = (
     return projects;
   }
 
-  const nodes = toProjectNodes(projects);
+  const nodes = toProjectNodes(projects, projectExpansionMap);
 
   const fromIndex = nodes.findIndex((p) => p.id === fromId);
   let toIndex = nodes.findIndex((p) => p.id === toId);
@@ -122,7 +100,11 @@ export const moveProject = (
 
   const newNodes = [...nodes];
 
-  if (fromIndex < toIndex && toNode.subProjectCount && !toNode.expanded) {
+  if (
+    fromIndex < toIndex &&
+    toNode.subProjectCount &&
+    !projectExpansionMap.get(toNode.id)
+  ) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
     // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
     const toProject = findProject(projects, toNode.id);
@@ -138,7 +120,11 @@ export const moveProject = (
   // 移動したプロジェクト (from)
   const moved = newNodes[toIndex];
 
-  if (fromIndex < toIndex && toNode.subProjectCount && toNode.expanded) {
+  if (
+    fromIndex < toIndex &&
+    toNode.subProjectCount &&
+    projectExpansionMap.get(toNode.id)
+  ) {
     moved.depth = toNode.depth + 1;
   } else {
     moved.depth = toNode.depth;
@@ -149,10 +135,11 @@ export const moveProject = (
 
 export const updateProjectDepth = (
   projects: Project[],
+  projectExpansionMap: ProjectExpansionMap,
   projectId: string,
   newDepth: number,
 ): Project[] => {
-  const nodes = toProjectNodes(projects);
+  const nodes = toProjectNodes(projects, projectExpansionMap);
 
   const targetIndex = nodes.findIndex((p) => p.id === projectId);
   if (targetIndex === -1) {
@@ -187,9 +174,10 @@ export const updateProjectDepth = (
 
 export const dragProjectStart = (
   projects: Project[],
+  projectExpansionMap: ProjectExpansionMap,
   id: string,
 ): { results: Project[]; removedDescendantNodes: ProjectNode[] } => {
-  const nodes = toProjectNodes(projects);
+  const nodes = toProjectNodes(projects, projectExpansionMap);
 
   const targetIndex = nodes.findIndex((p) => p.id === id);
   const targetNode = nodes[targetIndex];
@@ -218,10 +206,11 @@ export const dragProjectStart = (
 
 export const dragProjectEnd = (
   projects: Project[],
+  projectExpansionMap: ProjectExpansionMap,
   id: string,
   removedDescendants: ProjectNode[],
-): Project[] => {
-  const nodes = toProjectNodes(projects);
+): [Project[], ProjectExpansionMap] => {
+  const nodes = toProjectNodes(projects, projectExpansionMap);
 
   const targetIndex = nodes.findIndex((n) => n.id === id);
   if (targetIndex === -1) {
@@ -243,6 +232,8 @@ export const dragProjectEnd = (
     ...nodes.slice(targetIndex + 1),
   ];
 
+  const newExpansionMap = new Map(projectExpansionMap);
+
   // ドラッグしたノードの親プロジェクトのexpandedをtrueにする
   if (targetNode.depth > 0) {
     const parent = newNodes
@@ -252,8 +243,8 @@ export const dragProjectEnd = (
       throw new Error(`親プロジェクトが存在しない`);
     }
 
-    parent.expanded = true;
+    newExpansionMap.set(parent.id, true);
   }
 
-  return toProjects(newNodes);
+  return [toProjects(newNodes), newExpansionMap];
 };

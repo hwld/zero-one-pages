@@ -3,12 +3,12 @@ import { projectRepository } from "./repository";
 import { fetcher } from "@/lib/fetcher";
 import { TodoistAPI } from "../routes";
 import { delay, http, HttpResponse } from "msw";
-import { ProjectSummary, projectSummarySchema } from "./model";
+import { Project, projectSchema } from "./model";
 
-export const fetchProjectSummaries = async (): Promise<ProjectSummary[]> => {
+export const fetchProjects = async (): Promise<Project[]> => {
   const res = await fetcher.get(TodoistAPI.projects());
   const json = await res.json();
-  const projectSummaries = z.array(projectSummarySchema).parse(json);
+  const projectSummaries = z.array(projectSchema).parse(json);
 
   return projectSummaries;
 };
