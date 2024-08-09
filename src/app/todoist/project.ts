@@ -1,4 +1,4 @@
-import { Project } from "./_backend/project/model";
+import { Project, ProjectPositionChange } from "./_backend/project/model";
 
 export type ProjectExpansionMap = Map<string, boolean>;
 
@@ -11,8 +11,10 @@ export type ProjectNode = Omit<
   subProjectCount: number;
 };
 
-export const toProjectMap = (projects: Project[]): Map<string, Project> => {
-  const projectMap = new Map<string, Project>();
+export type ProjectMap = Map<string, Project>;
+
+export const toProjectMap = (projects: Project[]): ProjectMap => {
+  const projectMap: ProjectMap = new Map();
 
   const addToMap = (project: Project) => {
     projectMap.set(project.id, project);
@@ -22,6 +24,33 @@ export const toProjectMap = (projects: Project[]): Map<string, Project> => {
   projects.forEach(addToMap);
 
   return projectMap;
+};
+
+export const getProjectPositionChanges = (
+  baseMap: ProjectMap,
+  map: ProjectMap,
+): ProjectPositionChange[] => {
+  const result: ProjectPositionChange[] = [];
+
+  Array.from(map.entries()).forEach(([id, project]) => {
+    const baseProject = baseMap.get(id);
+    if (!baseProject) {
+      throw new Error("プロジェクトが削除されています");
+    }
+
+    if (
+      baseProject.order !== project.order ||
+      baseProject.parentId !== project.parentId
+    ) {
+      result.push({
+        projectId: project.id,
+        order: project.order,
+        parentProjectId: project.parentId,
+      });
+    }
+  });
+
+  return result;
 };
 
 export const toProjectNodes = (

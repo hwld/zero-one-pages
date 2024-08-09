@@ -18,13 +18,15 @@ import {
   ProjectExpansionMap,
   ProjectNode,
   toProjectMap,
+  ProjectMap,
+  getProjectPositionChanges,
 } from "../../project";
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
 import { SidebarIconButton } from "./icon-button";
 import { MyProjectNavLink } from "../../_features/project/my-project-nav-list/item";
 import { useProjects } from "../../_features/project/use-projects";
-import { Project } from "../../_backend/project/model";
+import { useChangeProjectPosition } from "../../_features/project/use-change-project-position";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -99,7 +101,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     null,
   );
 
-  const dragStartProjectMap = useRef(new Map<string, Project>());
+  const dragStartProjectMap = useRef<ProjectMap>(new Map());
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
   const handleDrag = (id: string) => {
@@ -135,14 +137,13 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     });
   };
 
+  const changeProjectPosition = useChangeProjectPosition();
+
   useEffect(() => {
     const handlePointerUp = () => {
       if (!draggingProjectId) {
         return;
       }
-
-      // TODO:
-      // バックエンドに反映させる
 
       updateProjectsCache((projects) => {
         const [updatedProjects, expansionMap] = dragProjectEnd(
@@ -151,8 +152,14 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
           draggingProjectId,
           removedDescendantsRef.current,
         );
-
         setProjectExpansionMap(expansionMap);
+
+        const updatedMap = toProjectMap(updatedProjects);
+        const projectPositionChanges = getProjectPositionChanges(
+          dragStartProjectMap.current,
+          updatedMap,
+        );
+        changeProjectPosition.mutate(projectPositionChanges);
 
         return updatedProjects;
       });
@@ -164,7 +171,13 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return () => {
       document.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [draggingProjectId, projectExpansionMap, projects, updateProjectsCache]);
+  }, [
+    changeProjectPosition,
+    draggingProjectId,
+    projectExpansionMap,
+    projects,
+    updateProjectsCache,
+  ]);
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">

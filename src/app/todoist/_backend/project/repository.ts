@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { initialData } from "./data";
-import { Project } from "./model";
+import { Project, ProjectPositionChange } from "./model";
 
 export const projectRecordSchema = z.object({
   id: z.string(),
@@ -29,8 +29,17 @@ class ProjectRepository {
 
     this.projectRecords = [...this.projectRecords, newRecord];
   }
-  public update() {
-    throw new Error("未実装");
+  public updatePosition({
+    projectId,
+    order,
+    parentProjectId,
+  }: ProjectPositionChange) {
+    this.projectRecords = this.projectRecords.map((record): ProjectRecord => {
+      if (projectId === record.id) {
+        return { ...record, order, parentId: parentProjectId };
+      }
+      return record;
+    });
   }
 
   public remove() {
