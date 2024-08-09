@@ -16,9 +16,9 @@ type MyProjectListItemProps = {
   expanded: boolean;
   onChangeExpanded: (id: string, expanded: boolean) => void;
   draggingProjectId: null | string;
-  onDrag: (projectId: string) => void;
+  onDragStart: (event: React.DragEvent, project: ProjectNode) => void;
   onMoveProjects: (fromId: string, toId: string) => void;
-  onChangeProjectDepth: (projectId: string, depthChange: number) => void;
+  onChangeProjectDepth: (event: MouseEvent, projectId: string) => void;
 };
 
 export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
@@ -27,7 +27,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   expanded,
   onChangeExpanded,
   draggingProjectId,
-  onDrag,
+  onDragStart,
   onMoveProjects,
   onChangeProjectDepth,
 }) => {
@@ -77,19 +77,12 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   }, [isFocus, isMenuOpen, project.todos]);
 
   const isDragging = draggingProjectId === project.id;
-  const dragStartInfo = useRef({ x: 0, depth: 0 });
 
   useEffect(() => {
     const handleChangeDepth = (e: MouseEvent) => {
-      if (!isDragging) {
-        return;
+      if (isDragging) {
+        onChangeProjectDepth(e, project.id);
       }
-
-      const newDepth =
-        dragStartInfo.current.depth +
-        Math.floor((e.clientX - dragStartInfo.current.x) / 16);
-
-      onChangeProjectDepth(project.id, newDepth);
     };
 
     document.addEventListener("pointermove", handleChangeDepth);
@@ -100,7 +93,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
 
   // リストの外側のドラッグも処理できるように、poitnermoveイベントをハンドリングする
   useEffect(() => {
-    const handleDragOver = (e: MouseEvent) => {
+    const handleMoveProject = (e: MouseEvent) => {
       const itemEl = itemRef.current;
       if (draggingProjectId == null || isDragging || !itemEl) {
         return;
@@ -114,9 +107,9 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
       }
     };
 
-    document.addEventListener("pointermove", handleDragOver);
+    document.addEventListener("pointermove", handleMoveProject);
     return () => {
-      document.removeEventListener("pointermove", handleDragOver);
+      document.removeEventListener("pointermove", handleMoveProject);
     };
   }, [draggingProjectId, isDragging, onMoveProjects, project.id]);
 
@@ -145,8 +138,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
           isDragging={isDragging}
           isAnyDragging={!!draggingProjectId}
           onDragStart={(e) => {
-            dragStartInfo.current = { x: e.clientX, depth: project.depth };
-            onDrag(project.id);
+            onDragStart(e, project);
           }}
           right={
             <div className="flex items-center gap-1">
