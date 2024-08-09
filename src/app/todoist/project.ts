@@ -2,10 +2,26 @@ import { Project } from "./_backend/project/model";
 
 export type ProjectExpansionMap = Map<string, boolean>;
 
-export type ProjectNode = Omit<Project, "subProjects"> & {
+export type ProjectNode = Omit<
+  Project,
+  "subProjects" | "order" | "parentProjectId"
+> & {
   depth: number;
   visible: boolean;
   subProjectCount: number;
+};
+
+export const toProjectMap = (projects: Project[]): Map<string, Project> => {
+  const projectMap = new Map<string, Project>();
+
+  const addToMap = (project: Project) => {
+    projectMap.set(project.id, project);
+    project.subProjects.forEach(addToMap);
+  };
+
+  projects.forEach(addToMap);
+
+  return projectMap;
 };
 
 export const toProjectNodes = (
@@ -28,7 +44,7 @@ export const toProjectNodes = (
         project.subProjects,
         projectExpansionMap,
         depth + 1,
-        parentVisible && projectExpansionMap.get(project.id),
+        !!(parentVisible && projectExpansionMap.get(project.id)),
       ),
     ];
   });
@@ -45,12 +61,21 @@ export const toProjects = (nodes: ProjectNode[]): Project[] => {
 
     const project: Project = {
       ...node,
+      order: 0,
+      parentId: null,
       subProjects: [],
     };
 
     if (stack.length > 0) {
-      stack[stack.length - 1].subProjects.push(project);
+      const parent = stack[stack.length - 1];
+      const parentSubProjects = parent.subProjects;
+
+      project.order = parentSubProjects.length;
+      project.parentId = parent.id;
+
+      parentSubProjects.push(project);
     } else {
+      project.order = result.length;
       result.push(project);
     }
 

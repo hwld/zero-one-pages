@@ -17,6 +17,7 @@ import {
   toProjectNodes,
   ProjectExpansionMap,
   ProjectNode,
+  toProjectMap,
 } from "../../project";
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
@@ -82,10 +83,8 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     return paths;
   }, [paths, searchParams]);
 
-  const [_projects, setProjects] = useState<Project[]>([]);
-
   // TODO:
-  const { data: projects = [] } = useProjects();
+  const { data: projects = [], updateProjectsCache } = useProjects();
   const [projectExpansionMap, setProjectExpansionMap] =
     useState<ProjectExpansionMap>(new Map());
   const projectNodes = toProjectNodes(projects, projectExpansionMap);
@@ -100,34 +99,33 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
     null,
   );
 
+  const dragStartProjectMap = useRef(new Map<string, Project>());
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
   const handleDrag = (id: string) => {
-    const { results, removedDescendantNodes } = dragProjectStart(
-      projects,
-      projectExpansionMap,
-      id,
-    );
-    removedDescendantsRef.current = removedDescendantNodes;
+    dragStartProjectMap.current = toProjectMap(projects);
 
-    setProjects(results);
+    updateProjectsCache((projects) => {
+      const { results, removedDescendantNodes } = dragProjectStart(
+        projects,
+        projectExpansionMap,
+        id,
+      );
+      removedDescendantsRef.current = removedDescendantNodes;
+
+      return results;
+    });
     setDraggingProjectId(id);
   };
 
   const handleMoveProjects = (draggingId: string, dragOverId: string) => {
-    setProjects((projects) => {
-      const newProjects = moveProject(
-        projects,
-        projectExpansionMap,
-        draggingId,
-        dragOverId,
-      );
-      return newProjects;
+    updateProjectsCache((projects) => {
+      return moveProject(projects, projectExpansionMap, draggingId, dragOverId);
     });
   };
 
   const handleChangeDepth = (projectId: string, newDepth: number) => {
-    setProjects((projects) => {
+    updateProjectsCache((projects) => {
       return updateProjectDepth(
         projects,
         projectExpansionMap,
@@ -139,24 +137,34 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
   useEffect(() => {
     const handlePointerUp = () => {
-      if (draggingProjectId) {
-        setProjects((projects) => {
-          return dragProjectEnd(
-            projects,
-            projectExpansionMap,
-            draggingProjectId,
-            removedDescendantsRef.current,
-          )[0];
-        });
-        setDraggingProjectId(null);
+      if (!draggingProjectId) {
+        return;
       }
+
+      // TODO:
+      // バックエンドに反映させる
+
+      updateProjectsCache((projects) => {
+        const [updatedProjects, expansionMap] = dragProjectEnd(
+          projects,
+          projectExpansionMap,
+          draggingProjectId,
+          removedDescendantsRef.current,
+        );
+
+        setProjectExpansionMap(expansionMap);
+
+        return updatedProjects;
+      });
+
+      setDraggingProjectId(null);
     };
 
     document.addEventListener("pointerup", handlePointerUp);
     return () => {
       document.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [draggingProjectId, projectExpansionMap]);
+  }, [draggingProjectId, projectExpansionMap, projects, updateProjectsCache]);
 
   return (
     <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
