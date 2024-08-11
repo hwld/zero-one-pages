@@ -3,15 +3,15 @@ import {
   dragProjectStart,
   getProjectPositionChanges,
   moveProject,
-  ProjectExpansionMap,
   ProjectMap,
   ProjectNode,
   toProjectMap,
   updateProjectDepth,
-} from "@/app/todoist/project";
+} from "../logic/project";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useProjects } from "../use-projects";
 import { useChangeProjectPosition } from "../use-change-project-position";
+import { ProjectExpansionMap } from "../logic/expansion-map";
 
 type UseDragMyProjectNavLinkParams = {
   projectExpansionMap: ProjectExpansionMap;

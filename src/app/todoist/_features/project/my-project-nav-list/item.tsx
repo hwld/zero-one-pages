@@ -8,7 +8,7 @@ import {
 import { MyProjectNavLinkMenu } from "./item-menu";
 import { Routes } from "@/app/todoist/routes";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
-import { ProjectNode } from "@/app/todoist/project";
+import { ProjectNode } from "../logic/project";
 
 type MyProjectListItemProps = {
   currentRoute: string;

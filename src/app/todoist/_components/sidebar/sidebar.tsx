@@ -9,13 +9,14 @@ import { MyProjectNavList } from "../../_features/project/my-project-nav-list/li
 import { Routes } from "../../routes";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Tooltip, TooltipDelayGroup } from "../tooltip";
-import { toProjectNodes, ProjectExpansionMap } from "../../project";
+import { toProjectNodes } from "../../_features/project/logic/project";
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
 import { SidebarIconButton } from "./icon-button";
 import { MyProjectNavLink } from "../../_features/project/my-project-nav-list/item";
 import { useProjects } from "../../_features/project/use-projects";
 import { useDragMyProjectNavLink } from "../../_features/project/my-project-nav-list/use-drag";
+import { ProjectExpansionMap } from "../../_features/project/logic/expansion-map";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
@@ -76,8 +77,9 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
   // TODO:
   const { data: projects = [], updateProjectsCache } = useProjects();
-  const [projectExpansionMap, setProjectExpansionMap] =
-    useState<ProjectExpansionMap>(new Map());
+  const [projectExpansionMap, setProjectExpansionMap] = useState(
+    new ProjectExpansionMap(),
+  );
   const projectNodes = toProjectNodes(projects, projectExpansionMap);
 
   const {
@@ -93,7 +95,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
   const handleChangeExpanded = (projectId: string, newExpanded: boolean) => {
     setProjectExpansionMap((m) => {
-      return new Map(m).set(projectId, newExpanded);
+      return new ProjectExpansionMap(m).toggle(projectId, newExpanded);
     });
   };
 
@@ -158,7 +160,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                   <MyProjectNavLink
                     currentRoute={currentRoute}
                     project={projectNode}
-                    expanded={projectExpansionMap.get(projectNode.id) ?? true}
+                    expanded={projectExpansionMap.isExpanded(projectNode.id)}
                     onChangeExpanded={handleChangeExpanded}
                     draggingProjectId={draggingProjectId}
                     onDragStart={handleDragStart}

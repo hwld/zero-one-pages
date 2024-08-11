@@ -1,6 +1,8 @@
-import { Project, ProjectPositionChange } from "./_backend/project/model";
-
-export type ProjectExpansionMap = Map<string, boolean>;
+import {
+  Project,
+  ProjectPositionChange,
+} from "../../../_backend/project/model";
+import { ProjectExpansionMap } from "./expansion-map";
 
 export type ProjectNode = Omit<
   Project,
@@ -73,7 +75,7 @@ export const toProjectNodes = (
         project.subProjects,
         projectExpansionMap,
         depth + 1,
-        parentVisible && (projectExpansionMap.get(project.id) ?? true),
+        parentVisible && projectExpansionMap.isExpanded(project.id),
       ),
     ];
   });
@@ -157,7 +159,7 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.subProjectCount &&
-    !(projectExpansionMap.get(toNode.id) ?? true)
+    !projectExpansionMap.isExpanded(toNode.id)
   ) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
     // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
@@ -177,7 +179,7 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.subProjectCount &&
-    (projectExpansionMap.get(toNode.id) ?? true)
+    projectExpansionMap.isExpanded(toNode.id)
   ) {
     moved.depth = toNode.depth + 1;
   } else {
@@ -286,7 +288,7 @@ export const dragProjectEnd = (
     ...nodes.slice(targetIndex + 1),
   ];
 
-  const newExpansionMap = new Map(projectExpansionMap);
+  const newExpansionMap = new ProjectExpansionMap(projectExpansionMap);
 
   // ドラッグしたノードの親プロジェクトのexpandedをtrueにする
   if (targetNode.depth > 0) {
@@ -297,7 +299,7 @@ export const dragProjectEnd = (
       throw new Error(`親プロジェクトが存在しない`);
     }
 
-    newExpansionMap.set(parent.id, true);
+    newExpansionMap.toggle(parent.id, true);
   }
 
   return [toProjects(newNodes), newExpansionMap];
