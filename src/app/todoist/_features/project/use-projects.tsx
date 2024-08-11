@@ -2,6 +2,7 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProjects } from "../../_backend/project/api";
 import { Project } from "../../_backend/project/model";
 import { useCallback } from "react";
+import { useMswState } from "@/app/_providers/msw-provider";
 
 const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
@@ -11,6 +12,7 @@ const projectsQueryOptions = queryOptions({
 });
 
 export const useProjects = () => {
+  const { isMockserverUp } = useMswState();
   const client = useQueryClient();
 
   const updateProjectsCache = useCallback(
@@ -22,7 +24,10 @@ export const useProjects = () => {
     [client],
   );
 
-  const queryData = useQuery(projectsQueryOptions);
+  const queryData = useQuery({
+    ...projectsQueryOptions,
+    enabled: isMockserverUp,
+  });
 
   return { ...queryData, updateProjectsCache };
 };
