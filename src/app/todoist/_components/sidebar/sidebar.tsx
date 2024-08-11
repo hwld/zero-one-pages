@@ -158,7 +158,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
                   <MyProjectNavLink
                     currentRoute={currentRoute}
                     project={projectNode}
-                    expanded={!!projectExpansionMap.get(projectNode.id)}
+                    expanded={projectExpansionMap.get(projectNode.id) ?? true}
                     onChangeExpanded={handleChangeExpanded}
                     draggingProjectId={draggingProjectId}
                     onDragStart={handleDragStart}

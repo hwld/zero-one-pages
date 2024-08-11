@@ -73,7 +73,7 @@ export const toProjectNodes = (
         project.subProjects,
         projectExpansionMap,
         depth + 1,
-        !!(parentVisible && projectExpansionMap.get(project.id)),
+        parentVisible && (projectExpansionMap.get(project.id) ?? true),
       ),
     ];
   });
@@ -157,7 +157,7 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.subProjectCount &&
-    !projectExpansionMap.get(toNode.id)
+    !(projectExpansionMap.get(toNode.id) ?? true)
   ) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
     // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
@@ -177,7 +177,7 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.subProjectCount &&
-    projectExpansionMap.get(toNode.id)
+    (projectExpansionMap.get(toNode.id) ?? true)
   ) {
     moved.depth = toNode.depth + 1;
   } else {
