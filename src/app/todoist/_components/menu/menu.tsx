@@ -1,3 +1,4 @@
+//https://codesandbox.io/p/sandbox/admiring-lamport-5wt3yg?file=%2Fsrc%2FDropdownMenu.tsx
 import {
   autoUpdate,
   flip,
@@ -38,6 +39,9 @@ import {
   useCallback,
   useMemo,
 } from "react";
+
+export type MenuItemClickEvent = { shouldCloseMenu: boolean };
+type SubMenuOpenEvent = { nodeId: string; parentId: string | null };
 
 type MenuContext = {
   getItemProps: (userProps?: HTMLProps<HTMLElement>) => Record<string, unknown>;
@@ -152,11 +156,13 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
     useEffect(() => {
       if (!tree) return;
 
-      function handleTreeClick() {
-        handleOpenChange(false);
+      function handleTreeClick(event: MenuItemClickEvent) {
+        if (event.shouldCloseMenu) {
+          handleOpenChange(false);
+        }
       }
 
-      function onSubMenuOpen(event: { nodeId: string; parentId: string }) {
+      function onSubMenuOpen(event: SubMenuOpenEvent) {
         if (event.nodeId !== nodeId && event.parentId === parentId) {
           handleOpenChange(false);
         }
@@ -173,7 +179,10 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
 
     useEffect(() => {
       if (isOpen && tree) {
-        tree.events.emit("menuopen", { parentId, nodeId });
+        tree.events.emit("menuopen", {
+          parentId,
+          nodeId,
+        } satisfies SubMenuOpenEvent);
       }
     }, [tree, isOpen, nodeId, parentId]);
 
@@ -220,6 +229,7 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
                     modal={false}
                     initialFocus={isNested ? -1 : 0}
                     returnFocus={!isNested}
+                    closeOnFocusOut={false}
                   >
                     <div
                       className="focus-visible:outline-none"
