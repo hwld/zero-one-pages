@@ -103,29 +103,26 @@ const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
 type ButtonItemProps = ContentProps &
   ComponentPropsWithoutRef<"button"> & { closeMenuOnClick?: boolean };
 
-export const MenuButtonItem: React.FC<ButtonItemProps> = ({
-  icon,
-  label,
-  description,
-  right,
-  variant,
-  closeMenuOnClick,
-  ...props
-}) => {
-  return (
-    <MenuItemWrapper closeMenuOnClick={closeMenuOnClick}>
-      <button {...props}>
-        <MenuItemContent
-          icon={icon}
-          label={label}
-          description={description}
-          right={right}
-          variant={variant}
-        />
-      </button>
-    </MenuItemWrapper>
-  );
-};
+export const MenuButtonItem = forwardRef<HTMLButtonElement, ButtonItemProps>(
+  function MenuButtonItem(
+    { icon, label, description, right, variant, closeMenuOnClick, ...props },
+    ref,
+  ) {
+    return (
+      <MenuItemWrapper closeMenuOnClick={closeMenuOnClick}>
+        <button ref={ref} {...props}>
+          <MenuItemContent
+            icon={icon}
+            label={label}
+            description={description}
+            right={right}
+            variant={variant}
+          />
+        </button>
+      </MenuItemWrapper>
+    );
+  },
+);
 
 type LinkItemProps = ContentProps & LinkProps;
 

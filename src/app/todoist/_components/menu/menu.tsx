@@ -139,7 +139,7 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
       ignoreMouse: isNested,
     });
     const role = useRole(context, { role: "menu" });
-    const dismiss = useDismiss(context, { bubbles: true });
+    const dismiss = useDismiss(context, { bubbles: true, escapeKey: false });
     const listNavigation = useListNavigation(context, {
       listRef: elementsRef,
       activeIndex,
@@ -235,7 +235,18 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
                       className="focus-visible:outline-none"
                       ref={refs.setFloating}
                       style={floatingStyles}
-                      {...getFloatingProps()}
+                      {...getFloatingProps({
+                        onKeyDown: (e) => {
+                          if (
+                            e.key === "Escape" &&
+                            e.target instanceof HTMLElement &&
+                            (e.target.role === "menu" ||
+                              e.target.role == "menuitem")
+                          ) {
+                            handleOpenChange(false);
+                          }
+                        },
+                      })}
                     >
                       <motion.div
                         className="flex flex-col rounded-lg border border-stone-200 bg-stone-50 py-2 text-sm text-stone-700 shadow-md"
