@@ -55,6 +55,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
 
     return (
       <MyProjectNavLinkMenu
+        project={project}
         onOpenChange={(open) => {
           if (!open) {
             // Menuを閉じたときにIconBUttonにfocusを戻す時間を確保する
@@ -74,7 +75,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
         }
       />
     );
-  }, [isFocus, isMenuOpen, project.todos]);
+  }, [isFocus, isMenuOpen, project]);
 
   const isDragging = draggingProjectId === project.id;
 
@@ -143,7 +144,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
           right={
             <div className="flex items-center gap-1">
               <div className="grid size-6 place-items-center">{rightNode}</div>
-              {project.subProjectCount ? (
+              {project.descendantsProjectCount ? (
                 <TreeToggleIconButton
                   isOpen={expanded}
                   onOpenChange={(open) => onChangeExpanded(project.id, open)}

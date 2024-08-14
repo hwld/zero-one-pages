@@ -10,7 +10,7 @@ export type ProjectNode = Omit<
 > & {
   depth: number;
   visible: boolean;
-  subProjectCount: number;
+  descendantsProjectCount: number;
 };
 
 export type ProjectMap = Map<string, Project>;
@@ -62,11 +62,13 @@ export const toProjectNodes = (
   parentVisible: boolean = true,
 ): ProjectNode[] => {
   return projects.flatMap((project): ProjectNode[] => {
+    const descendants = countProjectDescendants(project);
+
     const node: ProjectNode = {
       ...project,
       depth,
       visible: parentVisible,
-      subProjectCount: project.subProjects.length,
+      descendantsProjectCount: descendants,
     };
 
     return [
@@ -158,7 +160,7 @@ export const moveProject = (
 
   if (
     fromIndex < toIndex &&
-    toNode.subProjectCount &&
+    toNode.descendantsProjectCount &&
     !projectExpansionMap.isExpanded(toNode.id)
   ) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
@@ -178,7 +180,7 @@ export const moveProject = (
 
   if (
     fromIndex < toIndex &&
-    toNode.subProjectCount &&
+    toNode.descendantsProjectCount &&
     projectExpansionMap.isExpanded(toNode.id)
   ) {
     moved.depth = toNode.depth + 1;
