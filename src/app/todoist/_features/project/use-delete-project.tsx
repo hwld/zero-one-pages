@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
+import { deleteProject } from "../../_backend/project/api";
 
 export const useDeleteProject = () => {
   return useMutation({
     mutationFn: async (id: string) => {
-      throw new Error(`TODO: delete ${id}`);
+      return deleteProject(id);
     },
   });
 };

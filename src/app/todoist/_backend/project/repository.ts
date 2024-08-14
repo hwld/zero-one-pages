@@ -42,8 +42,37 @@ class ProjectRepository {
     });
   }
 
-  public remove() {
-    throw new Error("未実装");
+  public remove(id: string) {
+    const targetProject = this.projectRecords.find((p) => p.id === id);
+    if (!targetProject) {
+      throw new Error("プロジェクトが存在しない");
+    }
+
+    const targetIds: string[] = [];
+    const pushDescendantIds = (id: string) => {
+      targetIds.push(id);
+
+      this.projectRecords.forEach((p) => {
+        if (p.parentId === id) {
+          pushDescendantIds(p.id);
+        }
+      });
+    };
+
+    pushDescendantIds(targetProject.id);
+
+    this.projectRecords = this.projectRecords
+      .filter((p) => !targetIds.includes(p.id))
+      .map((project) => {
+        if (
+          project.parentId === targetProject.parentId &&
+          project.order < targetProject.order
+        ) {
+          return { ...project, order: project.order - 1 };
+        }
+
+        return project;
+      });
   }
 
   private static recordsToProjects(projectRecords: ProjectRecord[]): Project[] {

@@ -107,7 +107,7 @@ export const MyProjectNavList: React.FC<Props> = ({
           ) : null}
         </div>
       </div>
-      {projectsStatus === "error" && (
+      {projectsStatus === "error" ? (
         <div className="mt-1 flex gap-1 rounded border border-red-500 bg-red-50 p-2 text-xs">
           <PiWarningCircle className="size-5 shrink-0 text-red-500" />
           <div className="space-y-2">
@@ -119,46 +119,47 @@ export const MyProjectNavList: React.FC<Props> = ({
             </Button>
           </div>
         </div>
+      ) : (
+        <AnimatePresence>
+          {isOpen ? (
+            <motion.ul
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.1 }}
+            >
+              {projectNodes.map((projectNode) => {
+                return (
+                  <AnimatePresence key={projectNode.id}>
+                    {projectNode.visible ||
+                    draggingProjectId === projectNode.id ? (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.1 }}
+                      >
+                        <MyProjectNavLink
+                          currentRoute={currentRoute}
+                          project={projectNode}
+                          expanded={projectExpansionMap.isExpanded(
+                            projectNode.id,
+                          )}
+                          onChangeExpanded={handleChangeExpanded}
+                          draggingProjectId={draggingProjectId}
+                          onDragStart={handleDragStart}
+                          onMoveProjects={handleMoveProjects}
+                          onChangeProjectDepth={handleChangeDepth}
+                        />
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                );
+              })}
+            </motion.ul>
+          ) : null}
+        </AnimatePresence>
       )}
-      <AnimatePresence>
-        {isOpen ? (
-          <motion.ul
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.1 }}
-          >
-            {projectNodes.map((projectNode) => {
-              return (
-                <AnimatePresence key={projectNode.id}>
-                  {projectNode.visible ||
-                  draggingProjectId === projectNode.id ? (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.1 }}
-                    >
-                      <MyProjectNavLink
-                        currentRoute={currentRoute}
-                        project={projectNode}
-                        expanded={projectExpansionMap.isExpanded(
-                          projectNode.id,
-                        )}
-                        onChangeExpanded={handleChangeExpanded}
-                        draggingProjectId={draggingProjectId}
-                        onDragStart={handleDragStart}
-                        onMoveProjects={handleMoveProjects}
-                        onChangeProjectDepth={handleChangeDepth}
-                      />
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              );
-            })}
-          </motion.ul>
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 };

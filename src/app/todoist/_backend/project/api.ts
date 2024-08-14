@@ -25,6 +25,11 @@ export const changeProjectsPosition = async (
   return;
 };
 
+export const deleteProject = async (id: string): Promise<void> => {
+  await fetcher.delete(TodoistAPI.project(id));
+  return;
+};
+
 export const projectApiHandlers = [
   http.get(TodoistAPI.projects(), async () => {
     await delay();
@@ -34,6 +39,8 @@ export const projectApiHandlers = [
   }),
 
   http.post(TodoistAPI.changeProjectPosition(), async ({ request }) => {
+    await delay();
+
     const changes = z
       .array(projectPositionChangeSchema)
       .parse(await request.json());
@@ -41,6 +48,15 @@ export const projectApiHandlers = [
     changes.forEach((change) => {
       projectRepository.updatePosition(change);
     });
+
+    return HttpResponse.json({});
+  }),
+
+  http.delete(TodoistAPI.project(), async ({ params }) => {
+    await delay();
+
+    const id = z.string().parse(params.id);
+    projectRepository.remove(id);
 
     return HttpResponse.json({});
   }),
