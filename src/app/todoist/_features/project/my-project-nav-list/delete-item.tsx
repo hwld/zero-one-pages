@@ -11,14 +11,16 @@ export const ProjectDeleteMenuItem: React.FC<Props> = ({ project }) => {
 
   return (
     <>
-      <MenuButtonItem
-        closeMenuOnClick={false}
-        icon={PiTrashLight}
-        label="削除"
-        variant="destructive"
-        onClick={() => setIsDialogOpen(true)}
-      />
       <ProjectDeleteDialog
+        trigger={
+          <MenuButtonItem
+            closeMenuOnClick={false}
+            icon={PiTrashLight}
+            label="削除"
+            variant="destructive"
+            onClick={() => setIsDialogOpen(true)}
+          />
+        }
         project={project}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}

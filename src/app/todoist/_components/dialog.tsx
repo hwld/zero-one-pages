@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
 
 type DialogProps = {
+  trigger: ReactNode;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
@@ -10,6 +11,7 @@ type DialogProps = {
 };
 
 export const Dialog: React.FC<DialogProps> = ({
+  trigger,
   isOpen,
   onOpenChange,
   children,
@@ -17,6 +19,7 @@ export const Dialog: React.FC<DialogProps> = ({
 }) => {
   return (
     <RxDialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      <RxDialog.Trigger asChild>{trigger}</RxDialog.Trigger>
       <AnimatePresence>
         {isOpen && (
           <RxDialog.Portal forceMount>
