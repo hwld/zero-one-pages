@@ -1,8 +1,8 @@
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 import { TaskStatus, taskStatusSchema, taskStatusStore } from "./store";
-import { fetcher } from "@/lib/fetcher";
 import { z } from "zod";
+import { fetcher } from "../../../../lib/fetcher";
 
 export const fetchAllTaskStatus = async (): Promise<TaskStatus[]> => {
   const res = await fetcher.get(GitHubProjectAPI.allTaskStatus());

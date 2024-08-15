@@ -3,7 +3,7 @@
 import * as React from "react";
 import { AlertCircleIcon, CheckCircle2Icon, XIcon } from "lucide-react";
 import * as ToastPrimitives from "@radix-ui/react-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../lib/utils";
 
 const ToastProvider = ToastPrimitives.Provider;
 

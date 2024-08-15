@@ -16,7 +16,7 @@ import { ProjectExpansionMap } from "../logic/expansion-map";
 import { toProjectNodes } from "../logic/project";
 import { useProjects } from "../use-projects";
 import { MyProjectNavLink } from "./item";
-import { Button } from "@/app/todoist/_components/button";
+import { Button } from "../../../_components/button";
 
 type Props = {
   isHeaderActive?: boolean;

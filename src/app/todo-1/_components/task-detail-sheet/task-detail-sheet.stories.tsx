@@ -12,7 +12,7 @@ import {
 } from "@storybook/test";
 import { HttpResponse, http } from "msw";
 import { Todo1API, updateTaskInputSchema } from "../../_backend/api";
-import { waitForAnimation } from "@/app/_test/utils";
+import { waitForAnimation } from "../../../_test/utils";
 
 const updateTaskMock = fn();
 const handleOpenChangeMock = fn();

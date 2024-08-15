@@ -4,8 +4,8 @@ import { ReactNode } from "react";
 import { ChatPanel } from "./_components/chat-panel/chat-panel";
 import { ServerSidebar } from "./_components/server-sidebar/server-sidebar";
 import { SideBar } from "./_components/sidebar/sidebar";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const ChatPage: React.FC<{ children: ReactNode }> = ({ children }) => {
   const bgClass = "bg-neutral-800";

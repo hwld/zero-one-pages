@@ -1,7 +1,6 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
 import { DATE_EVENT_MIN_HEIGHT } from "./utils";
 import { EventInCol } from "./type";
-import { areDragDateRangeOverlapping } from "@/app/calendar/utils";
 import { startOfDay, endOfDay, areIntervalsOverlapping } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { EventInColCardProps, EventInColCard } from "./card/event-in-col-card";
@@ -10,6 +9,7 @@ import { EventInColPreview } from "./event-in-col-preview";
 import { useMoveEventInCol } from "./move-event-provider";
 import { usePrepareCreateEventInCol } from "./prepare-create-event-provider";
 import { useResizeEventInCol } from "./resize-event-provider";
+import { areDragDateRangeOverlapping } from "../../utils";
 
 type Props = {
   eventsInCol: EventInCol[];

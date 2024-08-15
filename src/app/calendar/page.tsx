@@ -14,8 +14,8 @@ import {
 import { useCalendarCommands } from "./command";
 import { Select, SelectItem } from "./_components/select";
 import { CalendarViewDate } from "./_components/calendar-view-date";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const Page = () => {
   useCalendarCommands();

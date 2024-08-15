@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import {
   forwardRef,
   ComponentPropsWithoutRef,
@@ -23,6 +22,7 @@ import {
   startOfDay,
 } from "date-fns";
 import { DragDateRange } from "../../utils";
+import { cn } from "../../../../lib/utils";
 
 export const EVENT_FORM_ID = "event-form-id";
 

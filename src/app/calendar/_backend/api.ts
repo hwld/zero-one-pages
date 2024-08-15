@@ -1,8 +1,8 @@
 import { HttpResponse, delay, http } from "msw";
 import { z } from "zod";
 import { Event, eventSchema, eventStore } from "./event-store";
-import { fetcher } from "@/lib/fetcher";
 import { isSameMinute } from "date-fns";
+import { fetcher } from "../../../lib/fetcher";
 
 const CalendarAPI = {
   base: "/calendar/api",

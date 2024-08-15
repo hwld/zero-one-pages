@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./store";
-import { fetcher } from "@/lib/fetcher";
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
 import { taskStatusStore } from "../task-status/store";
 import { viewRecordStore } from "../view/view-record-store";
+import { fetcher } from "../../../../lib/fetcher";
 
 export const fetchTask = async (id: string): Promise<Task> => {
   const res = await fetcher.get(GitHubProjectAPI.task(id));

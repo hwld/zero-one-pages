@@ -15,11 +15,11 @@ import { ProjectMenuTrigger } from "./_components/project-menu-trigger";
 import { Toaster } from "./_components/toast/toaster";
 import { ViewTabs } from "./_components/view-tabs/view-tabs";
 import { useGitHubProjectCommands } from "./commands";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
 import { TaskDetailPanel } from "./_components/task-detail-panel/task-detail-panel";
 import { BG_COLOR_CLASS } from "./consts";
 import { useLocalStorage } from "@mantine/hooks";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const GitHubProjectPage: React.FC = () => {
   const [isDetailPinned, setIsDetailPinned] = useLocalStorage({

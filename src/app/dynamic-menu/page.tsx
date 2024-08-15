@@ -2,8 +2,8 @@
 
 import { NextPage } from "next";
 import { Menu } from "./_components/menu/menu";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import clsx from "clsx";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const Page: NextPage = () => {
   const bgClass = "bg-neutral-900";

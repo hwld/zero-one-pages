@@ -1,4 +1,3 @@
-import { errorIfNotDevelopment } from "@/app/_test/utils";
 import React, {
   PropsWithChildren,
   createContext,
@@ -6,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { errorIfNotDevelopment } from "../../../_test/utils";
 
 export type TaskTableSelectionContext = {
   selectedTaskIds: string[];

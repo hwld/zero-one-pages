@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { fetchTask } from "../_backend/task/api";
-import { useMswState } from "@/app/_providers/msw-provider";
+import { useMswState } from "../../_providers/msw-provider";
 
 export const taskQueryOption = (id: string) =>
   queryOptions({

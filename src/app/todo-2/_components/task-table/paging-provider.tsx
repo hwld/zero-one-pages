@@ -1,4 +1,3 @@
-import { errorIfNotDevelopment } from "@/app/_test/utils";
 import {
   PropsWithChildren,
   createContext,
@@ -7,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useScrollableRoot } from "../../_providers/scrollable-root-provider";
+import { errorIfNotDevelopment } from "../../../_test/utils";
 
 export type TaskTablePagingContext = {
   page: number;

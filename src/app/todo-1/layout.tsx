@@ -14,9 +14,9 @@ import { TaskCreateInput } from "./_components/task-create-input";
 import { Menu } from "./_components/menu/menu";
 import { useTodo1HomeCommands } from "./commands";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { TaskListContent } from "./_components/task-list-content";
 import { useTasks } from "./_queries/use-tasks";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする

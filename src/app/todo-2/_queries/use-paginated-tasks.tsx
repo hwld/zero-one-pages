@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { PaginatedTasksInput, fetchPaginatedTasks } from "../_backend/api";
-import { useMswState } from "@/app/_providers/msw-provider";
+import { useMswState } from "../../_providers/msw-provider";
 
 export const usePaginatedTasks = (args: PaginatedTasksInput) => {
   const { isMockserverUp } = useMswState();

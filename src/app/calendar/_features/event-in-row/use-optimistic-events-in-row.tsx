@@ -1,8 +1,8 @@
-import { Event } from "@/app/calendar/_backend/event-store";
 import { useMoveEventInRow } from "./move-event-provider";
 import { getEventFromMoveEventPreview, getEventsInRow } from "./utils";
 import { useResizeEventInRow } from "./resize-event-provider";
 import { Interval } from "date-fns";
+import { Event } from "../../_backend/event-store";
 
 /**
  *  表示する日付の範囲を指定して、eventのMoveやResizeの状態から更新後のEventInRowを返す

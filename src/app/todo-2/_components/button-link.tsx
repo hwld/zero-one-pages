@@ -1,7 +1,7 @@
 import Link, { LinkProps } from "next/link";
 import { ReactNode, forwardRef } from "react";
 import { buttonBaseClass, buttonClass } from "./button";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../lib/utils";
 
 type Props = {
   children: ReactNode;

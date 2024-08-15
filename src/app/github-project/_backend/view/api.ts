@@ -7,9 +7,9 @@ import {
 } from "./view-record-store";
 import { taskSchema, taskStore } from "../task/store";
 import { taskStatusSchema, taskStatusStore } from "../task-status/store";
-import { fetcher } from "@/lib/fetcher";
 import { HttpResponse, delay, http } from "msw";
 import { GitHubProjectAPI } from "../api-routes";
+import { fetcher } from "../../../../lib/fetcher";
 
 const viewTaskSchema = viewTaskRecordSchema.merge(taskSchema);
 const viewColumnSchema = viewColumnRecordSchema.merge(

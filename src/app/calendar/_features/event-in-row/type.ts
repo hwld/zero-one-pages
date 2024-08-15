@@ -1,4 +1,4 @@
-import { Event } from "@/app/calendar/_backend/event-store";
+import { Event } from "../../_backend/event-store";
 import { DragDateRange } from "../../utils";
 
 /**

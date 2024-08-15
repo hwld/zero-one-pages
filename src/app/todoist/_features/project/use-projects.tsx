@@ -2,7 +2,7 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProjects } from "../../_backend/project/api";
 import { Project } from "../../_backend/project/model";
 import { useCallback } from "react";
-import { useMswState } from "@/app/_providers/msw-provider";
+import { useMswState } from "../../../_providers/msw-provider";
 
 const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],

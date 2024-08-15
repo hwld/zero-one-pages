@@ -11,7 +11,7 @@ import Link, { LinkProps } from "next/link";
 import { Slot } from "@radix-ui/react-slot";
 import { MenuContext, MenuItemClickEvent } from "./menu";
 import { PiCaretRightBold } from "@react-icons/all-files/pi/PiCaretRightBold";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../lib/utils";
 
 type ContentProps = {
   icon: IconType;

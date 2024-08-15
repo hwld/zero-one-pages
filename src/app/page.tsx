@@ -3,8 +3,8 @@
 import clsx from "clsx";
 import { pages } from "./pages";
 import { IoLogoGithub } from "@react-icons/all-files/io/IoLogoGithub";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { PageCard } from "./page-card";
+import { useBodyBgColor } from "../lib/useBodyBgColor";
 
 export default function Home() {
   const bgClass = "bg-zinc-900";

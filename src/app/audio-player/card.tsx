@@ -1,6 +1,6 @@
 "use client";
-import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import { cn } from "../../lib/utils";
 
 export const Card: React.FC<{
   children?: ReactNode;

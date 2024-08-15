@@ -18,9 +18,9 @@ import { PiQuestionLight } from "@react-icons/all-files/pi/PiQuestionLight";
 import { PiSignOutLight } from "@react-icons/all-files/pi/PiSignOutLight";
 import { MenuButtonItem, SubMenuTrigger } from "../menu/item";
 import { Menu, MenuSeparator } from "../menu/menu";
-import { cn } from "@/lib/utils";
 import { IconType } from "@react-icons/all-files";
 import { PiStarDuotone } from "@react-icons/all-files/pi/PiStarDuotone";
+import { cn } from "../../../../lib/utils";
 
 export const UserMenuTrigger: React.FC = () => {
   return (

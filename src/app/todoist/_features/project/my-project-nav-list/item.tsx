@@ -6,9 +6,9 @@ import {
   SidebarListLink,
 } from "../../../_components/sidebar/item";
 import { MyProjectNavLinkMenu } from "./item-menu";
-import { Routes } from "@/app/todoist/routes";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
 import { ProjectNode } from "../logic/project";
+import { Routes } from "../../../routes";
 
 type MyProjectListItemProps = {
   currentRoute: string;

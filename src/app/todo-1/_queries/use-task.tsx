@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTask } from "../_backend/api";
-import { useMswState } from "@/app/_providers/msw-provider";
+import { useMswState } from "../../_providers/msw-provider";
 
 export const useTask = (id: string) => {
   const { isMockserverUp } = useMswState();

@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import { Resizable, ResizableProps } from "re-resizable";
 import { LegacyRef } from "react";
+import { cn } from "../../../lib/utils";
 
 type Props = Omit<
   ResizableProps,

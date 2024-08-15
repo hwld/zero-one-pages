@@ -19,12 +19,12 @@ import {
   TaskTableSortContext,
   TaskTableSortProvider,
 } from "./sort-provider";
-import { errorIfNotDevelopment } from "@/app/_test/utils";
 import {
   MockTaskTableSearchProvider,
   TaskTableSearchContext,
   TaskTableSearchProvider,
 } from "./search-provider";
+import { errorIfNotDevelopment } from "../../../_test/utils";
 
 export const TaskTableProvider: React.FC<PropsWithChildren> = ({
   children,

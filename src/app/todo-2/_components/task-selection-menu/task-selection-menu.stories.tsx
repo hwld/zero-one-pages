@@ -18,9 +18,9 @@ import {
   updateTaskStatusesInputSchema,
 } from "../../_backend/api";
 import { z } from "zod";
-import { waitForAnimation } from "@/app/_test/utils";
 import { MockTaskTableProvider } from "../task-table/provider";
 import { ScrollableRootProvider } from "../../_providers/scrollable-root-provider";
+import { waitForAnimation } from "../../../_test/utils";
 
 const mockUnselectAll = fn();
 const mockDeleteTasks = fn();

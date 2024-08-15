@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "../../../lib/utils";
 
 type Props = { className?: string; align?: "horizontal" | "vertical" };
 export const DropPreviewLine: React.FC<Props> = ({

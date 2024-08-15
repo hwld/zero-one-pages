@@ -1,7 +1,7 @@
 import { HttpResponse, delay, http } from "msw";
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./task-store";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher } from "../../../lib/fetcher";
 
 export const createTaskInputSchema = z.object({
   title: z

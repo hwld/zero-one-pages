@@ -20,7 +20,7 @@ import {
   RovingTabindexRoot,
   useRovingTabindex,
 } from "./roving-tabindex";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../lib/utils";
 
 type NodeStates = Map<string, boolean>;
 

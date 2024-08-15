@@ -3,7 +3,7 @@ import { HttpResponse, http } from "msw";
 import { paginate } from "../_lib/utils";
 import { z } from "zod";
 import { Task, taskSchema, taskStore } from "./task-store";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher } from "../../../lib/fetcher";
 
 const sortOrderSchema = z.union([z.literal("asc"), z.literal("desc")]);
 export type SortOrder = z.infer<typeof sortOrderSchema>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
+import { useBodyBgColor } from "../lib/useBodyBgColor";
 import { GlobalCommand } from "./_providers/global-command/global-command";
 import clsx from "clsx";
 

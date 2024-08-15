@@ -6,8 +6,8 @@ import {
   useState,
 } from "react";
 import { SortEntry } from "../../_backend/api";
-import { errorIfNotDevelopment } from "@/app/_test/utils";
 import { useTaskTablePaging } from "./paging-provider";
+import { errorIfNotDevelopment } from "../../../_test/utils";
 
 export type TaskTableSortContext = {
   sortEntry: SortEntry;

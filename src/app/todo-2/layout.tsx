@@ -6,8 +6,8 @@ import { ScrollableRootProvider } from "./_providers/scrollable-root-provider";
 import clsx from "clsx";
 import { Sidebar } from "./_components/side-bar/side-bar";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { TaskTableProvider } from "./_components/task-table/provider";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { scrollableRootRef } = useScrollableRoot();

@@ -2,7 +2,7 @@ import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { EventInCol } from "../type";
 import { DATE_EVENT_MIN_HEIGHT } from "../utils";
 import { formatEventDateSpan } from "../utils";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../../../lib/utils";
 
 type Props = {
   style: {

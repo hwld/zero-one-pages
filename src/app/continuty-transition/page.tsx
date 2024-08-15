@@ -1,5 +1,4 @@
 "use client";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
 import { useClickOutside } from "@mantine/hooks";
 import clsx from "clsx";
 import { motion } from "framer-motion";
@@ -14,6 +13,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 import { z } from "zod";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const Page: React.FC = () => {
   const router = useRouter();

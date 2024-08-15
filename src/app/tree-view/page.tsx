@@ -1,5 +1,5 @@
 "use client";
-import { useBodyBgColor } from "@/lib/useBodyBgColor";
+
 import clsx from "clsx";
 import {
   TreeNodeType,
@@ -9,7 +9,8 @@ import {
 } from "./_components/tree-view";
 import { ComponentPropsWithoutRef, useState } from "react";
 import { createData } from "./_lib/data";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
+import { useBodyBgColor } from "../../lib/useBodyBgColor";
 
 const bgClass = "bg-slate-50";
 

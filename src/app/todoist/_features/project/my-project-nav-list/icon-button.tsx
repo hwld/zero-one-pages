@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
 import { IconType } from "@react-icons/all-files";
 import { PiCaretRightLight } from "@react-icons/all-files/pi/PiCaretRightLight";
 import { motion } from "framer-motion";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
+import { cn } from "../../../../../lib/utils";
 
 export const TreeToggleIconButton: React.FC<{
   isOpen: boolean;

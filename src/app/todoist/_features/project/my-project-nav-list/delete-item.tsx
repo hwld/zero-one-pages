@@ -1,8 +1,8 @@
-import { MenuButtonItem } from "@/app/todoist/_components/menu/item";
 import { PiTrashLight } from "@react-icons/all-files/pi/PiTrashLight";
 import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectNode } from "../logic/project";
 import { useState } from "react";
+import { MenuButtonItem } from "../../../_components/menu/item";
 
 type Props = { project: ProjectNode };
 

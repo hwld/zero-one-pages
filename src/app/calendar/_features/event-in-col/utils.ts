@@ -1,4 +1,3 @@
-import { Event } from "@/app/calendar/_backend/event-store";
 import {
   areIntervalsOverlapping,
   startOfDay,
@@ -12,6 +11,7 @@ import {
   min,
 } from "date-fns";
 import { EventInCol } from "./type";
+import { Event } from "../../_backend/event-store";
 
 export const DATE_EVENT_MIN_HEIGHT = 17;
 export const DATE_EVENT_MIN_MINUTES = 15;
