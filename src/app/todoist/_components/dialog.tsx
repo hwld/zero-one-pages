@@ -1,22 +1,37 @@
 import * as RxDialog from "@radix-ui/react-dialog";
+import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode } from "react";
+import { PropsWithChildren, ReactNode, useRef } from "react";
+import { IconButton } from "./icon-button";
+import { PiXLight } from "@react-icons/all-files/pi/PiXLight";
 
 type DialogProps = {
   trigger: ReactNode;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  children: ReactNode;
   width?: number;
+  children: ReactNode;
 };
 
 export const Dialog: React.FC<DialogProps> = ({
   trigger,
   isOpen,
   onOpenChange,
-  children,
   width = 450,
+  children,
 }) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenAutoFocus = (e: Event) => {
+    const target = contentRef.current?.querySelector("[data-auto-focus]");
+    if (!target || !(target instanceof HTMLElement)) {
+      return;
+    }
+
+    e.preventDefault();
+    target.focus();
+  };
+
   return (
     <RxDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <RxDialog.Trigger asChild>{trigger}</RxDialog.Trigger>
@@ -32,9 +47,14 @@ export const Dialog: React.FC<DialogProps> = ({
                 transition={{ duration: 0.1 }}
               />
             </RxDialog.Overlay>
-            <RxDialog.Content style={{ width }} asChild>
+            <RxDialog.Content
+              ref={contentRef}
+              style={{ width }}
+              asChild
+              onOpenAutoFocus={handleOpenAutoFocus}
+            >
               <motion.div
-                className="fixed inset-[50%] z-[100] h-min max-h-[90%] w-[500px] rounded-lg bg-stone-100 text-stone-700 shadow-md outline-none"
+                className="fixed inset-[50%] z-[100] flex h-min max-h-[90%] w-[500px] flex-col rounded-lg bg-stone-100 text-stone-700 shadow-md outline-none"
                 initial={{ opacity: 0, y: "-55%", x: "-50%" }}
                 animate={{ opacity: 1, y: "-50%", x: "-50%" }}
                 exit={{ opacity: 0, y: "-55%", x: "-50%" }}
@@ -50,20 +70,42 @@ export const Dialog: React.FC<DialogProps> = ({
   );
 };
 
-export const DialogTitle: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const DialogHeader: React.FC<
+  { withClose?: boolean } & PropsWithChildren
+> = ({ children, withClose }) => {
   return (
-    <RxDialog.Title className="text-md px-4 pb-2 pt-4 font-bold">
+    <header
+      className={clsx(
+        "flex items-center pb-2",
+        withClose ? "pl-4 pr-2 pt-2" : "px-4 pt-4",
+      )}
+    >
       {children}
-    </RxDialog.Title>
+      {withClose && (
+        <DialogClose>
+          <IconButton icon={PiXLight} />
+        </DialogClose>
+      )}
+    </header>
   );
 };
 
-export const DialogContent: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  return <div className="px-4 text-sm">{children}</div>;
+export const DialogContent: React.FC<PropsWithChildren> = ({ children }) => {
+  return <div className="overflow-auto px-4 py-2 text-sm">{children}</div>;
+};
+
+export const DialogFooter: React.FC<PropsWithChildren> = ({ children }) => {
+  return <footer className="p-4">{children}</footer>;
+};
+
+export const DialogTitle: React.FC<PropsWithChildren> = ({ children }) => {
+  return (
+    <RxDialog.Title className="text-md font-bold">{children}</RxDialog.Title>
+  );
+};
+
+export const DialogClose: React.FC<PropsWithChildren> = ({ children }) => {
+  return <RxDialog.Close asChild>{children}</RxDialog.Close>;
 };
 
 export const DialogActions: React.FC<{
@@ -71,7 +113,7 @@ export const DialogActions: React.FC<{
   left?: ReactNode;
 }> = ({ children, left }) => {
   return (
-    <div className="flex items-center justify-between px-4 pb-4 pt-6">
+    <div className="flex items-center justify-between">
       <div>{left}</div>
       <div className="flex items-center gap-2">{children}</div>
     </div>

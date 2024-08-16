@@ -3,7 +3,10 @@ import { Button } from "../../_components/button";
 import {
   Dialog,
   DialogActions,
+  DialogClose,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
 } from "../../_components/dialog";
 import { ProjectNode } from "./logic/project";
@@ -50,16 +53,20 @@ export const ProjectDeleteDialog: React.FC<Props> = ({
 
   return (
     <Dialog trigger={trigger} isOpen={isOpen} onOpenChange={onOpenChange}>
-      <DialogTitle>削除しますか？</DialogTitle>
+      <DialogHeader>
+        <DialogTitle>削除しますか？</DialogTitle>
+      </DialogHeader>
       <DialogContent>{description}</DialogContent>
-      <DialogActions>
-        <Button color="secondary" onClick={() => onOpenChange(false)}>
-          キャンセル
-        </Button>
-        <Button onClick={handleDelete} disabled={deleteProject.isPending}>
-          削除
-        </Button>
-      </DialogActions>
+      <DialogFooter>
+        <DialogActions>
+          <DialogClose>
+            <Button color="secondary">キャンセル</Button>
+          </DialogClose>
+          <Button onClick={handleDelete} disabled={deleteProject.isPending}>
+            削除
+          </Button>
+        </DialogActions>
+      </DialogFooter>
     </Dialog>
   );
 };
