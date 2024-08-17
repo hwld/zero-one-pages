@@ -18,8 +18,7 @@
 				"isDefault": true
 			},
 			"presentation": {
-				"reveal": "silent",
-				"close": true
+				"reveal": "silent"
 			},
 			"runOptions": {
 				"runOn": "default"
