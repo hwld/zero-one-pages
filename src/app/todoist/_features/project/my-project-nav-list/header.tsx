@@ -8,6 +8,8 @@ import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { PiBrowsersLight } from "@react-icons/all-files/pi/PiBrowsersLight";
 import { PiSpinnerGap } from "@react-icons/all-files/pi/PiSpinnerGap";
 import { Icon, TreeToggleIconButton, IconButton } from "./icon-button";
+import { useState } from "react";
+import { ProjectCreateDialog } from "../project-create-dialog";
 
 type Props = {
   active?: boolean;
@@ -24,6 +26,8 @@ export const MyProjectNavListHeader: React.FC<Props> = ({
   projectsCount,
   onOpenChange,
 }) => {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   return (
     <div
       className={clsx(
@@ -59,6 +63,7 @@ export const MyProjectNavListHeader: React.FC<Props> = ({
             icon={PiHashLight}
             label="プロジェクトを追加"
             description="タスクを計画&アサイン"
+            onClick={() => setIsCreateDialogOpen(true)}
           />
           <MenuButtonItem
             icon={PiBrowsersLight}
@@ -66,6 +71,10 @@ export const MyProjectNavListHeader: React.FC<Props> = ({
             description="プロジェクトテンプレートで始める"
           />
         </Menu>
+        <ProjectCreateDialog
+          isOpen={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+        />
         {isProjectPending ? (
           <PiSpinnerGap className="animate-spin" />
         ) : projectsCount ? (

@@ -18,16 +18,27 @@ export const fetchProjects = async (): Promise<Project[]> => {
   return projectSummaries;
 };
 
+// TODO: parentIdとかorderを指定できるようにする
+export const projectFormSchema = z.object({
+  label: z
+    .string()
+    .min(1, "プロジェクト名を入力してください")
+    .max(120, "プロジェクト名は120文字以内で入力してください"),
+});
+export type ProjectFormData = z.infer<typeof projectFormSchema>;
+
+export const createProject = async (data: ProjectFormData): Promise<void> => {
+  await fetcher.post(TodoistAPI.projects(), { body: data });
+};
+
 export const changeProjectsPosition = async (
   changes: ProjectPositionChange[],
 ): Promise<void> => {
   await fetcher.post(TodoistAPI.changeProjectPosition(), { body: changes });
-  return;
 };
 
 export const deleteProject = async (id: string): Promise<void> => {
   await fetcher.delete(TodoistAPI.project(id));
-  return;
 };
 
 export const projectApiHandlers = [
@@ -36,6 +47,19 @@ export const projectApiHandlers = [
 
     const summaries = projectRepository.getAll();
     return HttpResponse.json(summaries);
+  }),
+
+  http.post(TodoistAPI.projects(), async ({ request }) => {
+    await delay();
+    const input = projectFormSchema.parse(await request.json());
+
+    projectRepository.add({
+      parentId: null,
+      label: input.label,
+      order: projectRepository.getSiblingsMaxOrder(null) + 1,
+    });
+
+    return HttpResponse.json({});
   }),
 
   http.post(TodoistAPI.changeProjectPosition(), async ({ request }) => {

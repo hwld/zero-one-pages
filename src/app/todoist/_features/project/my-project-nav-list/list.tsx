@@ -8,6 +8,7 @@ import { useProjects } from "../use-projects";
 import { MyProjectNavLink } from "./item";
 import { Button } from "../../../_components/button";
 import { MyProjectNavListHeader } from "./header";
+import { Routes } from "../../../routes";
 
 type Props = {
   currentRoute: string;
@@ -48,6 +49,7 @@ export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
   return (
     <div>
       <MyProjectNavListHeader
+        active={currentRoute === Routes.myProjectList()}
         isOpen={isOpen}
         onOpenChange={setIsOpen}
         isProjectPending={projectsStatus === "pending"}

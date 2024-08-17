@@ -54,7 +54,7 @@ export const Dialog: React.FC<DialogProps> = ({
               onOpenAutoFocus={handleOpenAutoFocus}
             >
               <motion.div
-                className="fixed inset-[50%] z-[100] flex h-min max-h-[90%] w-[500px] flex-col rounded-lg bg-stone-100 text-stone-700 shadow-md outline-none"
+                className="fixed inset-[50%] z-[100] flex h-min max-h-[90%] w-[500px] flex-col rounded-lg bg-stone-50 text-stone-700 shadow-md outline-none"
                 initial={{ opacity: 0, y: "-55%", x: "-50%" }}
                 animate={{ opacity: 1, y: "-50%", x: "-50%" }}
                 exit={{ opacity: 0, y: "-55%", x: "-50%" }}
@@ -91,7 +91,7 @@ export const DialogHeader: React.FC<
 };
 
 export const DialogContent: React.FC<PropsWithChildren> = ({ children }) => {
-  return <div className="overflow-auto px-4 py-2 text-sm">{children}</div>;
+  return <div className="overflow-auto px-4 py-3 text-sm">{children}</div>;
 };
 
 export const DialogFooter: React.FC<PropsWithChildren> = ({ children }) => {

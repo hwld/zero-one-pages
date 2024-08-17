@@ -19,6 +19,14 @@ class ProjectRepository {
     return ProjectRepository.recordsToProjects(this.projectRecords);
   }
 
+  public getSiblingsMaxOrder(parentId: string | null): number {
+    return Math.max(
+      ...this.projectRecords
+        .filter((p) => p.parentId === parentId)
+        .map((p) => p.order),
+    );
+  }
+
   public add(input: { parentId: string | null; label: string; order: number }) {
     const newRecord: ProjectRecord = {
       id: crypto.randomUUID(),

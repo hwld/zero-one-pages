@@ -115,10 +115,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
       <SidebarNavList currentRoute={currentRoute} />
 
-      <MyProjectNavList
-        isHeaderActive={currentRoute === Routes.myProjectList()}
-        currentRoute={currentRoute}
-      />
+      <MyProjectNavList currentRoute={currentRoute} />
     </div>
   );
 };
