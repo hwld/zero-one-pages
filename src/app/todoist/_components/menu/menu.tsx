@@ -40,7 +40,6 @@ import {
   useMemo,
 } from "react";
 
-export type MenuItemClickEvent = { shouldCloseMenu: boolean };
 type SubMenuOpenEvent = { nodeId: string; parentId: string | null };
 
 type MenuContext = {
@@ -156,10 +155,8 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
     useEffect(() => {
       if (!tree) return;
 
-      function handleTreeClick(event: MenuItemClickEvent) {
-        if (event.shouldCloseMenu) {
-          handleOpenChange(false);
-        }
+      function handleTreeClick() {
+        handleOpenChange(false);
       }
 
       function onSubMenuOpen(event: SubMenuOpenEvent) {
@@ -229,7 +226,6 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
                     modal={false}
                     initialFocus={isNested ? -1 : 0}
                     returnFocus={!isNested}
-                    closeOnFocusOut={false}
                   >
                     <div
                       className="focus-visible:outline-none"

@@ -9,6 +9,7 @@ import { MyProjectNavLinkMenu } from "./item-menu";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
 import { ProjectNode } from "../logic/project";
 import { Routes } from "../../../routes";
+import { ProjectDeleteDialog } from "../project-delete-dialog";
 
 type MyProjectListItemProps = {
   currentRoute: string;
@@ -32,6 +33,8 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   onChangeProjectDepth,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const [isFocus, setIsFocus] = useState(false);
 
   const itemRef = useRef<HTMLLIElement>(null);
@@ -55,7 +58,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
 
     return (
       <MyProjectNavLinkMenu
-        project={project}
+        onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
         onOpenChange={(open) => {
           if (!open) {
             // Menuを閉じたときにIconBUttonにfocusを戻す時間を確保する
@@ -155,6 +158,11 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
           depth={project.depth}
         >
           {project.label}
+          <ProjectDeleteDialog
+            isOpen={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            project={project}
+          />
         </SidebarListLink>
       )}
     </>

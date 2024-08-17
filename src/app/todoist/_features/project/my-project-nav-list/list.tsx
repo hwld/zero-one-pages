@@ -1,33 +1,21 @@
-import clsx from "clsx";
-import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
-import { PiPlusLight } from "@react-icons/all-files/pi/PiPlusLight";
-import { PiBrowsersLight } from "@react-icons/all-files/pi/PiBrowsersLight";
-import { PiSpinnerGap } from "@react-icons/all-files/pi/PiSpinnerGap";
 import { PiWarningCircle } from "@react-icons/all-files/pi/PiWarningCircle";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes } from "../../../routes";
-import Link from "next/link";
-import { Menu } from "../../../_components/menu/menu";
-import { MenuButtonItem } from "../../../_components/menu/item";
-import { Icon, IconButton, TreeToggleIconButton } from "./icon-button";
 import { useDragMyProjectNavLink } from "./use-drag";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 import { toProjectNodes } from "../logic/project";
 import { useProjects } from "../use-projects";
 import { MyProjectNavLink } from "./item";
 import { Button } from "../../../_components/button";
+import { MyProjectNavListHeader } from "./header";
 
 type Props = {
-  isHeaderActive?: boolean;
   currentRoute: string;
 };
 
-export const MyProjectNavList: React.FC<Props> = ({
-  isHeaderActive,
-  currentRoute,
-}) => {
+export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
   const [isOpen, setIsOpen] = useState(true);
+
   const {
     data: projects = [],
     status: projectsStatus,
@@ -59,54 +47,12 @@ export const MyProjectNavList: React.FC<Props> = ({
 
   return (
     <div>
-      <div
-        className={clsx(
-          "group/sidebar flex h-9 w-full items-center justify-between rounded transition-colors",
-          isHeaderActive ? "bg-rose-100" : "hover:bg-black/5",
-        )}
-      >
-        <Link
-          href={Routes.myProjectList()}
-          className={clsx(
-            "w-full py-2 pl-2 text-start font-bold",
-            isHeaderActive ? "text-rose-700" : "text-stone-500",
-          )}
-        >
-          マイプロジェクト
-        </Link>
-        <div
-          className={clsx(
-            "group flex h-full items-center gap-1 pr-2",
-            projectsStatus === "pending"
-              ? "opacity-100"
-              : "opacity-0 focus-within:opacity-100 group-hover/sidebar:opacity-100 has-[*[data-open]]:opacity-100",
-          )}
-        >
-          <Menu
-            trigger={
-              <IconButton>
-                <Icon icon={PiPlusLight} />
-              </IconButton>
-            }
-          >
-            <MenuButtonItem
-              icon={PiHashLight}
-              label="プロジェクトを追加"
-              description="タスクを計画&アサイン"
-            />
-            <MenuButtonItem
-              icon={PiBrowsersLight}
-              label="テンプレートを見る"
-              description="プロジェクトテンプレートで始める"
-            />
-          </Menu>
-          {projectsStatus === "pending" ? (
-            <PiSpinnerGap className="animate-spin" />
-          ) : projectNodes.length ? (
-            <TreeToggleIconButton isOpen={isOpen} onOpenChange={setIsOpen} />
-          ) : null}
-        </div>
-      </div>
+      <MyProjectNavListHeader
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        isProjectPending={projectsStatus === "pending"}
+        projectsCount={projects.length}
+      />
       {projectsStatus === "error" ? (
         <div className="mt-1 flex gap-1 rounded border border-red-500 bg-red-50 p-2 text-xs">
           <PiWarningCircle className="size-5 shrink-0 text-red-500" />

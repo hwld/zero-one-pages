@@ -9,7 +9,7 @@ import { IconType } from "@react-icons/all-files/lib/iconBase";
 import clsx from "clsx";
 import Link, { LinkProps } from "next/link";
 import { Slot } from "@radix-ui/react-slot";
-import { MenuContext, MenuItemClickEvent } from "./menu";
+import { MenuContext } from "./menu";
 import { PiCaretRightBold } from "@react-icons/all-files/pi/PiCaretRightBold";
 import { cn } from "../../../../lib/utils";
 
@@ -67,11 +67,10 @@ const itemClass = "mx-2 rounded focus:bg-black/5 focus:outline-none";
 
 type MenuItemWrapperProps = {
   children: ReactNode;
-  closeMenuOnClick?: boolean;
 };
 
 const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
-  function MenuItem({ children, closeMenuOnClick }, forwardedRef) {
+  function MenuItem({ children }, forwardedRef) {
     const menu = useContext(MenuContext);
     const item = useListItem();
     const tree = useFloatingTree();
@@ -85,9 +84,7 @@ const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
         tabIndex={isActive ? 0 : -1}
         {...menu.getItemProps({
           onClick() {
-            tree?.events.emit("click", {
-              shouldCloseMenu: closeMenuOnClick ?? true,
-            } satisfies MenuItemClickEvent);
+            tree?.events.emit("click");
           },
           onFocus() {
             menu.setHasFocusInside(true);
@@ -100,16 +97,15 @@ const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
   },
 );
 
-type ButtonItemProps = ContentProps &
-  ComponentPropsWithoutRef<"button"> & { closeMenuOnClick?: boolean };
+type ButtonItemProps = ContentProps & ComponentPropsWithoutRef<"button">;
 
 export const MenuButtonItem = forwardRef<HTMLButtonElement, ButtonItemProps>(
   function MenuButtonItem(
-    { icon, label, description, right, variant, closeMenuOnClick, ...props },
+    { icon, label, description, right, variant, ...props },
     ref,
   ) {
     return (
-      <MenuItemWrapper closeMenuOnClick={closeMenuOnClick}>
+      <MenuItemWrapper>
         <button ref={ref} {...props}>
           <MenuItemContent
             icon={icon}

@@ -17,19 +17,18 @@ import { PiUploadSimpleLight } from "@react-icons/all-files/pi/PiUploadSimpleLig
 import { MenuButtonItem } from "../../../_components/menu/item";
 import { Menu, MenuSeparator } from "../../../_components/menu/menu";
 import { ReactNode } from "react";
-import { ProjectNode } from "../logic/project";
-import { ProjectDeleteMenuItem } from "./delete-item";
+import { PiTrashLight } from "@react-icons/all-files/pi/PiTrashLight";
 
 type Props = {
-  project: ProjectNode;
   trigger: ReactNode;
   onOpenChange: (open: boolean) => void;
+  onOpenDeleteDialog: () => void;
 };
 
 export const MyProjectNavLinkMenu: React.FC<Props> = ({
-  project,
   trigger,
   onOpenChange,
+  onOpenDeleteDialog,
 }) => {
   return (
     <Menu
@@ -82,7 +81,12 @@ export const MyProjectNavLinkMenu: React.FC<Props> = ({
       <MenuButtonItem icon={PiPuzzlePieceLight} label="拡張機能を追加" />
       <MenuSeparator />
       <MenuButtonItem icon={PiArchiveLight} label="アーカイブ" />
-      <ProjectDeleteMenuItem project={project} />
+      <MenuButtonItem
+        icon={PiTrashLight}
+        label="削除"
+        variant="destructive"
+        onClick={onOpenDeleteDialog}
+      />
     </Menu>
   );
 };

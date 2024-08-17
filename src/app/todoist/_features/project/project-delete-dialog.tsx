@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 import { Button } from "../../_components/button";
 import {
   Dialog,
@@ -13,14 +13,12 @@ import { ProjectNode } from "./logic/project";
 import { useDeleteProject } from "./use-delete-project";
 
 type Props = {
-  trigger: ReactNode;
   project: ProjectNode;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
 export const ProjectDeleteDialog: React.FC<Props> = ({
-  trigger,
   project,
   isOpen,
   onOpenChange,
@@ -52,7 +50,7 @@ export const ProjectDeleteDialog: React.FC<Props> = ({
   }, [project.label, project.descendantsProjectCount]);
 
   return (
-    <Dialog trigger={trigger} isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <DialogHeader>
         <DialogTitle>削除しますか？</DialogTitle>
       </DialogHeader>

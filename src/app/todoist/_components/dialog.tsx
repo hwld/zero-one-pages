@@ -6,7 +6,7 @@ import { IconButton } from "./icon-button";
 import { PiXLight } from "@react-icons/all-files/pi/PiXLight";
 
 type DialogProps = {
-  trigger: ReactNode;
+  trigger?: ReactNode;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   width?: number;
@@ -34,7 +34,7 @@ export const Dialog: React.FC<DialogProps> = ({
 
   return (
     <RxDialog.Root open={isOpen} onOpenChange={onOpenChange}>
-      <RxDialog.Trigger asChild>{trigger}</RxDialog.Trigger>
+      {trigger && <RxDialog.Trigger asChild>{trigger}</RxDialog.Trigger>}
       <AnimatePresence>
         {isOpen && (
           <RxDialog.Portal forceMount>
