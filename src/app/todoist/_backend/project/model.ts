@@ -17,11 +17,3 @@ export const projectSchema: z.ZodType<Project> = z.object({
   subProjects: z.lazy(() => projectSchema.array()),
   order: z.number(),
 });
-
-export const projectPositionChangeSchema = z.object({
-  projectId: z.string(),
-  order: z.number(),
-  parentProjectId: z.string().nullable(),
-});
-
-export type ProjectPositionChange = z.infer<typeof projectPositionChangeSchema>;

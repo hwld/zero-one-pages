@@ -2,13 +2,14 @@ import { z } from "zod";
 import { projectRepository } from "./repository";
 import { TodoistAPI } from "../routes";
 import { delay, http, HttpResponse } from "msw";
+import { Project, projectSchema } from "./model";
+import { fetcher } from "../../../../lib/fetcher";
 import {
-  Project,
+  ProjectFormData,
+  projectFormSchema,
   ProjectPositionChange,
   projectPositionChangeSchema,
-  projectSchema,
-} from "./model";
-import { fetcher } from "../../../../lib/fetcher";
+} from "./schema";
 
 export const fetchProjects = async (): Promise<Project[]> => {
   const res = await fetcher.get(TodoistAPI.projects());
@@ -17,15 +18,6 @@ export const fetchProjects = async (): Promise<Project[]> => {
 
   return projectSummaries;
 };
-
-// TODO: parentIdとかorderを指定できるようにする
-export const projectFormSchema = z.object({
-  label: z
-    .string()
-    .min(1, "プロジェクト名を入力してください")
-    .max(120, "プロジェクト名は120文字以内で入力してください"),
-});
-export type ProjectFormData = z.infer<typeof projectFormSchema>;
 
 export const createProject = async (data: ProjectFormData): Promise<void> => {
   await fetcher.post(TodoistAPI.projects(), { body: data });
@@ -70,6 +62,7 @@ export const projectApiHandlers = [
   }),
 
   http.patch(TodoistAPI.project(), async ({ params, request }) => {
+    await delay();
     const id = z.string().parse(params.id);
     const input = projectFormSchema.parse(await request.json());
 
