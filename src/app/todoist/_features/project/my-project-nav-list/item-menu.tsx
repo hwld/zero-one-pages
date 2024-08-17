@@ -23,12 +23,14 @@ type Props = {
   trigger: ReactNode;
   onOpenChange: (open: boolean) => void;
   onOpenDeleteDialog: () => void;
+  onOpenUpdateDialog: () => void;
 };
 
 export const MyProjectNavLinkMenu: React.FC<Props> = ({
   trigger,
   onOpenChange,
   onOpenDeleteDialog,
+  onOpenUpdateDialog,
 }) => {
   return (
     <Menu
@@ -40,7 +42,11 @@ export const MyProjectNavLinkMenu: React.FC<Props> = ({
       <MenuButtonItem icon={PiArrowUpLight} label="プロジェクトを上に追加" />
       <MenuButtonItem icon={PiArrowDownLight} label="プロジェクトを下に追加" />
       <MenuSeparator />
-      <MenuButtonItem icon={PiPencilSimpleLineLight} label="編集" />
+      <MenuButtonItem
+        icon={PiPencilSimpleLineLight}
+        label="編集"
+        onClick={onOpenUpdateDialog}
+      />
       <MenuButtonItem icon={PiHeartLight} label="お気に入りに追加" />
       <MenuButtonItem icon={PiCopyLight} label="複製" />
       <MenuSeparator />

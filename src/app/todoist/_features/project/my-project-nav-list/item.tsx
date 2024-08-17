@@ -10,6 +10,7 @@ import { IconButton, TreeToggleIconButton } from "./icon-button";
 import { ProjectNode } from "../logic/project";
 import { Routes } from "../../../routes";
 import { ProjectDeleteDialog } from "../project-delete-dialog";
+import { ProjectUpdateDialog } from "../project-update-dialog";
 
 type MyProjectListItemProps = {
   currentRoute: string;
@@ -33,6 +34,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   onChangeProjectDepth,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [isFocus, setIsFocus] = useState(false);
@@ -58,6 +60,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
 
     return (
       <MyProjectNavLinkMenu
+        onOpenUpdateDialog={() => setIsUpdateDialogOpen(true)}
         onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
         onOpenChange={(open) => {
           if (!open) {
@@ -158,13 +161,18 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
           depth={project.depth}
         >
           {project.label}
-          <ProjectDeleteDialog
-            isOpen={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-            project={project}
-          />
         </SidebarListLink>
       )}
+      <ProjectDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        project={project}
+      />
+      <ProjectUpdateDialog
+        isOpen={isUpdateDialogOpen}
+        onOpenChange={setIsUpdateDialogOpen}
+        project={project}
+      />
     </>
   );
 };

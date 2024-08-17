@@ -31,6 +31,13 @@ export const createProject = async (data: ProjectFormData): Promise<void> => {
   await fetcher.post(TodoistAPI.projects(), { body: data });
 };
 
+export const updateProject = async ({
+  id,
+  ...data
+}: ProjectFormData & { id: string }): Promise<void> => {
+  await fetcher.patch(TodoistAPI.project(id), { body: data });
+};
+
 export const changeProjectsPosition = async (
   changes: ProjectPositionChange[],
 ): Promise<void> => {
@@ -58,6 +65,15 @@ export const projectApiHandlers = [
       label: input.label,
       order: projectRepository.getSiblingsMaxOrder(null) + 1,
     });
+
+    return HttpResponse.json({});
+  }),
+
+  http.patch(TodoistAPI.project(), async ({ params, request }) => {
+    const id = z.string().parse(params.id);
+    const input = projectFormSchema.parse(await request.json());
+
+    projectRepository.update({ id, label: input.label });
 
     return HttpResponse.json({});
   }),

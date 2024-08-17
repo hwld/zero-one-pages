@@ -37,6 +37,15 @@ class ProjectRepository {
 
     this.projectRecords = [...this.projectRecords, newRecord];
   }
+
+  public update(input: { id: string; label: string }) {
+    this.projectRecords = this.projectRecords.map((p) => {
+      if (p.id === input.id) {
+        return { ...p, label: input.label };
+      }
+      return p;
+    });
+  }
   public updatePosition({
     projectId,
     order,
