@@ -13,9 +13,9 @@ import { ProjectNode } from "./logic/project";
 import { Separator } from "../../_components/separator";
 import { Button } from "../../_components/button";
 import { ProjectForm } from "./project-form";
-import { ProjectFormData } from "../../_backend/project/api";
 import { useId } from "react";
 import { useUpdateProject } from "./use-update-project";
+import { ProjectFormData } from "../../_backend/project/schema";
 
 type Props = {
   project: ProjectNode;

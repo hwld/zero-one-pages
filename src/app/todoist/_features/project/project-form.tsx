@@ -1,10 +1,13 @@
 import { useForm } from "react-hook-form";
-import { ProjectFormData, projectFormSchema } from "../../_backend/project/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../_components/input";
 import { useId } from "react";
 import { Label } from "../../_components/label";
 import { ErrorMessage } from "../../_components/error-message";
+import {
+  ProjectFormData,
+  projectFormSchema,
+} from "../../_backend/project/schema";
 
 type Props = {
   id: string;

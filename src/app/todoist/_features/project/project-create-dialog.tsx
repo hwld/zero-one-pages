@@ -13,8 +13,8 @@ import { Separator } from "../../_components/separator";
 import { Button } from "../../_components/button";
 import { ProjectForm } from "./project-form";
 import { useCreateProject } from "./use-create-project";
-import { ProjectFormData } from "../../_backend/project/api";
 import { useId } from "react";
+import { ProjectFormData } from "../../_backend/project/schema";
 
 type Props = {
   isOpen: boolean;

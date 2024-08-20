@@ -1,7 +1,5 @@
-import {
-  Project,
-  ProjectPositionChange,
-} from "../../../_backend/project/model";
+import { Project } from "../../../_backend/project/model";
+import { ProjectPositionChange } from "../../../_backend/project/schema";
 import { ProjectExpansionMap } from "./expansion-map";
 
 export type ProjectNode = Omit<
