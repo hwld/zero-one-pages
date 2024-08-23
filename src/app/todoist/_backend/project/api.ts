@@ -5,10 +5,11 @@ import { delay, http, HttpResponse } from "msw";
 import { Project, projectSchema } from "./model";
 import { fetcher } from "../../../../lib/fetcher";
 import {
-  ProjectFormData,
+  CreateProjectInput,
   projectFormSchema,
   ProjectPositionChange,
   projectPositionChangeSchema,
+  UpdateProjectInput,
 } from "./schema";
 
 export const fetchProjects = async (): Promise<Project[]> => {
@@ -19,15 +20,17 @@ export const fetchProjects = async (): Promise<Project[]> => {
   return projectSummaries;
 };
 
-export const createProject = async (data: ProjectFormData): Promise<void> => {
-  await fetcher.post(TodoistAPI.projects(), { body: data });
+export const createProject = async (
+  input: CreateProjectInput,
+): Promise<void> => {
+  await fetcher.post(TodoistAPI.projects(), { body: input });
 };
 
 export const updateProject = async ({
   id,
-  ...data
-}: ProjectFormData & { id: string }): Promise<void> => {
-  await fetcher.patch(TodoistAPI.project(id), { body: data });
+  ...body
+}: UpdateProjectInput): Promise<void> => {
+  await fetcher.patch(TodoistAPI.project(id), { body });
 };
 
 export const changeProjectsPosition = async (

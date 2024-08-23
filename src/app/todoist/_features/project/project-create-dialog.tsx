@@ -14,22 +14,37 @@ import { Button } from "../../_components/button";
 import { ProjectForm } from "./project-form";
 import { useCreateProject } from "./use-create-project";
 import { useId } from "react";
-import { ProjectFormData } from "../../_backend/project/schema";
+import {
+  CreateProjectInput,
+  ProjectFormData,
+} from "../../_backend/project/schema";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-};
+} & (
+  | { createType: "default" }
+  | { createType: "before" | "after"; referenceProjectId: string }
+);
 
-export const ProjectCreateDialog: React.FC<Props> = ({
-  isOpen,
-  onOpenChange,
-}) => {
+export const ProjectCreateDialog: React.FC<Props> = (props) => {
+  const { isOpen, onOpenChange } = props;
   const formId = useId();
   const createProject = useCreateProject();
 
   const handleCreateProject = (data: ProjectFormData) => {
-    createProject.mutate(data, {
+    let input: CreateProjectInput;
+    if (props.createType === "default") {
+      input = { ...data, type: "default" };
+    } else {
+      input = {
+        ...data,
+        type: props.createType,
+        referenceProjectId: props.referenceProjectId,
+      };
+    }
+
+    createProject.mutate(input, {
       onSuccess: () => {
         onOpenChange(false);
       },

@@ -72,6 +72,7 @@ export const MyProjectNavListHeader: React.FC<Props> = ({
           />
         </Menu>
         <ProjectCreateDialog
+          createType="default"
           isOpen={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
         />
