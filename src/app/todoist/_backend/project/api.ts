@@ -6,10 +6,11 @@ import { Project, projectSchema } from "./model";
 import { fetcher } from "../../../../lib/fetcher";
 import {
   CreateProjectInput,
-  projectFormSchema,
+  createProjectInputSchema,
   ProjectPositionChange,
   projectPositionChangeSchema,
   UpdateProjectInput,
+  updateProjectInputSchema,
 } from "./schema";
 
 export const fetchProjects = async (): Promise<Project[]> => {
@@ -53,13 +54,17 @@ export const projectApiHandlers = [
 
   http.post(TodoistAPI.projects(), async ({ request }) => {
     await delay();
-    const input = projectFormSchema.parse(await request.json());
+    const input = createProjectInputSchema.parse(await request.json());
 
-    projectRepository.add({
-      parentId: null,
-      label: input.label,
-      order: projectRepository.getSiblingsMaxOrder(null) + 1,
-    });
+    if (input.type === "default") {
+      projectRepository.add({ label: input.label, parentId: null });
+    } else {
+      projectRepository.addAdjacent({
+        label: input.label,
+        position: input.type,
+        referenceProjectId: input.referenceProjectId,
+      });
+    }
 
     return HttpResponse.json({});
   }),
@@ -67,7 +72,7 @@ export const projectApiHandlers = [
   http.patch(TodoistAPI.project(), async ({ params, request }) => {
     await delay();
     const id = z.string().parse(params.id);
-    const input = projectFormSchema.parse(await request.json());
+    const input = updateProjectInputSchema.parse(await request.json());
 
     projectRepository.update({ id, label: input.label });
 

@@ -7,27 +7,91 @@ import { Project } from "./model";
 class ProjectRepository {
   private projectRecords = initialData;
 
+  public get(id: string): Project | undefined {
+    const _get = (projects: Project[]): Project | undefined => {
+      for (const project of projects) {
+        if (project.id === id) {
+          return project;
+        }
+
+        const found = _get(project.subProjects);
+        if (found) {
+          return found;
+        }
+      }
+
+      return undefined;
+    };
+
+    return _get(this.getAll());
+  }
+
   public getAll(): Project[] {
     return recordsToProjects(this.projectRecords);
   }
 
   public getSiblingsMaxOrder(parentId: string | null): number {
-    return Math.max(
-      ...this.projectRecords
-        .filter((p) => p.parentId === parentId)
-        .map((p) => p.order),
-    );
+    const siblingOrders = this.projectRecords
+      .filter((p) => p.parentId === parentId)
+      .map((p) => p.order);
+
+    return siblingOrders.length > 0 ? Math.max(...siblingOrders) : 0;
   }
 
-  public add(input: { parentId: string | null; label: string; order: number }) {
+  public add(input: {
+    label: string;
+    parentId: string | null;
+    order?: number;
+  }) {
+    const newOrder =
+      input.order ?? this.getSiblingsMaxOrder(input.parentId) + 1;
+
     const newRecord: ProjectRecord = {
       id: crypto.randomUUID(),
       parentId: input.parentId,
       label: input.label,
-      order: input.order,
+      order: newOrder,
     };
 
+    this.projectRecords = this.projectRecords.map((p) => {
+      if (p.parentId === input.parentId && p.order >= newOrder) {
+        return { ...p, order: p.order + 1 };
+      }
+      return p;
+    });
+
     this.projectRecords = [...this.projectRecords, newRecord];
+  }
+
+  public addAdjacent({
+    label,
+    position,
+    referenceProjectId,
+  }: {
+    label: string;
+    position: "before" | "after";
+    referenceProjectId: string;
+  }) {
+    const referenceProject = this.get(referenceProjectId);
+    if (!referenceProject) {
+      throw new Error(`プロジェクトが存在しない: ${referenceProjectId}`);
+    }
+
+    if (position === "before") {
+      const newParentId = referenceProject.parentId;
+      const newOrder = referenceProject.order;
+
+      this.add({ parentId: newParentId, order: newOrder, label });
+    } else if (position === "after") {
+      //　基準となるプロジェクトがサブプロジェクトを持っていたら、サブプロジェクトのorder:0に追加する
+      const hasSubProjects = referenceProject.subProjects.length !== 0;
+      const newParentId = hasSubProjects
+        ? referenceProject.id
+        : referenceProject.parentId;
+      const newOrder = hasSubProjects ? 0 : referenceProject.order + 1;
+
+      this.add({ parentId: newParentId, order: newOrder, label });
+    }
   }
 
   public update(input: { id: string; label: string }) {

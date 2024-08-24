@@ -11,6 +11,7 @@ import { ProjectNode } from "../logic/project";
 import { Routes } from "../../../routes";
 import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectUpdateDialog } from "../project-update-dialog";
+import { ProjectCreateDialog } from "../project-create-dialog";
 
 type MyProjectListItemProps = {
   currentRoute: string;
@@ -34,6 +35,9 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
   onChangeProjectDepth,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCreateBeforeDialogOpen, setIsCreateBeforeDialogOpen] =
+    useState(false);
+  const [isCreateAfterDialogOpen, setIsCreateAfterDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -62,6 +66,8 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
       <MyProjectNavLinkMenu
         onOpenUpdateDialog={() => setIsUpdateDialogOpen(true)}
         onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
+        onOpenCreateBeforeDialog={() => setIsCreateBeforeDialogOpen(true)}
+        onOpenCreateAfterDialog={() => setIsCreateAfterDialogOpen(true)}
         onOpenChange={(open) => {
           if (!open) {
             // Menuを閉じたときにIconBUttonにfocusを戻す時間を確保する
@@ -172,6 +178,18 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
         isOpen={isUpdateDialogOpen}
         onOpenChange={setIsUpdateDialogOpen}
         project={project}
+      />
+      <ProjectCreateDialog
+        isOpen={isCreateBeforeDialogOpen}
+        onOpenChange={setIsCreateBeforeDialogOpen}
+        createType="before"
+        referenceProjectId={project.id}
+      />
+      <ProjectCreateDialog
+        isOpen={isCreateAfterDialogOpen}
+        onOpenChange={setIsCreateAfterDialogOpen}
+        createType="after"
+        referenceProjectId={project.id}
       />
     </>
   );
