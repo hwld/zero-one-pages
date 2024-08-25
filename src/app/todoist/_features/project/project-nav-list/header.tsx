@@ -19,7 +19,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
 };
 
-export const MyProjectNavListHeader: React.FC<Props> = ({
+export const ProjectNavListHeader: React.FC<Props> = ({
   active,
   isOpen,
   isProjectPending,
@@ -36,7 +36,7 @@ export const MyProjectNavListHeader: React.FC<Props> = ({
       )}
     >
       <Link
-        href={Routes.myProjectList()}
+        href={Routes.projectList()}
         className={clsx(
           "w-full py-2 pl-2 text-start font-bold",
           active ? "text-rose-700" : "text-stone-500",

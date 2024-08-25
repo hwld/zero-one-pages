@@ -13,17 +13,17 @@ import { useProjects } from "../use-projects";
 import { useChangeProjectPosition } from "../use-change-project-position";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 
-type UseDragMyProjectNavLinkParams = {
+type UseDragProjectNavItemParams = {
   projectExpansionMap: ProjectExpansionMap;
   setProjectExpansionMap: Dispatch<SetStateAction<ProjectExpansionMap>>;
   updateProjectsCache: ReturnType<typeof useProjects>["updateProjectsCache"];
 };
 
-export const useDragMyProjectNavLink = ({
+export const useDragProjectNavItem = ({
   projectExpansionMap,
   setProjectExpansionMap,
   updateProjectsCache,
-}: UseDragMyProjectNavLinkParams) => {
+}: UseDragProjectNavItemParams) => {
   const changeProjectPosition = useChangeProjectPosition();
   const [draggingProjectId, setDraggingProjectId] = useState<null | string>(
     null,

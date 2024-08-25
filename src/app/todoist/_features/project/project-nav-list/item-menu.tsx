@@ -28,7 +28,7 @@ type Props = {
   onOpenCreateAfterDialog: () => void;
 };
 
-export const MyProjectNavLinkMenu: React.FC<Props> = ({
+export const ProjectNavItemMenu: React.FC<Props> = ({
   trigger,
   onOpenChange,
   onOpenDeleteDialog,

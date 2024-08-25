@@ -5,7 +5,7 @@ import {
   SidebarListButton,
   SidebarListLink,
 } from "../../../_components/sidebar/item";
-import { MyProjectNavLinkMenu } from "./item-menu";
+import { ProjectNavItemMenu } from "./item-menu";
 import { IconButton, TreeToggleIconButton } from "./icon-button";
 import { ProjectNode } from "../logic/project";
 import { Routes } from "../../../routes";
@@ -13,7 +13,7 @@ import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectUpdateDialog } from "../project-update-dialog";
 import { ProjectCreateDialog } from "../project-create-dialog";
 
-type MyProjectListItemProps = {
+type ProjectListItemProps = {
   currentRoute: string;
   project: ProjectNode;
   expanded: boolean;
@@ -24,7 +24,7 @@ type MyProjectListItemProps = {
   onChangeProjectDepth: (event: MouseEvent, projectId: string) => void;
 };
 
-export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
+export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   currentRoute,
   project,
   expanded,
@@ -63,7 +63,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
     }
 
     return (
-      <MyProjectNavLinkMenu
+      <ProjectNavItemMenu
         onOpenUpdateDialog={() => setIsUpdateDialogOpen(true)}
         onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
         onOpenCreateBeforeDialog={() => setIsCreateBeforeDialogOpen(true)}
@@ -139,7 +139,7 @@ export const MyProjectNavLink: React.FC<MyProjectListItemProps> = ({
       ) : (
         <SidebarListLink
           ref={itemRef}
-          href={Routes.myProject(project.id)}
+          href={Routes.project(project.id)}
           currentRoute={currentRoute}
           icon={PiHashLight}
           onPointerEnter={() => setFocus(true)}

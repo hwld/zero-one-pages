@@ -1,20 +1,20 @@
 import { PiWarningCircle } from "@react-icons/all-files/pi/PiWarningCircle";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDragMyProjectNavLink } from "./use-drag";
+import { useDragProjectNavItem } from "./use-drag";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 import { toProjectNodes } from "../logic/project";
 import { useProjects } from "../use-projects";
-import { MyProjectNavLink } from "./item";
+import { ProjectNavItem } from "./item";
 import { Button } from "../../../_components/button";
-import { MyProjectNavListHeader } from "./header";
+import { ProjectNavListHeader } from "./header";
 import { Routes } from "../../../routes";
 
 type Props = {
   currentRoute: string;
 };
 
-export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
+export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const {
@@ -34,7 +34,7 @@ export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
     handleMoveProjects,
     handleChangeDepth,
     draggingProjectId,
-  } = useDragMyProjectNavLink({
+  } = useDragProjectNavItem({
     projectExpansionMap,
     setProjectExpansionMap,
     updateProjectsCache,
@@ -48,8 +48,8 @@ export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
 
   return (
     <div>
-      <MyProjectNavListHeader
-        active={currentRoute === Routes.myProjectList()}
+      <ProjectNavListHeader
+        active={currentRoute === Routes.projectList()}
         isOpen={isOpen}
         onOpenChange={setIsOpen}
         isProjectPending={projectsStatus === "pending"}
@@ -79,15 +79,14 @@ export const MyProjectNavList: React.FC<Props> = ({ currentRoute }) => {
               {projectNodes.map((projectNode) => {
                 return (
                   <AnimatePresence key={projectNode.id}>
-                    {projectNode.visible ||
-                    draggingProjectId === projectNode.id ? (
+                    {projectNode.visible ? (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.1 }}
                       >
-                        <MyProjectNavLink
+                        <ProjectNavItem
                           currentRoute={currentRoute}
                           project={projectNode}
                           expanded={projectExpansionMap.isExpanded(

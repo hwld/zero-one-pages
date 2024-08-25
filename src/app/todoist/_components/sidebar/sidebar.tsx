@@ -5,7 +5,7 @@ import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
 import { PiBellSimple } from "@react-icons/all-files/pi/PiBellSimple";
 import { PiSidebarSimple } from "@react-icons/all-files/pi/PiSidebarSimple";
-import { MyProjectNavList } from "../../_features/project/my-project-nav-list/list";
+import { ProjectNavList } from "../../_features/project/project-nav-list/list";
 import { Routes } from "../../routes";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Tooltip, TooltipDelayGroup } from "../tooltip";
@@ -60,10 +60,10 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
   const searchParams = useSearchParams();
 
   const currentRoute = useMemo(() => {
-    if (paths === Routes.myProject()) {
+    if (paths === Routes.project()) {
       const id = searchParams.get("id");
       if (id) {
-        return Routes.myProject(id);
+        return Routes.project(id);
       }
     }
 
@@ -115,7 +115,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
 
       <SidebarNavList currentRoute={currentRoute} />
 
-      <MyProjectNavList currentRoute={currentRoute} />
+      <ProjectNavList currentRoute={currentRoute} />
     </div>
   );
 };
