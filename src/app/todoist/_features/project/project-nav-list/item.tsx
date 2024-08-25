@@ -1,6 +1,6 @@
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
   SidebarListButton,
   SidebarListLink,
@@ -12,16 +12,13 @@ import { Routes } from "../../../routes";
 import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectUpdateDialog } from "../project-update-dialog";
 import { ProjectCreateDialog } from "../project-create-dialog";
+import { useDragProjectNavItem } from "./use-drag";
 
 type ProjectListItemProps = {
   currentRoute: string;
   project: ProjectNode;
   expanded: boolean;
   onChangeExpanded: (id: string, expanded: boolean) => void;
-  draggingProjectId: null | string;
-  onDragStart: (event: React.DragEvent, project: ProjectNode) => void;
-  onMoveProjects: (fromId: string, toId: string) => void;
-  onChangeProjectDepth: (event: MouseEvent, projectId: string) => void;
 };
 
 export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
@@ -29,10 +26,6 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   project,
   expanded,
   onChangeExpanded,
-  draggingProjectId,
-  onDragStart,
-  onMoveProjects,
-  onChangeProjectDepth,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateBeforeDialogOpen, setIsCreateBeforeDialogOpen] =
@@ -41,9 +34,12 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const [isFocus, setIsFocus] = useState(false);
+  const { itemRef, draggingProjectId, handleDragStart } = useDragProjectNavItem(
+    project.id,
+  );
+  const isDragging = draggingProjectId === project.id;
 
-  const itemRef = useRef<HTMLLIElement>(null);
+  const [isFocus, setIsFocus] = useState(false);
 
   const timer = useRef(0);
 
@@ -89,43 +85,6 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
     );
   }, [isFocus, isMenuOpen, project]);
 
-  const isDragging = draggingProjectId === project.id;
-
-  useEffect(() => {
-    const handleChangeDepth = (e: MouseEvent) => {
-      if (isDragging) {
-        onChangeProjectDepth(e, project.id);
-      }
-    };
-
-    document.addEventListener("pointermove", handleChangeDepth);
-    return () => {
-      document.removeEventListener("pointermove", handleChangeDepth);
-    };
-  }, [isDragging, onChangeProjectDepth, project.depth, project.id]);
-
-  // リストの外側のドラッグも処理できるように、poitnermoveイベントをハンドリングする
-  useEffect(() => {
-    const handleMoveProject = (e: MouseEvent) => {
-      const itemEl = itemRef.current;
-      if (draggingProjectId == null || isDragging || !itemEl) {
-        return;
-      }
-
-      const itemRect = itemEl.getBoundingClientRect();
-      const isPointerOver =
-        e.clientY <= itemRect.bottom && e.clientY >= itemRect.top;
-      if (isPointerOver) {
-        onMoveProjects(draggingProjectId, project.id);
-      }
-    };
-
-    document.addEventListener("pointermove", handleMoveProject);
-    return () => {
-      document.removeEventListener("pointermove", handleMoveProject);
-    };
-  }, [draggingProjectId, isDragging, onMoveProjects, project.id]);
-
   return (
     <>
       {isDragging ? (
@@ -151,7 +110,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
           isDragging={isDragging}
           isAnyDragging={!!draggingProjectId}
           onDragStart={(e) => {
-            onDragStart(e, project);
+            handleDragStart(e, project);
           }}
           right={
             <div className="flex items-center gap-1">
