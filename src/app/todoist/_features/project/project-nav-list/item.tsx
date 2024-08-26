@@ -1,6 +1,6 @@
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
-import { useState, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   SidebarListButton,
   SidebarListLink,
@@ -13,6 +13,7 @@ import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectUpdateDialog } from "../project-update-dialog";
 import { ProjectCreateDialog } from "../project-create-dialog";
 import { useDragProjectNavItem } from "./use-drag";
+import { useDelayedState } from "../../../_hooks/use-delayed-state";
 
 type ProjectListItemProps = {
   currentRoute: string;
@@ -39,19 +40,10 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   );
   const isDragging = draggingProjectId === project.id;
 
-  const [isFocus, setIsFocus] = useState(false);
-
-  const timer = useRef(0);
-
   // Link -> IconButtonの順にfocusを当てるとき、LinkのonBlurですぐにhoverをfalseにすると、
   // その時点IconButtonが消えてしまうので、hoverをfalseにするのを次のイベントループまで遅延させて
   // IconButtonにフォーカスと当てられるようにする
-  const setFocus = (focus: boolean) => {
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      setIsFocus(focus);
-    }, 0);
-  };
+  const [isFocus, setFocus] = useDelayedState(false);
 
   const rightNode = useMemo(() => {
     if (!isFocus && !isMenuOpen) {
@@ -83,7 +75,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
         }
       />
     );
-  }, [isFocus, isMenuOpen, project]);
+  }, [isFocus, isMenuOpen, project.todos, setFocus]);
 
   return (
     <>
