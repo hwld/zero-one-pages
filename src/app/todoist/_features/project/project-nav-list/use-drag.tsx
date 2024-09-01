@@ -9,12 +9,9 @@ import {
   updateProjectDepth,
 } from "../logic/project";
 import {
-  createContext,
   Dispatch,
-  PropsWithChildren,
   SetStateAction,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
@@ -23,31 +20,24 @@ import { useProjects } from "../use-projects";
 import { useChangeProjectPosition } from "../use-change-project-position";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 
-type DragProjectNavItemContext = {
+type UseDragProjectListParams = {
+  projectExpansionMap: ProjectExpansionMap;
+  setProjectExpansionMap: Dispatch<SetStateAction<ProjectExpansionMap>>;
+  updateProjectsCache: ReturnType<typeof useProjects>["updateProjectsCache"];
+};
+
+export type DragProjectContext = {
+  draggingProjectId: string | null;
   handleDragStart: (e: React.DragEvent, project: ProjectNode) => void;
   handleMoveProjects: (draggingId: string, dragOverId: string) => void;
   handleChangeDepth: (e: MouseEvent, projectId: string) => void;
-  draggingProjectId: string | null;
 };
 
-const DragProjectNavItemContext = createContext<
-  DragProjectNavItemContext | undefined
->(undefined);
-
-export const DragProjectNavItemProvider: React.FC<
-  {
-    value: {
-      projectExpansionMap: ProjectExpansionMap;
-      setProjectExpansionMap: Dispatch<SetStateAction<ProjectExpansionMap>>;
-      updateProjectsCache: ReturnType<
-        typeof useProjects
-      >["updateProjectsCache"];
-    };
-  } & PropsWithChildren
-> = ({
-  children,
-  value: { projectExpansionMap, setProjectExpansionMap, updateProjectsCache },
-}) => {
+export const useDragProjectContext = ({
+  projectExpansionMap,
+  setProjectExpansionMap,
+  updateProjectsCache,
+}: UseDragProjectListParams): DragProjectContext => {
   const changeProjectPosition = useChangeProjectPosition();
   const [draggingProjectId, setDraggingProjectId] = useState<string | null>(
     null,
@@ -57,28 +47,27 @@ export const DragProjectNavItemProvider: React.FC<
   const dragStartInfo = useRef({ x: 0, depth: 0 });
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
-  const handleDragStart: DragProjectNavItemContext["handleDragStart"] =
-    useCallback(
-      (e, project) => {
-        dragStartInfo.current = { x: e.clientX, depth: project.depth };
+  const handleDragStart: DragProjectContext["handleDragStart"] = useCallback(
+    (e, project) => {
+      dragStartInfo.current = { x: e.clientX, depth: project.depth };
 
-        updateProjectsCache((projects) => {
-          dragStartProjectMap.current = toProjectMap(projects);
-          const { results, removedDescendantNodes } = dragProjectStart(
-            projects,
-            projectExpansionMap,
-            project.id,
-          );
-          removedDescendantsRef.current = removedDescendantNodes;
+      updateProjectsCache((projects) => {
+        dragStartProjectMap.current = toProjectMap(projects);
+        const { results, removedDescendantNodes } = dragProjectStart(
+          projects,
+          projectExpansionMap,
+          project.id,
+        );
+        removedDescendantsRef.current = removedDescendantNodes;
 
-          return results;
-        });
-        setDraggingProjectId(project.id);
-      },
-      [projectExpansionMap, setDraggingProjectId, updateProjectsCache],
-    );
+        return results;
+      });
+      setDraggingProjectId(project.id);
+    },
+    [projectExpansionMap, setDraggingProjectId, updateProjectsCache],
+  );
 
-  const handleMoveProjects: DragProjectNavItemContext["handleMoveProjects"] =
+  const handleMoveProjects: DragProjectContext["handleMoveProjects"] =
     useCallback(
       (draggingId, dragOverId) => {
         updateProjectsCache((projects) => {
@@ -93,7 +82,7 @@ export const DragProjectNavItemProvider: React.FC<
       [projectExpansionMap, updateProjectsCache],
     );
 
-  const handleChangeDepth: DragProjectNavItemContext["handleChangeDepth"] =
+  const handleChangeDepth: DragProjectContext["handleChangeDepth"] =
     useCallback(
       (e, projectId) => {
         const newDepth =
@@ -153,33 +142,25 @@ export const DragProjectNavItemProvider: React.FC<
     updateProjectsCache,
   ]);
 
-  return (
-    <DragProjectNavItemContext.Provider
-      value={{
-        draggingProjectId,
-        handleDragStart,
-        handleMoveProjects,
-        handleChangeDepth,
-      }}
-    >
-      {children}
-    </DragProjectNavItemContext.Provider>
-  );
+  return {
+    draggingProjectId,
+    handleDragStart,
+    handleMoveProjects,
+    handleChangeDepth,
+  };
 };
 
-export const useDragProjectNavItem = (projectId: string) => {
-  const ctx = useContext(DragProjectNavItemContext);
-  if (!ctx) {
-    throw new Error("DragProjectNavItemProviderが存在しません");
-  }
-
+export const useDragProject = (
+  projectId: string,
+  context: DragProjectContext,
+) => {
   const itemRef = useRef<HTMLLIElement>(null);
   const {
     handleMoveProjects,
     handleChangeDepth,
     draggingProjectId,
     handleDragStart,
-  } = ctx;
+  } = context;
 
   const isDragging = projectId === draggingProjectId;
 
