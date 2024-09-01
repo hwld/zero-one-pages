@@ -12,7 +12,7 @@ import { Routes } from "../../../routes";
 import { ProjectDeleteDialog } from "../project-delete-dialog";
 import { ProjectUpdateDialog } from "../project-update-dialog";
 import { ProjectCreateDialog } from "../project-create-dialog";
-import { useDragProjectNavItem } from "./use-drag";
+import { useDragProject, type DragProjectListState } from "./use-drag";
 import { useDelayedState } from "../../../_hooks/use-delayed-state";
 
 type ProjectListItemProps = {
@@ -20,6 +20,7 @@ type ProjectListItemProps = {
   project: ProjectNode;
   expanded: boolean;
   onChangeExpanded: (id: string, expanded: boolean) => void;
+  dragState: DragProjectListState;
 };
 
 export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
@@ -27,6 +28,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   project,
   expanded,
   onChangeExpanded,
+  dragState,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateBeforeDialogOpen, setIsCreateBeforeDialogOpen] =
@@ -35,8 +37,9 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { itemRef, draggingProjectId, handleDragStart } = useDragProjectNavItem(
+  const { itemRef, draggingProjectId, handleDragStart } = useDragProject(
     project.id,
+    dragState,
   );
   const isDragging = draggingProjectId === project.id;
 
