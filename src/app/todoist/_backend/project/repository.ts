@@ -1,11 +1,17 @@
-import { z } from "zod";
 import { initialData } from "./data";
 import { Project } from "./model";
+
+export type ProjectRecord = {
+  id: string;
+  parentId: string | null;
+  label: string;
+  order: number;
+};
 
 // 他のUIではStoreという名前にしているが、今回は薄いデータのラッパーではなくて、ドメインモデルを扱いたかったので
 // Repositoryという名前にしてみる
 class ProjectRepository {
-  private projectRecords = initialData;
+  private projectRecords: ProjectRecord[] = initialData;
 
   public get(id: string): Project | undefined {
     const _get = (projects: Project[]): Project | undefined => {
@@ -30,7 +36,7 @@ class ProjectRepository {
     return recordsToProjects(this.projectRecords);
   }
 
-  public getSiblingsMaxOrder(parentId: string | null): number {
+  public getMaxOrderByParentId(parentId: string | null): number {
     const siblingOrders = this.projectRecords
       .filter((p) => p.parentId === parentId)
       .map((p) => p.order);
@@ -44,7 +50,7 @@ class ProjectRepository {
     order?: number;
   }) {
     const newOrder =
-      input.order ?? this.getSiblingsMaxOrder(input.parentId) + 1;
+      input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
 
     const newRecord: ProjectRecord = {
       id: crypto.randomUUID(),
@@ -155,25 +161,23 @@ class ProjectRepository {
 
 export const projectRepository = new ProjectRepository();
 
-export const projectRecordSchema = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
-  label: z.string(),
-  order: z.number(),
-});
-export type ProjectRecord = z.infer<typeof projectRecordSchema>;
-
 const recordsToProjects = (projectRecords: ProjectRecord[]): Project[] => {
-  type ProjectId = string;
-  const projectMap = new Map<ProjectId, Project>();
-
-  // この配列の要素のsubProjectsをミュータブルに書き換えていく
-  const projects = projectRecords.map(
-    (r): Project => ({ ...r, subProjects: [], todos: 0 }),
+  // このMapの要素のsubProjectsをmutableに書き換えていく
+  const projectMap = new Map<string, Project>(
+    projectRecords.map((r) => [
+      r.id,
+      {
+        id: r.id,
+        parentId: r.parentId,
+        label: r.label,
+        order: r.order,
+        subProjects: [],
+        todos: 0,
+      } satisfies Project,
+    ]),
   );
 
-  // すべてのProjectをMapに詰める
-  projects.forEach((project) => projectMap.set(project.id, project));
+  const projects = Array.from(projectMap.values());
 
   projects.forEach((project) => {
     if (!project.parentId) {

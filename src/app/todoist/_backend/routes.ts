@@ -4,4 +4,6 @@ export const TodoistAPI = {
   project: (id?: string) => `${TodoistAPI.projects()}/${id ?? ":id"}` as const,
   changeProjectPosition: () =>
     `${TodoistAPI.projects()}/change-position` as const,
+
+  tasks: () => `${TodoistAPI.base}/tasks` as const,
 } as const;
