@@ -10,22 +10,53 @@ import clsx from "clsx";
 import { PiTrayLight } from "@react-icons/all-files/pi/PiTrayLight";
 import { PiCaretDown } from "@react-icons/all-files/pi/PiCaretDown";
 import { Button } from "../../_components/button";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { taskFormSchema, type TaskFormData } from "../../_backend/task/schema";
+import { useCreateTask } from "./use-create-task";
 
-type Props = { size?: "md" | "sm" };
+type Props = {
+  size?: "md" | "sm";
+  onCancel: () => void;
+  onAfterSubmit?: () => void;
+};
 
-export const TaskForm: React.FC<Props> = ({ size = "md" }) => {
+export const TaskForm: React.FC<Props> = ({
+  size = "md",
+  onCancel,
+  onAfterSubmit,
+}) => {
+  const createTask = useCreateTask();
+  const { register, handleSubmit } = useForm<TaskFormData>({
+    resolver: zodResolver(taskFormSchema),
+  });
+
+  const handleCreateTask: SubmitHandler<TaskFormData> = (input) => {
+    createTask.mutate(
+      { title: input.title, description: input.description },
+      {
+        onSuccess: () => {
+          onAfterSubmit?.();
+        },
+      },
+    );
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit(handleCreateTask)}>
       <div className="grid grid-rows-[auto_auto] gap-4 p-4">
         <div className="grid grid-rows-[auto_auto] gap-1">
           <input
+            autoFocus
+            {...register("title")}
             placeholder="タスク名"
             className={clsx(
-              "border-none bg-transparent font-bold text-stone-900 outline-none placeholder:font-bold placeholder:text-stone-400",
+              "border-none bg-transparent font-bold tracking-wide text-stone-700 outline-none placeholder:font-bold placeholder:text-stone-400",
               { md: "text-lg", sm: "" }[size],
             )}
           />
           <textarea
+            {...register("description")}
             placeholder="説明"
             className="resize-none bg-transparent text-stone-700 outline-none placeholder:text-stone-400"
             rows={3}
@@ -43,7 +74,7 @@ export const TaskForm: React.FC<Props> = ({ size = "md" }) => {
         </div>
       </div>
       <hr />
-      <div className="flex items-center justify-between gap-2 p-4">
+      <div className="flex items-center justify-between gap-2 p-2">
         <button className="group grid h-8 grid-cols-[auto_1fr_auto] items-center gap-1 rounded px-2 transition-colors hover:bg-stone-500/10">
           <PiTrayLight className="size-4" />
           <p className="font-medium text-stone-500 group-hover:text-stone-900">
@@ -52,11 +83,13 @@ export const TaskForm: React.FC<Props> = ({ size = "md" }) => {
           <PiCaretDown className="size-4" />
         </button>
         <div className="flex items-center gap-2">
-          <Button color="secondary">キャンセル</Button>
-          <Button>タスクを追加</Button>
+          <Button color="secondary" onClick={onCancel}>
+            キャンセル
+          </Button>
+          <Button type="submit">タスクを追加</Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -6,9 +6,9 @@ import { DefaultQueryClientProvider } from "../_providers/default-query-client-p
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <DefaultQueryClientProvider>
-      <div className="text-neutral-00 flex h-[100dvh] bg-stone-50 text-sm">
+      <div className="flex h-[100dvh] bg-stone-50 text-sm text-neutral-900">
         <Sidebar />
-        <div className="min-h-full w-full pl-16 pt-8">{children}</div>
+        <div className="w-full overflow-hidden">{children}</div>
       </div>
     </DefaultQueryClientProvider>
   );
