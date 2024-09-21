@@ -2,6 +2,7 @@ import type { Task } from "./model";
 
 export type TaskRecord = {
   id: string;
+  done: boolean;
   parentId: string | null;
   title: string;
   description: string;
@@ -10,6 +11,10 @@ export type TaskRecord = {
 
 class TaskRepository {
   private taskRecords: TaskRecord[] = [];
+
+  public get(id: string): Task | undefined {
+    return recordsToTasks(this.taskRecords).find((t) => t.id === id);
+  }
 
   public getAll(): Task[] {
     return recordsToTasks(this.taskRecords);
@@ -34,6 +39,7 @@ class TaskRepository {
 
     const newRecord: TaskRecord = {
       id: crypto.randomUUID(),
+      done: false,
       parentId: input.parentId,
       title: input.title,
       description: input.description,
@@ -49,6 +55,30 @@ class TaskRepository {
 
     this.taskRecords = [...this.taskRecords, newRecord];
   }
+
+  public updateTaskDone(input: { id: string; done: boolean }) {
+    const task = this.get(input.id);
+    if (!task) {
+      throw new Error("タスクが存在しません");
+    }
+
+    if (input.done) {
+      const allDescendantIds = allDescendantTaskIds(this.taskRecords, input.id);
+      this.taskRecords = this.taskRecords.map((t) => {
+        if (t.id === task.id || allDescendantIds.includes(t.id)) {
+          return { ...t, done: true };
+        }
+        return t;
+      });
+    } else {
+      this.taskRecords = this.taskRecords.map((t) => {
+        if (t.id === task.id) {
+          return { ...t, done: false };
+        }
+        return t;
+      });
+    }
+  }
 }
 
 export const taskRepository = new TaskRepository();
@@ -60,6 +90,7 @@ const recordsToTasks = (taskRecords: TaskRecord[]): Task[] => {
       r.id,
       {
         id: r.id,
+        done: r.done,
         title: r.title,
         description: r.description,
         order: r.order,
@@ -92,4 +123,27 @@ const recordsToTasks = (taskRecords: TaskRecord[]): Task[] => {
     .sort((a, b) => a.order - b.order);
 
   return result;
+};
+
+const allDescendantTaskIds = (
+  taskRecords: TaskRecord[],
+  taskId: string,
+): string[] => {
+  const allTasks = recordsToTasks(taskRecords);
+  const task = allTasks.find((t) => t.id === taskId);
+  if (!task) {
+    throw new Error("タスクが存在しない");
+  }
+
+  const descendants: Task[] = [];
+  const pushDescendantIds = (task: Task) => {
+    descendants.push(...task.subTasks);
+    task.subTasks.forEach((sub) => {
+      pushDescendantIds(sub);
+    });
+  };
+
+  pushDescendantIds(task);
+
+  return descendants.map((d) => d.id);
 };

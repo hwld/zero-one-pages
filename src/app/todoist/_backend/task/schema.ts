@@ -8,3 +8,7 @@ export const taskFormSchema = z.object({
 });
 
 export type TaskFormData = z.infer<typeof taskFormSchema>;
+
+export const updateTaskDoneSchema = z.object({ done: z.boolean() });
+
+export type UpdateTaskDoneInput = z.infer<typeof updateTaskDoneSchema>;

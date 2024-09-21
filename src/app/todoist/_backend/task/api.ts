@@ -1,5 +1,10 @@
 import { delay, http, HttpResponse } from "msw";
-import { taskFormSchema, type TaskFormData } from "./schema";
+import {
+  taskFormSchema,
+  updateTaskDoneSchema,
+  type TaskFormData,
+  type UpdateTaskDoneInput,
+} from "./schema";
 import { TodoistAPI } from "../routes";
 import { fetcher } from "../../../../lib/fetcher";
 import { taskRepository } from "./repository";
@@ -16,6 +21,13 @@ export const fetchTasks = async () => {
 
 export const createTask = async (input: TaskFormData) => {
   await fetcher.post(TodoistAPI.tasks(), { body: input });
+};
+
+export const updateTaskDone = async ({
+  id,
+  ...body
+}: UpdateTaskDoneInput & { id: string }) => {
+  await fetcher.patch(TodoistAPI.updateTaskDone(id), { body });
 };
 
 export const taskApiHandlers = [
@@ -35,6 +47,15 @@ export const taskApiHandlers = [
       description: input.description,
       parentId: null,
     });
+
+    return HttpResponse.json({});
+  }),
+
+  http.patch(TodoistAPI.updateTaskDone(), async ({ params, request }) => {
+    const taskId = z.string().parse(params.id);
+    const input = updateTaskDoneSchema.parse(await request.json());
+
+    taskRepository.updateTaskDone({ id: taskId, done: input.done });
 
     return HttpResponse.json({});
   }),
