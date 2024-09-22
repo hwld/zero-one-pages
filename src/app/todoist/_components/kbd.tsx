@@ -69,4 +69,5 @@ export type KeyboardKey =
   // | "Ctrl"
   // | "Alt"
   // | "Meta"
-  | "Cmd";
+  | "Cmd"
+  | ".";
