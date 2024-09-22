@@ -10,7 +10,7 @@ import clsx from "clsx";
 import { PiTrayLight } from "@react-icons/all-files/pi/PiTrayLight";
 import { PiCaretDown } from "@react-icons/all-files/pi/PiCaretDown";
 import { Button } from "../../_components/button";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   taskFormFieldMap,
@@ -32,6 +32,8 @@ export const TaskForm: React.FC<Props> = ({
   onAfterSubmit,
 }) => {
   const createTask = useCreateTask();
+  const submitRef = useRef<HTMLButtonElement | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -67,7 +69,7 @@ export const TaskForm: React.FC<Props> = ({
     titleInputRef.current?.focus();
   };
 
-  const handleCreateTask: SubmitHandler<TaskFormData> = (input) => {
+  const handleCreateTask = handleSubmit((input: TaskFormData) => {
     createTask.mutate(
       { title: input.title, description: input.description },
       {
@@ -76,6 +78,19 @@ export const TaskForm: React.FC<Props> = ({
         },
       },
     );
+  });
+
+  const handleFormKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      onCancel();
+      return;
+    }
+
+    if (e.key === "Enter" && e.metaKey) {
+      submitRef.current?.click();
+      return;
+    }
   };
 
   useEffect(() => {
@@ -84,7 +99,7 @@ export const TaskForm: React.FC<Props> = ({
   }, [trigger]);
 
   return (
-    <form onSubmit={handleSubmit(handleCreateTask)}>
+    <div onKeyDown={handleFormKeyDown}>
       <div
         className="grid cursor-pointer grid-rows-[auto_auto] gap-2 p-4"
         onClick={handleClickForm}
@@ -139,12 +154,16 @@ export const TaskForm: React.FC<Props> = ({
           <Button color="secondary" onClick={onCancel}>
             キャンセル
           </Button>
-          <Button type="submit" disabled={!isValid}>
+          <Button
+            ref={submitRef}
+            onClick={handleCreateTask}
+            disabled={!isValid}
+          >
             タスクを追加
           </Button>
         </div>
       </div>
-    </form>
+    </div>
   );
 };
 

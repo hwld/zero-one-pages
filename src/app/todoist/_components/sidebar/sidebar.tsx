@@ -92,7 +92,7 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
       <AnimatePresence>
         {isOpen ? null : (
           <motion.div
-            className="absolute left-full ml-4"
+            className="absolute left-full z-10 ml-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
