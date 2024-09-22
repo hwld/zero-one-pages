@@ -1,11 +1,14 @@
 import { z } from "zod";
 
 export const taskFormSchema = z.object({
-  title: z.string().min(1, "タスクのタイトルを入力してください"),
-  description: z
-    .string()
-    .max(2000, "タスクの説明は2000文字以内で入力してください"),
+  title: z.string().min(1).max(500),
+  description: z.string().max(2000),
 });
+
+export const taskFormFieldMap: Record<string, string> = {
+  title: "タスク名",
+  description: "タスクの説明",
+} satisfies Record<keyof TaskFormData, string>;
 
 export type TaskFormData = z.infer<typeof taskFormSchema>;
 

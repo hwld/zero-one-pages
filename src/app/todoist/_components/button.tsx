@@ -25,7 +25,7 @@ export const Button: React.FC<Props> = ({
   return (
     <button
       className={clsx(
-        "select-none rounded ring-offset-2 transition-all focus-visible:outline-none focus-visible:ring-2 active:scale-95 disabled:opacity-50",
+        "select-none rounded ring-offset-2 transition-all focus-visible:outline-none focus-visible:ring-2 active:scale-95 disabled:pointer-events-none disabled:opacity-50",
         sizeClass[size],
         colorClass[color],
       )}

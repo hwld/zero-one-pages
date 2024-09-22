@@ -1,6 +1,6 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
+import { useEffect, useRef, type PropsWithChildren } from "react";
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiCalendarBlank } from "@react-icons/all-files/pi/PiCalendarBlank";
 import { PiAlarm } from "@react-icons/all-files/pi/PiAlarm";
@@ -12,8 +12,13 @@ import { PiCaretDown } from "@react-icons/all-files/pi/PiCaretDown";
 import { Button } from "../../_components/button";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { taskFormSchema, type TaskFormData } from "../../_backend/task/schema";
+import {
+  taskFormFieldMap,
+  taskFormSchema,
+  type TaskFormData,
+} from "../../_backend/task/schema";
 import { useCreateTask } from "./use-create-task";
+import { z } from "zod";
 
 type Props = {
   size?: "md" | "sm";
@@ -27,9 +32,40 @@ export const TaskForm: React.FC<Props> = ({
   onAfterSubmit,
 }) => {
   const createTask = useCreateTask();
-  const { register, handleSubmit } = useForm<TaskFormData>({
-    resolver: zodResolver(taskFormSchema),
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    trigger,
+  } = useForm<TaskFormData>({
+    mode: "all",
+    resolver: zodResolver(taskFormSchema, {
+      errorMap: (issue, ctx) => {
+        if (issue.code === z.ZodIssueCode.too_big && issue.type === "string") {
+          const field = issue.path[0];
+
+          return {
+            message: `${taskFormFieldMap[field]}の文字数制限: ${Number(ctx.data?.length)} / ${issue.maximum}`,
+          };
+        }
+
+        return { message: ctx.defaultError };
+      },
+    }),
   });
+
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+
+  const errorMessages = [errors.title, errors.description]
+    .filter((e) => {
+      return e?.type !== z.ZodIssueCode.too_small;
+    })
+    .map((e) => e?.message)
+    .filter((m) => m !== undefined);
+
+  const handleClickForm = () => {
+    titleInputRef.current?.focus();
+  };
 
   const handleCreateTask: SubmitHandler<TaskFormData> = (input) => {
     createTask.mutate(
@@ -42,13 +78,26 @@ export const TaskForm: React.FC<Props> = ({
     );
   };
 
+  useEffect(() => {
+    // 初期レンダリングでエラーを表示させる
+    trigger();
+  }, [trigger]);
+
   return (
     <form onSubmit={handleSubmit(handleCreateTask)}>
-      <div className="grid grid-rows-[auto_auto] gap-4 p-4">
-        <div className="grid grid-rows-[auto_auto] gap-1">
+      <div
+        className="grid cursor-pointer grid-rows-[auto_auto] gap-2 p-4"
+        onClick={handleClickForm}
+      >
+        <div className="grid grid-rows-[auto_auto_auto] gap-1">
           <input
             autoFocus
             {...register("title")}
+            ref={(e) => {
+              register("title").ref(e);
+              titleInputRef.current = e;
+            }}
+            onClick={(e) => e.stopPropagation()}
             placeholder="タスク名"
             className={clsx(
               "border-none bg-transparent font-bold tracking-wide text-stone-700 outline-none placeholder:font-bold placeholder:text-stone-400",
@@ -60,7 +109,11 @@ export const TaskForm: React.FC<Props> = ({
             placeholder="説明"
             className="resize-none bg-transparent text-stone-700 outline-none placeholder:text-stone-400"
             rows={3}
+            onClick={(e) => e.stopPropagation()}
           />
+          {errorMessages.length > 0 && (
+            <p className="text-xs text-red-600">{errorMessages[0]}</p>
+          )}
         </div>
         <div className="flex gap-2">
           <Select icon={PiCalendarBlank}>予定日</Select>
@@ -86,7 +139,9 @@ export const TaskForm: React.FC<Props> = ({
           <Button color="secondary" onClick={onCancel}>
             キャンセル
           </Button>
-          <Button type="submit">タスクを追加</Button>
+          <Button type="submit" disabled={!isValid}>
+            タスクを追加
+          </Button>
         </div>
       </div>
     </form>
