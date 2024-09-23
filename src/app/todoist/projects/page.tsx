@@ -1,5 +1,7 @@
+import { AppLayout } from "../_components/app-layout";
+
 const ProjectPage: React.FC = () => {
-  return <div>マイプロジェクト</div>;
+  return <AppLayout title="マイプロジェクト" />;
 };
 
 export default ProjectPage;

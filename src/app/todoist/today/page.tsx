@@ -1,5 +1,7 @@
+import { AppLayout } from "../_components/app-layout";
+
 const TodayPage: React.FC = () => {
-  return <div>Today</div>;
+  return <AppLayout title="今日" />;
 };
 
 export default TodayPage;

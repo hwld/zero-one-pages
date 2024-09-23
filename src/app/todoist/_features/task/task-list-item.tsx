@@ -31,13 +31,24 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
         <div className="absolute right-full mr-1 flex items-center pt-[9px]">
           {/* TODO: subTaskの状況に応じて表示を制御する */}
           <div className="opacity-0 transition-all group-hover:opacity-100">
-            <SideButton icon={PiDotsSixVerticalBold} />
+            <SideButton icon={PiDotsSixVerticalBold} tabIndex={-1} />
           </div>
           <Tooltip label="サブタスクを広げる" placement="top">
             <SideButton icon={PiCaretRight} />
           </Tooltip>
         </div>
-        <div className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100">
+
+        <div className="pt-[10px]">
+          <Checkbox checked={task.done} onChange={handleUpdateTaskDone} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-1 py-2">
+          <div className="break-all">{task.title}</div>
+          <div className="truncate text-xs text-stone-500">
+            {task.description}
+          </div>
+        </div>
+
+        <div className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100 has-[:focus]:opacity-100">
           {!task.done && (
             <>
               <Tooltip placement="top" label="タスクを編集" keys={["Cmd", "E"]}>
@@ -55,21 +66,12 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
             <ActionButton icon={PiDotsThreeOutlineLight} />
           </Tooltip>
         </div>
-        <div className="pt-[10px]">
-          <Checkbox checked={task.done} onChange={handleUpdateTaskDone} />
-        </div>
-        <div className="flex min-w-0 flex-col gap-1 py-2">
-          <div className="break-all">{task.title}</div>
-          <div className="truncate text-xs text-stone-500">
-            {task.description}
-          </div>
-        </div>
       </div>
     </TooltipDelayGroup>
   );
 };
 
-const SideButton: React.FC<{ icon: IconType }> = forwardRef<
+const SideButton = forwardRef<
   HTMLButtonElement,
   { icon: IconType } & ComponentPropsWithoutRef<"button">
 >(function SideButton({ icon: Icon, ...props }, ref) {

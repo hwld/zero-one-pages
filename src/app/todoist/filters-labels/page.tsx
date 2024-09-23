@@ -1,5 +1,7 @@
+import { AppLayout } from "../_components/app-layout";
+
 const FiltersLabelsPage: React.FC = () => {
-  return <div>FiltersLabels</div>;
+  return <AppLayout title="フィルター&ラベル" />;
 };
 
 export default FiltersLabelsPage;

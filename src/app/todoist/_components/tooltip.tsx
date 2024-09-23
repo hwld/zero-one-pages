@@ -57,7 +57,7 @@ export const Tooltip: React.FC<Props> = ({
           <div
             ref={refs.setFloating}
             style={floatingStyles}
-            className="flex h-7 items-center gap-2 rounded bg-stone-800 px-2 text-xs text-stone-100"
+            className="z-20 flex h-7 items-center gap-2 rounded bg-stone-800 px-2 text-xs text-stone-100"
             {...getFloatingProps()}
           >
             <p>{label}</p>
