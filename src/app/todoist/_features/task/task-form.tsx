@@ -158,6 +158,7 @@ export const TaskForm: React.FC<Props> = ({
             ref={submitRef}
             onClick={handleCreateTask}
             disabled={!isValid}
+            loading={createTask.isPending}
           >
             タスクを追加
           </Button>
