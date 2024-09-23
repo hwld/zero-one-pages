@@ -10,17 +10,25 @@ import { PiPencilSimpleLineLight } from "@react-icons/all-files/pi/PiPencilSimpl
 import { PiCalendarPlusLight } from "@react-icons/all-files/pi/PiCalendarPlusLight";
 import { PiChatLight } from "@react-icons/all-files/pi/PiChatLight";
 import { PiDotsThreeOutlineLight } from "@react-icons/all-files/pi/PiDotsThreeOutlineLight";
-import { forwardRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, useState, type ComponentPropsWithoutRef } from "react";
 import { Tooltip, TooltipDelayGroup } from "../../_components/tooltip";
+import { TaskForm } from "./task-form";
+import { useUpdateTask } from "./use-update-task";
+import type { TaskFormData } from "../../_backend/task/schema";
 
 type Props = { task: Task };
 
 export const TaskListItem: React.FC<Props> = ({ task }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const updateTaskDone = useUpdateTaskDone();
 
   const handleUpdateTaskDone = () => {
     updateTaskDone.mutate({ id: task.id, done: !task.done });
   };
+
+  if (isEditing) {
+    return <TaskUpdateForm task={task} onClose={() => setIsEditing(false)} />;
+  }
 
   return (
     <TooltipDelayGroup>
@@ -52,7 +60,10 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
           {!task.done && (
             <>
               <Tooltip placement="top" label="タスクを編集" keys={["Cmd", "E"]}>
-                <ActionButton icon={PiPencilSimpleLineLight} />
+                <ActionButton
+                  icon={PiPencilSimpleLineLight}
+                  onClick={() => setIsEditing(true)}
+                />
               </Tooltip>
               <Tooltip placement="top" label="予定日を設定" keys={["T"]}>
                 <ActionButton icon={PiCalendarPlusLight} />
@@ -68,6 +79,37 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
         </div>
       </div>
     </TooltipDelayGroup>
+  );
+};
+
+const TaskUpdateForm: React.FC<{
+  task: Task;
+  onClose: () => void;
+}> = ({ task, onClose }) => {
+  const updateTask = useUpdateTask();
+
+  const handleUpdate = (input: TaskFormData) => {
+    updateTask.mutate(
+      { id: task.id, ...input },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="rounded-lg border border-stone-300">
+      <TaskForm
+        size="sm"
+        defaultValues={{ title: task.title, description: task.description }}
+        submitText="保存"
+        onSubmit={handleUpdate}
+        isSubmitting={updateTask.isPending}
+        onCancel={onClose}
+      />
+    </div>
   );
 };
 

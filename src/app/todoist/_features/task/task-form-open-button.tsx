@@ -1,12 +1,27 @@
 import { useState } from "react";
 import { TaskForm } from "./task-form";
 import { PiPlusBold } from "@react-icons/all-files/pi/PiPlusBold";
+import { useCreateTask } from "./use-create-task";
+import type { TaskFormData } from "../../_backend/task/schema";
 
 type Props = {};
 
 export const TaskFormOpenButton: React.FC<Props> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [formKey, setFormKey] = useState(crypto.randomUUID());
+
+  const createTask = useCreateTask();
+
+  const handleCreateTask = (input: TaskFormData) => {
+    createTask.mutate(
+      { title: input.title, description: input.description },
+      {
+        onSuccess: () => {
+          setFormKey(crypto.randomUUID());
+        },
+      },
+    );
+  };
 
   if (isOpen) {
     return (
@@ -15,7 +30,9 @@ export const TaskFormOpenButton: React.FC<Props> = () => {
           key={formKey}
           size="sm"
           onCancel={() => setIsOpen(false)}
-          onAfterSubmit={() => setFormKey(crypto.randomUUID())}
+          onSubmit={handleCreateTask}
+          submitText="タスクを追加"
+          isSubmitting={createTask.isPending}
         />
       </div>
     );

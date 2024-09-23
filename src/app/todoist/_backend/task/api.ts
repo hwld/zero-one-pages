@@ -23,6 +23,13 @@ export const createTask = async (input: TaskFormData) => {
   await fetcher.post(TodoistAPI.tasks(), { body: input });
 };
 
+export const updateTask = async ({
+  id,
+  ...input
+}: TaskFormData & { id: string }) => {
+  await fetcher.patch(TodoistAPI.task(id), { body: input });
+};
+
 export const updateTaskDone = async ({
   id,
   ...body
@@ -51,7 +58,22 @@ export const taskApiHandlers = [
     return HttpResponse.json({});
   }),
 
+  http.patch(TodoistAPI.task(), async ({ request, params }) => {
+    await delay();
+    const taskId = z.string().parse(params.id);
+    const input = taskFormSchema.parse(await request.json());
+
+    taskRepository.update({
+      id: taskId,
+      title: input.title,
+      description: input.description,
+    });
+
+    return HttpResponse.json({});
+  }),
+
   http.patch(TodoistAPI.updateTaskDone(), async ({ params, request }) => {
+    await delay();
     const taskId = z.string().parse(params.id);
     const input = updateTaskDoneSchema.parse(await request.json());
 

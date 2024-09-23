@@ -17,21 +17,25 @@ import {
   taskFormSchema,
   type TaskFormData,
 } from "../../_backend/task/schema";
-import { useCreateTask } from "./use-create-task";
 import { z } from "zod";
 
 type Props = {
   size?: "md" | "sm";
+  defaultValues?: TaskFormData;
   onCancel: () => void;
-  onAfterSubmit?: () => void;
+  onSubmit: (input: TaskFormData) => void;
+  submitText: string;
+  isSubmitting: boolean;
 };
 
 export const TaskForm: React.FC<Props> = ({
   size = "md",
+  defaultValues = { title: "", description: "" },
   onCancel,
-  onAfterSubmit,
+  onSubmit,
+  submitText,
+  isSubmitting,
 }) => {
-  const createTask = useCreateTask();
   const submitRef = useRef<HTMLButtonElement | null>(null);
 
   const {
@@ -40,6 +44,7 @@ export const TaskForm: React.FC<Props> = ({
     formState: { errors, isValid },
     trigger,
   } = useForm<TaskFormData>({
+    defaultValues,
     mode: "all",
     resolver: zodResolver(taskFormSchema, {
       errorMap: (issue, ctx) => {
@@ -68,17 +73,6 @@ export const TaskForm: React.FC<Props> = ({
   const handleClickForm = () => {
     titleInputRef.current?.focus();
   };
-
-  const handleCreateTask = handleSubmit((input: TaskFormData) => {
-    createTask.mutate(
-      { title: input.title, description: input.description },
-      {
-        onSuccess: () => {
-          onAfterSubmit?.();
-        },
-      },
-    );
-  });
 
   const handleFormKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -156,11 +150,11 @@ export const TaskForm: React.FC<Props> = ({
           </Button>
           <Button
             ref={submitRef}
-            onClick={handleCreateTask}
+            onClick={handleSubmit(onSubmit)}
             disabled={!isValid}
-            loading={createTask.isPending}
+            loading={isSubmitting}
           >
-            タスクを追加
+            {submitText}
           </Button>
         </div>
       </div>
