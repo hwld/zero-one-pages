@@ -136,7 +136,12 @@ export const TaskForm: React.FC<Props> = ({
         </div>
       </div>
       <hr />
-      <div className="flex items-center justify-between gap-2 p-2">
+      <div
+        className={clsx(
+          "flex items-center justify-between gap-2",
+          { sm: "p-2", md: "p-4" }[size],
+        )}
+      >
         <button className="group grid h-8 grid-cols-[auto_1fr_auto] items-center gap-1 rounded px-2 transition-colors hover:bg-stone-500/10">
           <PiTrayLight className="size-4" />
           <p className="font-medium text-stone-500 group-hover:text-stone-900">
