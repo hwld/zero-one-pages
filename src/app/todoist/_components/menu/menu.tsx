@@ -5,6 +5,7 @@ import {
   FloatingFocusManager,
   FloatingList,
   FloatingNode,
+  FloatingOverlay,
   FloatingPortal,
   FloatingTree,
   offset,
@@ -221,39 +222,41 @@ const MenuComponent = forwardRef<HTMLButtonElement, MenuComponentProps>(
             <AnimatePresence>
               {isOpen && (
                 <FloatingPortal>
-                  <FloatingFocusManager
-                    context={context}
-                    modal={false}
-                    initialFocus={isNested ? -1 : 0}
-                    returnFocus={!isNested}
-                  >
-                    <div
-                      className="focus-visible:outline-none"
-                      ref={refs.setFloating}
-                      style={floatingStyles}
-                      {...getFloatingProps({
-                        onKeyDown: (e) => {
-                          if (
-                            e.key === "Escape" &&
-                            e.target instanceof HTMLElement &&
-                            (e.target.role === "menu" ||
-                              e.target.role == "menuitem")
-                          ) {
-                            handleOpenChange(false);
-                          }
-                        },
-                      })}
+                  <FloatingOverlay lockScroll className="z-30">
+                    <FloatingFocusManager
+                      context={context}
+                      modal={false}
+                      initialFocus={isNested ? -1 : 0}
+                      returnFocus={!isNested}
                     >
-                      <motion.div
-                        className="flex flex-col rounded-lg border border-stone-200 bg-stone-50 py-2 text-sm text-stone-700 shadow-md"
-                        {...menuAnimation}
-                        transition={{ duration: 0.1 }}
-                        style={{ width }}
+                      <div
+                        className="z-40 focus-visible:outline-none"
+                        ref={refs.setFloating}
+                        style={floatingStyles}
+                        {...getFloatingProps({
+                          onKeyDown: (e) => {
+                            if (
+                              e.key === "Escape" &&
+                              e.target instanceof HTMLElement &&
+                              (e.target.role === "menu" ||
+                                e.target.role == "menuitem")
+                            ) {
+                              handleOpenChange(false);
+                            }
+                          },
+                        })}
                       >
-                        {children}
-                      </motion.div>
-                    </div>
-                  </FloatingFocusManager>
+                        <motion.div
+                          className="flex flex-col rounded-lg border border-stone-200 bg-stone-50 py-2 text-sm text-stone-700 shadow-md"
+                          {...menuAnimation}
+                          transition={{ duration: 0.1 }}
+                          style={{ width }}
+                        >
+                          {children}
+                        </motion.div>
+                      </div>
+                    </FloatingFocusManager>
+                  </FloatingOverlay>
                 </FloatingPortal>
               )}
             </AnimatePresence>

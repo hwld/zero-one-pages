@@ -43,9 +43,11 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   );
   const isDragging = draggingProjectId === project.id;
 
+  // LinkにフォーカスがあたったときにIconButtonを表示させるためにfocusを自前で管理する。
+  //
   // Link -> IconButtonの順にfocusを当てるとき、LinkのonBlurですぐにhoverをfalseにすると、
   // その時点IconButtonが消えてしまうので、hoverをfalseにするのを次のイベントループまで遅延させて
-  // IconButtonにフォーカスと当てられるようにする
+  // IconButtonにフォーカスを当てられるようにする
   const [isFocus, setFocus] = useDelayedState(false);
 
   const rightNode = useMemo(() => {
@@ -60,8 +62,12 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
         onOpenCreateBeforeDialog={() => setIsCreateBeforeDialogOpen(true)}
         onOpenCreateAfterDialog={() => setIsCreateAfterDialogOpen(true)}
         onOpenChange={(open) => {
+          if (open) {
+            setFocus(false);
+          }
+
           if (!open) {
-            // Menuを閉じたときにIconBUttonにfocusを戻す時間を確保する
+            // キーボードでMenuを閉じたときにIconBUttonにfocusを戻す時間を確保する
             window.setTimeout(() => {
               setIsMenuOpen(false);
             }, 300);
@@ -70,8 +76,12 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
         }}
         trigger={
           <IconButton
-            onFocus={() => setFocus(true)}
-            onBlur={() => setFocus(false)}
+            onFocus={() => {
+              setFocus(true);
+            }}
+            onBlur={() => {
+              setFocus(false);
+            }}
           >
             <PiDotsThreeBold className="size-6" />
           </IconButton>
@@ -96,12 +106,18 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
           href={Routes.project(project.id)}
           currentRoute={currentRoute}
           icon={PiHashLight}
-          onPointerEnter={() => setFocus(true)}
+          onPointerEnter={() => {
+            setFocus(true);
+          }}
           onPointerLeave={() => {
             setFocus(false);
           }}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
+          onFocus={() => {
+            setFocus(true);
+          }}
+          onBlur={() => {
+            setFocus(false);
+          }}
           isDragging={isDragging}
           isAnyDragging={!!draggingProjectId}
           onDragStart={(e) => {
