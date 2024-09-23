@@ -1,22 +1,24 @@
 "use client";
 import React, { Suspense, useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Resizable } from "re-resizable";
-import { useRef, useState } from "react";
-import { PiBellSimple } from "@react-icons/all-files/pi/PiBellSimple";
-import { PiSidebarSimple } from "@react-icons/all-files/pi/PiSidebarSimple";
+import { useRef } from "react";
+import { PiBellSimpleLight } from "@react-icons/all-files/pi/PiBellSimpleLight";
+import { PiSidebarSimpleLight } from "@react-icons/all-files/pi/PiSidebarSimpleLight";
 import { ProjectNavList } from "../../_features/project/project-nav-list/list";
 import { Routes } from "../../routes";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Tooltip, TooltipDelayGroup } from "../tooltip";
 import { UserMenuTrigger } from "./user-menu";
 import { SidebarNavList } from "./nav-list";
-import { SidebarIconButton } from "./icon-button";
+import { IconButton } from "../icon-button";
+import { useSidebarContext } from "./provider";
+import { appHeaderHeightName } from "../../layout";
 
 export const Sidebar: React.FC = () => {
   const resizableRef = useRef<Resizable>(null);
 
-  const [isOpen, setIsOpen] = useState(true);
+  const { isOpen, setIsOpen } = useSidebarContext();
   const marginLeft = useMemo(() => {
     if (isOpen) {
       return 0;
@@ -26,7 +28,7 @@ export const Sidebar: React.FC = () => {
     return barWidth ? -barWidth : 0;
   }, [isOpen]);
 
-  const handleClass = "flex justify-center group";
+  const handleClass = "flex justify-center group z-20";
   const handle = (
     <div className="h-full w-1 transition-colors group-hover:bg-black/10 group-active:bg-black/20" />
   );
@@ -71,16 +73,19 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
   }, [paths, searchParams]);
 
   return (
-    <div className="group/sidebar relative flex size-full flex-col gap-3 p-3">
-      <div className="flex h-min w-full justify-between">
+    <div className="group/sidebar relative flex size-full flex-col gap-2">
+      <div
+        className="flex w-full items-center justify-between px-3"
+        style={{ height: `var(${appHeaderHeightName})` }}
+      >
         <UserMenuTrigger />
         <div className="flex items-center gap-1">
           <Tooltip label="通知を開く" keys={["O", "N"]}>
-            <SidebarIconButton icon={PiBellSimple} />
+            <IconButton icon={PiBellSimpleLight} />
           </Tooltip>
           <Tooltip label="サイドバーを閉じる" keys={["M"]}>
-            <SidebarIconButton
-              icon={PiSidebarSimple}
+            <IconButton
+              icon={PiSidebarSimpleLight}
               onClick={() => {
                 onChangeOpen(false);
               }}
@@ -89,33 +94,11 @@ const SidebarContent: React.FC<ContentProps> = ({ isOpen, onChangeOpen }) => {
           </Tooltip>
         </div>
       </div>
-      <AnimatePresence>
-        {isOpen ? null : (
-          <motion.div
-            className="absolute left-full ml-4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <Tooltip
-              label="サイドバーを開く"
-              keys={["M"]}
-              placement="bottom-start"
-            >
-              <SidebarIconButton
-                icon={PiSidebarSimple}
-                onClick={() => {
-                  onChangeOpen(true);
-                }}
-              />
-            </Tooltip>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      <SidebarNavList currentRoute={currentRoute} />
-
-      <ProjectNavList currentRoute={currentRoute} />
+      <div className="flex flex-col gap-3 px-3">
+        <SidebarNavList currentRoute={currentRoute} />
+        <ProjectNavList currentRoute={currentRoute} />
+      </div>
     </div>
   );
 };

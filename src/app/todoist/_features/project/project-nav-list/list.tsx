@@ -1,7 +1,7 @@
 import { PiWarningCircle } from "@react-icons/all-files/pi/PiWarningCircle";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDragProjectList } from "./use-drag";
+import { useDragProjectContext } from "./use-drag";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 import { toProjectNodes } from "../logic/project";
 import { useProjects } from "../use-projects";
@@ -30,7 +30,7 @@ export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
 
   const projectNodes = toProjectNodes(projects, projectExpansionMap);
 
-  const dragListState = useDragProjectList({
+  const dragContext = useDragProjectContext({
     projectExpansionMap,
     setProjectExpansionMap,
     updateProjectsCache,
@@ -83,7 +83,7 @@ export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
                         transition={{ duration: 0.1 }}
                       >
                         <ProjectNavItem
-                          dragState={dragListState}
+                          dragContext={dragContext}
                           currentRoute={currentRoute}
                           project={projectNode}
                           expanded={projectExpansionMap.isExpanded(

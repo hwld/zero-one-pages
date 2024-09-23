@@ -14,6 +14,6 @@ export const projectSchema: z.ZodType<Project> = z.object({
   parentId: z.string().nullable(),
   label: z.string(),
   todos: z.number(),
-  subProjects: z.lazy(() => projectSchema.array()),
   order: z.number(),
+  subProjects: z.lazy(() => projectSchema.array()),
 });

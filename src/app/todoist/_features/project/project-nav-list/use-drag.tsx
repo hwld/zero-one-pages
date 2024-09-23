@@ -26,18 +26,18 @@ type UseDragProjectListParams = {
   updateProjectsCache: ReturnType<typeof useProjects>["updateProjectsCache"];
 };
 
-export type DragProjectListState = {
+export type DragProjectContext = {
   draggingProjectId: string | null;
   handleDragStart: (e: React.DragEvent, project: ProjectNode) => void;
   handleMoveProjects: (draggingId: string, dragOverId: string) => void;
   handleChangeDepth: (e: MouseEvent, projectId: string) => void;
 };
 
-export const useDragProjectList = ({
+export const useDragProjectContext = ({
   projectExpansionMap,
   setProjectExpansionMap,
   updateProjectsCache,
-}: UseDragProjectListParams): DragProjectListState => {
+}: UseDragProjectListParams): DragProjectContext => {
   const changeProjectPosition = useChangeProjectPosition();
   const [draggingProjectId, setDraggingProjectId] = useState<string | null>(
     null,
@@ -47,7 +47,7 @@ export const useDragProjectList = ({
   const dragStartInfo = useRef({ x: 0, depth: 0 });
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
-  const handleDragStart: DragProjectListState["handleDragStart"] = useCallback(
+  const handleDragStart: DragProjectContext["handleDragStart"] = useCallback(
     (e, project) => {
       dragStartInfo.current = { x: e.clientX, depth: project.depth };
 
@@ -67,7 +67,7 @@ export const useDragProjectList = ({
     [projectExpansionMap, setDraggingProjectId, updateProjectsCache],
   );
 
-  const handleMoveProjects: DragProjectListState["handleMoveProjects"] =
+  const handleMoveProjects: DragProjectContext["handleMoveProjects"] =
     useCallback(
       (draggingId, dragOverId) => {
         updateProjectsCache((projects) => {
@@ -82,7 +82,7 @@ export const useDragProjectList = ({
       [projectExpansionMap, updateProjectsCache],
     );
 
-  const handleChangeDepth: DragProjectListState["handleChangeDepth"] =
+  const handleChangeDepth: DragProjectContext["handleChangeDepth"] =
     useCallback(
       (e, projectId) => {
         const newDepth =
@@ -152,7 +152,7 @@ export const useDragProjectList = ({
 
 export const useDragProject = (
   projectId: string,
-  state: DragProjectListState,
+  context: DragProjectContext,
 ) => {
   const itemRef = useRef<HTMLLIElement>(null);
   const {
@@ -160,7 +160,7 @@ export const useDragProject = (
     handleChangeDepth,
     draggingProjectId,
     handleDragStart,
-  } = state;
+  } = context;
 
   const isDragging = projectId === draggingProjectId;
 

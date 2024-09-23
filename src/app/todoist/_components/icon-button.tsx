@@ -5,12 +5,13 @@ import { ComponentPropsWithoutRef, forwardRef } from "react";
 type Props = {
   icon: IconType;
   size?: "md";
+  label?: string;
 } & ComponentPropsWithoutRef<"button">;
 
 export const IconButton = forwardRef<HTMLButtonElement, Props>(
-  function IconButton({ icon: Icon, size = "md", ...props }, ref) {
+  function IconButton({ icon: Icon, label, size = "md", ...props }, ref) {
     const sizeClass = {
-      md: { button: "size-8", icon: "size-6" },
+      md: { button: "h-8", icon: "size-5" },
     };
 
     return (
@@ -20,9 +21,11 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
         className={clsx(
           "grid place-items-center rounded ring-stone-500 transition-all hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2",
           sizeClass[size].button,
+          label ? "grid-cols-[auto_1fr] gap-1 px-2" : "w-8",
         )}
       >
         <Icon className={clsx(sizeClass[size].icon)} />
+        {label && <p className="font-semibold text-stone-500">{label}</p>}
       </button>
     );
   },

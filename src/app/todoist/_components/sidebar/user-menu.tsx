@@ -20,6 +20,7 @@ import { MenuButtonItem, SubMenuTrigger } from "../menu/item";
 import { Menu, MenuSeparator } from "../menu/menu";
 import { IconType } from "@react-icons/all-files";
 import { PiStarDuotone } from "@react-icons/all-files/pi/PiStarDuotone";
+import { PiUserBold } from "@react-icons/all-files/pi/PiUserBold";
 import { cn } from "../../../../lib/utils";
 
 export const UserMenuTrigger: React.FC = () => {
@@ -27,7 +28,9 @@ export const UserMenuTrigger: React.FC = () => {
     <Menu
       trigger={
         <button className="group/usermenu flex h-8 items-center gap-2 rounded p-2 transition-colors hover:bg-black/5">
-          <span className="size-6 rounded-full bg-stone-700" />
+          <div className="grid size-7 place-items-center rounded-full bg-stone-500 text-stone-100">
+            <PiUserBold className="size-5" />
+          </div>
           <span className="font-bold">User</span>
           <PiCaretDownBold className="text-stone-600 group-hover/usermenu:text-stone-900" />
         </button>
