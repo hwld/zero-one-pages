@@ -28,7 +28,7 @@ export const Sidebar: React.FC = () => {
     return barWidth ? -barWidth : 0;
   }, [isOpen]);
 
-  const handleClass = "flex justify-center group";
+  const handleClass = "flex justify-center group z-20";
   const handle = (
     <div className="h-full w-1 transition-colors group-hover:bg-black/10 group-active:bg-black/20" />
   );
