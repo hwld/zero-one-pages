@@ -37,6 +37,10 @@ export const updateTaskDone = async ({
   await fetcher.patch(TodoistAPI.updateTaskDone(id), { body });
 };
 
+export const deleteTask = async (id: string) => {
+  await fetcher.delete(TodoistAPI.task(id));
+};
+
 export const taskApiHandlers = [
   http.get(TodoistAPI.tasks(), async () => {
     await delay();
@@ -78,6 +82,15 @@ export const taskApiHandlers = [
     const input = updateTaskDoneSchema.parse(await request.json());
 
     taskRepository.updateTaskDone({ id: taskId, done: input.done });
+
+    return HttpResponse.json({});
+  }),
+
+  http.delete(TodoistAPI.task(), async ({ params }) => {
+    await delay();
+    const taskId = z.string().parse(params.id);
+
+    taskRepository.delete(taskId);
 
     return HttpResponse.json({});
   }),

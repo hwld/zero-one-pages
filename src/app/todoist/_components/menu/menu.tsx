@@ -60,6 +60,9 @@ export const MenuContext = createContext<MenuContext>({
 });
 
 type MenuComponentProps = {
+  /**
+   * triggerにはpropsが渡されるので、それを受け取る必要がある
+   */
   trigger: ReactNode;
   children?: ReactNode;
   onOpenChange?: (open: boolean) => void;

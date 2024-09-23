@@ -15,15 +15,26 @@ import { Tooltip, TooltipDelayGroup } from "../../_components/tooltip";
 import { TaskForm } from "./task-form";
 import { useUpdateTask } from "./use-update-task";
 import type { TaskFormData } from "../../_backend/task/schema";
+import { Menu } from "../../_components/menu/menu";
+import { MenuButtonItem } from "../../_components/menu/item";
+import { PiTrashLight } from "@react-icons/all-files/pi/PiTrashLight";
+import { useDeleteTask } from "./use-delete-task";
 
 type Props = { task: Task };
 
 export const TaskListItem: React.FC<Props> = ({ task }) => {
   const [isEditing, setIsEditing] = useState(false);
+
   const updateTaskDone = useUpdateTaskDone();
 
   const handleUpdateTaskDone = () => {
     updateTaskDone.mutate({ id: task.id, done: !task.done });
+  };
+
+  const deleteTask = useDeleteTask();
+
+  const handleDeleteTask = () => {
+    deleteTask.mutate(task.id);
   };
 
   if (isEditing) {
@@ -56,7 +67,7 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
           </div>
         </div>
 
-        <div className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100 has-[:focus]:opacity-100">
+        <div className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100 has-[:focus]:opacity-100 has-[[data-open]]:opacity-100">
           {!task.done && (
             <>
               <Tooltip placement="top" label="タスクを編集" keys={["Cmd", "E"]}>
@@ -74,7 +85,18 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
             <ActionButton icon={PiChatLight} />
           </Tooltip>
           <Tooltip placement="top" label="その他のアクション" keys={["."]}>
-            <ActionButton icon={PiDotsThreeOutlineLight} />
+            <Menu
+              placement="bottom-start"
+              width={250}
+              trigger={<ActionButton icon={PiDotsThreeOutlineLight} />}
+            >
+              <MenuButtonItem
+                icon={PiTrashLight}
+                label="削除する"
+                variant="destructive"
+                onClick={handleDeleteTask}
+              />
+            </Menu>
           </Tooltip>
         </div>
       </div>
@@ -131,12 +153,15 @@ const SideButton = forwardRef<
 const ActionButton = forwardRef<
   HTMLButtonElement,
   { icon: IconType } & ComponentPropsWithoutRef<"button">
->(function ActionButton({ icon: Icon, ...props }, ref) {
+>(function ActionButton({ icon: Icon, className, ...props }, ref) {
   return (
     <button
       ref={ref}
       {...props}
-      className="grid size-7 place-items-center rounded text-stone-600 transition-colors hover:bg-black/5"
+      className={cn(
+        "grid size-7 place-items-center rounded text-stone-600 transition-colors hover:bg-black/5",
+        className,
+      )}
     >
       <Icon className="size-6" />
     </button>

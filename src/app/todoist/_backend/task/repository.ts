@@ -88,6 +88,10 @@ class TaskRepository {
       });
     }
   }
+
+  public delete(id: string) {
+    this.taskRecords = this.taskRecords.filter((r) => r.id !== id);
+  }
 }
 
 export const taskRepository = new TaskRepository();
