@@ -12,6 +12,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { MenuContext } from "./menu";
 import { PiCaretRightBold } from "@react-icons/all-files/pi/PiCaretRightBold";
 import { cn } from "../../../../lib/utils";
+import { Tooltip } from "../tooltip";
 
 type ContentProps = {
   icon: IconType;
@@ -63,14 +64,13 @@ const MenuItemContent: React.FC<ContentProps> = ({
   );
 };
 
-const itemClass = "mx-2 rounded focus:bg-black/5 focus:outline-none";
-
 type MenuItemWrapperProps = {
   children: ReactNode;
+  className: string;
 };
 
 const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
-  function MenuItem({ children }, forwardedRef) {
+  function MenuItem({ children, className, ...props }, forwardedRef) {
     const menu = useContext(MenuContext);
     const item = useListItem();
     const tree = useFloatingTree();
@@ -80,7 +80,7 @@ const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
       <Slot
         ref={useMergeRefs([item.ref, forwardedRef])}
         role="menuitem"
-        className={itemClass}
+        className={className}
         tabIndex={isActive ? 0 : -1}
         {...menu.getItemProps({
           onClick() {
@@ -90,12 +90,15 @@ const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemWrapperProps>(
             menu.setHasFocusInside(true);
           },
         })}
+        {...props}
       >
         {children}
       </Slot>
     );
   },
 );
+
+const wideItemClass = "mx-2 rounded focus:bg-black/5 focus:outline-none";
 
 type ButtonItemProps = ContentProps & ComponentPropsWithoutRef<"button">;
 
@@ -105,7 +108,7 @@ export const MenuButtonItem = forwardRef<HTMLButtonElement, ButtonItemProps>(
     ref,
   ) {
     return (
-      <MenuItemWrapper>
+      <MenuItemWrapper className={wideItemClass}>
         <button ref={ref} {...props}>
           <MenuItemContent
             icon={icon}
@@ -131,7 +134,7 @@ export const MenuLinkItem: React.FC<LinkItemProps> = ({
   ...props
 }) => {
   return (
-    <MenuItemWrapper>
+    <MenuItemWrapper className={wideItemClass}>
       <Link {...props}>
         <MenuItemContent
           icon={icon}
@@ -154,7 +157,7 @@ export const SubMenuTrigger = forwardRef<HTMLButtonElement, SubMenuTrigger>(
     ref,
   ) {
     return (
-      <button ref={ref} {...props} className={cn(className, itemClass)}>
+      <button ref={ref} {...props} className={cn(className, wideItemClass)}>
         <MenuItemContent
           icon={icon}
           label={label}
@@ -166,3 +169,41 @@ export const SubMenuTrigger = forwardRef<HTMLButtonElement, SubMenuTrigger>(
     );
   },
 );
+
+type _MenuIconButtonItemProps = {
+  icon: ReactNode;
+  className?: string;
+} & ComponentPropsWithoutRef<"button">;
+
+const _MenuIconButtonItem = forwardRef<
+  HTMLButtonElement,
+  _MenuIconButtonItemProps
+>(function MenuIconButtonItem({ icon, className, ...props }, ref) {
+  return (
+    <MenuItemWrapper
+      className={cn(
+        "grid size-8 place-items-center rounded border border-stone-300 focus:bg-black/5 focus:outline-none",
+        className,
+      )}
+    >
+      <button ref={ref} {...props}>
+        {icon}
+      </button>
+    </MenuItemWrapper>
+  );
+});
+
+export const MenuIconButtonItem: React.FC<
+  _MenuIconButtonItemProps & { label: string }
+> = ({ label, ...props }) => {
+  return (
+    // MenuIconButtonItemをTooltipDelayGroupでラップしても意図した挙動にはならない。
+    // これは、TooltipのDelayはBlurでリセットされるためだと思う。
+    // MenuItemはホバーしたときにfocusイベントが発生するので、
+    // ホバーを外したときにBlurが動いてしまい、delyaがリセットされる
+    // 妥協してopenのdelayを0にする
+    <Tooltip label={label} placement="top" delay={{ open: 0 }}>
+      <_MenuIconButtonItem {...props} />
+    </Tooltip>
+  );
+};

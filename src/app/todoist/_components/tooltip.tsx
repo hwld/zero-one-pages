@@ -20,6 +20,7 @@ type Props = {
   keys?: KeyboardKey[];
   children: ReactNode;
   placement?: Placement;
+  delay?: Partial<{ open: number; close: number }>;
 };
 
 export const Tooltip: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const Tooltip: React.FC<Props> = ({
   keys,
   children,
   placement,
+  delay,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -38,8 +40,11 @@ export const Tooltip: React.FC<Props> = ({
     middleware: [offset(4), shift()],
   });
 
-  const { delay } = useDelayGroup(context);
-  const hover = useHover(context, { move: false, delay });
+  const { delay: delayFromContext } = useDelayGroup(context);
+  const hover = useHover(context, {
+    move: false,
+    delay: delay ?? delayFromContext,
+  });
   const focus = useFocus(context);
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
@@ -57,7 +62,7 @@ export const Tooltip: React.FC<Props> = ({
           <div
             ref={refs.setFloating}
             style={floatingStyles}
-            className="z-20 flex h-7 items-center gap-2 rounded bg-stone-800 px-2 text-xs text-stone-100"
+            className="z-50 flex h-7 items-center gap-2 rounded bg-stone-800 px-2 text-xs text-stone-100"
             {...getFloatingProps()}
           >
             <p>{label}</p>
