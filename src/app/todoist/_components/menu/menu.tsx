@@ -39,6 +39,7 @@ import {
   useRef,
   useCallback,
   useMemo,
+  type PropsWithChildren,
 } from "react";
 
 type SubMenuOpenEvent = { nodeId: string; parentId: string | null };
@@ -290,4 +291,21 @@ export const Menu = forwardRef<HTMLButtonElement, MenuProps>(
 
 export const MenuSeparator: React.FC = () => {
   return <div className="my-1 h-[1px] w-full bg-stone-200" />;
+};
+
+type MenuActions = { label: string; right: ReactNode } & PropsWithChildren;
+export const MenuActions: React.FC<MenuActions> = ({
+  label,
+  right,
+  children,
+}) => {
+  return (
+    <div className="flex flex-col justify-start gap-2 px-4 py-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold">{label}</p>
+        <p className="text-xs text-stone-500">{right}</p>
+      </div>
+      <div className="flex gap-2">{children}</div>
+    </div>
+  );
 };

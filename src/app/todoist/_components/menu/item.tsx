@@ -182,7 +182,7 @@ const _MenuIconButtonItem = forwardRef<
   return (
     <MenuItemWrapper
       className={cn(
-        "grid size-8 place-items-center rounded border border-stone-300 focus:bg-black/5 focus:outline-none",
+        "grid size-8 place-items-center rounded border border-stone-200 focus:bg-black/5 focus:outline-none",
         className,
       )}
     >

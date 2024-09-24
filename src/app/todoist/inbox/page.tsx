@@ -1,7 +1,6 @@
 "use client";
 
 import { TaskFormOpenButton } from "../_features/task/task-form-open-button";
-import { TaskListItem } from "../_features/task/task-list-item";
 import { useTasks } from "../_features/task/use-tasks";
 import { AppLayout } from "../_components/app-layout";
 import { PiChatLight } from "@react-icons/all-files/pi/PiChatLight";
@@ -9,6 +8,7 @@ import { PiDotsThreeOutlineLight } from "@react-icons/all-files/pi/PiDotsThreeOu
 import { PiSlidersHorizontalLight } from "@react-icons/all-files/pi/PiSlidersHorizontalLight";
 import { IconButton } from "../_components/icon-button";
 import { Tooltip, TooltipDelayGroup } from "../_components/tooltip";
+import { TaskListItem } from "../_features/task/task-list-item/task-list-item";
 
 const InboxPage: React.FC = () => {
   const { data: tasks = [] } = useTasks();
