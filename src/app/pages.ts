@@ -121,7 +121,7 @@ export const pages: Page[] = [
     href: "/todoist/inbox",
     title: "Todoist",
     description:
-      "TodoistのUIを作りたい。とりあえずDnDができるツリーのあるサイドバーだけ作った。",
-    tags: ["PC", "PART", "WIP"],
+      "Todoistのレイアウトを作ってみた。サイドバーにあるプロジェクトリストのDnDが難しかった。",
+    tags: ["PC", "LAYOUT", "WIP", "PRIME"],
   },
 ];
