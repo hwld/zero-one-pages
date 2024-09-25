@@ -55,7 +55,7 @@ export const TaskCreateInput = forwardRef<HTMLInputElement, {}>(
                 {...otherRegister}
               />
             </form>
-            <div className="relative mr-2 grid h-[36px] w-[45px] place-items-center gap-1 rounded-full border border-neutral-500 bg-white/20 p-2 duration-300">
+            <div className="relative mr-2 grid h-[36px] w-[50px] place-items-center rounded-full border border-neutral-500 bg-white/20 duration-300">
               <motion.div
                 className="absolute grid size-full place-items-center text-neutral-100"
                 initial={{ opacity: 0, y: -10 }}
