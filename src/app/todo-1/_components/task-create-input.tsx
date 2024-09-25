@@ -2,7 +2,7 @@ import { useMergeRefs } from "@floating-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircleIcon, CommandIcon } from "lucide-react";
+import { AlertCircleIcon, CommandIcon, Loader2Icon } from "lucide-react";
 import { FocusEventHandler, forwardRef, useId } from "react";
 import { useForm } from "react-hook-form";
 import { useAddTask } from "../_queries/use-add-task";
@@ -30,6 +30,10 @@ export const TaskCreateInput = forwardRef<HTMLInputElement, {}>(
     };
 
     const handleSubmit = buildHandleSubmit((data: CreateTaskInput) => {
+      if (addTaskMutation.isPending) {
+        return;
+      }
+
       addTaskMutation.mutate(data);
       reset({ title: "" });
     });
@@ -51,11 +55,34 @@ export const TaskCreateInput = forwardRef<HTMLInputElement, {}>(
                 {...otherRegister}
               />
             </form>
-            <div className="mr-2 flex items-center  gap-1 rounded-full bg-white/20 p-2 duration-300">
-              <div className="flex items-center text-neutral-50">
+            <div className="relative mr-2 grid h-[36px] w-[45px] place-items-center gap-1 rounded-full border border-neutral-500 bg-white/20 p-2 duration-300">
+              <motion.div
+                className="absolute grid size-full place-items-center text-neutral-100"
+                initial={{ opacity: 0, y: -10 }}
+                animate={
+                  addTaskMutation.isPending
+                    ? { opacity: 1, y: 0 }
+                    : { opacity: 0 }
+                }
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Loader2Icon className="size-5 animate-spin" />
+              </motion.div>
+              <motion.div
+                className="absolute inset-0 flex size-full items-center justify-center text-neutral-50"
+                initial={
+                  addTaskMutation.isPending ? { opacity: 0, y: 10 } : false
+                }
+                animate={
+                  addTaskMutation.isPending
+                    ? { opacity: 0 }
+                    : { opacity: 1, y: 0 }
+                }
+                exit={{ opacity: 0, y: 10 }}
+              >
                 <CommandIcon size={15} />
                 <div className="select-none text-sm">K</div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </Popover.Anchor>

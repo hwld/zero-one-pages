@@ -87,7 +87,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <DefaultQueryClientProvider>
       <LayoutInner>{children}</LayoutInner>
-      <Toaster expand gap={8} />
+      <Toaster expand gap={8} duration={3000} />
     </DefaultQueryClientProvider>
   );
 };

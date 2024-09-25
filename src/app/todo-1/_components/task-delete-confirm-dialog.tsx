@@ -6,7 +6,8 @@ export const TaskDeleteConfirmDialog: React.FC<{
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-}> = ({ task, isOpen, onOpenChange, onConfirm }) => {
+  isDeleting: boolean;
+}> = ({ task, isOpen, onOpenChange, onConfirm, isDeleting }) => {
   return (
     <Dialog
       isOpen={isOpen}
@@ -15,6 +16,7 @@ export const TaskDeleteConfirmDialog: React.FC<{
       cancelText="キャンセル"
       actionText="削除する"
       onAction={onConfirm}
+      isActionPending={isDeleting}
     >
       <div>
         タスク`

@@ -29,6 +29,10 @@ export const TaskCard: React.FC<{
     updateTaskMutation.mutate({ ...task, done: !task.done });
   };
 
+  const handleDeleteTask = () => {
+    deleteTaskMutation.mutate(task.id);
+  };
+
   const titleInputRef = useRef<HTMLInputElement>(null);
   return (
     <Card>
@@ -99,9 +103,8 @@ export const TaskCard: React.FC<{
             task={task}
             isOpen={isConfirmDeleteOpen}
             onOpenChange={setIsConfirmDeleteOpen}
-            onConfirm={() => {
-              deleteTaskMutation.mutate(task.id);
-            }}
+            onConfirm={handleDeleteTask}
+            isDeleting={deleteTaskMutation.isPending}
           />
         </div>
       </div>

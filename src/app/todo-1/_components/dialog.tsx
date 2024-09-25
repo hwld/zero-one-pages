@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useIsPresent } from "framer-motion";
-import { XIcon } from "lucide-react";
+import { LoaderCircleIcon, XIcon } from "lucide-react";
 
 export const Dialog: React.FC<{
   isOpen: boolean;
@@ -10,6 +10,7 @@ export const Dialog: React.FC<{
   cancelText: string;
   actionText: string;
   onAction: () => void;
+  isActionPending?: boolean;
   children: ReactNode;
 }> = ({
   isOpen,
@@ -18,6 +19,7 @@ export const Dialog: React.FC<{
   cancelText,
   actionText,
   onAction,
+  isActionPending = false,
   children,
 }) => {
   const isPresent = useIsPresent();
@@ -55,10 +57,29 @@ export const Dialog: React.FC<{
                     {cancelText}
                   </button>
                   <button
-                    className="rounded bg-neutral-900 px-3 py-2 text-sm text-neutral-100 hover:bg-neutral-700"
+                    className="group relative overflow-hidden rounded text-sm text-neutral-100 disabled:pointer-events-none"
                     onClick={onAction}
+                    disabled={isActionPending}
                   >
-                    {actionText}
+                    <div
+                      className={
+                        "size-full bg-neutral-900 px-3 py-2 transition-opacity group-hover:bg-neutral-700 group-disabled:opacity-50"
+                      }
+                    >
+                      {actionText}
+                    </div>
+                    <AnimatePresence>
+                      {isActionPending && (
+                        <motion.div
+                          className="absolute inset-0 grid size-full place-items-center bg-black/50"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          <LoaderCircleIcon className="size-5 animate-spin" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </button>
                 </div>
               </motion.div>
