@@ -25,6 +25,10 @@ export const TaskCard: React.FC<{
   const updateTaskMutation = useUpdateTask();
   const deleteTaskMutation = useDeleteTask();
 
+  const handleUpdateTaskDone = () => {
+    updateTaskMutation.mutate({ ...task, done: !task.done });
+  };
+
   const titleInputRef = useRef<HTMLInputElement>(null);
   return (
     <Card>
@@ -49,9 +53,7 @@ export const TaskCard: React.FC<{
               type="checkbox"
               className="peer absolute h-[25px] w-[25px] cursor-pointer appearance-none rounded-full border-2 border-neutral-300"
               checked={task.done}
-              onChange={() => {
-                updateTaskMutation.mutate({ ...task, done: !task.done });
-              }}
+              onChange={handleUpdateTaskDone}
             ></input>
             <div
               className={clsx(

@@ -4,7 +4,7 @@ import { ActivityIcon, CircleAlertIcon, TextIcon, XIcon } from "lucide-react";
 import { TaskStatusBadge } from "../task-status-badge";
 import { TaskDescriptionForm } from "./task-description-form";
 import { useUpdateTask } from "../../_queries/use-update-task";
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 import { useTask } from "../../_queries/use-task";
 import { BounceDot } from "../task-list-loading";
 
@@ -19,6 +19,24 @@ export const TaskDetailSheet = forwardRef<HTMLDivElement, Props>(
     const { data: task, status: taskStatus } = useTask(taskId);
 
     const updateTaskMutation = useUpdateTask();
+
+    const handleUpdateTaskDone = useCallback(() => {
+      if (!task) {
+        return;
+      }
+      updateTaskMutation.mutate({ ...task, done: !task.done });
+    }, [task, updateTaskMutation]);
+
+    const handleUpdateTaskDesc = useCallback(
+      (desc: string) => {
+        if (!task) {
+          return;
+        }
+
+        updateTaskMutation.mutate({ ...task, description: desc });
+      },
+      [task, updateTaskMutation],
+    );
 
     const content = useMemo(() => {
       if (taskStatus === "pending") {
@@ -67,12 +85,7 @@ export const TaskDetailSheet = forwardRef<HTMLDivElement, Props>(
             <div className="ml-2">
               <TaskStatusBadge
                 done={task.done}
-                onChangeDone={() => {
-                  updateTaskMutation.mutate({
-                    ...task,
-                    done: !task.done,
-                  });
-                }}
+                onChangeDone={handleUpdateTaskDone}
               />
             </div>
           </div>
@@ -87,17 +100,18 @@ export const TaskDetailSheet = forwardRef<HTMLDivElement, Props>(
             <TaskDescriptionForm
               id="description"
               defaultDescription={task.description}
-              onChangeDescription={(desc) => {
-                updateTaskMutation.mutate({
-                  ...task,
-                  description: desc,
-                });
-              }}
+              onChangeDescription={handleUpdateTaskDesc}
             />
           </div>
         </>
       );
-    }, [onOpenChange, task, taskStatus, updateTaskMutation]);
+    }, [
+      handleUpdateTaskDesc,
+      handleUpdateTaskDone,
+      onOpenChange,
+      task,
+      taskStatus,
+    ]);
 
     return (
       <RadixDialog.Root open={isOpen} onOpenChange={onOpenChange}>

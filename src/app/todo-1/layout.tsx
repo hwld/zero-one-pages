@@ -17,6 +17,7 @@ import { DefaultQueryClientProvider } from "../_providers/default-query-client-p
 import { TaskListContent } from "./_components/task-list-content";
 import { useTasks } from "./_queries/use-tasks";
 import { useBodyBgColor } from "../../lib/useBodyBgColor";
+import { Toaster } from "sonner";
 
 // Static ExportでParallel Routesが動かないっぽいので、page.tsxにnullを返させて
 // layoutでページをレンダリングする
@@ -86,6 +87,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <DefaultQueryClientProvider>
       <LayoutInner>{children}</LayoutInner>
+      <Toaster expand gap={8} />
     </DefaultQueryClientProvider>
   );
 };
