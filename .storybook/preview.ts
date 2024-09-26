@@ -13,7 +13,9 @@ const preview: Preview = {
       },
     },
   },
+
   loaders: [mswLoader],
+  tags: [],
 };
 
 export default preview;
