@@ -2,6 +2,7 @@ import { Project } from "../../../_backend/project/model";
 import { ProjectPositionChange } from "../../../_backend/project/schema";
 import { ProjectExpansionMap } from "./expansion-map";
 
+// orderは存在せず、配列の並びで順番を決める
 export type ProjectNode = Omit<
   Project,
   "subProjects" | "order" | "parentProjectId"
@@ -59,26 +60,28 @@ export const toProjectNodes = (
   depth: number = 0,
   parentVisible: boolean = true,
 ): ProjectNode[] => {
-  return projects.flatMap((project): ProjectNode[] => {
-    const descendants = countProjectDescendants(project);
+  return [...projects]
+    .sort((a, b) => a.order - b.order)
+    .flatMap((project): ProjectNode[] => {
+      const descendants = countProjectDescendants(project);
 
-    const node: ProjectNode = {
-      ...project,
-      depth,
-      visible: parentVisible,
-      descendantsProjectCount: descendants,
-    };
+      const node: ProjectNode = {
+        ...project,
+        depth,
+        visible: parentVisible,
+        descendantsProjectCount: descendants,
+      };
 
-    return [
-      node,
-      ...toProjectNodes(
-        project.subProjects,
-        projectExpansionMap,
-        depth + 1,
-        parentVisible && projectExpansionMap.isExpanded(project.id),
-      ),
-    ];
-  });
+      return [
+        node,
+        ...toProjectNodes(
+          project.subProjects,
+          projectExpansionMap,
+          depth + 1,
+          parentVisible && projectExpansionMap.isExpanded(project.id),
+        ),
+      ];
+    });
 };
 
 export const toProjects = (nodes: ProjectNode[]): Project[] => {
