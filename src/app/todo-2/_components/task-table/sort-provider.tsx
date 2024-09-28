@@ -7,7 +7,7 @@ import {
 } from "react";
 import { SortEntry } from "../../_backend/api";
 import { useTaskTablePaging } from "./paging-provider";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export type TaskTableSortContext = {
   sortEntry: SortEntry;
@@ -56,7 +56,7 @@ export const useTaskTableSort = () => {
 export const MockTaskTableSortProvider: React.FC<
   { value?: TaskTableSortContext } & PropsWithChildren
 > = ({ value, children }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   if (!value) {
     return <TaskTableSortProvider>{children}</TaskTableSortProvider>;

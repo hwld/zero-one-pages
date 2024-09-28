@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { useScrollableRoot } from "../../_providers/scrollable-root-provider";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export type TaskTablePagingContext = {
   page: number;
@@ -59,7 +59,7 @@ export const useTaskTablePaging = () => {
 export const MockTaskTablePagingProvider: React.FC<
   { value?: TaskTablePagingContext } & PropsWithChildren
 > = ({ children, value }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   if (!value) {
     return <TaskTablePagingProvider>{children}</TaskTablePagingProvider>;

@@ -11,11 +11,14 @@ export const waitForAnimation = () => {
 };
 
 /**
- * 開発環境以外で実行されたときにエラーを出す関数。
+ * 本番環境で実行されたときにエラーを出す関数。
  * テスト用のContextProviderを公開するときなどに使用する
  */
-export const errorIfNotDevelopment = () => {
-  if (process.env.NODE_ENV !== "development") {
-    throw new Error("開発環境以外で使用することができません。");
+export const errorIfProduction = () => {
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.IS_STORYBOOK === undefined
+  ) {
+    throw new Error("本番環境で使用することができません。");
   }
 };

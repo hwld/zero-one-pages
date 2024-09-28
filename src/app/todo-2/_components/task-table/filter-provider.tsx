@@ -7,7 +7,7 @@ import {
 } from "react";
 import { FieldFilter, SelectionFilter } from "../../_backend/api";
 import { useTaskTablePaging } from "./paging-provider";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export type TaskTableFilterContext = {
   fieldFilters: FieldFilter[];
@@ -77,7 +77,7 @@ export const useTaskTableFilter = () => {
 export const MockTaskTableFilterProvider: React.FC<
   { value?: TaskTableFilterContext } & PropsWithChildren
 > = ({ value, children }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   if (!value) {
     return <TaskTableFilterProvider>{children}</TaskTableFilterProvider>;

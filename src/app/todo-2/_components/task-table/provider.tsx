@@ -24,7 +24,7 @@ import {
   TaskTableSearchContext,
   TaskTableSearchProvider,
 } from "./search-provider";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export const TaskTableProvider: React.FC<PropsWithChildren> = ({
   children,
@@ -58,7 +58,7 @@ export const MockTaskTableProvider: React.FC<MockTaskTableProviderProps> = ({
   mockSelection,
   children,
 }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   return (
     <MockTaskTablePagingProvider value={mockPaging}>

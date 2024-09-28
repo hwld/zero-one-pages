@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { useTaskTablePaging } from "./paging-provider";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export type TaskTableSearchContext = {
   searchText: string;
@@ -52,7 +52,7 @@ export const useTaskTableSearch = () => {
 export const MockTaskTableSearchProvider: React.FC<
   { value?: TaskTableSearchContext } & PropsWithChildren
 > = ({ value, children }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   if (!value) {
     return <TaskTableSearchProvider>{children}</TaskTableSearchProvider>;

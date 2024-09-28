@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { errorIfNotDevelopment } from "../../../_test/utils";
+import { errorIfProduction } from "../../../_test/utils";
 
 export type TaskTableSelectionContext = {
   selectedTaskIds: string[];
@@ -76,7 +76,7 @@ export const useTaskTableSelection = () => {
 export const MockTaskTableSelectionProvider: React.FC<
   PropsWithChildren & { value?: TaskTableSelectionContext }
 > = ({ children, value }) => {
-  errorIfNotDevelopment();
+  errorIfProduction();
 
   if (!value) {
     return <TaskTableSelectionProvider>{children}</TaskTableSelectionProvider>;
