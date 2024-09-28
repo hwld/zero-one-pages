@@ -17,8 +17,10 @@ export const waitForAnimation = () => {
 export const errorIfProduction = () => {
   if (
     process.env.NODE_ENV === "production" &&
-    process.env.IS_STORYBOOK === undefined
+    process.env.STORYBOOK === undefined
   ) {
-    throw new Error("本番環境で使用することができません。");
+    throw new Error(
+      `本番環境で使用することができません。 ${JSON.stringify(process.env.STORYBOOK)}`,
+    );
   }
 };
