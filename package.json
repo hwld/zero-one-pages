@@ -9,8 +9,11 @@
     "lint": "next lint",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "storybook:build": "storybook build",
+    "storybook:test": "test-storybook",
+    "storybook:ci": "npx concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"npm run storybook:ci:serve\" \"npm run storybook:ci:test\"",
+    "storybook:ci:serve": "npm run storybook:build --quiet && npx http-server storybook-static --port 6006 --silent",
+    "storybook:ci:test": "npx wait-on tcp:6006 && npm run storybook:test"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -63,10 +66,12 @@
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "autoprefixer": "^10.0.1",
+    "concurrently": "^9.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.2",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-storybook": "^0.8.0",
+    "http-server": "^14.1.1",
     "msw-storybook-addon": "^2.0.2",
     "postcss": "^8",
     "prettier": "^3.1.0",
@@ -75,7 +80,8 @@
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.1",
+    "wait-on": "^8.0.1"
   },
   "msw": {
     "workerDirectory": [
