@@ -10,11 +10,17 @@ import { TaskUpdateForm } from "./update-form";
 import { Tooltip, TooltipDelayGroup } from "../../../_components/tooltip";
 import { ActionButton } from "./action-button";
 import { TaskListItemMenu } from "./menu";
-import { Checkbox } from "./checkbox";
+import { TaskCheckbox } from "../task-checkbox";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Routes } from "../../../routes";
+import { stopPropagation } from "../../../../../lib/utils";
 
 type Props = { task: Task };
 
 export const TaskListItem: React.FC<Props> = ({ task }) => {
+  const router = useRouter();
+
   const [isEditing, setIsEditing] = useState(false);
 
   const updateTaskDone = useUpdateTaskDone();
@@ -31,9 +37,15 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
     <TooltipDelayGroup>
       <div
         key={task.id}
-        className="group relative grid min-w-0 grid-cols-[auto_1fr] gap-2 border-b border-stone-200 pr-5"
+        className="group relative grid min-w-0 cursor-pointer grid-cols-[auto_1fr] gap-2 border-b border-stone-200 pr-5"
+        onClick={() => {
+          router.push(Routes.project(task.id), { scroll: false });
+        }}
       >
-        <div className="absolute right-full mr-1 flex items-center pt-[9px]">
+        <div
+          className="absolute right-full mr-1 flex items-center pt-[9px]"
+          onClick={stopPropagation}
+        >
           <div className="opacity-0 transition-all group-hover:opacity-100">
             <ActionButton
               size="sm"
@@ -48,17 +60,29 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
           )}
         </div>
 
-        <div className="pt-[10px]">
-          <Checkbox checked={task.done} onChange={handleUpdateTaskDone} />
+        <div className="pt-[10px]" onClick={stopPropagation}>
+          <TaskCheckbox checked={task.done} onChange={handleUpdateTaskDone} />
         </div>
-        <div className="flex min-w-0 flex-col gap-1 py-2">
-          <div className="break-all">{task.title}</div>
+        <div
+          className="flex min-w-0 flex-col gap-1 py-2"
+          onClick={stopPropagation}
+        >
+          <Link
+            href={Routes.task(task.id)}
+            className="break-all"
+            scroll={false}
+          >
+            {task.title}
+          </Link>
           <div className="truncate text-xs text-stone-500">
             {task.description}
           </div>
         </div>
 
-        <div className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100 has-[:focus]:opacity-100 has-[[data-open]]:opacity-100">
+        <div
+          className="absolute right-0 flex items-center gap-1 bg-stone-50 opacity-0 transition-all group-hover:opacity-100 has-[:focus]:opacity-100 has-[[data-open]]:opacity-100"
+          onClick={stopPropagation}
+        >
           {!task.done && (
             <>
               <Tooltip placement="top" label="タスクを編集" keys={["Cmd", "E"]}>

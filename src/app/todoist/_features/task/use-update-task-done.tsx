@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UpdateTaskDoneInput } from "../../_backend/task/schema";
 import { updateTaskDone } from "../../_backend/task/api";
 import { tasksQueryOptions } from "./use-tasks";
+import { taskQueryOptions } from "./use-task";
 
 export const useUpdateTaskDone = () => {
   const client = useQueryClient();
@@ -11,7 +12,12 @@ export const useUpdateTaskDone = () => {
       return updateTaskDone(input);
     },
     onMutate: async (input) => {
-      await client.cancelQueries({ queryKey: tasksQueryOptions.queryKey });
+      const taskQuery = taskQueryOptions(input.id);
+
+      await Promise.all([
+        client.cancelQueries({ queryKey: tasksQueryOptions.queryKey }),
+        client.cancelQueries({ queryKey: taskQuery.queryKey }),
+      ]);
 
       client.setQueryData(tasksQueryOptions.queryKey, (oldTasks) =>
         oldTasks?.map((t) => {
@@ -21,6 +27,13 @@ export const useUpdateTaskDone = () => {
           return t;
         }),
       );
+
+      client.setQueryData(taskQuery.queryKey, (old) => {
+        if (!old) {
+          return undefined;
+        }
+        return { ...old, ...input };
+      });
     },
   });
 };

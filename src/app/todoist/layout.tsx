@@ -6,7 +6,10 @@ import { SidebarContextProvider } from "./_components/sidebar/provider";
 
 export const appHeaderHeightName = "--app-header-height";
 
-const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
+const Layout: React.FC<{ children: ReactNode; modal: ReactNode }> = ({
+  children,
+  modal,
+}) => {
   return (
     <SidebarContextProvider>
       <DefaultQueryClientProvider>
@@ -16,6 +19,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         >
           <Sidebar />
           <div className="w-full overflow-hidden">{children}</div>
+          {modal}
         </div>
       </DefaultQueryClientProvider>
     </SidebarContextProvider>

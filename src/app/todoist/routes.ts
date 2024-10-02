@@ -1,5 +1,7 @@
 export const Routes = {
   base: () => "/todoist" as const,
+  task: (id?: string) =>
+    `${Routes.base()}/task${id ? `?id=${id}` : ""}` as const,
   inbox: () => `${Routes.base()}/inbox` as const,
   today: () => `${Routes.base()}/today` as const,
   upcoming: () => `${Routes.base()}/upcoming` as const,

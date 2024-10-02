@@ -1,3 +1,4 @@
+import type { IconType } from "@react-icons/all-files";
 import { PiSpinnerGapBold } from "@react-icons/all-files/pi/PiSpinnerGapBold";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
@@ -5,19 +6,29 @@ import { ComponentPropsWithoutRef, forwardRef } from "react";
 
 type Props = {
   size?: "sm" | "md";
-  color?: "primary" | "secondary";
+  color?: "primary" | "secondary" | "transparent";
   loading?: boolean;
+  leftIcon?: IconType;
+  rightIcon?: IconType;
 } & Omit<ComponentPropsWithoutRef<"button">, "className">;
 
 export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
-  { size = "md", color = "primary", loading, children, ...props },
+  {
+    size = "md",
+    color = "primary",
+    loading,
+    children,
+    leftIcon: LeftIcon,
+    rightIcon: RightIcon,
+    ...props
+  },
   ref,
 ) {
   const colorClass = {
-    primary:
-      "bg-rose-700 text-stone-100 hover:bg-rose-800 focus-visible:outline-none ring-rose-400",
-    secondary:
-      "bg-stone-200 text-stone-700 hover:bg-stone-300 focus-visible:outline-none ring-stone-500",
+    primary: "bg-rose-700 text-stone-100 hover:bg-rose-800 ring-rose-400",
+    secondary: "bg-stone-200 text-stone-700 hover:bg-stone-300 ring-stone-500",
+    transparent:
+      "hover:bg-stone-500/10 text-stone-500 hover:text-stone-900 ring-stone-500",
   };
   const sizeClass = {
     md: "h-8 px-3 text-sm font-medium min-w-16",
@@ -28,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     <button
       ref={ref}
       className={clsx(
-        "relative select-none rounded ring-offset-2 transition-all focus-visible:outline-none focus-visible:ring-2 active:scale-95",
+        "relative select-none text-nowrap rounded ring-offset-2 transition-all focus-visible:outline-none focus-visible:ring-2 active:scale-95",
         sizeClass[size],
         colorClass[color],
         loading
@@ -50,11 +61,14 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
         )}
       </AnimatePresence>
       <motion.div
+        className="flex items-center gap-1"
         initial={loading ? { opacity: 0, y: 10 } : false}
         animate={loading ? { opacity: 0 } : { opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
       >
+        {LeftIcon ? <LeftIcon className="size-4 shrink-0" /> : null}
         {children}
+        {RightIcon ? <RightIcon className="size-4 shrink-0" /> : null}
       </motion.div>
     </button>
   );

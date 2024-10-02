@@ -8,7 +8,6 @@ import { PiFlag } from "@react-icons/all-files/pi/PiFlag";
 import type { IconType } from "@react-icons/all-files";
 import clsx from "clsx";
 import { PiTrayLight } from "@react-icons/all-files/pi/PiTrayLight";
-import { PiCaretDown } from "@react-icons/all-files/pi/PiCaretDown";
 import { Button } from "../../_components/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +17,7 @@ import {
   type TaskFormData,
 } from "../../_backend/task/schema";
 import { z } from "zod";
+import { PiCaretDownLight } from "@react-icons/all-files/pi/PiCaretDownLight";
 
 type Props = {
   size?: "md" | "sm";
@@ -142,13 +142,13 @@ export const TaskForm: React.FC<Props> = ({
           { sm: "p-2", md: "p-4" }[size],
         )}
       >
-        <button className="group grid h-8 grid-cols-[auto_1fr_auto] items-center gap-1 rounded px-2 transition-colors hover:bg-stone-500/10">
-          <PiTrayLight className="size-4" />
-          <p className="font-medium text-stone-500 group-hover:text-stone-900">
-            インボックス
-          </p>
-          <PiCaretDown className="size-4" />
-        </button>
+        <Button
+          color="transparent"
+          leftIcon={PiTrayLight}
+          rightIcon={PiCaretDownLight}
+        >
+          インボックス
+        </Button>
         <div className="flex items-center gap-2">
           <Button color="secondary" onClick={onCancel}>
             キャンセル

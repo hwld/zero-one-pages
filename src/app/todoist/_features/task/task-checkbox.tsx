@@ -1,13 +1,17 @@
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { PiCheckBold } from "@react-icons/all-files/pi/PiCheckBold";
-import { cn } from "../../../../../lib/utils";
+import { cn } from "../../../../lib/utils";
 
-type Props = CheckboxPrimitive.CheckboxProps & {
+type Props = Omit<CheckboxPrimitive.CheckboxProps, "onChange"> & {
   checked: boolean;
   onChange: (checked: boolean) => void;
 };
 
-export const Checkbox: React.FC<Props> = ({ checked, onChange, ...props }) => {
+export const TaskCheckbox: React.FC<Props> = ({
+  checked,
+  onChange,
+  ...props
+}) => {
   return (
     <CheckboxPrimitive.Root
       checked={checked}
