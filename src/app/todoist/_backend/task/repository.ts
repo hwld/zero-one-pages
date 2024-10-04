@@ -10,7 +10,32 @@ export type TaskRecord = {
 };
 
 class TaskRepository {
-  private taskRecords: TaskRecord[] = [];
+  private taskRecords: TaskRecord[] = [
+    {
+      id: "1",
+      title: "task1",
+      description: "",
+      done: false,
+      order: 0,
+      parentId: null,
+    },
+    {
+      id: "2",
+      title: "task2",
+      description: "task2の説明",
+      done: false,
+      order: 1,
+      parentId: null,
+    },
+    {
+      id: "3",
+      title: "task3",
+      description: "task3の説明",
+      done: true,
+      order: 2,
+      parentId: null,
+    },
+  ];
 
   public get(id: string): Task | undefined {
     return recordsToTasks(this.taskRecords).find((t) => t.id === id);
