@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
       "hover:bg-stone-500/10 text-stone-500 hover:text-stone-900 ring-stone-500",
   };
   const sizeClass = {
-    md: "h-8 px-3 text-sm font-medium min-w-16",
+    md: "h-8 px-3 text-sm font-medium",
     sm: "h-6 text-xs px-2",
   };
 

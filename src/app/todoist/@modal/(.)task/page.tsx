@@ -21,8 +21,13 @@ import { PiFlagLight } from "@react-icons/all-files/pi/PiFlagLight";
 import { PiPlusLight } from "@react-icons/all-files/pi/PiPlusLight";
 import { PiLockLight } from "@react-icons/all-files/pi/PiLockLight";
 import { PiPaperclipLight } from "@react-icons/all-files/pi/PiPaperclipLight";
-import type { ReactNode } from "react";
+import { PiTextAlignLeftLight } from "@react-icons/all-files/pi/PiTextAlignLeftLight";
+import { useState, type ReactNode } from "react";
 import { UserIcon } from "../../_components/user-icon";
+import type { Task } from "../../_backend/task/model";
+import { type TaskFormData } from "../../_backend/task/schema";
+import { useUpdateTask } from "../../_features/task/use-update-task";
+import { useTaskForm } from "../../_features/task/use-task-form";
 
 const ModalTaskPage: React.FC = () => {
   const router = useRouter();
@@ -80,6 +85,7 @@ export default ModalTaskPage;
 const TaskDetail: React.FC<{ taskId: string }> = ({ taskId }) => {
   const { data: task, status } = useTask(taskId);
   const udpateDone = useUpdateTaskDone();
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleUpdateTaskDone = (done: boolean) => {
     udpateDone.mutate({ id: taskId, done });
@@ -97,17 +103,33 @@ const TaskDetail: React.FC<{ taskId: string }> = ({ taskId }) => {
     <div className="flex flex-col gap-4 p-4 text-sm">
       <div className="grid grid-cols-[24px_1fr] items-start gap-2">
         <TaskCheckbox checked={task.done} onChange={handleUpdateTaskDone} />
-        <div className="flex flex-col gap-2">
-          <p
-            className={clsx(
-              "break-all text-lg font-bold leading-5",
-              task.done && "line-through",
-            )}
+        {isEditing ? (
+          <TaskEditor task={task} onEndEdit={() => setIsEditing(false)} />
+        ) : (
+          <div
+            className="flex cursor-pointer flex-col gap-2"
+            onClick={() => setIsEditing(true)}
           >
-            {task.title}
-          </p>
-          <p className="break-all">{task.description}</p>
-        </div>
+            <button
+              className={clsx(
+                "break-all text-start text-lg font-bold leading-5",
+                task.done && "line-through",
+              )}
+            >
+              {task.title}
+            </button>
+            <button className="whitespace-pre break-all text-start">
+              {task.description ? (
+                task.description
+              ) : (
+                <span className="flex select-none items-center gap-1 text-stone-400">
+                  <PiTextAlignLeftLight className="size-5" />
+                  説明
+                </span>
+              )}
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-4 pl-[32px]">
         <div className="w-min">
@@ -122,6 +144,71 @@ const TaskDetail: React.FC<{ taskId: string }> = ({ taskId }) => {
             <p className="text-stone-500">コメント</p>
             <PiPaperclipLight className="size-5" />
           </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TaskEditor: React.FC<{ task: Task; onEndEdit: () => void }> = ({
+  task,
+  onEndEdit,
+}) => {
+  const updateTask = useUpdateTask();
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid, errorMessagesWithoutTooSmall },
+    submitRef,
+    handleFormKeyDown,
+  } = useTaskForm({ defaultValues: task, onCancel: onEndEdit });
+
+  const handleUpdateTask = (data: TaskFormData) => {
+    updateTask.mutate(
+      { id: task.id, ...data },
+      {
+        onSuccess: () => {
+          onEndEdit();
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div
+        className="flex w-full flex-col gap-2 rounded-lg border p-2"
+        onKeyDown={handleFormKeyDown}
+      >
+        <input
+          autoFocus
+          className="bg-transparent text-lg font-bold leading-5 outline-none placeholder:text-stone-400"
+          placeholder="タスク名"
+          {...register("title")}
+        />
+        <textarea
+          className="resize-none bg-transparent outline-none placeholder:text-stone-400"
+          placeholder="説明"
+          rows={3}
+          {...register("description")}
+        />
+      </div>
+      <div className="flex w-full items-center justify-between gap-4">
+        <p className="text-xs text-red-600">
+          {errorMessagesWithoutTooSmall[0]}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button color="secondary" onClick={onEndEdit}>
+            キャンセル
+          </Button>
+          <Button
+            ref={submitRef}
+            onClick={handleSubmit(handleUpdateTask)}
+            disabled={!isValid || updateTask.isPending}
+            loading={updateTask.isPending}
+          >
+            保存
+          </Button>
         </div>
       </div>
     </div>
