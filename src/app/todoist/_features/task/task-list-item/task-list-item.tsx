@@ -39,7 +39,7 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
         key={task.id}
         className="group relative grid min-w-0 cursor-pointer grid-cols-[auto_1fr] gap-2 border-b border-stone-200 pr-5"
         onClick={() => {
-          router.push(Routes.project(task.id), { scroll: false });
+          router.push(Routes.task(task.id), { scroll: false });
         }}
       >
         <div
@@ -60,15 +60,17 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
           )}
         </div>
 
-        <div className="pt-[10px]" onClick={stopPropagation}>
-          <TaskCheckbox checked={task.done} onChange={handleUpdateTaskDone} />
+        <div className="pt-[10px]">
+          <TaskCheckbox
+            checked={task.done}
+            onChange={handleUpdateTaskDone}
+            onClick={stopPropagation}
+          />
         </div>
-        <div
-          className="flex min-w-0 flex-col gap-1 py-2"
-          onClick={stopPropagation}
-        >
+        <div className="flex min-w-0 flex-col gap-1 py-2">
           <Link
             href={Routes.task(task.id)}
+            onClick={stopPropagation}
             className="break-all"
             scroll={false}
           >
