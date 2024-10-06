@@ -51,11 +51,7 @@ export type ValidatedCreateInput = CreateInput & BRAND<"CreateInput">;
 export const validateCreateInput = (
   input: CreateInput,
 ): ValidatedCreateInput => {
-  return {
-    label: input.label,
-    parentId: input.parentId,
-    order: input.order,
-  } as ValidatedCreateInput;
+  return input as ValidatedCreateInput;
 };
 
 type UpdateInput = { id: string; label: string };
@@ -64,7 +60,7 @@ export type ValidatedUpdateInput = UpdateInput & BRAND<"UpdateInput">;
 export const validateUpdateInput = (
   input: UpdateInput,
 ): ValidatedUpdateInput => {
-  return { id: input.id, label: input.label } as ValidatedUpdateInput;
+  return input as ValidatedUpdateInput;
 };
 
 type UpdatePositionInput = {
@@ -79,10 +75,6 @@ export const validateUpdatePositionInputs = (
   inputs: UpdatePositionInput[],
 ): ValidatedUpdatePositionInput[] => {
   return inputs.map((input) => {
-    return {
-      projectId: input.projectId,
-      parentProjectId: input.parentProjectId,
-      order: input.order,
-    } as ValidatedUpdatePositionInput;
+    return input as ValidatedUpdatePositionInput;
   });
 };
