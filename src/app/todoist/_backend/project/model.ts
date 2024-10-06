@@ -17,3 +17,31 @@ export const projectSchema: z.ZodType<Project> = z.object({
   order: z.number(),
   subProjects: z.lazy(() => projectSchema.array()),
 });
+
+type GetOrderBasedOnProjectParams = {
+  baseProject: Project;
+  position: "before" | "after";
+};
+
+type OrderBasedOnProject = { parentId: string | null; order: number };
+
+export const getOrderBasedOnProject = ({
+  baseProject,
+  position,
+}: GetOrderBasedOnProjectParams): OrderBasedOnProject => {
+  switch (position) {
+    case "before": {
+      return { parentId: baseProject.parentId, order: baseProject.order };
+    }
+    case "after": {
+      const hasSubProjects = baseProject.subProjects.length !== 0;
+
+      return hasSubProjects
+        ? { parentId: baseProject.id, order: 0 }
+        : { parentId: baseProject.parentId, order: baseProject.order + 1 };
+    }
+    default: {
+      throw new Error(position satisfies never);
+    }
+  }
+};

@@ -9,6 +9,7 @@ import {
   type ProjectNode,
 } from "./project";
 import { ProjectExpansionMap } from "./expansion-map";
+import { genProject } from "../../../_backend/project/model.test";
 
 describe("project", () => {
   describe("toProjectNodes", () => {
@@ -160,15 +161,6 @@ describe("project", () => {
       expect(resultMap.get("1-2")?.parentId).toEqual("1");
     });
   });
-});
-
-const genProject = (project: Partial<Project>): Project => ({
-  id: project.id ?? crypto.randomUUID(),
-  label: project.label ?? "project",
-  parentId: project.parentId ?? null,
-  order: project.order ?? 0,
-  subProjects: project.subProjects ?? [],
-  todos: project.todos ?? 0,
 });
 
 const genProjectNode = (node: Partial<ProjectNode>): ProjectNode => ({

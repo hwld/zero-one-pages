@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { TaskDetailModalContent } from "../../_features/task/task-detail-modal-content";
 import { Dialog } from "../../_components/dialog";
 
+// Intercepting RoutesはStatic Exportsじゃ動かないので、dev serverのみで動く
 const ModalTaskPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();

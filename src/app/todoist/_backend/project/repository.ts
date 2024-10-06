@@ -69,37 +69,6 @@ class ProjectRepository {
     this.projectRecords = [...this.projectRecords, newRecord];
   }
 
-  public addAdjacent({
-    label,
-    position,
-    referenceProjectId,
-  }: {
-    label: string;
-    position: "before" | "after";
-    referenceProjectId: string;
-  }) {
-    const referenceProject = this.get(referenceProjectId);
-    if (!referenceProject) {
-      throw new Error(`プロジェクトが存在しない: ${referenceProjectId}`);
-    }
-
-    if (position === "before") {
-      const newParentId = referenceProject.parentId;
-      const newOrder = referenceProject.order;
-
-      this.add({ parentId: newParentId, order: newOrder, label });
-    } else if (position === "after") {
-      //　基準となるプロジェクトがサブプロジェクトを持っていたら、サブプロジェクトのorder:0に追加する
-      const hasSubProjects = referenceProject.subProjects.length !== 0;
-      const newParentId = hasSubProjects
-        ? referenceProject.id
-        : referenceProject.parentId;
-      const newOrder = hasSubProjects ? 0 : referenceProject.order + 1;
-
-      this.add({ parentId: newParentId, order: newOrder, label });
-    }
-  }
-
   public update(input: { id: string; label: string }) {
     this.projectRecords = this.projectRecords.map((p) => {
       if (p.id === input.id) {

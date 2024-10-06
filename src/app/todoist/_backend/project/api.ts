@@ -2,7 +2,7 @@ import { z } from "zod";
 import { projectRepository } from "./repository";
 import { TodoistAPI } from "../routes";
 import { delay, http, HttpResponse } from "msw";
-import { Project, projectSchema } from "./model";
+import { getOrderBasedOnProject, Project, projectSchema } from "./model";
 import { fetcher } from "../../../../lib/fetcher";
 import {
   CreateProjectInput,
@@ -59,10 +59,20 @@ export const projectApiHandlers = [
     if (input.type === "default") {
       projectRepository.add({ label: input.label, parentId: null });
     } else {
-      projectRepository.addAdjacent({
-        label: input.label,
+      const baseProject = projectRepository.get(input.referenceProjectId);
+      if (!baseProject) {
+        throw new Error("プロジェクトが存在しない");
+      }
+
+      const order = getOrderBasedOnProject({
+        baseProject,
         position: input.type,
-        referenceProjectId: input.referenceProjectId,
+      });
+
+      projectRepository.add({
+        label: input.label,
+        parentId: order.parentId,
+        order: order.order,
       });
     }
 
