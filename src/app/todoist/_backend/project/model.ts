@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type BRAND } from "zod";
 
 export type Project = {
   id: string;
@@ -22,7 +22,6 @@ type GetOrderBasedOnProjectParams = {
   baseProject: Project;
   position: "before" | "after";
 };
-
 type OrderBasedOnProject = { parentId: string | null; order: number };
 
 export const getOrderBasedOnProject = ({
@@ -44,4 +43,46 @@ export const getOrderBasedOnProject = ({
       throw new Error(position satisfies never);
     }
   }
+};
+
+type CreateInput = { label: string; parentId: string | null; order?: number };
+export type ValidatedCreateInput = CreateInput & BRAND<"CreateInput">;
+
+export const validateCreateInput = (
+  input: CreateInput,
+): ValidatedCreateInput => {
+  return {
+    label: input.label,
+    parentId: input.parentId,
+    order: input.order,
+  } as ValidatedCreateInput;
+};
+
+type UpdateInput = { id: string; label: string };
+export type ValidatedUpdateInput = UpdateInput & BRAND<"UpdateInput">;
+
+export const validateUpdateInput = (
+  input: UpdateInput,
+): ValidatedUpdateInput => {
+  return { id: input.id, label: input.label } as ValidatedUpdateInput;
+};
+
+type UpdatePositionInput = {
+  projectId: string;
+  parentProjectId: string | null;
+  order: number;
+};
+export type ValidatedUpdatePositionInput = UpdatePositionInput &
+  BRAND<"UpdatePositionInput">;
+
+export const validateUpdatePositionInputs = (
+  inputs: UpdatePositionInput[],
+): ValidatedUpdatePositionInput[] => {
+  return inputs.map((input) => {
+    return {
+      projectId: input.projectId,
+      parentProjectId: input.parentProjectId,
+      order: input.order,
+    } as ValidatedUpdatePositionInput;
+  });
 };

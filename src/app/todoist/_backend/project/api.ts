@@ -2,7 +2,14 @@ import { z } from "zod";
 import { projectRepository } from "./repository";
 import { TodoistAPI } from "../routes";
 import { delay, http, HttpResponse } from "msw";
-import { getOrderBasedOnProject, Project, projectSchema } from "./model";
+import {
+  getOrderBasedOnProject,
+  Project,
+  projectSchema,
+  validateCreateInput,
+  validateUpdateInput,
+  validateUpdatePositionInputs,
+} from "./model";
 import { fetcher } from "../../../../lib/fetcher";
 import {
   CreateProjectInput,
@@ -30,7 +37,7 @@ export const createProject = async (
 export const updateProject = async ({
   id,
   ...body
-}: UpdateProjectInput): Promise<void> => {
+}: UpdateProjectInput & { id: string }): Promise<void> => {
   await fetcher.patch(TodoistAPI.project(id), { body });
 };
 
@@ -57,7 +64,12 @@ export const projectApiHandlers = [
     const input = createProjectInputSchema.parse(await request.json());
 
     if (input.type === "default") {
-      projectRepository.add({ label: input.label, parentId: null });
+      const validatedInput = validateCreateInput({
+        label: input.label,
+        parentId: null,
+      });
+
+      projectRepository.add(validatedInput);
     } else {
       const baseProject = projectRepository.get(input.referenceProjectId);
       if (!baseProject) {
@@ -69,11 +81,13 @@ export const projectApiHandlers = [
         position: input.type,
       });
 
-      projectRepository.add({
+      const validatedInput = validateCreateInput({
         label: input.label,
         parentId: order.parentId,
         order: order.order,
       });
+
+      projectRepository.add(validatedInput);
     }
 
     return HttpResponse.json({});
@@ -84,7 +98,8 @@ export const projectApiHandlers = [
     const id = z.string().parse(params.id);
     const input = updateProjectInputSchema.parse(await request.json());
 
-    projectRepository.update({ id, label: input.label });
+    const validatedInput = validateUpdateInput({ id, label: input.label });
+    projectRepository.update(validatedInput);
 
     return HttpResponse.json({});
   }),
@@ -96,7 +111,8 @@ export const projectApiHandlers = [
       .array(projectPositionChangeSchema)
       .parse(await request.json());
 
-    changes.forEach((change) => {
+    const validatedChanges = validateUpdatePositionInputs(changes);
+    validatedChanges.forEach((change) => {
       projectRepository.updatePosition(change);
     });
 

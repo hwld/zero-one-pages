@@ -20,9 +20,7 @@ export const createProjectInputSchema = z.union([
 
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>;
 
-export const updateProjectInputSchema = projectFormSchema.merge(
-  z.object({ id: z.string() }),
-);
+export const updateProjectInputSchema = projectFormSchema;
 export type UpdateProjectInput = z.infer<typeof updateProjectInputSchema>;
 
 export const projectPositionChangeSchema = z.object({

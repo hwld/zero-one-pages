@@ -1,5 +1,10 @@
 import { initialData } from "./data";
-import { Project } from "./model";
+import {
+  Project,
+  type ValidatedCreateInput,
+  type ValidatedUpdateInput,
+  type ValidatedUpdatePositionInput,
+} from "./model";
 
 export type ProjectRecord = {
   id: string;
@@ -44,11 +49,7 @@ class ProjectRepository {
     return siblingOrders.length > 0 ? Math.max(...siblingOrders) : 0;
   }
 
-  public add(input: {
-    label: string;
-    parentId: string | null;
-    order?: number;
-  }) {
+  public add(input: ValidatedCreateInput) {
     const newOrder =
       input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
 
@@ -69,7 +70,7 @@ class ProjectRepository {
     this.projectRecords = [...this.projectRecords, newRecord];
   }
 
-  public update(input: { id: string; label: string }) {
+  public update(input: ValidatedUpdateInput) {
     this.projectRecords = this.projectRecords.map((p) => {
       if (p.id === input.id) {
         return { ...p, label: input.label };
@@ -81,11 +82,7 @@ class ProjectRepository {
     projectId,
     order,
     parentProjectId,
-  }: {
-    order: number;
-    projectId: string;
-    parentProjectId: string | null;
-  }) {
+  }: ValidatedUpdatePositionInput) {
     this.projectRecords = this.projectRecords.map((record): ProjectRecord => {
       if (projectId === record.id) {
         return { ...record, order, parentId: parentProjectId };
