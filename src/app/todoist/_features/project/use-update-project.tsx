@@ -4,7 +4,7 @@ import { UpdateProjectInput } from "../../_backend/project/schema";
 
 export const useUpdateProject = () => {
   return useMutation({
-    mutationFn: (data: UpdateProjectInput) => {
+    mutationFn: (data: UpdateProjectInput & { id: string }) => {
       return updateProject(data);
     },
   });
