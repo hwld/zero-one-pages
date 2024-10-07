@@ -19,15 +19,22 @@ export const projectSchema: z.ZodType<Project> = z.object({
 });
 
 type GetOrderBasedOnProjectParams = {
-  baseProject: Project;
+  baseProjectId: string;
   position: "before" | "after";
+  getProject: (id: string) => Project | undefined;
 };
 type OrderBasedOnProject = { parentId: string | null; order: number };
 
 export const getOrderBasedOnProject = ({
-  baseProject,
+  baseProjectId,
   position,
+  getProject,
 }: GetOrderBasedOnProjectParams): OrderBasedOnProject => {
+  const baseProject = getProject(baseProjectId);
+  if (!baseProject) {
+    throw new Error(`存在しないプロジェクト :${baseProject}`);
+  }
+
   switch (position) {
     case "before": {
       return { parentId: baseProject.parentId, order: baseProject.order };
@@ -59,7 +66,13 @@ export type ValidatedUpdateInput = UpdateInput & BRAND<"UpdateInput">;
 
 export const validateUpdateInput = (
   input: UpdateInput,
+  { getProject }: { getProject: (id: string) => Project | undefined },
 ): ValidatedUpdateInput => {
+  const project = getProject(input.id);
+  if (!project) {
+    throw new Error(`プロジェクトが存在しない: ${input.id}`);
+  }
+
   return input as ValidatedUpdateInput;
 };
 
@@ -73,8 +86,16 @@ export type ValidatedUpdatePositionInput = UpdatePositionInput &
 
 export const validateUpdatePositionInputs = (
   inputs: UpdatePositionInput[],
+  { getProjects }: { getProjects: (ids: string[]) => Project[] },
 ): ValidatedUpdatePositionInput[] => {
+  const projects = getProjects(inputs.map((i) => i.projectId));
+  const projectMap = new Map(projects.map((p) => [p.id, p]));
+
   return inputs.map((input) => {
+    if (!projectMap.get(input.projectId)) {
+      throw new Error(`プロジェクトが存在しない: ${input.projectId}`);
+    }
+
     return input as ValidatedUpdatePositionInput;
   });
 };

@@ -71,14 +71,10 @@ export const projectApiHandlers = [
 
       projectRepository.add(validatedInput);
     } else {
-      const baseProject = projectRepository.get(input.referenceProjectId);
-      if (!baseProject) {
-        throw new Error("プロジェクトが存在しない");
-      }
-
       const order = getOrderBasedOnProject({
-        baseProject,
+        baseProjectId: input.referenceProjectId,
         position: input.type,
+        getProject: projectRepository.get,
       });
 
       const validatedInput = validateCreateInput({
@@ -98,7 +94,10 @@ export const projectApiHandlers = [
     const id = z.string().parse(params.id);
     const input = updateProjectInputSchema.parse(await request.json());
 
-    const validatedInput = validateUpdateInput({ id, label: input.label });
+    const validatedInput = validateUpdateInput(
+      { id, label: input.label },
+      { getProject: projectRepository.get },
+    );
     projectRepository.update(validatedInput);
 
     return HttpResponse.json({});
@@ -111,7 +110,10 @@ export const projectApiHandlers = [
       .array(projectPositionChangeSchema)
       .parse(await request.json());
 
-    const validatedChanges = validateUpdatePositionInputs(changes);
+    const validatedChanges = validateUpdatePositionInputs(changes, {
+      getProjects: projectRepository.getMany,
+    });
+
     validatedChanges.forEach((change) => {
       projectRepository.updatePosition(change);
     });

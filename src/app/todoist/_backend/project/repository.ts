@@ -37,19 +37,23 @@ class ProjectRepository {
     return _get(this.getAll());
   }
 
-  public getAll(): Project[] {
+  public getAll = (): Project[] => {
     return recordsToProjects(this.projectRecords);
-  }
+  };
 
-  public getMaxOrderByParentId(parentId: string | null): number {
+  public getMany = (ids: string[]): Project[] => {
+    return ids.map((id) => this.get(id)).filter((p) => p !== undefined);
+  };
+
+  public getMaxOrderByParentId = (parentId: string | null): number => {
     const siblingOrders = this.projectRecords
       .filter((p) => p.parentId === parentId)
       .map((p) => p.order);
 
     return siblingOrders.length > 0 ? Math.max(...siblingOrders) : 0;
-  }
+  };
 
-  public add(input: ValidatedCreateInput) {
+  public add = (input: ValidatedCreateInput) => {
     const newOrder =
       input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
 
@@ -68,30 +72,30 @@ class ProjectRepository {
     });
 
     this.projectRecords = [...this.projectRecords, newRecord];
-  }
+  };
 
-  public update(input: ValidatedUpdateInput) {
+  public update = (input: ValidatedUpdateInput) => {
     this.projectRecords = this.projectRecords.map((p) => {
       if (p.id === input.id) {
         return { ...p, label: input.label };
       }
       return p;
     });
-  }
-  public updatePosition({
+  };
+  public updatePosition = ({
     projectId,
     order,
     parentProjectId,
-  }: ValidatedUpdatePositionInput) {
+  }: ValidatedUpdatePositionInput) => {
     this.projectRecords = this.projectRecords.map((record): ProjectRecord => {
       if (projectId === record.id) {
         return { ...record, order, parentId: parentProjectId };
       }
       return record;
     });
-  }
+  };
 
-  public remove(id: string) {
+  public remove = (id: string) => {
     const targetProject = this.projectRecords.find((p) => p.id === id);
     if (!targetProject) {
       throw new Error("プロジェクトが存在しない");
@@ -122,7 +126,7 @@ class ProjectRepository {
 
         return project;
       });
-  }
+  };
 }
 
 export const projectRepository = new ProjectRepository();

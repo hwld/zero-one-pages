@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getOrderBasedOnProject, type Project } from "./model";
+import {
+  getOrderBasedOnProject,
+  validateUpdateInput,
+  validateUpdatePositionInputs,
+  type Project,
+} from "./model";
 
 describe("project model", () => {
   describe("getOrderBasedOnProject", () => {
@@ -12,8 +17,9 @@ describe("project model", () => {
       });
 
       const order = getOrderBasedOnProject({
-        baseProject,
+        baseProjectId: baseProject.id,
         position: "before",
+        getProject: () => baseProject,
       });
 
       expect(order.parentId).toBe("parent");
@@ -29,8 +35,9 @@ describe("project model", () => {
       });
 
       const order = getOrderBasedOnProject({
-        baseProject,
+        baseProjectId: baseProject.id,
         position: "after",
+        getProject: () => baseProject,
       });
 
       expect(order.parentId).toBe("parent");
@@ -46,12 +53,68 @@ describe("project model", () => {
       });
 
       const order = getOrderBasedOnProject({
-        baseProject,
+        baseProjectId: baseProject.id,
         position: "after",
+        getProject: () => baseProject,
       });
 
       expect(order.parentId).toBe("1");
       expect(order.order).toBe(0);
+    });
+  });
+
+  describe("validateUpdateInput", () => {
+    it("検証に成功する", () => {
+      const execute = () =>
+        validateUpdateInput(
+          { id: "1", label: "label" },
+          { getProject: () => genProject({ id: "1" }) },
+        );
+
+      expect(execute).not.toThrowError();
+    });
+
+    it("プロジェクトが存在しないときにはエラー", () => {
+      const execute = () =>
+        validateUpdateInput(
+          { id: "1", label: "label" },
+          { getProject: () => undefined },
+        );
+
+      expect(execute).toThrowError();
+    });
+  });
+
+  describe("validateUpdatePositionInputs", () => {
+    it("検証に成功する", () => {
+      const execute = () =>
+        validateUpdatePositionInputs(
+          [
+            { projectId: "1", parentProjectId: null, order: 0 },
+            { projectId: "2", parentProjectId: null, order: 1 },
+          ],
+          {
+            getProjects: () => [
+              genProject({ id: "1", parentId: null }),
+              genProject({ id: "2", parentId: null }),
+            ],
+          },
+        );
+
+      expect(execute).not.toThrowError();
+    });
+
+    it("存在しないプロジェクトがあるとエラー", () => {
+      const execute = () =>
+        validateUpdatePositionInputs(
+          [
+            { projectId: "1", parentProjectId: null, order: 0 },
+            { projectId: "2", parentProjectId: null, order: 1 },
+          ],
+          { getProjects: () => [genProject({ id: "1", parentId: null })] },
+        );
+
+      expect(execute).toThrowError();
     });
   });
 });
