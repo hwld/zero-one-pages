@@ -10,14 +10,14 @@ describe("project model", () => {
   describe("getOrderBasedOnProject", () => {
     it("あるプロジェクトのbeforeのorderを正しく取得できる", () => {
       const baseProject = genProject({
-        id: "1",
+        taskboxId: "1",
         order: 10,
         parentId: "parent",
         subProjects: [genProject(), genProject()],
       });
 
       const order = getOrderBasedOnProject({
-        baseProjectId: baseProject.id,
+        baseProjectId: baseProject.taskboxId,
         position: "before",
         getProject: () => baseProject,
       });
@@ -28,14 +28,14 @@ describe("project model", () => {
 
     it("サブプロジェクトが存在しないプロジェクトのafterのorderを正しく取得できる", () => {
       const baseProject = genProject({
-        id: "1",
+        taskboxId: "1",
         order: 10,
         parentId: "parent",
         subProjects: [],
       });
 
       const order = getOrderBasedOnProject({
-        baseProjectId: baseProject.id,
+        baseProjectId: baseProject.taskboxId,
         position: "after",
         getProject: () => baseProject,
       });
@@ -46,14 +46,14 @@ describe("project model", () => {
 
     it("サブプロジェクトが存在するプロジェクトのafterのorderを正しく取得できる", () => {
       const baseProject = genProject({
-        id: "1",
+        taskboxId: "1",
         order: 10,
         parentId: "parent",
         subProjects: [genProject(), genProject()],
       });
 
       const order = getOrderBasedOnProject({
-        baseProjectId: baseProject.id,
+        baseProjectId: baseProject.taskboxId,
         position: "after",
         getProject: () => baseProject,
       });
@@ -68,7 +68,7 @@ describe("project model", () => {
       const execute = () =>
         validateUpdateInput(
           { id: "1", label: "label" },
-          { getProject: () => genProject({ id: "1" }) },
+          { getProject: () => genProject({ taskboxId: "1" }) },
         );
 
       expect(execute).not.toThrowError();
@@ -95,8 +95,8 @@ describe("project model", () => {
           ],
           {
             getProjects: () => [
-              genProject({ id: "1", parentId: null }),
-              genProject({ id: "2", parentId: null }),
+              genProject({ taskboxId: "1", parentId: null }),
+              genProject({ taskboxId: "2", parentId: null }),
             ],
           },
         );
@@ -111,7 +111,9 @@ describe("project model", () => {
             { projectId: "1", parentProjectId: null, order: 0 },
             { projectId: "2", parentProjectId: null, order: 1 },
           ],
-          { getProjects: () => [genProject({ id: "1", parentId: null })] },
+          {
+            getProjects: () => [genProject({ taskboxId: "1", parentId: null })],
+          },
         );
 
       expect(execute).toThrowError();
@@ -121,7 +123,7 @@ describe("project model", () => {
 
 export const genProject = (project?: Partial<Project>): Project => {
   return {
-    id: project?.id ?? crypto.randomUUID(),
+    taskboxId: project?.taskboxId ?? crypto.randomUUID(),
     label: project?.label ?? "project",
     order: project?.order ?? 0,
     parentId: project?.parentId ?? null,

@@ -26,7 +26,7 @@ export const ProjectDeleteDialog: React.FC<Props> = ({
   const deleteProject = useDeleteProject();
 
   const handleDelete = () => {
-    deleteProject.mutate(project.id);
+    deleteProject.mutate(project.taskboxId);
   };
 
   const description = useMemo(() => {

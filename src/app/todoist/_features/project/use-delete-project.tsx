@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { deleteProject } from "../../_backend/project/api";
+import { deleteProject } from "../../_backend/taskbox/project/api";
 
 export const useDeleteProject = () => {
   return useMutation({

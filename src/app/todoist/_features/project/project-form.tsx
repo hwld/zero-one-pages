@@ -7,7 +7,7 @@ import { ErrorMessage } from "../../_components/error-message";
 import {
   ProjectFormData,
   projectFormSchema,
-} from "../../_backend/project/schema";
+} from "../../_backend/taskbox/project/schema";
 
 type Props = {
   id: string;

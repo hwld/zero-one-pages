@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { updateProject } from "../../_backend/project/api";
-import { UpdateProjectInput } from "../../_backend/project/schema";
+import { updateProject } from "../../_backend/taskbox/project/api";
+import { UpdateProjectInput } from "../../_backend/taskbox/project/schema";
 
 export const useUpdateProject = () => {
   return useMutation({

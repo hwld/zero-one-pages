@@ -1,5 +1,5 @@
-import { Project } from "../../../_backend/project/model";
-import { ProjectPositionChange } from "../../../_backend/project/schema";
+import { Project } from "../../../_backend/taskbox/project/model";
+import { ProjectPositionChange } from "../../../_backend/taskbox/project/schema";
 import { ProjectExpansionMap } from "./expansion-map";
 
 // orderは存在せず、配列の並びで順番を決める
@@ -18,7 +18,7 @@ export const toProjectMap = (projects: Project[]): ProjectMap => {
   const projectMap: ProjectMap = new Map();
 
   const addToMap = (project: Project) => {
-    projectMap.set(project.id, project);
+    projectMap.set(project.taskboxId, project);
     project.subProjects.forEach(addToMap);
   };
 
@@ -44,7 +44,7 @@ export const getProjectPositionChanges = (
       baseProject.parentId !== project.parentId
     ) {
       result.push({
-        projectId: project.id,
+        projectId: project.taskboxId,
         order: project.order,
         parentProjectId: project.parentId,
       });
@@ -78,7 +78,7 @@ export const toProjectNodes = (
           project.subProjects,
           projectExpansionMap,
           depth + 1,
-          parentVisible && projectExpansionMap.isExpanded(project.id),
+          parentVisible && projectExpansionMap.isExpanded(project.taskboxId),
         ),
       ];
     });
@@ -105,7 +105,7 @@ export const toProjects = (nodes: ProjectNode[]): Project[] => {
       const parentSubProjects = parent.subProjects;
 
       project.order = parentSubProjects.length;
-      project.parentId = parent.id;
+      project.parentId = parent.taskboxId;
 
       parentSubProjects.push(project);
     } else {
@@ -121,7 +121,7 @@ export const toProjects = (nodes: ProjectNode[]): Project[] => {
 
 const findProject = (projects: Project[], id: string): Project | undefined => {
   for (const project of projects) {
-    if (project.id === id) {
+    if (project.taskboxId === id) {
       return project;
     }
 
@@ -153,8 +153,8 @@ export const moveProject = (
 
   const nodes = toProjectNodes(projects, projectExpansionMap);
 
-  const fromIndex = nodes.findIndex((p) => p.id === fromId);
-  let toIndex = nodes.findIndex((p) => p.id === toId);
+  const fromIndex = nodes.findIndex((p) => p.taskboxId === fromId);
+  let toIndex = nodes.findIndex((p) => p.taskboxId === toId);
   const toNode = nodes[toIndex];
 
   const newNodes = [...nodes];
@@ -162,11 +162,11 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.descendantsProjectCount &&
-    !projectExpansionMap.isExpanded(toNode.id)
+    !projectExpansionMap.isExpanded(toNode.taskboxId)
   ) {
     // 前から後の移動で、移動対象のプロジェクトにsubProjectsが存在し、展開されていない場合には
     // 移動対象のプロジェクトの子孫プロジェクトの数だけindexをずらす
-    const toProject = findProject(projects, toNode.id);
+    const toProject = findProject(projects, toNode.taskboxId);
     if (!toProject) {
       throw new Error("移動対象のプロジェクトが存在しません");
     }
@@ -182,7 +182,7 @@ export const moveProject = (
   if (
     fromIndex < toIndex &&
     toNode.descendantsProjectCount &&
-    projectExpansionMap.isExpanded(toNode.id)
+    projectExpansionMap.isExpanded(toNode.taskboxId)
   ) {
     moved.depth = toNode.depth + 1;
   } else {
@@ -200,7 +200,7 @@ export const updateProjectDepth = (
 ): Project[] => {
   const nodes = toProjectNodes(projects, projectExpansionMap);
 
-  const targetIndex = nodes.findIndex((p) => p.id === projectId);
+  const targetIndex = nodes.findIndex((p) => p.taskboxId === projectId);
   if (targetIndex === -1) {
     throw new Error(`変更対象のプロジェクトが存在しない: ${projectId}`);
   }
@@ -238,7 +238,7 @@ export const dragProjectStart = (
 ): { results: Project[]; removedDescendantNodes: ProjectNode[] } => {
   const nodes = toProjectNodes(projects, projectExpansionMap);
 
-  const targetIndex = nodes.findIndex((p) => p.id === id);
+  const targetIndex = nodes.findIndex((p) => p.taskboxId === id);
   const targetNode = nodes[targetIndex];
   if (!targetNode) {
     throw new Error(`プロジェクトが存在しない: ${id}`);
@@ -271,7 +271,7 @@ export const dragProjectEnd = (
 ): [Project[], ProjectExpansionMap] => {
   const nodes = toProjectNodes(projects, projectExpansionMap);
 
-  const targetIndex = nodes.findIndex((n) => n.id === id);
+  const targetIndex = nodes.findIndex((n) => n.taskboxId === id);
   if (targetIndex === -1) {
     throw new Error(`対象のプロジェクトが存在しない: ${id}`);
   }
@@ -302,7 +302,7 @@ export const dragProjectEnd = (
       throw new Error(`親プロジェクトが存在しない`);
     }
 
-    newExpansionMap.toggle(parent.id, true);
+    newExpansionMap.toggle(parent.taskboxId, true);
   }
 
   return [toProjects(newNodes), newExpansionMap];

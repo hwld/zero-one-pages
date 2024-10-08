@@ -1,6 +1,6 @@
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchProjects } from "../../_backend/project/api";
-import { Project } from "../../_backend/project/model";
+import { fetchProjects } from "../../_backend/taskbox/project/api";
+import { Project } from "../../_backend/taskbox/project/model";
 import { useCallback } from "react";
 import { useMswState } from "../../../_providers/msw-provider";
 

@@ -74,7 +74,7 @@ export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
             >
               {projectNodes.map((projectNode) => {
                 return (
-                  <AnimatePresence key={projectNode.id}>
+                  <AnimatePresence key={projectNode.taskboxId}>
                     {projectNode.visible ? (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -87,7 +87,7 @@ export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
                           currentRoute={currentRoute}
                           project={projectNode}
                           expanded={projectExpansionMap.isExpanded(
-                            projectNode.id,
+                            projectNode.taskboxId,
                           )}
                           onChangeExpanded={handleChangeExpanded}
                         />

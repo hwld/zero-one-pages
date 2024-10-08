@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { projectRepository } from "./repository";
-import { TodoistAPI } from "../routes";
+import { TodoistAPI } from "../../routes";
 import { delay, http, HttpResponse } from "msw";
 import {
   getOrderBasedOnProject,
@@ -10,7 +10,7 @@ import {
   validateUpdateInput,
   validateUpdatePositionInputs,
 } from "./model";
-import { fetcher } from "../../../../lib/fetcher";
+import { fetcher } from "../../../../../lib/fetcher";
 import {
   CreateProjectInput,
   createProjectInputSchema,

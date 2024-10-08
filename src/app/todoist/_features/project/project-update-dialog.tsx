@@ -15,7 +15,7 @@ import { Button } from "../../_components/button";
 import { ProjectForm } from "./project-form";
 import { useId } from "react";
 import { useUpdateProject } from "./use-update-project";
-import { ProjectFormData } from "../../_backend/project/schema";
+import { ProjectFormData } from "../../_backend/taskbox/project/schema";
 
 type Props = {
   project: ProjectNode;
@@ -33,7 +33,7 @@ export const ProjectUpdateDialog: React.FC<Props> = ({
 
   const handleUpdateProject = (data: ProjectFormData) => {
     updateProject.mutate(
-      { ...data, id: project.id },
+      { ...data, id: project.taskboxId },
       {
         onSuccess: () => {
           onOpenChange(false);

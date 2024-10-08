@@ -17,7 +17,7 @@ import { useId } from "react";
 import {
   CreateProjectInput,
   ProjectFormData,
-} from "../../_backend/project/schema";
+} from "../../_backend/taskbox/project/schema";
 
 type Props = {
   isOpen: boolean;

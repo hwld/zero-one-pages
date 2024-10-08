@@ -38,10 +38,10 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { itemRef, draggingProjectId, handleDragStart } = useDragProject(
-    project.id,
+    project.taskboxId,
     dragContext,
   );
-  const isDragging = draggingProjectId === project.id;
+  const isDragging = draggingProjectId === project.taskboxId;
 
   // LinkにフォーカスがあたったときにIconButtonを表示させるためにfocusを自前で管理する。
   //
@@ -103,7 +103,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
       ) : (
         <SidebarListLink
           ref={itemRef}
-          href={Routes.project(project.id)}
+          href={Routes.project(project.taskboxId)}
           currentRoute={currentRoute}
           icon={PiHashLight}
           onPointerEnter={() => {
@@ -129,7 +129,9 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
               {project.descendantsProjectCount ? (
                 <TreeToggleIconButton
                   isOpen={expanded}
-                  onOpenChange={(open) => onChangeExpanded(project.id, open)}
+                  onOpenChange={(open) =>
+                    onChangeExpanded(project.taskboxId, open)
+                  }
                 />
               ) : null}
             </div>
@@ -153,13 +155,13 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
         isOpen={isCreateBeforeDialogOpen}
         onOpenChange={setIsCreateBeforeDialogOpen}
         createType="before"
-        referenceProjectId={project.id}
+        referenceProjectId={project.taskboxId}
       />
       <ProjectCreateDialog
         isOpen={isCreateAfterDialogOpen}
         onOpenChange={setIsCreateAfterDialogOpen}
         createType="after"
-        referenceProjectId={project.id}
+        referenceProjectId={project.taskboxId}
       />
     </>
   );

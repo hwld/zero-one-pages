@@ -56,13 +56,13 @@ export const useDragProjectContext = ({
         const { results, removedDescendantNodes } = dragProjectStart(
           projects,
           projectExpansionMap,
-          project.id,
+          project.taskboxId,
         );
         removedDescendantsRef.current = removedDescendantNodes;
 
         return results;
       });
-      setDraggingProjectId(project.id);
+      setDraggingProjectId(project.taskboxId);
     },
     [projectExpansionMap, setDraggingProjectId, updateProjectsCache],
   );

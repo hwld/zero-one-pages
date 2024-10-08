@@ -1,7 +1,7 @@
 import { z, type BRAND } from "zod";
 
 export type Project = {
-  id: string;
+  taskboxId: string;
   parentId: string | null;
   label: string;
   todos: number;
@@ -10,7 +10,7 @@ export type Project = {
 };
 
 export const projectSchema: z.ZodType<Project> = z.object({
-  id: z.string(),
+  taskboxId: z.string(),
   parentId: z.string().nullable(),
   label: z.string(),
   todos: z.number(),
@@ -43,7 +43,7 @@ export const getOrderBasedOnProject = ({
       const hasSubProjects = baseProject.subProjects.length !== 0;
 
       return hasSubProjects
-        ? { parentId: baseProject.id, order: 0 }
+        ? { parentId: baseProject.taskboxId, order: 0 }
         : { parentId: baseProject.parentId, order: baseProject.order + 1 };
     }
     default: {
@@ -89,7 +89,7 @@ export const validateUpdatePositionInputs = (
   { getProjects }: { getProjects: (ids: string[]) => Project[] },
 ): ValidatedUpdatePositionInput[] => {
   const projects = getProjects(inputs.map((i) => i.projectId));
-  const projectMap = new Map(projects.map((p) => [p.id, p]));
+  const projectMap = new Map(projects.map((p) => [p.taskboxId, p]));
 
   return inputs.map((input) => {
     if (!projectMap.get(input.projectId)) {

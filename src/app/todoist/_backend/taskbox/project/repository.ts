@@ -1,10 +1,11 @@
-import { initialData } from "../taskbox/project/data";
+import { taskboxRepository } from "../repository";
+import { initialData } from "./data";
 import {
   Project,
   type ValidatedCreateInput,
   type ValidatedUpdateInput,
   type ValidatedUpdatePositionInput,
-} from "../taskbox/project/model";
+} from "./model";
 
 export type ProjectRecord = {
   taskboxId: string;
@@ -71,6 +72,7 @@ class ProjectRepository {
       return p;
     });
 
+    taskboxRepository.add(newRecord.taskboxId);
     this.projectRecords = [...this.projectRecords, newRecord];
   };
 
@@ -82,6 +84,7 @@ class ProjectRepository {
       return p;
     });
   };
+
   public updatePosition = ({
     projectId,
     order,
@@ -113,6 +116,8 @@ class ProjectRepository {
     };
 
     pushDescendantIds(targetProject.taskboxId);
+
+    taskboxRepository.remove(targetIds);
 
     this.projectRecords = this.projectRecords
       .filter((p) => !targetIds.includes(p.taskboxId))
