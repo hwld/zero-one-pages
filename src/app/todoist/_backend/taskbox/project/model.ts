@@ -1,6 +1,9 @@
 import { z, type BRAND } from "zod";
 
 export type Project = {
+  /**
+   * 主キーとして使うIdで、projectIdと同じ意味を持つ
+   */
   taskboxId: string;
   parentId: string | null;
   label: string;
@@ -98,4 +101,19 @@ export const validateUpdatePositionInputs = (
 
     return input as ValidatedUpdatePositionInput;
   });
+};
+
+type DeleteInput = { projectId: string };
+export type ValidatedDeleteInput = DeleteInput & BRAND<"DeleteInput">;
+
+export const validateDeleteInput = (
+  input: DeleteInput,
+  { getProject }: { getProject: (id: string) => Project | undefined },
+): ValidatedDeleteInput => {
+  const project = getProject(input.projectId);
+  if (!project) {
+    throw new Error(`プロジェクトが存在しない: ${input.projectId}`);
+  }
+
+  return input as ValidatedDeleteInput;
 };

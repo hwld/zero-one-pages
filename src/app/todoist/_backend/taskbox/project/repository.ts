@@ -3,11 +3,15 @@ import { initialData } from "./data";
 import {
   Project,
   type ValidatedCreateInput,
+  type ValidatedDeleteInput,
   type ValidatedUpdateInput,
   type ValidatedUpdatePositionInput,
 } from "./model";
 
 export type ProjectRecord = {
+  /**
+   * 主キーのように使う。projectIdと同じ意味を持つ
+   */
   taskboxId: string;
   parentId: string | null;
   label: string;
@@ -19,7 +23,7 @@ export type ProjectRecord = {
 class ProjectRepository {
   private projectRecords: ProjectRecord[] = initialData;
 
-  public get(id: string): Project | undefined {
+  public get = (id: string): Project | undefined => {
     const _get = (projects: Project[]): Project | undefined => {
       for (const project of projects) {
         if (project.taskboxId === id) {
@@ -36,7 +40,7 @@ class ProjectRepository {
     };
 
     return _get(this.getAll());
-  }
+  };
 
   public getAll = (): Project[] => {
     return recordsToProjects(this.projectRecords);
@@ -98,8 +102,10 @@ class ProjectRepository {
     });
   };
 
-  public remove = (id: string) => {
-    const targetProject = this.projectRecords.find((p) => p.taskboxId === id);
+  public remove = ({ projectId }: ValidatedDeleteInput) => {
+    const targetProject = this.projectRecords.find(
+      (p) => p.taskboxId === projectId,
+    );
     if (!targetProject) {
       throw new Error("プロジェクトが存在しない");
     }

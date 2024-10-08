@@ -7,6 +7,7 @@ import {
   Project,
   projectSchema,
   validateCreateInput,
+  validateDeleteInput,
   validateUpdateInput,
   validateUpdatePositionInputs,
 } from "./model";
@@ -125,7 +126,13 @@ export const projectApiHandlers = [
     await delay();
 
     const id = z.string().parse(params.id);
-    projectRepository.remove(id);
+
+    const validatedInput = validateDeleteInput(
+      { projectId: id },
+      { getProject: projectRepository.get },
+    );
+
+    projectRepository.remove(validatedInput);
 
     return HttpResponse.json({});
   }),

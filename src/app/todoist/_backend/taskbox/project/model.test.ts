@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getOrderBasedOnProject,
+  validateDeleteInput,
   validateUpdateInput,
   validateUpdatePositionInputs,
   type Project,
@@ -115,6 +116,30 @@ describe("project model", () => {
             getProjects: () => [genProject({ taskboxId: "1", parentId: null })],
           },
         );
+
+      expect(execute).toThrowError();
+    });
+  });
+
+  describe("validateDeleteInput", () => {
+    it("検証に成功する", () => {
+      const execute = () => {
+        validateDeleteInput(
+          { projectId: "1" },
+          { getProject: () => genProject({ taskboxId: "1" }) },
+        );
+      };
+
+      expect(execute).not.toThrowError();
+    });
+
+    it("存在しないプロジェクトだとエラー", () => {
+      const execute = () => {
+        validateDeleteInput(
+          { projectId: "1" },
+          { getProject: () => undefined },
+        );
+      };
 
       expect(execute).toThrowError();
     });
