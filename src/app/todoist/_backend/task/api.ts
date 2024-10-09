@@ -27,14 +27,6 @@ export const fetchTask = async (id: string): Promise<Task> => {
   return task;
 };
 
-export const fetchTasks = async (): Promise<Task[]> => {
-  const res = await fetcher.get(TodoistAPI.tasks());
-  const json = await res.json();
-  const tasks = z.array(taskSchema).parse(json);
-
-  return tasks;
-};
-
 export const createTask = async (input: TaskFormData): Promise<void> => {
   await fetcher.post(TodoistAPI.tasks(), { body: input });
 };
@@ -58,13 +50,6 @@ export const deleteTask = async (id: string): Promise<void> => {
 };
 
 export const taskApiHandlers = [
-  http.get(TodoistAPI.tasks(), async () => {
-    await delay();
-    const tasks = taskRepository.getAll();
-
-    return HttpResponse.json(tasks);
-  }),
-
   http.post(TodoistAPI.tasks(), async ({ request }) => {
     await delay();
     const input = taskFormSchema.parse(await request.json());

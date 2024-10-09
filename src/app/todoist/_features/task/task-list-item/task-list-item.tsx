@@ -26,7 +26,11 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
   const updateTaskDone = useUpdateTaskDone();
 
   const handleUpdateTaskDone = () => {
-    updateTaskDone.mutate({ id: task.id, done: !task.done });
+    updateTaskDone.mutate({
+      id: task.id,
+      done: !task.done,
+      taskboxId: task.taskboxId,
+    });
   };
 
   if (isEditing) {
@@ -102,7 +106,7 @@ export const TaskListItem: React.FC<Props> = ({ task }) => {
             <ActionButton icon={PiChatLight} />
           </Tooltip>
           <Tooltip placement="top" label="その他のアクション" keys={["."]}>
-            <TaskListItemMenu taskId={task.id} />
+            <TaskListItemMenu taskId={task.id} taskboxId={task.taskboxId} />
           </Tooltip>
         </div>
       </div>

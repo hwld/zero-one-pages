@@ -76,7 +76,11 @@ const TaskDetail: React.FC<{ taskId: string }> = ({ taskId }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleUpdateTaskDone = (done: boolean) => {
-    udpateDone.mutate({ id: taskId, done });
+    if (!task) {
+      return;
+    }
+
+    udpateDone.mutate({ id: taskId, done, taskboxId: task.taskboxId });
   };
 
   if (status === "pending") {

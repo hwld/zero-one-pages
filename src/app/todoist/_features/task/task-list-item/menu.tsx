@@ -29,14 +29,14 @@ import {
 import { useDeleteTask } from "../use-delete-task";
 import { ActionButton } from "./action-button";
 
-type Props = { taskId: string };
+type Props = { taskId: string; taskboxId: string };
 
 export const TaskListItemMenu = forwardRef<HTMLButtonElement, Props>(
-  function TaskListItemMenu({ taskId, ...props }, ref) {
+  function TaskListItemMenu({ taskId, taskboxId, ...props }, ref) {
     const deleteTask = useDeleteTask();
 
     const handleDeleteTask = () => {
-      deleteTask.mutate(taskId);
+      deleteTask.mutate({ taskId, taskboxId });
     };
 
     return (
