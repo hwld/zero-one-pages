@@ -1,4 +1,5 @@
 import { z, type BRAND } from "zod";
+import { taskSchema } from "../../task/model";
 
 export type Project = {
   /**
@@ -20,6 +21,14 @@ export const projectSchema: z.ZodType<Project> = z.object({
   order: z.number(),
   subProjects: z.lazy(() => projectSchema.array()),
 });
+
+export const projectDetailSchema = z.object({
+  taskboxId: z.string(),
+  label: z.string(),
+  tasks: z.array(taskSchema),
+});
+
+export type ProjectDetail = z.infer<typeof projectDetailSchema>;
 
 type GetOrderBasedOnProjectParams = {
   baseProjectId: string;

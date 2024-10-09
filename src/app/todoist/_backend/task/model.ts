@@ -7,6 +7,7 @@ export type Task = {
   parentId: string | null;
   title: string;
   description: string;
+  // TODO: Taskとは別に持たせたい
   order: number;
   subTasks: Task[];
   taskboxId: string;

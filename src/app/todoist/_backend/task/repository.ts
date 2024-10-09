@@ -24,6 +24,12 @@ class TaskRepository {
     return recordsToTasks(this.taskRecords).find((t) => t.id === id);
   };
 
+  public getManyByTaskboxId = (taskboxId: string): Task[] => {
+    return recordsToTasks(this.taskRecords).filter(
+      (t) => t.taskboxId === taskboxId,
+    );
+  };
+
   public getAll = (): Task[] => {
     return recordsToTasks(this.taskRecords);
   };
@@ -37,6 +43,7 @@ class TaskRepository {
   };
 
   public add = (input: ValidatedCreateInput) => {
+    // TODO: taskbox毎にorderを管理する必要がある
     const newOrder =
       input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
 

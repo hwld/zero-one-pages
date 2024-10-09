@@ -1,7 +1,6 @@
 "use client";
 
 import { TaskFormOpenButton } from "../_features/task/task-form-open-button";
-import { useTasks } from "../_features/task/use-tasks";
 import { AppLayout } from "../_components/app-layout";
 import { PiChatLight } from "@react-icons/all-files/pi/PiChatLight";
 import { PiDotsThreeOutlineLight } from "@react-icons/all-files/pi/PiDotsThreeOutlineLight";
@@ -9,12 +8,13 @@ import { PiSlidersHorizontalLight } from "@react-icons/all-files/pi/PiSlidersHor
 import { IconButton } from "../_components/icon-button";
 import { Tooltip, TooltipDelayGroup } from "../_components/tooltip";
 import { TaskListItem } from "../_features/task/task-list-item/task-list-item";
+import { useInbox } from "../_features/inbox/use-inbox";
 
 const InboxPage: React.FC = () => {
-  const { data: tasks = [] } = useTasks();
+  const { data: inbox } = useInbox();
 
-  const doneTasks = tasks.filter((t) => t.done);
-  const undoneTasks = tasks.filter((t) => !t.done);
+  const doneTasks = inbox?.tasks.filter((t) => t.done);
+  const undoneTasks = inbox?.tasks.filter((t) => !t.done);
 
   return (
     <AppLayout
@@ -37,13 +37,13 @@ const InboxPage: React.FC = () => {
     >
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
-          {undoneTasks.map((t) => {
+          {undoneTasks?.map((t) => {
             return <TaskListItem key={t.id} task={t} />;
           })}
         </div>
         <TaskFormOpenButton />
         <div className="flex flex-col gap-2">
-          {doneTasks.map((t) => {
+          {doneTasks?.map((t) => {
             return <TaskListItem key={t.id} task={t} />;
           })}
         </div>

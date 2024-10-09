@@ -5,11 +5,13 @@ import { delay, http, HttpResponse } from "msw";
 import {
   getOrderBasedOnProject,
   Project,
+  projectDetailSchema,
   projectSchema,
   validateCreateInput,
   validateDeleteInput,
   validateUpdateInput,
   validateUpdatePositionInputs,
+  type ProjectDetail,
 } from "./model";
 import { fetcher } from "../../../../../lib/fetcher";
 import {
@@ -20,6 +22,7 @@ import {
   UpdateProjectInput,
   updateProjectInputSchema,
 } from "./schema";
+import { taskRepository } from "../../task/repository";
 
 export const fetchProjects = async (): Promise<Project[]> => {
   const res = await fetcher.get(TodoistAPI.projects());
@@ -27,6 +30,14 @@ export const fetchProjects = async (): Promise<Project[]> => {
   const projectSummaries = z.array(projectSchema).parse(json);
 
   return projectSummaries;
+};
+
+export const fetchProject = async (id: string): Promise<ProjectDetail> => {
+  const res = await fetcher.get(TodoistAPI.project(id));
+  const json = await res.json();
+  const projectDetail = projectDetailSchema.parse(json);
+
+  return projectDetail;
 };
 
 export const createProject = async (
@@ -58,6 +69,24 @@ export const projectApiHandlers = [
 
     const summaries = projectRepository.getAll();
     return HttpResponse.json(summaries);
+  }),
+
+  http.get(TodoistAPI.project(), async ({ params }) => {
+    await delay();
+    const projectId = z.string().parse(params.id);
+
+    const projectSumary = projectRepository.get(projectId);
+    if (!projectSumary) {
+      throw new Error(`プロジェクトが存在しません id:${projectId}`);
+    }
+
+    const projectDetail: ProjectDetail = {
+      label: projectSumary.label,
+      taskboxId: projectSumary.taskboxId,
+      tasks: taskRepository.getManyByTaskboxId(projectId),
+    };
+
+    return HttpResponse.json(projectDetail);
   }),
 
   http.post(TodoistAPI.projects(), async ({ request }) => {

@@ -1,3 +1,5 @@
+"use client";
+
 import { AppLayout } from "../_components/app-layout";
 
 const ProjectPage: React.FC = () => {
