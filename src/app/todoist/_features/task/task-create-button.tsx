@@ -60,7 +60,7 @@ const TaskCreateDialog: React.FC<{
             </DialogOverlay>
             <DialogContent asChild>
               <motion.div
-                className="fixed left-1/2 top-[120px] z-50 w-[550px] -translate-x-1/2 rounded-lg border border-stone-200 bg-stone-50 shadow-2xl"
+                className="fixed left-1/2 top-[120px] z-50 w-[550px] -translate-x-1/2 rounded-lg border border-stone-300 bg-stone-50 shadow-2xl"
                 initial={{ opacity: 0, y: 40, x: "-50%", scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
                 exit={{ opacity: 0, y: 40, x: "-50%", scale: 0.8 }}

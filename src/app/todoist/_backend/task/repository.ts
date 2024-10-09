@@ -1,3 +1,4 @@
+import { initialData } from "./data";
 import type { Task } from "./model";
 
 export type TaskRecord = {
@@ -7,35 +8,11 @@ export type TaskRecord = {
   title: string;
   description: string;
   order: number;
+  taskboxId: string;
 };
 
 class TaskRepository {
-  private taskRecords: TaskRecord[] = [
-    {
-      id: "1",
-      title: "task1",
-      description: "",
-      done: false,
-      order: 0,
-      parentId: null,
-    },
-    {
-      id: "2",
-      title: "task2",
-      description: "task2の説明",
-      done: false,
-      order: 1,
-      parentId: null,
-    },
-    {
-      id: "3",
-      title: "task3",
-      description: "task3の説明",
-      done: true,
-      order: 2,
-      parentId: null,
-    },
-  ];
+  private taskRecords: TaskRecord[] = initialData;
 
   public get(id: string): Task | undefined {
     return recordsToTasks(this.taskRecords).find((t) => t.id === id);
@@ -58,6 +35,7 @@ class TaskRepository {
     description: string;
     order?: number;
     parentId: string | null;
+    taskboxId: string;
   }) {
     const newOrder =
       input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
@@ -68,6 +46,7 @@ class TaskRepository {
       parentId: input.parentId,
       title: input.title,
       description: input.description,
+      taskboxId: input.taskboxId,
       order: newOrder,
     };
 
@@ -134,6 +113,7 @@ const recordsToTasks = (taskRecords: TaskRecord[]): Task[] => {
         order: r.order,
         parentId: r.parentId,
         subTasks: [],
+        taskboxId: r.taskboxId,
       } satisfies Task,
     ]),
   );

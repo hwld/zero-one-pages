@@ -16,14 +16,14 @@ import {
   useRef,
   useState,
 } from "react";
-import { useProjects } from "../use-projects";
 import { useChangeProjectPosition } from "../use-change-project-position";
 import { ProjectExpansionMap } from "../logic/expansion-map";
+import type { ProjectsContext } from "../projects-provider";
 
 type UseDragProjectListParams = {
   projectExpansionMap: ProjectExpansionMap;
   setProjectExpansionMap: Dispatch<SetStateAction<ProjectExpansionMap>>;
-  updateProjectsCache: ReturnType<typeof useProjects>["updateProjectsCache"];
+  updateProjectsCache: ProjectsContext["updateProjectsCache"];
 };
 
 export type DragProjectContext = {

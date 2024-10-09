@@ -8,6 +8,7 @@ export type Task = {
   description: string;
   order: number;
   subTasks: Task[];
+  taskboxId: string;
 };
 
 export const taskSchema: z.ZodType<Task> = z.object({
@@ -18,4 +19,5 @@ export const taskSchema: z.ZodType<Task> = z.object({
   description: z.string(),
   order: z.number(),
   subTasks: z.lazy(() => taskSchema.array()),
+  taskboxId: z.string(),
 });

@@ -65,6 +65,7 @@ export const taskApiHandlers = [
       title: input.title,
       description: input.description,
       parentId: null,
+      taskboxId: "TODO:",
     });
 
     return HttpResponse.json({});

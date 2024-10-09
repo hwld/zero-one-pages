@@ -11,7 +11,7 @@ const projectsQueryOptions = queryOptions({
   },
 });
 
-export const useProjects = () => {
+export const useQueryProjects = () => {
   const { isMockserverUp } = useMswState();
   const client = useQueryClient();
 

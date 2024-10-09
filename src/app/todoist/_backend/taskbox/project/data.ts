@@ -1,4 +1,4 @@
-import { ProjectRecord } from "../../project/repository";
+import { ProjectRecord } from "../project/repository";
 
 export const initialData: ProjectRecord[] = [
   {

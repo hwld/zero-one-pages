@@ -6,7 +6,6 @@ import { Routes } from "../../../routes";
 import { MenuButtonItem } from "../../../_components/menu/item";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { PiBrowsersLight } from "@react-icons/all-files/pi/PiBrowsersLight";
-import { PiSpinnerGap } from "@react-icons/all-files/pi/PiSpinnerGap";
 import { Icon, TreeToggleIconButton, IconButton } from "./icon-button";
 import { useState } from "react";
 import { ProjectCreateDialog } from "../project-create-dialog";
@@ -14,7 +13,6 @@ import { ProjectCreateDialog } from "../project-create-dialog";
 type Props = {
   active?: boolean;
   isOpen: boolean;
-  isProjectPending: boolean;
   projectsCount: number;
   onOpenChange: (open: boolean) => void;
 };
@@ -22,7 +20,6 @@ type Props = {
 export const ProjectNavListHeader: React.FC<Props> = ({
   active,
   isOpen,
-  isProjectPending,
   projectsCount,
   onOpenChange,
 }) => {
@@ -46,10 +43,7 @@ export const ProjectNavListHeader: React.FC<Props> = ({
       </Link>
       <div
         className={clsx(
-          "group flex h-full items-center gap-1 pr-2",
-          isProjectPending
-            ? "opacity-100"
-            : "opacity-0 focus-within:opacity-100 group-hover/sidebar:opacity-100 has-[*[data-open]]:opacity-100",
+          "group flex h-full items-center gap-1 pr-2 opacity-0 focus-within:opacity-100 group-hover/sidebar:opacity-100 has-[*[data-open]]:opacity-100",
         )}
       >
         <Menu
@@ -76,9 +70,7 @@ export const ProjectNavListHeader: React.FC<Props> = ({
           isOpen={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
         />
-        {isProjectPending ? (
-          <PiSpinnerGap className="animate-spin" />
-        ) : projectsCount ? (
+        {projectsCount ? (
           <TreeToggleIconButton isOpen={isOpen} onOpenChange={onOpenChange} />
         ) : null}
       </div>

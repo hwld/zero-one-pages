@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type PropsWithChildren } from "react";
+import { useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { PiDotsThreeBold } from "@react-icons/all-files/pi/PiDotsThreeBold";
 import { PiCalendarBlank } from "@react-icons/all-files/pi/PiCalendarBlank";
 import { PiAlarm } from "@react-icons/all-files/pi/PiAlarm";
@@ -12,6 +12,11 @@ import { Button } from "../../_components/button";
 import { type TaskFormData } from "../../_backend/task/schema";
 import { PiCaretDownLight } from "@react-icons/all-files/pi/PiCaretDownLight";
 import { useTaskForm } from "./use-task-form";
+import { Popover } from "../../_components/popover";
+import { Command } from "cmdk";
+import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
+import { UserIcon } from "../../_components/user-icon";
+import { useTaskboxNodes } from "../taskbox/taskbox-nodes-provider";
 
 type Props = {
   size?: "md" | "sm";
@@ -102,13 +107,7 @@ export const TaskForm: React.FC<Props> = ({
           { sm: "p-2", md: "p-4" }[size],
         )}
       >
-        <Button
-          color="transparent"
-          leftIcon={PiTrayLight}
-          rightIcon={PiCaretDownLight}
-        >
-          インボックス
-        </Button>
+        <TaskBoxSelectPopover />
         <div className="flex items-center gap-2">
           <Button color="secondary" onClick={onCancel}>
             キャンセル
@@ -144,5 +143,109 @@ const Select: React.FC<PropsWithChildren & { icon: IconType }> = ({
       <Icon className="size-4 group-hover:text-stone-900" />
       {children}
     </button>
+  );
+};
+
+const TaskBoxSelectPopover: React.FC = () => {
+  const taskboxes = useTaskboxNodes();
+  const [isFiltering, setIsFiltering] = useState(false);
+
+  return (
+    <Popover
+      trigger={
+        <Button
+          color="transparent"
+          leftIcon={PiTrayLight}
+          rightIcon={PiCaretDownLight}
+        >
+          インボックス
+        </Button>
+      }
+    >
+      <Command className="flex h-full flex-col" loop>
+        <div className="grid p-2">
+          <Command.Input
+            onValueChange={(search) => {
+              if (search === "") {
+                setIsFiltering(false);
+              } else {
+                setIsFiltering(true);
+              }
+            }}
+            placeholder="プロジェクト名を入力"
+            className="h-8 rounded border border-stone-300 bg-transparent px-2 outline-none focus-visible:border-stone-400"
+          />
+        </div>
+        <div className="h-[1px] w-full bg-stone-200" />
+        <div className="flex min-h-0 flex-col overflow-auto">
+          <Command.Empty className="p-2">
+            プロジェクトが見つかりません
+          </Command.Empty>
+
+          <Command.List>
+            {taskboxes ? (
+              <>
+                <Command.Group>
+                  <TaskBoxSelectItem
+                    icon={PiTrayLight}
+                    label="インボックス"
+                    depth={0}
+                    value={taskboxes.inbox.taskboxId}
+                  />
+                </Command.Group>
+                <Command.Group>
+                  {isFiltering ? null : (
+                    <div className="grid h-8 grid-cols-[auto_1fr] items-center gap-2 px-2 font-bold">
+                      <UserIcon size="sm" />
+                      マイプロジェクト
+                    </div>
+                  )}
+                  {taskboxes.projectNodes.map((project) => {
+                    // フィルタリング中はフラットに表示させる
+                    const depth = isFiltering ? 0 : 1 + project.depth;
+
+                    return (
+                      <TaskBoxSelectItem
+                        key={project.taskboxId}
+                        icon={PiHashLight}
+                        label={project.label}
+                        depth={depth}
+                        value={project.taskboxId}
+                      />
+                    );
+                  })}
+                </Command.Group>
+              </>
+            ) : null}
+          </Command.List>
+        </div>
+      </Command>
+    </Popover>
+  );
+};
+
+const TaskBoxSelectItem: React.FC<{
+  icon: IconType;
+  label: string;
+  depth: number;
+  value: string;
+  onSelect?: (value: string) => void;
+}> = ({ icon: Icon, label, value, onSelect, depth }) => {
+  // valueでもフィルタリングされてしまうので、意図しないフィルタリングが発生する可能性がある
+  // 将来のリリースでdefailtFilterがexportされそうなので、その使い方で制御できそうな気がする
+  // https://github.com/pacocoursey/cmdk/pull/229
+
+  return (
+    <Command.Item
+      style={{ paddingInline: `${8 * (depth + 1)}px` }}
+      className="grid h-8 cursor-pointer grid-cols-[auto_1fr] items-center gap-1 text-stone-600 data-[selected='true']:bg-black/5"
+      value={value}
+      key={value}
+      onSelect={onSelect}
+      keywords={[label]}
+    >
+      <Icon className="size-4" />
+      {label}
+    </Command.Item>
   );
 };
