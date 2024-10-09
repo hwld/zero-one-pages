@@ -53,6 +53,7 @@ export const TaskForm: React.FC<Props> = ({
       title: "",
       description: "",
       taskboxId: taskboxNodes.inbox.taskboxId,
+      parentId: null,
     },
     onCancel,
   });

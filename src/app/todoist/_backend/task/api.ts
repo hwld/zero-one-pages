@@ -9,7 +9,15 @@ import { TodoistAPI } from "../routes";
 import { fetcher } from "../../../../lib/fetcher";
 import { taskRepository } from "./repository";
 import { z } from "zod";
-import { taskSchema, type Task } from "./model";
+import {
+  taskSchema,
+  validateCreateInput,
+  validateDeleteInput,
+  validateUpdateInput,
+  validateUpdateTaskDone,
+  type Task,
+} from "./model";
+import { taskboxRepository } from "../taskbox/repository";
 
 export const fetchTask = async (id: string): Promise<Task> => {
   const res = await fetcher.get(TodoistAPI.task(id));
@@ -61,12 +69,12 @@ export const taskApiHandlers = [
     await delay();
     const input = taskFormSchema.parse(await request.json());
 
-    taskRepository.add({
-      title: input.title,
-      description: input.description,
-      parentId: null,
-      taskboxId: input.taskboxId,
+    const validatedInput = validateCreateInput(input, {
+      getTask: taskRepository.get,
+      getTaskbox: taskboxRepository.get,
     });
+
+    taskRepository.add(validatedInput);
 
     return HttpResponse.json({});
   }),
@@ -88,12 +96,15 @@ export const taskApiHandlers = [
     const taskId = z.string().parse(params.id);
     const input = taskFormSchema.parse(await request.json());
 
-    taskRepository.update({
-      id: taskId,
-      title: input.title,
-      description: input.description,
-      taskboxId: input.taskboxId,
-    });
+    const validatedInput = validateUpdateInput(
+      { id: taskId, ...input },
+      {
+        getTask: taskRepository.get,
+        getTaskbox: taskboxRepository.get,
+      },
+    );
+
+    taskRepository.update(validatedInput);
 
     return HttpResponse.json({});
   }),
@@ -103,7 +114,12 @@ export const taskApiHandlers = [
     const taskId = z.string().parse(params.id);
     const input = updateTaskDoneSchema.parse(await request.json());
 
-    taskRepository.updateTaskDone({ id: taskId, done: input.done });
+    const validatedInput = validateUpdateTaskDone(
+      { id: taskId, ...input },
+      { getTask: taskRepository.get },
+    );
+
+    taskRepository.updateTaskDone(validatedInput);
 
     return HttpResponse.json({});
   }),
@@ -112,7 +128,12 @@ export const taskApiHandlers = [
     await delay();
     const taskId = z.string().parse(params.id);
 
-    taskRepository.delete(taskId);
+    const validatedInput = validateDeleteInput(
+      { id: taskId },
+      { getTask: taskRepository.get },
+    );
+
+    taskRepository.delete(validatedInput);
 
     return HttpResponse.json({});
   }),

@@ -1,5 +1,11 @@
 import { initialData } from "./data";
-import type { Task } from "./model";
+import type {
+  Task,
+  ValidatedCreateInput,
+  ValidatedDeleteInput,
+  ValidatedUpdateInput,
+  ValidatedUpdateTaskDoneInput,
+} from "./model";
 
 export type TaskRecord = {
   id: string;
@@ -14,29 +20,23 @@ export type TaskRecord = {
 class TaskRepository {
   private taskRecords: TaskRecord[] = initialData;
 
-  public get(id: string): Task | undefined {
+  public get = (id: string): Task | undefined => {
     return recordsToTasks(this.taskRecords).find((t) => t.id === id);
-  }
+  };
 
-  public getAll(): Task[] {
+  public getAll = (): Task[] => {
     return recordsToTasks(this.taskRecords);
-  }
+  };
 
-  public getMaxOrderByParentId(parentId: string | null) {
+  public getMaxOrderByParentId = (parentId: string | null) => {
     const siblingsOrders = this.taskRecords
       .filter((t) => t.parentId === parentId)
       .map((t) => t.order);
 
     return siblingsOrders.length > 0 ? Math.max(...siblingsOrders) : 0;
-  }
+  };
 
-  public add(input: {
-    title: string;
-    description: string;
-    order?: number;
-    parentId: string | null;
-    taskboxId: string;
-  }) {
+  public add = (input: ValidatedCreateInput) => {
     const newOrder =
       input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
 
@@ -58,14 +58,9 @@ class TaskRepository {
     });
 
     this.taskRecords = [...this.taskRecords, newRecord];
-  }
+  };
 
-  public update(input: {
-    id: string;
-    title: string;
-    description: string;
-    taskboxId: string;
-  }) {
+  public update = (input: ValidatedUpdateInput) => {
     this.taskRecords = this.taskRecords.map((r) => {
       if (r.id === input.id) {
         return {
@@ -77,9 +72,9 @@ class TaskRepository {
       }
       return r;
     });
-  }
+  };
 
-  public updateTaskDone(input: { id: string; done: boolean }) {
+  public updateTaskDone = (input: ValidatedUpdateTaskDoneInput) => {
     const task = this.get(input.id);
     if (!task) {
       throw new Error("タスクが存在しません");
@@ -101,11 +96,11 @@ class TaskRepository {
         return t;
       });
     }
-  }
+  };
 
-  public delete(id: string) {
+  public delete = ({ id }: ValidatedDeleteInput) => {
     this.taskRecords = this.taskRecords.filter((r) => r.id !== id);
-  }
+  };
 }
 
 export const taskRepository = new TaskRepository();

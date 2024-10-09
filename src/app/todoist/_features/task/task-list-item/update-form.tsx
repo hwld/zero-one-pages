@@ -30,6 +30,7 @@ export const TaskUpdateForm: React.FC<Props> = ({ task, onClose }) => {
           title: task.title,
           description: task.description,
           taskboxId: task.taskboxId,
+          parentId: task.parentId,
         }}
         submitText="保存"
         onSubmit={handleUpdate}

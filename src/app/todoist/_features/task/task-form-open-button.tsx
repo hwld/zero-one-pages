@@ -18,6 +18,7 @@ export const TaskFormOpenButton: React.FC<Props> = () => {
         title: input.title,
         description: input.description,
         taskboxId: input.taskboxId,
+        parentId: input.parentId,
       },
       {
         onSuccess: () => {
