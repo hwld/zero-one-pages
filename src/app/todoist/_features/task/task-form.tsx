@@ -17,6 +17,8 @@ import { Command } from "cmdk";
 import { PiHashLight } from "@react-icons/all-files/pi/PiHashLight";
 import { UserIcon } from "../../_components/user-icon";
 import { useTaskboxNodes } from "../taskbox/taskbox-nodes-provider";
+import type { TaskboxNodes } from "../taskbox/taskbox";
+import { PiCheckBold } from "@react-icons/all-files/pi/PiCheckBold";
 
 type Props = {
   size?: "md" | "sm";
@@ -29,12 +31,14 @@ type Props = {
 
 export const TaskForm: React.FC<Props> = ({
   size = "md",
-  defaultValues = { title: "", description: "" },
+  defaultValues,
   onCancel,
   onSubmit,
   submitText,
   isSubmitting,
 }) => {
+  const taskboxNodes = useTaskboxNodes();
+
   const {
     register,
     handleSubmit,
@@ -42,13 +46,37 @@ export const TaskForm: React.FC<Props> = ({
     trigger,
     submitRef,
     handleFormKeyDown,
-  } = useTaskForm({ defaultValues, onCancel });
+    watch,
+    setValue,
+  } = useTaskForm({
+    defaultValues: defaultValues ?? {
+      title: "",
+      description: "",
+      taskboxId: taskboxNodes.inbox.taskboxId,
+    },
+    onCancel,
+  });
 
   const titleInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleClickForm = () => {
     titleInputRef.current?.focus();
   };
+
+  const watchedTaskboxId = watch("taskboxId");
+  const handleSelectTaskboxId = (id: string) => {
+    setValue("taskboxId", id, { shouldValidate: true });
+  };
+
+  // taskboxIdが存在しない場合にフィールドをクリアする
+  useEffect(() => {
+    if (
+      !(taskboxNodes.inbox.taskboxId === watchedTaskboxId) &&
+      !taskboxNodes.projectNodes.find((p) => p.taskboxId === watchedTaskboxId)
+    ) {
+      setValue("taskboxId", "", { shouldValidate: true });
+    }
+  }, [setValue, taskboxNodes, watchedTaskboxId]);
 
   useEffect(() => {
     // 初期レンダリングでエラーを表示させる
@@ -107,7 +135,11 @@ export const TaskForm: React.FC<Props> = ({
           { sm: "p-2", md: "p-4" }[size],
         )}
       >
-        <TaskBoxSelectPopover />
+        <TaskBoxSelectPopover
+          taskboxNodes={taskboxNodes}
+          selectedTaskboxId={watchedTaskboxId}
+          onSelect={handleSelectTaskboxId}
+        />
         <div className="flex items-center gap-2">
           <Button color="secondary" onClick={onCancel}>
             キャンセル
@@ -146,32 +178,60 @@ const Select: React.FC<PropsWithChildren & { icon: IconType }> = ({
   );
 };
 
-const TaskBoxSelectPopover: React.FC = () => {
-  const taskboxes = useTaskboxNodes();
+const TaskBoxSelectPopover: React.FC<{
+  taskboxNodes: TaskboxNodes;
+  selectedTaskboxId: string;
+  onSelect: (id: string) => void;
+}> = ({ taskboxNodes, selectedTaskboxId, onSelect }) => {
   const [isFiltering, setIsFiltering] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleFilterValueChange = (filter: string) => {
+    if (filter === "") {
+      setIsFiltering(false);
+    } else {
+      setIsFiltering(true);
+    }
+  };
+
+  const handleSelect = (id: string) => {
+    onSelect(id);
+    setIsOpen(false);
+  };
+
+  const triggerInfo = (() => {
+    if (selectedTaskboxId === taskboxNodes.inbox.taskboxId) {
+      return { label: "インボックス", icon: PiTrayLight };
+    }
+
+    const project = taskboxNodes.projectNodes.find(
+      (p) => p.taskboxId === selectedTaskboxId,
+    );
+    if (project) {
+      return { label: project.label, icon: PiHashLight };
+    }
+
+    return { label: "プロジェクトが選択されていません", icon: undefined };
+  })();
 
   return (
     <Popover
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
       trigger={
         <Button
           color="transparent"
-          leftIcon={PiTrayLight}
+          leftIcon={triggerInfo.icon}
           rightIcon={PiCaretDownLight}
         >
-          インボックス
+          {triggerInfo.label}
         </Button>
       }
     >
       <Command className="flex h-full flex-col" loop>
         <div className="grid p-2">
           <Command.Input
-            onValueChange={(search) => {
-              if (search === "") {
-                setIsFiltering(false);
-              } else {
-                setIsFiltering(true);
-              }
-            }}
+            onValueChange={handleFilterValueChange}
             placeholder="プロジェクト名を入力"
             className="h-8 rounded border border-stone-300 bg-transparent px-2 outline-none focus-visible:border-stone-400"
           />
@@ -183,14 +243,18 @@ const TaskBoxSelectPopover: React.FC = () => {
           </Command.Empty>
 
           <Command.List>
-            {taskboxes ? (
+            {taskboxNodes ? (
               <>
                 <Command.Group>
                   <TaskBoxSelectItem
                     icon={PiTrayLight}
                     label="インボックス"
                     depth={0}
-                    value={taskboxes.inbox.taskboxId}
+                    value={taskboxNodes.inbox.taskboxId}
+                    selected={
+                      taskboxNodes.inbox.taskboxId === selectedTaskboxId
+                    }
+                    onSelect={handleSelect}
                   />
                 </Command.Group>
                 <Command.Group>
@@ -200,7 +264,7 @@ const TaskBoxSelectPopover: React.FC = () => {
                       マイプロジェクト
                     </div>
                   )}
-                  {taskboxes.projectNodes.map((project) => {
+                  {taskboxNodes.projectNodes.map((project) => {
                     // フィルタリング中はフラットに表示させる
                     const depth = isFiltering ? 0 : 1 + project.depth;
 
@@ -211,6 +275,8 @@ const TaskBoxSelectPopover: React.FC = () => {
                         label={project.label}
                         depth={depth}
                         value={project.taskboxId}
+                        onSelect={handleSelect}
+                        selected={project.taskboxId === selectedTaskboxId}
                       />
                     );
                   })}
@@ -229,16 +295,17 @@ const TaskBoxSelectItem: React.FC<{
   label: string;
   depth: number;
   value: string;
+  selected: boolean;
   onSelect?: (value: string) => void;
-}> = ({ icon: Icon, label, value, onSelect, depth }) => {
+}> = ({ icon: Icon, label, value, onSelect, selected, depth }) => {
   // valueでもフィルタリングされてしまうので、意図しないフィルタリングが発生する可能性がある
   // 将来のリリースでdefailtFilterがexportされそうなので、その使い方で制御できそうな気がする
   // https://github.com/pacocoursey/cmdk/pull/229
 
   return (
     <Command.Item
-      style={{ paddingInline: `${8 * (depth + 1)}px` }}
-      className="grid h-8 cursor-pointer grid-cols-[auto_1fr] items-center gap-1 text-stone-600 data-[selected='true']:bg-black/5"
+      style={{ paddingLeft: `${10 * (depth + 1)}px`, paddingRight: "10px" }}
+      className="grid h-8 cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-1 text-stone-600 data-[selected='true']:bg-black/5"
       value={value}
       key={value}
       onSelect={onSelect}
@@ -246,6 +313,7 @@ const TaskBoxSelectItem: React.FC<{
     >
       <Icon className="size-4" />
       {label}
+      {selected ? <PiCheckBold className="text-rose-600" /> : null}
     </Command.Item>
   );
 };

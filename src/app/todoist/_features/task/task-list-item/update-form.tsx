@@ -26,7 +26,11 @@ export const TaskUpdateForm: React.FC<Props> = ({ task, onClose }) => {
     <div className="rounded-lg border border-stone-300">
       <TaskForm
         size="sm"
-        defaultValues={{ title: task.title, description: task.description }}
+        defaultValues={{
+          title: task.title,
+          description: task.description,
+          taskboxId: task.taskboxId,
+        }}
         submitText="保存"
         onSubmit={handleUpdate}
         isSubmitting={updateTask.isPending}

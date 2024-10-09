@@ -16,6 +16,9 @@ export const useTaskForm = ({ defaultValues, onCancel }: Params) => {
     handleSubmit,
     formState: { errors, isValid },
     trigger,
+    watch,
+    setValue,
+    resetField,
   } = useForm<TaskFormData>({
     defaultValues,
     mode: "all",
@@ -63,5 +66,8 @@ export const useTaskForm = ({ defaultValues, onCancel }: Params) => {
     trigger,
     submitRef,
     handleFormKeyDown,
+    watch,
+    setValue,
+    resetField,
   };
 };

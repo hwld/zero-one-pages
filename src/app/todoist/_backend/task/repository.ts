@@ -60,10 +60,20 @@ class TaskRepository {
     this.taskRecords = [...this.taskRecords, newRecord];
   }
 
-  public update(input: { id: string; title: string; description: string }) {
+  public update(input: {
+    id: string;
+    title: string;
+    description: string;
+    taskboxId: string;
+  }) {
     this.taskRecords = this.taskRecords.map((r) => {
       if (r.id === input.id) {
-        return { ...r, title: input.title, description: input.description };
+        return {
+          ...r,
+          title: input.title,
+          description: input.description,
+          taskboxId: input.taskboxId,
+        };
       }
       return r;
     });

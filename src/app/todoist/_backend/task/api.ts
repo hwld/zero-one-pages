@@ -65,7 +65,7 @@ export const taskApiHandlers = [
       title: input.title,
       description: input.description,
       parentId: null,
-      taskboxId: "TODO:",
+      taskboxId: input.taskboxId,
     });
 
     return HttpResponse.json({});
@@ -92,6 +92,7 @@ export const taskApiHandlers = [
       id: taskId,
       title: input.title,
       description: input.description,
+      taskboxId: input.taskboxId,
     });
 
     return HttpResponse.json({});

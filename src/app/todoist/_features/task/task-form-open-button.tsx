@@ -14,7 +14,11 @@ export const TaskFormOpenButton: React.FC<Props> = () => {
 
   const handleCreateTask = (input: TaskFormData) => {
     createTask.mutate(
-      { title: input.title, description: input.description },
+      {
+        title: input.title,
+        description: input.description,
+        taskboxId: input.taskboxId,
+      },
       {
         onSuccess: () => {
           setFormKey(crypto.randomUUID());
