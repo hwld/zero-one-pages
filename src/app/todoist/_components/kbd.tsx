@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { PiCommand } from "@react-icons/all-files/pi/PiCommand";
+import { PiArrowFatUp } from "@react-icons/all-files/pi/PiArrowFatUp";
 
 type Props = { children: KeyboardKey };
 
@@ -7,6 +8,10 @@ export const Kbd: React.FC<Props> = ({ children }) => {
   const key = useMemo(() => {
     if (children === "Cmd") {
       return <PiCommand />;
+    }
+
+    if (children === "Shift") {
+      return <PiArrowFatUp />;
     }
 
     return children;
@@ -65,7 +70,7 @@ export type KeyboardKey =
   // | "Backspace"
   // | "Tab"
   // | "Space"
-  // | "Shift"
+  | "Shift"
   // | "Ctrl"
   // | "Alt"
   // | "Meta"

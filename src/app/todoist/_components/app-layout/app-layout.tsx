@@ -6,13 +6,13 @@ import {
   type PropsWithChildren,
   type ReactNode,
 } from "react";
-import { IconButton } from "./icon-button";
+import { IconButton } from "../icon-button";
 import { PiSidebarSimpleLight } from "@react-icons/all-files/pi/PiSidebarSimpleLight";
-import { useSidebarContext } from "./sidebar/provider";
-import { Tooltip } from "./tooltip";
+import { useSidebarContext } from "../sidebar/provider";
+import { Tooltip } from "../tooltip";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import clsx from "clsx";
-import { appHeaderHeightName } from "../layout";
+import { appHeaderHeightName } from "../../layout";
 
 type Props = {
   title: string;

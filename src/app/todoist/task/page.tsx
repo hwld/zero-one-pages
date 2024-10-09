@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { TaskDetailModalContent } from "../_features/task/task-detail-modal-content";
 import { Routes } from "../routes";
-import { AppLayout } from "../_components/app-layout";
+import { AppLayout } from "../_components/app-layout/app-layout";
 
 const TaskPage: React.FC = () => {
   const router = useRouter();

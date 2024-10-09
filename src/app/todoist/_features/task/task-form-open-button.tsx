@@ -4,9 +4,9 @@ import { PiPlusBold } from "@react-icons/all-files/pi/PiPlusBold";
 import { useCreateTask } from "./use-create-task";
 import type { TaskFormData } from "../../_backend/task/schema";
 
-type Props = {};
+type Props = { taskboxId: string };
 
-export const TaskFormOpenButton: React.FC<Props> = () => {
+export const TaskFormOpenButton: React.FC<Props> = ({ taskboxId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formKey, setFormKey] = useState(crypto.randomUUID());
 
@@ -34,6 +34,7 @@ export const TaskFormOpenButton: React.FC<Props> = () => {
         <TaskForm
           key={formKey}
           size="sm"
+          defaultValues={{ taskboxId }}
           onCancel={() => setIsOpen(false)}
           onSubmit={handleCreateTask}
           submitText="タスクを追加"

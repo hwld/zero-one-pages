@@ -1,4 +1,4 @@
-import { AppLayout } from "../_components/app-layout";
+import { AppLayout } from "../_components/app-layout/app-layout";
 
 const TodayPage: React.FC = () => {
   return <AppLayout title="今日" />;

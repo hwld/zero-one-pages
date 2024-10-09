@@ -22,7 +22,7 @@ import { PiCheckBold } from "@react-icons/all-files/pi/PiCheckBold";
 
 type Props = {
   size?: "md" | "sm";
-  defaultValues?: TaskFormData;
+  defaultValues?: Partial<TaskFormData>;
   onCancel: () => void;
   onSubmit: (input: TaskFormData) => void;
   submitText: string;
@@ -49,10 +49,10 @@ export const TaskForm: React.FC<Props> = ({
     watch,
     setValue,
   } = useTaskForm({
-    defaultValues: defaultValues ?? {
-      title: "",
-      description: "",
-      taskboxId: taskboxNodes.inbox.taskboxId,
+    defaultValues: {
+      title: defaultValues?.title ?? "",
+      description: defaultValues?.description ?? "",
+      taskboxId: defaultValues?.taskboxId ?? taskboxNodes.inbox.taskboxId,
       parentId: null,
     },
     onCancel,
