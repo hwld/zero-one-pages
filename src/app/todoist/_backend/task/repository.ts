@@ -34,18 +34,21 @@ class TaskRepository {
     return recordsToTasks(this.taskRecords);
   };
 
-  public getMaxOrderByParentId = (parentId: string | null) => {
+  public getMaxOrderByParentId = (
+    parentId: string | null,
+    taskboxId: string,
+  ) => {
     const siblingsOrders = this.taskRecords
-      .filter((t) => t.parentId === parentId)
+      .filter((t) => t.parentId === parentId && t.taskboxId === taskboxId)
       .map((t) => t.order);
 
-    return siblingsOrders.length > 0 ? Math.max(...siblingsOrders) : 0;
+    return siblingsOrders.length > 0 ? Math.max(...siblingsOrders) : -1;
   };
 
   public add = (input: ValidatedCreateInput) => {
-    // TODO: taskbox毎にorderを管理する必要がある
     const newOrder =
-      input.order ?? this.getMaxOrderByParentId(input.parentId) + 1;
+      input.order ??
+      this.getMaxOrderByParentId(input.parentId, input.taskboxId) + 1;
 
     const newRecord: TaskRecord = {
       id: crypto.randomUUID(),
@@ -58,7 +61,11 @@ class TaskRepository {
     };
 
     this.taskRecords = this.taskRecords.map((t) => {
-      if (t.parentId === input.parentId && t.order >= newOrder) {
+      if (
+        t.taskboxId === input.taskboxId &&
+        t.parentId === input.parentId &&
+        t.order >= newOrder
+      ) {
         return { ...t, order: t.order + 1 };
       }
       return t;

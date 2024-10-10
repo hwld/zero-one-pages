@@ -55,7 +55,7 @@ class ProjectRepository {
       .filter((p) => p.parentId === parentId)
       .map((p) => p.order);
 
-    return siblingOrders.length > 0 ? Math.max(...siblingOrders) : 0;
+    return siblingOrders.length > 0 ? Math.max(...siblingOrders) : -1;
   };
 
   public add = (input: ValidatedCreateInput) => {
