@@ -11,10 +11,13 @@ import { Routes } from "../../routes";
 import { Tooltip } from "../tooltip";
 import { SidebarListButton, SidebarListLink } from "./item";
 import { TaskCreateButton } from "../../_features/task/task-create-button";
+import { useInbox } from "../../_features/inbox/use-inbox";
 
 type Props = { currentRoute: string };
 
 export const SidebarNavList: React.FC<Props> = ({ currentRoute }) => {
+  const { data: inbox } = useInbox();
+
   return (
     <nav>
       <ul>
@@ -39,7 +42,7 @@ export const SidebarNavList: React.FC<Props> = ({ currentRoute }) => {
             currentRoute={currentRoute}
             icon={PiTrayLight}
             activeIcon={PiTrayFill}
-            right={3}
+            right={inbox?.taskCount ?? 0}
           >
             インボックス
           </SidebarListLink>
@@ -51,7 +54,6 @@ export const SidebarNavList: React.FC<Props> = ({ currentRoute }) => {
             currentRoute={currentRoute}
             icon={PiCalendarLight}
             activeIcon={PiCalendarFill}
-            right={10}
           >
             今日
           </SidebarListLink>

@@ -25,9 +25,7 @@ class TaskRepository {
   };
 
   public getManyByTaskboxId = (taskboxId: string): Task[] => {
-    return recordsToTasks(this.taskRecords).filter(
-      (t) => t.taskboxId === taskboxId,
-    );
+    return this.getAll().filter((t) => t.taskboxId === taskboxId);
   };
 
   public getAll = (): Task[] => {

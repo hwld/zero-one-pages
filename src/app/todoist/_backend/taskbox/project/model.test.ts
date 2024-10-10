@@ -153,6 +153,6 @@ export const genProject = (project?: Partial<Project>): Project => {
     order: project?.order ?? 0,
     parentId: project?.parentId ?? null,
     subProjects: project?.subProjects ?? [],
-    todos: project?.todos ?? 0,
+    taskCount: project?.taskCount ?? 0,
   };
 };

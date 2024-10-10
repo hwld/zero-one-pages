@@ -187,6 +187,6 @@ const genProjectNode = (node: Partial<ProjectNode>): ProjectNode => ({
   depth: node.depth ?? 0,
   parentId: node.parentId ?? null,
   descendantsProjectCount: node.descendantsProjectCount ?? 0,
-  todos: node.todos ?? 0,
+  taskCount: node.taskCount ?? 0,
   visible: node.visible ?? true,
 });

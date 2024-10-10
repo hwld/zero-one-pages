@@ -8,7 +8,7 @@ export type Project = {
   taskboxId: string;
   parentId: string | null;
   label: string;
-  todos: number;
+  taskCount: number;
   order: number;
   subProjects: Project[];
 };
@@ -17,7 +17,7 @@ export const projectSchema: z.ZodType<Project> = z.object({
   taskboxId: z.string(),
   parentId: z.string().nullable(),
   label: z.string(),
-  todos: z.number(),
+  taskCount: z.number(),
   order: z.number(),
   subProjects: z.lazy(() => projectSchema.array()),
 });

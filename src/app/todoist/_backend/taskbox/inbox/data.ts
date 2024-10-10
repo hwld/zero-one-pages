@@ -1,3 +1,3 @@
-import type { Inbox } from "./model";
+import type { InboxRecord } from "./repository";
 
-export const initialData: Inbox = { taskboxId: "inbox" };
+export const initialData: InboxRecord = { taskboxId: "inbox" };

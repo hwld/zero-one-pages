@@ -22,6 +22,7 @@ export const inboxApiHandlers = [
     const inbox: InboxDetail = {
       taskboxId: inboxSummary.taskboxId,
       tasks: taskRepository.getManyByTaskboxId(inboxSummary.taskboxId),
+      taskCount: inboxSummary.taskCount,
     };
 
     return HttpResponse.json(inbox);

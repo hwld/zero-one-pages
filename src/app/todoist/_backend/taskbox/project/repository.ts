@@ -1,3 +1,4 @@
+import { taskRepository } from "../../task/repository";
 import { taskboxRepository } from "../repository";
 import { initialData } from "./data";
 import {
@@ -153,7 +154,7 @@ const recordsToProjects = (projectRecords: ProjectRecord[]): Project[] => {
         label: r.label,
         order: r.order,
         subProjects: [],
-        todos: 0,
+        taskCount: taskRepository.getManyByTaskboxId(r.taskboxId).length,
       } satisfies Project,
     ]),
   );

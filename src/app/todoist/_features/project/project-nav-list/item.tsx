@@ -52,7 +52,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
 
   const rightNode = useMemo(() => {
     if (!isFocus && !isMenuOpen) {
-      return project.todos > 0 ? project.todos : undefined;
+      return project.taskCount > 0 ? project.taskCount : undefined;
     }
 
     return (
@@ -88,7 +88,7 @@ export const ProjectNavItem: React.FC<ProjectListItemProps> = ({
         }
       />
     );
-  }, [isFocus, isMenuOpen, project.todos, setFocus]);
+  }, [isFocus, isMenuOpen, project.taskCount, setFocus]);
 
   return (
     <>
