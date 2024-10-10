@@ -12,11 +12,15 @@ import { PiSlidersHorizontalLight } from "@react-icons/all-files/pi/PiSlidersHor
 import { PiUserPlusLight } from "@react-icons/all-files/pi/PiUserPlusLight";
 import { ButtonLink } from "../_components/button";
 import { Routes } from "../routes";
-import { AppLayoutTasksContent } from "../_components/app-layout/tasks-content";
+import { TasksContent } from "../_components/app-layout/tasks-content";
 
 const ProjectPage: React.FC = () => {
   const projectId = z.string().parse(useSearchParams().get("id"));
-  const { data: project } = useProject(projectId);
+  const { data: project, status } = useProject(projectId);
+
+  const taskbox = project
+    ? { tasks: project.tasks, taskboxId: project.taskboxId }
+    : undefined;
 
   return (
     <AppLayout
@@ -45,12 +49,11 @@ const ProjectPage: React.FC = () => {
         </div>
       }
     >
-      {project ? (
-        <AppLayoutTasksContent
-          tasks={project.tasks}
-          taskboxId={project.taskboxId}
-        />
-      ) : null}
+      <TasksContent
+        status={status}
+        taskbox={taskbox}
+        errorMessage="プロジェクトを読み込むことができませんでした。"
+      />
     </AppLayout>
   );
 };

@@ -9,10 +9,14 @@ import {
   type ProjectsContext,
 } from "../_features/project/projects-provider";
 import { Button } from "./button";
+import { useInbox } from "../_features/inbox/use-inbox";
 
 export const GlobalDataProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
+  // prefetch
+  useInbox();
+
   const { data: taskboxNodes, status: taskboxNodesStatus } =
     useQueryTaskboxNodes();
 

@@ -7,10 +7,14 @@ import { PiSlidersHorizontalLight } from "@react-icons/all-files/pi/PiSlidersHor
 import { IconButton } from "../_components/icon-button";
 import { Tooltip, TooltipDelayGroup } from "../_components/tooltip";
 import { useInbox } from "../_features/inbox/use-inbox";
-import { AppLayoutTasksContent } from "../_components/app-layout/tasks-content";
+import { TasksContent } from "../_components/app-layout/tasks-content";
 
 const InboxPage: React.FC = () => {
-  const { data: inbox } = useInbox();
+  const { data: inbox, status } = useInbox();
+
+  const taskbox = inbox
+    ? { tasks: inbox.tasks, taskboxId: inbox.taskboxId }
+    : undefined;
 
   return (
     <AppLayout
@@ -31,12 +35,11 @@ const InboxPage: React.FC = () => {
         </div>
       }
     >
-      {inbox ? (
-        <AppLayoutTasksContent
-          tasks={inbox.tasks}
-          taskboxId={inbox.taskboxId}
-        />
-      ) : null}
+      <TasksContent
+        status={status}
+        taskbox={taskbox}
+        errorMessage="インボックスを読み込むことができませんでした。"
+      />
     </AppLayout>
   );
 };
