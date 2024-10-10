@@ -22,7 +22,6 @@ import {
   UpdateProjectInput,
   updateProjectInputSchema,
 } from "./schema";
-import { taskRepository } from "../../task/repository";
 
 export const fetchProjects = async (): Promise<Project[]> => {
   const res = await fetcher.get(TodoistAPI.projects());
@@ -75,18 +74,12 @@ export const projectApiHandlers = [
     await delay();
     const projectId = z.string().parse(params.id);
 
-    const projectSumary = projectRepository.get(projectId);
-    if (!projectSumary) {
+    const detail = projectRepository.getDetail(projectId);
+    if (!detail) {
       throw new Error(`プロジェクトが存在しません id:${projectId}`);
     }
 
-    const projectDetail: ProjectDetail = {
-      label: projectSumary.label,
-      taskboxId: projectSumary.taskboxId,
-      tasks: taskRepository.getManyByTaskboxId(projectId),
-    };
-
-    return HttpResponse.json(projectDetail);
+    return HttpResponse.json(detail);
   }),
 
   http.post(TodoistAPI.projects(), async ({ request }) => {

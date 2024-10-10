@@ -1,6 +1,6 @@
 import { taskRepository } from "../../task/repository";
 import { initialData } from "./data";
-import type { Inbox } from "./model";
+import { type Inbox, type InboxDetail } from "./model";
 
 export type InboxRecord = { taskboxId: string };
 
@@ -13,6 +13,19 @@ class InboxRepository {
     ).length;
 
     return { taskboxId: this.inbox.taskboxId, taskCount: taskCount };
+  };
+
+  public getDetail = (): InboxDetail => {
+    const summary = this.get();
+    const inboxTasks = taskRepository.getManyByTaskboxId(summary.taskboxId);
+
+    const detail: InboxDetail = {
+      taskboxId: summary.taskboxId,
+      taskCount: summary.taskCount,
+      tasks: inboxTasks,
+    };
+
+    return detail;
   };
 }
 

@@ -3,6 +3,7 @@ import { taskboxRepository } from "../repository";
 import { initialData } from "./data";
 import {
   Project,
+  type ProjectDetail,
   type ValidatedCreateInput,
   type ValidatedDeleteInput,
   type ValidatedUpdateInput,
@@ -41,6 +42,23 @@ class ProjectRepository {
     };
 
     return _get(this.getAll());
+  };
+
+  public getDetail = (id: string): ProjectDetail | undefined => {
+    const summary = this.get(id);
+    if (!summary) {
+      return undefined;
+    }
+
+    const projectTasks = taskRepository.getManyByTaskboxId(id);
+
+    const detail: ProjectDetail = {
+      label: summary.label,
+      taskboxId: summary.taskboxId,
+      tasks: projectTasks,
+    };
+
+    return detail;
   };
 
   public getAll = (): Project[] => {
