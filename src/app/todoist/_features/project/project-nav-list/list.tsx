@@ -55,7 +55,8 @@ export const ProjectNavList: React.FC<Props> = ({ currentRoute }) => {
             {projectNodes.map((projectNode) => {
               return (
                 <AnimatePresence key={projectNode.taskboxId} initial={false}>
-                  {projectNode.visible ? (
+                  {projectNode.visible ||
+                  dragContext.draggingProjectId === projectNode.taskboxId ? (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
