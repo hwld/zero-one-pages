@@ -2,12 +2,12 @@ import { useMemo, type PropsWithChildren } from "react";
 import { useQueryTaskboxNodes } from "../_features/taskbox/use-query-taskbox-nodes";
 import { TaskboxNodesProvider } from "../_features/taskbox/taskbox-nodes-provider";
 import { PiSpinnerGap } from "@react-icons/all-files/pi/PiSpinnerGap";
-import { useQueryProjects } from "../_features/project/use-query-projects";
+import { useProjectsQuery } from "../_features/project/use-projects-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ProjectsProvider,
   type ProjectsContext,
-} from "../_features/project/projects-provider";
+} from "../_features/project/use-projects";
 import { Button } from "./button";
 import { useInbox } from "../_features/inbox/use-inbox";
 
@@ -24,7 +24,7 @@ export const GlobalDataProvider: React.FC<PropsWithChildren> = ({
     data: projects = [],
     updateProjectsCache,
     status: projectsStatus,
-  } = useQueryProjects();
+  } = useProjectsQuery();
 
   const projectsValue = useMemo(
     (): ProjectsContext => ({ projects, updateProjectsCache }),

@@ -6,7 +6,7 @@ import { toProjectNodes } from "../logic/project";
 import { ProjectNavItem } from "./item";
 import { ProjectNavListHeader } from "./header";
 import { Routes } from "../../../routes";
-import { useProjects } from "../projects-provider";
+import { useProjects } from "../use-projects";
 
 type Props = {
   currentRoute: string;

@@ -18,9 +18,9 @@ import {
 } from "react";
 import { useChangeProjectPosition } from "../use-change-project-position";
 import { ProjectExpansionMap } from "../logic/expansion-map";
-import type { ProjectsContext } from "../projects-provider";
+import type { ProjectsContext } from "../use-projects";
 import { useQueryClient } from "@tanstack/react-query";
-import { projectsQueryOptions } from "../use-query-projects";
+import { projectsQueryOptions } from "../use-projects-query";
 
 type UseDragProjectListParams = {
   projectExpansionMap: ProjectExpansionMap;
