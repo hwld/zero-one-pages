@@ -23,8 +23,12 @@ import {
   updateProjectInputSchema,
 } from "./schema";
 
-export const fetchProjects = async (): Promise<Project[]> => {
-  const res = await fetcher.get(TodoistAPI.projects());
+export const fetchProjects = async ({
+  signal,
+}: {
+  signal?: AbortSignal;
+}): Promise<Project[]> => {
+  const res = await fetcher.get(TodoistAPI.projects(), { signal });
   const json = await res.json();
   const projectSummaries = z.array(projectSchema).parse(json);
 
@@ -54,8 +58,12 @@ export const updateProject = async ({
 
 export const changeProjectsPosition = async (
   changes: ProjectPositionChange[],
+  { signal }: { signal?: AbortSignal },
 ): Promise<void> => {
-  await fetcher.post(TodoistAPI.changeProjectPosition(), { body: changes });
+  await fetcher.post(TodoistAPI.changeProjectPosition(), {
+    body: changes,
+    signal,
+  });
 };
 
 export const deleteProject = async (id: string): Promise<void> => {

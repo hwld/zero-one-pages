@@ -4,10 +4,10 @@ import { Project } from "../../_backend/taskbox/project/model";
 import { useCallback } from "react";
 import { useMswState } from "../../../_providers/msw-provider";
 
-const projectsQueryOptions = queryOptions({
+export const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
-  queryFn: () => {
-    return fetchProjects();
+  queryFn: ({ signal }) => {
+    return fetchProjects({ signal });
   },
 });
 
@@ -17,9 +17,13 @@ export const useQueryProjects = () => {
 
   const updateProjectsCache = useCallback(
     (callback: (projects: Project[]) => Project[]) => {
-      const oldProjects =
-        client.getQueryData(projectsQueryOptions.queryKey) ?? [];
-      client.setQueryData(projectsQueryOptions.queryKey, callback(oldProjects));
+      client.cancelQueries({
+        queryKey: projectsQueryOptions.queryKey,
+      });
+
+      client.setQueryData(projectsQueryOptions.queryKey, (old) => {
+        return callback(old ?? []);
+      });
     },
     [client],
   );

@@ -19,6 +19,8 @@ import {
 import { useChangeProjectPosition } from "../use-change-project-position";
 import { ProjectExpansionMap } from "../logic/expansion-map";
 import type { ProjectsContext } from "../projects-provider";
+import { useQueryClient } from "@tanstack/react-query";
+import { projectsQueryOptions } from "../use-query-projects";
 
 type UseDragProjectListParams = {
   projectExpansionMap: ProjectExpansionMap;
@@ -47,8 +49,17 @@ export const useDragProjectContext = ({
   const dragStartInfo = useRef({ x: 0, depth: 0 });
   const removedDescendantsRef = useRef<ProjectNode[]>([]);
 
+  const queryClient = useQueryClient();
+  const mutationAbortController = useRef<AbortController | undefined>(
+    undefined,
+  );
+
   const handleDragStart: DragProjectContext["handleDragStart"] = useCallback(
     (e, project) => {
+      // dragのmutationが途中の可能性があるので、ここでキャンセルして、mutationのonSettledで発生するinvalidateによるrefetchで
+      // キャッシュが上書きされないようにする
+      mutationAbortController.current?.abort();
+
       dragStartInfo.current = { x: e.clientX, depth: project.depth };
 
       updateProjectsCache((projects) => {
@@ -64,7 +75,7 @@ export const useDragProjectContext = ({
       });
       setDraggingProjectId(project.taskboxId);
     },
-    [projectExpansionMap, setDraggingProjectId, updateProjectsCache],
+    [projectExpansionMap, updateProjectsCache],
   );
 
   const handleMoveProjects: DragProjectContext["handleMoveProjects"] =
@@ -107,24 +118,32 @@ export const useDragProjectContext = ({
         return;
       }
 
-      updateProjectsCache((projects) => {
-        const [updatedProjects, expansionMap] = dragProjectEnd(
-          projects,
-          projectExpansionMap,
-          draggingProjectId,
-          removedDescendantsRef.current,
-        );
-        setProjectExpansionMap(expansionMap);
+      const projects = queryClient.getQueryData(projectsQueryOptions.queryKey);
+      if (!projects) {
+        return;
+      }
 
-        const updatedMap = toProjectMap(updatedProjects);
-        const projectPositionChanges = getProjectPositionChanges(
-          dragStartProjectMap.current,
-          updatedMap,
-        );
-        changeProjectPosition.mutate(projectPositionChanges);
+      const [updatedProjects, expansionMap] = dragProjectEnd(
+        projects,
+        projectExpansionMap,
+        draggingProjectId,
+        removedDescendantsRef.current,
+      );
+      setProjectExpansionMap(expansionMap);
 
-        return updatedProjects;
+      const updatedMap = toProjectMap(updatedProjects);
+      const projectPositionChanges = getProjectPositionChanges(
+        dragStartProjectMap.current,
+        updatedMap,
+      );
+
+      // 外からmutationをキャンセルできるようにする
+      const abortController = new AbortController();
+      changeProjectPosition.mutate({
+        changes: projectPositionChanges,
+        signal: abortController.signal,
       });
+      mutationAbortController.current = abortController;
 
       setDraggingProjectId(null);
     };
@@ -137,6 +156,7 @@ export const useDragProjectContext = ({
     changeProjectPosition,
     draggingProjectId,
     projectExpansionMap,
+    queryClient,
     setDraggingProjectId,
     setProjectExpansionMap,
     updateProjectsCache,

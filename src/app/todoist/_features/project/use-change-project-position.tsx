@@ -4,8 +4,14 @@ import { ProjectPositionChange } from "../../_backend/taskbox/project/schema";
 
 export const useChangeProjectPosition = () => {
   return useMutation({
-    mutationFn: (data: ProjectPositionChange[]) => {
-      return changeProjectsPosition(data);
+    mutationFn: ({
+      changes,
+      signal,
+    }: {
+      changes: ProjectPositionChange[];
+      signal: AbortSignal;
+    }) => {
+      return changeProjectsPosition(changes, { signal });
     },
   });
 };
