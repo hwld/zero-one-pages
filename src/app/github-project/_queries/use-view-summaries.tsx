@@ -1,6 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { fetchViewSummaries } from "../_backend/view/api";
-import { useMswState } from "../../_providers/msw-provider";
+import { useMswQuery } from "../../../lib/useMswQuery";
 
 export const viewSummariesQueryOption = queryOptions({
   queryKey: ["view-summaries"],
@@ -10,10 +10,5 @@ export const viewSummariesQueryOption = queryOptions({
 });
 
 export const useViewSummaries = () => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({
-    ...viewSummariesQueryOption,
-    enabled: isMockserverUp,
-  });
+  return useMswQuery(viewSummariesQueryOption);
 };

@@ -1,6 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { fetchView } from "../_backend/view/api";
-import { useMswState } from "../../_providers/msw-provider";
+import { useMswQuery } from "../../../lib/useMswQuery";
 
 export const viewQueryOption = (id: string) =>
   queryOptions({
@@ -11,10 +11,8 @@ export const viewQueryOption = (id: string) =>
   });
 
 export const useView = (id?: string) => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({
+  return useMswQuery({
     ...viewQueryOption(id!),
-    enabled: isMockserverUp && !!id,
+    enabled: !!id,
   });
 };

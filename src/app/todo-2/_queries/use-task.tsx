@@ -1,15 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { fetchTask } from "../_backend/api";
-import { useMswState } from "../../_providers/msw-provider";
+import { useMswQuery } from "../../../lib/useMswQuery";
 
 export const useTask = (id: string) => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({
+  return useMswQuery({
     queryKey: ["tasks", id],
     queryFn: () => {
       return fetchTask(id);
     },
-    enabled: isMockserverUp,
   });
 };

@@ -1,6 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useMswState } from "../../../_providers/msw-provider";
+import { queryOptions } from "@tanstack/react-query";
 import { fetchInbox } from "../../_backend/taskbox/inbox/api";
+import { useMswQuery } from "../../../../lib/useMswQuery";
 
 export const inboxQueryOptions = queryOptions({
   queryKey: ["inbox"],
@@ -10,10 +10,5 @@ export const inboxQueryOptions = queryOptions({
 });
 
 export const useInbox = () => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({
-    ...inboxQueryOptions,
-    enabled: isMockserverUp,
-  });
+  return useMswQuery(inboxQueryOptions);
 };

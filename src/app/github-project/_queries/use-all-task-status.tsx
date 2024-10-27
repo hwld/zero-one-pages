@@ -1,6 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { fetchAllTaskStatus } from "../_backend/task-status/api";
-import { useMswState } from "../../_providers/msw-provider";
+import { useMswQuery } from "../../../lib/useMswQuery";
 
 const allTaskStatusQueryOption = () =>
   queryOptions({
@@ -11,7 +11,7 @@ const allTaskStatusQueryOption = () =>
   });
 
 export const useAllTaskStatus = () => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({ ...allTaskStatusQueryOption(), enabled: isMockserverUp });
+  return useMswQuery({
+    ...allTaskStatusQueryOption(),
+  });
 };

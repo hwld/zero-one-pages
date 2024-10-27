@@ -1,6 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useMswState } from "../../../_providers/msw-provider";
+import { queryOptions } from "@tanstack/react-query";
 import { fetchProject } from "../../_backend/taskbox/project/api";
+import { useMswQuery } from "../../../../lib/useMswQuery";
 
 export const projectQueryOptions = (id: string) =>
   queryOptions({
@@ -11,10 +11,7 @@ export const projectQueryOptions = (id: string) =>
   });
 
 export const useProject = (id: string) => {
-  const { isMockserverUp } = useMswState();
-
-  return useQuery({
+  return useMswQuery({
     ...projectQueryOptions(id),
-    enabled: isMockserverUp,
   });
 };
