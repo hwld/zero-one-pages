@@ -5,6 +5,7 @@ import {
   QueryClient,
   QueryKey,
   UndefinedInitialDataOptions,
+  // eslint-disable-next-line no-restricted-imports
   useQuery,
   UseQueryOptions,
   UseQueryResult,

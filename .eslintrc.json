@@ -8,6 +8,20 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@tanstack/react-query",
+            "importNames": [
+              "useQuery"
+            ],
+            "message": "mswの初期化を待機するために、useMswQueryを使用してください"
+          }
+        ]
+      }
+    ],
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {

@@ -21,7 +21,6 @@
       "[\"'`]([^\"'`]*).*?[\"'`]"
     ]
   ],
-  "testing.openTesting": "neverOpen",
   "editor.codeLens": true,
-  "typescript.referencesCodeLens.enabled": true
+  "typescript.referencesCodeLens.enabled": true,
 }
