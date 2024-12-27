@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { setupMsw } from "../app/_providers/msw";
 
 type Resource = Parameters<typeof fetch>[0];
 type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
@@ -16,6 +15,7 @@ class Fetcher {
   ): Promise<Response> {
     if ("serviceWorker" in navigator) {
       if (this.isFirstFetch) {
+        const { setupMsw } = await import("../lib/msw");
         await setupMsw();
         this.isFirstFetch = false;
       }

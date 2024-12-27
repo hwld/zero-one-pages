@@ -85,31 +85,3 @@ const TasksMainContent: React.FC<{
     </div>
   );
 };
-
-export const TasksContentError: React.FC<{ message: string }> = ({
-  message,
-}) => {
-  return (
-    <div className="flex flex-col gap-2 text-red-600">
-      <PiWarningCircle className="size-8" />
-      <p>
-        {message}
-        <br />
-        ※このアプリでは、更新すると作成したデータは削除されます。
-      </p>
-    </div>
-  );
-};
-
-export const TasksContentSpinner: React.FC = () => {
-  return (
-    <motion.div
-      className="absolute"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <PiSpinnerGap className="size-8 animate-spin" />
-    </motion.div>
-  );
-};
