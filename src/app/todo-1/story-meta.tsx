@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import { todo1Handlers } from "./_backend/api";
-import { SetupCompletedMswProvider } from "../_providers/msw-provider";
 import { DefaultQueryClientProvider } from "../_providers/default-query-client-provider";
 
 export const defaultStoryMeta = {
@@ -9,11 +8,9 @@ export const defaultStoryMeta = {
   decorators: [
     (Story: React.FC) => {
       return (
-        <SetupCompletedMswProvider>
-          <DefaultQueryClientProvider>
-            <Story />
-          </DefaultQueryClientProvider>
-        </SetupCompletedMswProvider>
+        <DefaultQueryClientProvider>
+          <Story />
+        </DefaultQueryClientProvider>
       );
     },
   ],

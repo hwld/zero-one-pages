@@ -1,9 +1,9 @@
 import { fetchTaskboxes } from "../../_backend/taskbox/api";
 import { toTaskboxNodes } from "./taskbox";
-import { useMswQuery } from "../../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const useQueryTaskboxNodes = () => {
-  return useMswQuery({
+  return useQuery({
     queryKey: ["taskboxes"],
     queryFn: async () => {
       const boxes = await fetchTaskboxes();

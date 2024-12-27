@@ -1,23 +1,30 @@
+/* eslint-disable no-restricted-globals */
+import { setupMsw } from "../app/_providers/msw";
+
 type Resource = Parameters<typeof fetch>[0];
 type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
 
 type Args = [Resource, FetchOptions?];
 
 class Fetcher {
+  private isFirstFetch = true;
+
   private async fetch(
     method: string,
     resource: Resource,
     options?: FetchOptions,
   ): Promise<Response> {
-    // MSWを使っているのだが、長時間立ち上げっぱなしにしていると404が出てしまうので、
-    // fetchの前にactivateし直す
-    //(参考:https://github.com/mswjs/msw/issues/2115)
     if ("serviceWorker" in navigator) {
+      if (this.isFirstFetch) {
+        await setupMsw();
+        this.isFirstFetch = false;
+      }
+
+      // MSWを使っているのだが、長時間立ち上げっぱなしにしていると404が出てしまうので、
+      // fetchの前にactivateし直す
+      //(参考:https://github.com/mswjs/msw/issues/2115)
       navigator.serviceWorker.controller?.postMessage("MOCK_ACTIVATE");
     }
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10);
-    });
 
     const body = options?.body && JSON.stringify(options.body);
 

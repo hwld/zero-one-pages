@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchAllTaskStatus } from "../_backend/task-status/api";
-import { useMswQuery } from "../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 const allTaskStatusQueryOption = () =>
   queryOptions({
@@ -11,7 +11,7 @@ const allTaskStatusQueryOption = () =>
   });
 
 export const useAllTaskStatus = () => {
-  return useMswQuery({
+  return useQuery({
     ...allTaskStatusQueryOption(),
   });
 };

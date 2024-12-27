@@ -1,6 +1,6 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { fetchTasks } from "../_backend/api";
-import { useMswQuery } from "../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const tasksQueryOptions = queryOptions({
   queryKey: ["tasks"],
@@ -11,5 +11,5 @@ export const tasksQueryOptions = queryOptions({
 });
 
 export const useTasks = () => {
-  return useMswQuery(tasksQueryOptions);
+  return useQuery(tasksQueryOptions);
 };

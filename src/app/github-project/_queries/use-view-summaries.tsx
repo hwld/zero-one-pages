@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchViewSummaries } from "../_backend/view/api";
-import { useMswQuery } from "../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const viewSummariesQueryOption = queryOptions({
   queryKey: ["view-summaries"],
@@ -10,5 +10,5 @@ export const viewSummariesQueryOption = queryOptions({
 });
 
 export const useViewSummaries = () => {
-  return useMswQuery(viewSummariesQueryOption);
+  return useQuery(viewSummariesQueryOption);
 };

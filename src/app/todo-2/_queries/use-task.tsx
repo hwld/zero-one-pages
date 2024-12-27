@@ -1,8 +1,8 @@
 import { fetchTask } from "../_backend/api";
-import { useMswQuery } from "../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const useTask = (id: string) => {
-  return useMswQuery({
+  return useQuery({
     queryKey: ["tasks", id],
     queryFn: () => {
       return fetchTask(id);

@@ -2,7 +2,7 @@ import { queryOptions, useQueryClient } from "@tanstack/react-query";
 import { fetchProjects } from "../../_backend/taskbox/project/api";
 import { Project } from "../../_backend/taskbox/project/model";
 import { useCallback } from "react";
-import { useMswQuery } from "../../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
@@ -27,7 +27,7 @@ export const useProjectsQuery = () => {
     [client],
   );
 
-  const queryData = useMswQuery(projectsQueryOptions);
+  const queryData = useQuery(projectsQueryOptions);
 
   return { ...queryData, updateProjectsCache };
 };

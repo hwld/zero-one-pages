@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchView } from "../_backend/view/api";
-import { useMswQuery } from "../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const viewQueryOption = (id: string) =>
   queryOptions({
@@ -11,7 +11,7 @@ export const viewQueryOption = (id: string) =>
   });
 
 export const useView = (id?: string) => {
-  return useMswQuery({
+  return useQuery({
     ...viewQueryOption(id!),
     enabled: !!id,
   });

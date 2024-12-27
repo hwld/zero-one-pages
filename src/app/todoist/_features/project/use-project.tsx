@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchProject } from "../../_backend/taskbox/project/api";
-import { useMswQuery } from "../../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const projectQueryOptions = (id: string) =>
   queryOptions({
@@ -11,7 +11,7 @@ export const projectQueryOptions = (id: string) =>
   });
 
 export const useProject = (id: string) => {
-  return useMswQuery({
+  return useQuery({
     ...projectQueryOptions(id),
   });
 };

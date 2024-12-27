@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchInbox } from "../../_backend/taskbox/inbox/api";
-import { useMswQuery } from "../../../../lib/useMswQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export const inboxQueryOptions = queryOptions({
   queryKey: ["inbox"],
@@ -10,5 +10,5 @@ export const inboxQueryOptions = queryOptions({
 });
 
 export const useInbox = () => {
-  return useMswQuery(inboxQueryOptions);
+  return useQuery(inboxQueryOptions);
 };
