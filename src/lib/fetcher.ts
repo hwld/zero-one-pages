@@ -15,9 +15,9 @@ class Fetcher {
   ): Promise<Response> {
     if ("serviceWorker" in navigator) {
       if (this.isFirstFetch) {
+        this.isFirstFetch = false;
         const { setupMsw } = await import("../lib/msw");
         await setupMsw();
-        this.isFirstFetch = false;
       }
 
       // MSWを使っているのだが、長時間立ち上げっぱなしにしていると404が出てしまうので、
