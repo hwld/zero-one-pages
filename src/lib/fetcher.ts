@@ -6,7 +6,19 @@ type FetchOptions = Omit<RequestInit, "method" | "body"> & { body?: {} };
 type Args = [Resource, FetchOptions?];
 
 class Fetcher {
-  private isFirstFetch = true;
+  private setupMswPromise?: Promise<void>;
+
+  private async setupMswOnce() {
+    if (!this.setupMswPromise) {
+      const setupMsw = async () => {
+        const { setupMsw } = await import("../lib/msw");
+        await setupMsw();
+      };
+
+      this.setupMswPromise = setupMsw();
+    }
+    return this.setupMswPromise;
+  }
 
   private async fetch(
     method: string,
@@ -14,11 +26,7 @@ class Fetcher {
     options?: FetchOptions,
   ): Promise<Response> {
     if ("serviceWorker" in navigator) {
-      if (this.isFirstFetch) {
-        this.isFirstFetch = false;
-        const { setupMsw } = await import("../lib/msw");
-        await setupMsw();
-      }
+      await this.setupMswOnce();
 
       // MSWを使っているのだが、長時間立ち上げっぱなしにしていると404が出てしまうので、
       // fetchの前にactivateし直す
